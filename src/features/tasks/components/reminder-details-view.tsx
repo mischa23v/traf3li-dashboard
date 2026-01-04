@@ -132,9 +132,11 @@ export function ReminderDetailsView() {
         if (!reminderData) return null
         const r = reminderData
 
-        const reminderDate = r.dueDate ? new Date(r.dueDate) : null
+        // Use reminderDateTime or reminderDate as per API contract
+        const dateTimeValue = r.reminderDateTime || r.reminderDate
+        const reminderDate = dateTimeValue ? new Date(dateTimeValue) : null
         const dateDisplay = reminderDate ? reminderDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'
-        const timeDisplay = r.time || (reminderDate ? reminderDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
+        const timeDisplay = r.reminderTime || (reminderDate ? reminderDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
 
         // Type narrow assignedTo
         const assignee = !r.assignedTo
@@ -147,15 +149,15 @@ export function ReminderDetailsView() {
                     avatar: r.assignedTo.avatar || '/avatars/default.png'
                 }
 
-        // Type narrow caseId
-        const relatedTo = !r.caseId
+        // Type narrow relatedCase (API field name)
+        const relatedTo = !r.relatedCase
             ? null
-            : typeof r.caseId === 'string'
-                ? { type: 'case' as const, id: r.caseId, title: 'قضية' }
+            : typeof r.relatedCase === 'string'
+                ? { type: 'case' as const, id: r.relatedCase, title: 'قضية' }
                 : {
                     type: 'case' as const,
-                    id: r.caseId.caseNumber || 'غير محدد',
-                    title: r.caseId.title || 'قضية غير محددة'
+                    id: r.relatedCase.caseNumber || 'غير محدد',
+                    title: r.relatedCase.title || 'قضية غير محددة'
                 }
 
         return {

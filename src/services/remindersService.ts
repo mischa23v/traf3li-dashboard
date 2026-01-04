@@ -42,8 +42,8 @@ export type ReminderType =
   | 'najiz_deadline'
   | 'other'
 
-// Enhanced Status
-export type ReminderStatus = 'pending' | 'snoozed' | 'triggered' | 'completed' | 'dismissed' | 'expired' | 'delegated'
+// Enhanced Status (API valid values)
+export type ReminderStatus = 'pending' | 'snoozed' | 'completed' | 'dismissed' | 'delegated'
 
 // Deadline Type (Saudi Legal)
 export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal' | 'none'
@@ -536,10 +536,11 @@ const remindersService = {
 
   /**
    * Dismiss reminder
+   * Note: API expects empty body for dismiss endpoint
    */
-  dismissReminder: async (id: string, reason?: string): Promise<Reminder> => {
+  dismissReminder: async (id: string): Promise<Reminder> => {
     try {
-      const response = await apiClient.post(`/reminders/${id}/dismiss`, { reason })
+      const response = await apiClient.post(`/reminders/${id}/dismiss`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -945,10 +946,11 @@ const remindersService = {
 
   /**
    * Bulk update reminders
+   * Note: API expects { reminderIds, updates: {...} } format
    */
   bulkUpdate: async (reminderIds: string[], data: Partial<CreateReminderData>): Promise<BulkOperationResult> => {
     try {
-      const response = await apiClient.put('/reminders/bulk', { reminderIds, ...data })
+      const response = await apiClient.put('/reminders/bulk', { reminderIds, updates: data })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

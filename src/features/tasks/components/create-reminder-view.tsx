@@ -233,6 +233,26 @@ export function CreateReminderView() {
             notes: formData.description, // Also send as notes
             ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.relatedCase && { relatedCase: formData.relatedCase }),
+            ...(formData.relatedClient && { clientId: formData.relatedClient }),
+            ...(formData.tags.length > 0 && { tags: formData.tags }),
+            ...(notificationChannels.length > 0 && {
+                notification: {
+                    channels: notificationChannels,
+                    advanceNotifications: advanceNotifications.map(m => ({
+                        beforeMinutes: m,
+                        channels: notificationChannels,
+                        sent: false
+                    })),
+                    ...(escalationEnabled && {
+                        escalation: {
+                            enabled: true,
+                            escalateAfterMinutes: escalationDelay,
+                            escalated: false,
+                            escalationLevel: 0
+                        }
+                    })
+                }
+            }),
             ...(isRecurring && {
                 recurring: {
                     enabled: true,
