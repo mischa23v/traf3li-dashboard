@@ -739,9 +739,9 @@ const tasksService = {
   /**
    * Mark task as complete
    */
-  completeTask: async (id: string, completionNotes?: string): Promise<Task> => {
+  completeTask: async (id: string, completionNote?: string): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${id}/complete`, { completionNotes })
+      const response = await apiClient.post(`/tasks/${id}/complete`, { completionNote })
       return response.data.task || response.data.data
     } catch (error: any) {
       const errorMsg = handleApiError(error)
@@ -1206,12 +1206,11 @@ const tasksService = {
 
   /**
    * Add task dependency
-   * ⚠️ WARNING: This endpoint is NOT documented in backend API
    */
-  addDependency: async (taskId: string, dependencyTaskId: string, type: 'blocks' | 'blocked_by'): Promise<Task> => {
+  addDependency: async (taskId: string, dependsOn: string, type: 'blocks' | 'blocked_by'): Promise<Task> => {
     try {
       const response = await apiClient.post(`/tasks/${taskId}/dependencies`, {
-        dependencyTaskId,
+        dependsOn,
         type
       })
       return response.data.task || response.data.data
@@ -1632,9 +1631,9 @@ const tasksService = {
   /**
    * Save task as template
    */
-  saveAsTemplate: async (taskId: string, templateName: string): Promise<Task> => {
+  saveAsTemplate: async (taskId: string, templateName: string, isPublic?: boolean): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${taskId}/save-as-template`, { name: templateName })
+      const response = await apiClient.post(`/tasks/${taskId}/save-as-template`, { templateName, isPublic })
       return response.data.template || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -1648,7 +1647,7 @@ const tasksService = {
    */
   bulkUpdate: async (taskIds: string[], data: Partial<CreateTaskData>): Promise<BulkOperationResult> => {
     try {
-      const response = await apiClient.put('/tasks/bulk', { taskIds, ...data })
+      const response = await apiClient.put('/tasks/bulk', { taskIds, updates: data })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
