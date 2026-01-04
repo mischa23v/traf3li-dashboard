@@ -110,6 +110,21 @@ export const CACHE_TIMES = {
     GRID: 1 * 60 * 1000, // 1 minute
     ITEMS: 2 * 60 * 1000, // 2 minutes
   },
+
+  /**
+   * Search caching (Gold Standard - Algolia/AWS pattern)
+   * Uses aggressive caching with stale-while-revalidate for instant UX
+   */
+  SEARCH: {
+    /** How long search results are considered fresh (1 minute) */
+    STALE_TIME: 1 * 60 * 1000,
+    /** How long to keep search results in cache (5 minutes) */
+    GC_TIME: 5 * 60 * 1000,
+    /** Prefix cache - shorter for partial queries (30 seconds) */
+    PREFIX_STALE: 30 * 1000,
+    /** Prefix cache GC (2 minutes) */
+    PREFIX_GC: 2 * 60 * 1000,
+  },
 } as const
 
 /**
@@ -163,6 +178,23 @@ export const CACHE_CONFIG = {
     auth: {
       staleTime: CACHE_TIMES.AUTH.SESSION,
       gcTime: CACHE_TIMES.GC_MEDIUM,
+    },
+
+    /**
+     * Search queries (Gold Standard - stale-while-revalidate)
+     * Shows cached results instantly, refreshes in background
+     */
+    search: {
+      staleTime: CACHE_TIMES.SEARCH.STALE_TIME,
+      gcTime: CACHE_TIMES.SEARCH.GC_TIME,
+    },
+
+    /**
+     * Prefix search queries (shorter cache for partial matches)
+     */
+    searchPrefix: {
+      staleTime: CACHE_TIMES.SEARCH.PREFIX_STALE,
+      gcTime: CACHE_TIMES.SEARCH.PREFIX_GC,
     },
   },
 } as const

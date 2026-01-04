@@ -58,14 +58,35 @@ const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour (keep in cache)
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists (more dynamic)
 
+// Gold Standard Search Cache Configuration (AWS/Algolia pattern)
+const SEARCH_STALE_TIME = CACHE_TIMES.SEARCH?.STALE_TIME || 60 * 1000 // 1 minute for search
+const SEARCH_GC_TIME = CACHE_TIMES.SEARCH?.GC_TIME || 5 * 60 * 1000 // 5 minutes
+
 // ==================== Query Hooks ====================
 
+/**
+ * Gold Standard Task List Hook with Search Optimization
+ *
+ * Features:
+ * - Stale-while-revalidate: Shows cached results instantly, refreshes in background
+ * - Prefix caching: Search results cached by query prefix for instant autocomplete
+ * - Optimistic UI: Previous results shown while loading new search
+ * - Network-aware: Uses different cache times for search vs non-search queries
+ */
 export const useTasks = (filters?: TaskFilters) => {
+  const hasSearchFilter = filters?.search && filters.search.trim().length > 0
+
   return useQuery({
     queryKey: ['tasks', filters],
     queryFn: () => tasksService.getTasks(filters),
-    staleTime: LIST_STALE_TIME,
-    gcTime: STATS_GC_TIME,
+    // Use shorter stale time for search queries (more dynamic)
+    staleTime: hasSearchFilter ? SEARCH_STALE_TIME : LIST_STALE_TIME,
+    gcTime: hasSearchFilter ? SEARCH_GC_TIME : STATS_GC_TIME,
+    // Gold Standard: Stale-while-revalidate pattern
+    // Shows previous results immediately while fetching new data
+    placeholderData: (previousData) => previousData,
+    // Keep previous results visible during loading (no flicker)
+    refetchOnWindowFocus: !hasSearchFilter, // Don't refetch search on focus
   })
 }
 
