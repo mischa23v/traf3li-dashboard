@@ -22,7 +22,7 @@
 import { TasksSidebar } from './tasks-sidebar'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDebouncedCallback } from 'use-debounce'
+import { useAdaptiveSearchDebounce } from '@/hooks/useAdaptiveDebounce'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { Main } from '@/components/layout/main'
 import { ROUTES } from '@/constants/routes'
@@ -150,15 +150,17 @@ export function TasksListView() {
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('dueDate')
 
-    // Debounced search handler (enterprise-grade: 300ms debounce, min 2 chars)
-    const debouncedSetSearch = useDebouncedCallback(
+    // Gold Standard Adaptive Search Debounce (Google/AWS/Stripe pattern)
+    // - Adjusts delay based on typing speed (fast typer = longer wait)
+    // - Network-aware (slow network = longer delay)
+    // - Min 2 chars before searching
+    const { debouncedCallback: debouncedSetSearch, recordKeypress } = useAdaptiveSearchDebounce(
         (value: string) => {
             // Only search if empty (clear) or has at least 2 characters
             if (value === '' || value.trim().length >= 2) {
                 setSearchQuery(value)
             }
-        },
-        300
+        }
     )
 
     // Fetch team members and cases for filter dropdowns (DEFERRED)
@@ -607,10 +609,17 @@ export function TasksListView() {
                                             type="text"
                                             placeholder={t('tasks.list.searchPlaceholder')}
                                             defaultValue={searchQuery}
+                                            onKeyDown={recordKeypress}
                                             onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-12 h-14 w-full text-base"
                                             aria-label={t('tasks.list.searchPlaceholder')}
                                         />
+                                        {/* Subtle loading indicator when search is active */}
+                                        {isFetching && searchQuery && (
+                                            <div className="absolute start-4 top-1/2 -translate-y-1/2">
+                                                <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Filter Toggle Button - All screen sizes */}
