@@ -48,16 +48,16 @@ export const labels = [
 
 export const statuses = [
   {
+    label: 'في الانتظار',
+    value: 'backlog' as const,
+    icon: Circle,
+    tooltip: 'المهمة في قائمة الانتظار ولم يتم جدولتها بعد',
+  },
+  {
     label: 'جديدة',
     value: 'todo' as const,
     icon: HelpCircle,
     tooltip: 'المهمة لم تبدأ بعد وفي انتظار البدء بالعمل عليها',
-  },
-  {
-    label: 'معلقة',
-    value: 'pending' as const,
-    icon: Circle,
-    tooltip: 'المهمة متوقفة مؤقتاً في انتظار إجراء أو موافقة',
   },
   {
     label: 'قيد التنفيذ',
@@ -72,7 +72,7 @@ export const statuses = [
     tooltip: 'تم الانتهاء من تنفيذ المهمة بنجاح',
   },
   {
-    label: 'منتهية',
+    label: 'ملغية',
     value: 'canceled' as const,
     icon: CircleOff,
     tooltip: 'المهمة مغلقة نهائياً ولا تحتاج لأي إجراء آخر',
@@ -81,10 +81,10 @@ export const statuses = [
 
 export const priorities = [
   {
-    label: 'عاجل جداً',
-    value: 'urgent' as const,
+    label: 'حرج',
+    value: 'critical' as const,
     icon: Flame,
-    tooltip: 'مهمة عاجلة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
+    tooltip: 'مهمة حرجة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
   },
   {
     label: 'عاجل',
@@ -103,5 +103,11 @@ export const priorities = [
     value: 'low' as const,
     icon: ArrowDown,
     tooltip: 'مهمة عادية يمكن إنجازها ضمن المواعيد الاعتيادية',
+  },
+  {
+    label: 'بدون أولوية',
+    value: 'none' as const,
+    icon: Circle,
+    tooltip: 'مهمة بدون تحديد أولوية معينة',
   },
 ]

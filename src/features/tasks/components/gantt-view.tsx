@@ -236,7 +236,7 @@ export function GanttView() {
       if (task.sourceType === 'event') classes.push('gantt-task-event')
       // Priority styling for tasks
       if (task.sourceType === 'task') {
-        if (task.priority === 'urgent' || task.priority === 'critical') classes.push('gantt-task-urgent')
+        if (task.priority === 'critical') classes.push('gantt-task-urgent')
         if (task.priority === 'high') classes.push('gantt-task-high')
       }
       // Overdue tasks

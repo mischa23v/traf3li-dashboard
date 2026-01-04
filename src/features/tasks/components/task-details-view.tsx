@@ -465,7 +465,7 @@ export function TaskDetailsView() {
             id: t._id,
             title: t.title || t.description || 'مهمة غير محددة',
             description: t.description || 'لا يوجد وصف',
-            status: t.status || 'pending',
+            status: t.status || 'backlog',
             priority: t.priority || 'medium',
             taskType: t.taskType || 'other',
             dueDate: (() => {

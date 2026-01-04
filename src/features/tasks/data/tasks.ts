@@ -5,8 +5,8 @@ faker.seed(12345)
 
 export const tasks = Array.from({ length: 100 }, () => {
   const statuses = [
+    'backlog',
     'todo',
-    'pending',
     'in_progress',
     'done',
     'canceled',

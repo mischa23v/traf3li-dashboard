@@ -73,8 +73,8 @@ const taskTypeOptions = [
 
 // Status Options (Arabic) - matches backend API contract
 const statusOptions = [
+  { value: 'backlog', label: 'في الانتظار' },
   { value: 'todo', label: 'جديدة' },
-  { value: 'pending', label: 'معلقة' },
   { value: 'in_progress', label: 'قيد التنفيذ' },
   { value: 'done', label: 'مكتمل' },
   { value: 'canceled', label: 'ملغي' },
@@ -82,10 +82,11 @@ const statusOptions = [
 
 // Priority Options (Arabic) - matches backend API contract
 const priorityOptions = [
+  { value: 'none', label: 'بدون أولوية' },
   { value: 'low', label: 'عادية' },
   { value: 'medium', label: 'متوسطة' },
   { value: 'high', label: 'عاجل' },
-  { value: 'urgent', label: 'عاجل جداً' },
+  { value: 'critical', label: 'حرج' },
 ]
 
 // Deadline Type Options (Arabic)
