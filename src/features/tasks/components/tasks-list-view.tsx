@@ -150,9 +150,14 @@ export function TasksListView() {
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('dueDate')
 
-    // Debounced search handler
+    // Debounced search handler (enterprise-grade: 300ms debounce, min 2 chars)
     const debouncedSetSearch = useDebouncedCallback(
-        (value: string) => setSearchQuery(value),
+        (value: string) => {
+            // Only search if empty (clear) or has at least 2 characters
+            if (value === '' || value.trim().length >= 2) {
+                setSearchQuery(value)
+            }
+        },
         300
     )
 
@@ -604,6 +609,7 @@ export function TasksListView() {
                                             defaultValue={searchQuery}
                                             onChange={(e) => debouncedSetSearch(e.target.value)}
                                             className="pe-12 h-14 w-full text-base"
+                                            aria-label={t('tasks.list.searchPlaceholder')}
                                         />
                                     </div>
 
