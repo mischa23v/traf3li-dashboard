@@ -142,7 +142,7 @@ export function RemindersView() {
         }
 
         if (typeFilter !== 'all') {
-            f.reminderType = typeFilter
+            f.type = typeFilter
         }
 
         if (sortBy) {
@@ -424,10 +424,12 @@ export function RemindersView() {
                                         <GosiSelectContent>
                                             <GosiSelectItem value="all">{t('reminders.list.allTypes')}</GosiSelectItem>
                                             <GosiSelectItem value="general">{t('reminders.list.general')}</GosiSelectItem>
-                                            <GosiSelectItem value="court_hearing">{t('reminders.list.courtHearing')}</GosiSelectItem>
-                                            <GosiSelectItem value="filing_deadline">{t('reminders.list.filingDeadline')}</GosiSelectItem>
-                                            <GosiSelectItem value="payment_due">{t('reminders.list.paymentDue')}</GosiSelectItem>
+                                            <GosiSelectItem value="hearing">{t('reminders.list.courtHearing')}</GosiSelectItem>
+                                            <GosiSelectItem value="deadline">{t('reminders.list.filingDeadline')}</GosiSelectItem>
+                                            <GosiSelectItem value="payment">{t('reminders.list.paymentDue')}</GosiSelectItem>
                                             <GosiSelectItem value="follow_up">{t('reminders.list.followUp')}</GosiSelectItem>
+                                            <GosiSelectItem value="meeting">{t('reminders.list.meeting', 'اجتماع')}</GosiSelectItem>
+                                            <GosiSelectItem value="task_due">{t('reminders.list.taskDue', 'مهمة')}</GosiSelectItem>
                                         </GosiSelectContent>
                                     </GosiSelect>
                                 </div>
