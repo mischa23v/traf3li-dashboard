@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDebouncedCallback } from 'use-debounce'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
 import {
@@ -92,6 +93,17 @@ export function EventsView() {
     const [searchQuery, setSearchQuery] = useState('')
     const [typeFilter, setTypeFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('startDate')
+
+    // Debounced search handler (enterprise-grade: 300ms debounce, min 2 chars)
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => {
+            // Only search if empty (clear) or has at least 2 characters
+            if (value === '' || value.trim().length >= 2) {
+                setSearchQuery(value)
+            }
+        },
+        300
+    )
 
     // API filters - use date-based filters that backend supports
     const filters = useMemo(() => {
@@ -331,15 +343,16 @@ export function EventsView() {
                         {/* FILTERS BAR - Responsive Flex Wrap */}
                         <GosiCard className="p-4 md:p-6 rounded-[2rem]">
                             <div className="flex flex-wrap items-center gap-3 transition-all duration-300 ease-in-out">
-                                {/* Search Input */}
+                                {/* Search Input - Debounced for enterprise-grade performance */}
                                 <div className="relative flex-1 min-w-[200px]">
                                     <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
                                     <GosiInput
                                         type="text"
                                         placeholder={t('events.list.searchPlaceholder')}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        defaultValue={searchQuery}
+                                        onChange={(e) => debouncedSetSearch(e.target.value)}
                                         className="pe-12 h-14 w-full text-base"
+                                        aria-label={t('events.list.searchPlaceholder')}
                                     />
                                 </div>
 
