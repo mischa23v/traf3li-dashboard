@@ -16,18 +16,18 @@ export interface StatusOption {
 
 export const STATUS_OPTIONS: StatusOption[] = [
   {
+    value: 'backlog',
+    label: 'في الانتظار',
+    tooltip: 'المهمة في قائمة الانتظار ولم يتم جدولتها بعد',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100'
+  },
+  {
     value: 'todo',
     label: 'جديدة',
     tooltip: 'المهمة لم تبدأ بعد وفي انتظار البدء بالعمل عليها',
     color: 'text-slate-600',
     bgColor: 'bg-slate-100'
-  },
-  {
-    value: 'pending',
-    label: 'معلقة',
-    tooltip: 'المهمة متوقفة مؤقتاً في انتظار إجراء أو موافقة',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100'
   },
   {
     value: 'in_progress',
@@ -45,7 +45,7 @@ export const STATUS_OPTIONS: StatusOption[] = [
   },
   {
     value: 'canceled',
-    label: 'منتهية',
+    label: 'ملغية',
     tooltip: 'المهمة مغلقة نهائياً ولا تحتاج لأي إجراء آخر',
     color: 'text-red-600',
     bgColor: 'bg-red-100'
@@ -69,9 +69,9 @@ export interface PriorityOption {
 
 export const PRIORITY_OPTIONS: PriorityOption[] = [
   {
-    value: 'urgent',
-    label: 'عاجل جداً',
-    tooltip: 'مهمة عاجلة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
+    value: 'critical',
+    label: 'حرج',
+    tooltip: 'مهمة حرجة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
     color: 'text-red-700',
     bgColor: 'bg-red-50 border-red-200',
     dotColor: 'bg-red-500'
@@ -99,6 +99,14 @@ export const PRIORITY_OPTIONS: PriorityOption[] = [
     color: 'text-emerald-700',
     bgColor: 'bg-emerald-50 border-emerald-200',
     dotColor: 'bg-emerald-500'
+  },
+  {
+    value: 'none',
+    label: 'بدون أولوية',
+    tooltip: 'مهمة بدون تحديد أولوية معينة',
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-50 border-gray-200',
+    dotColor: 'bg-gray-400'
   },
 ]
 

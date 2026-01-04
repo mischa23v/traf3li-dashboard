@@ -240,13 +240,13 @@ export function TasksListView() {
     }, [i18n.language]) // Removed aiSuggestion from deps to prevent recreation
 
     // API Filters - Map UI tabs to actual task status values
-    // TaskStatus: 'todo' | 'pending' | 'in_progress' | 'done' | 'canceled'
+    // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
     const filters = useMemo(() => {
         const f: any = {}
 
         // Status filter
         if (activeStatusTab === 'active') {
-            f.status = ['todo', 'pending', 'in_progress']
+            f.status = ['backlog', 'todo', 'in_progress']
         } else if (activeStatusTab === 'completed') {
             f.status = 'done'
         }
@@ -660,10 +660,11 @@ export function TasksListView() {
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
                                                 <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allPriorities')}</GosiSelectItem>
-                                                <GosiSelectItem value="urgent" className="font-bold">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                <GosiSelectItem value="critical" className="font-bold">{t('tasks.priorities.critical')}</GosiSelectItem>
                                                 <GosiSelectItem value="high" className="font-bold">{t('tasks.priorities.high')}</GosiSelectItem>
                                                 <GosiSelectItem value="medium" className="font-bold">{t('tasks.priorities.medium')}</GosiSelectItem>
                                                 <GosiSelectItem value="low" className="font-bold">{t('tasks.priorities.low')}</GosiSelectItem>
+                                                <GosiSelectItem value="none" className="font-bold">{t('tasks.priorities.none')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -957,10 +958,11 @@ export function TasksListView() {
                                 >
                                     {/* Priority Strip Indicator - Always visible with color coding */}
                                     <div className={`absolute start-0 top-0 bottom-0 w-1.5 rounded-s-2xl transition-all duration-300 ${
-                                        task.priority === 'urgent' ? 'bg-red-500' :
+                                        task.priority === 'critical' ? 'bg-red-500' :
                                         task.priority === 'high' ? 'bg-orange-500' :
                                         task.priority === 'medium' ? 'bg-amber-400' :
-                                        'bg-emerald-400'
+                                        task.priority === 'low' ? 'bg-emerald-400' :
+                                        'bg-gray-300'
                                     }`} />
 
                                     <div className="flex items-center gap-3 ps-4">
@@ -1180,18 +1182,20 @@ export function TasksListView() {
                                                 value={task.priority}
                                                 onValueChange={(value) => handlePriorityChange(task.id, value)}
                                             >
-                                                <GosiSelectTrigger className={`w-auto min-w-[80px] h-6 text-[10px] font-bold rounded-md border-0 px-2 ${task.priority === 'urgent' ? 'bg-red-50 text-red-700' :
+                                                <GosiSelectTrigger className={`w-auto min-w-[80px] h-6 text-[10px] font-bold rounded-md border-0 px-2 ${task.priority === 'critical' ? 'bg-red-50 text-red-700' :
                                                     task.priority === 'high' ? 'bg-orange-50 text-orange-700' :
                                                         task.priority === 'medium' ? 'bg-amber-50 text-amber-700' :
-                                                            'bg-emerald-50 text-emerald-700'
+                                                            task.priority === 'low' ? 'bg-emerald-50 text-emerald-700' :
+                                                                'bg-gray-50 text-gray-600'
                                                     }`}>
                                                     <GosiSelectValue />
                                                 </GosiSelectTrigger>
                                                 <GosiSelectContent>
-                                                    <GosiSelectItem value="urgent" className="text-red-700 focus:bg-red-50">{t('tasks.priorities.urgent')}</GosiSelectItem>
+                                                    <GosiSelectItem value="critical" className="text-red-700 focus:bg-red-50">{t('tasks.priorities.critical')}</GosiSelectItem>
                                                     <GosiSelectItem value="high" className="text-orange-700 focus:bg-orange-50">{t('tasks.priorities.high')}</GosiSelectItem>
                                                     <GosiSelectItem value="medium" className="text-amber-700 focus:bg-amber-50">{t('tasks.priorities.medium')}</GosiSelectItem>
                                                     <GosiSelectItem value="low" className="text-emerald-700 focus:bg-emerald-50">{t('tasks.priorities.low')}</GosiSelectItem>
+                                                    <GosiSelectItem value="none" className="text-gray-600 focus:bg-gray-50">{t('tasks.priorities.none')}</GosiSelectItem>
                                                 </GosiSelectContent>
                                             </GosiSelect>
 
