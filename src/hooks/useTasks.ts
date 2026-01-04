@@ -431,8 +431,8 @@ export const useCompleteTask = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, completionNotes }: { id: string; completionNotes?: string }) =>
-      tasksService.completeTask(id, completionNotes),
+    mutationFn: ({ id, completionNote }: { id: string; completionNote?: string }) =>
+      tasksService.completeTask(id, completionNote),
     onSuccess: async (_, { id }) => {
       await invalidateCache.tasks.all()
       await invalidateCache.tasks.detail(id)
@@ -969,8 +969,8 @@ export const useSaveAsTemplate = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, templateName }: { taskId: string; templateName: string }) =>
-      tasksService.saveAsTemplate(taskId, templateName),
+    mutationFn: ({ taskId, templateName, isPublic }: { taskId: string; templateName: string; isPublic?: boolean }) =>
+      tasksService.saveAsTemplate(taskId, templateName, isPublic),
     onSuccess: async () => {
       await invalidateCache.tasks.templates()
       toast.success('تم حفظ المهمة كقالب | Task saved as template')
@@ -1149,11 +1149,8 @@ export const useAddDependency = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, dependencyTaskId, type }: { taskId: string; dependencyTaskId: string; type: 'blocks' | 'blocked_by' }) => {
-      // Log deprecation warning for undocumented endpoint
-      logDeprecationWarning('Task Dependencies - Add', 'POST /tasks/:id/dependencies')
-      return tasksService.addDependency(taskId, dependencyTaskId, type)
-    },
+    mutationFn: ({ taskId, dependsOn, type }: { taskId: string; dependsOn: string; type: 'blocks' | 'blocked_by' }) =>
+      tasksService.addDependency(taskId, dependsOn, type),
     onSuccess: async (_, { taskId }) => {
       await invalidateCache.tasks.detail(taskId)
       await invalidateCache.tasks.all()
