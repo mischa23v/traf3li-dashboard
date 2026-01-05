@@ -901,6 +901,128 @@ export const useReminderIds = (filters?: ReminderFilters, enabled: boolean = tru
   })
 }
 
+// ==================== BULK COMPLETE EVENTS ====================
+
+export const useBulkCompleteEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ eventIds, completionNote }: { eventIds: string[]; completionNote?: string }) =>
+      eventsService.bulkComplete(eventIds, completionNote),
+    onSuccess: (_, { eventIds }) => {
+      toast.success(`Completed ${eventIds.length} events | تم إكمال ${eventIds.length} حدث`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to complete events | فشل إكمال الأحداث')
+    },
+    onSettled: async () => {
+      await invalidateCache.events.related()
+    },
+  })
+}
+
+// ==================== BULK ARCHIVE/UNARCHIVE EVENTS ====================
+
+export const useBulkArchiveEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (eventIds: string[]) => eventsService.bulkArchive(eventIds),
+    onSuccess: (_, eventIds) => {
+      toast.success(`Archived ${eventIds.length} events | تم أرشفة ${eventIds.length} حدث`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to archive events | فشل أرشفة الأحداث')
+    },
+    onSettled: async () => {
+      await invalidateCache.events.related()
+    },
+  })
+}
+
+export const useBulkUnarchiveEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (eventIds: string[]) => eventsService.bulkUnarchive(eventIds),
+    onSuccess: (_, eventIds) => {
+      toast.success(`Unarchived ${eventIds.length} events | تم إلغاء أرشفة ${eventIds.length} حدث`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unarchive events | فشل إلغاء أرشفة الأحداث')
+    },
+    onSettled: async () => {
+      await invalidateCache.events.related()
+    },
+  })
+}
+
+// ==================== SINGLE ARCHIVE/UNARCHIVE EVENT ====================
+
+export const useArchiveEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => eventsService.archiveEvent(id),
+    onSuccess: () => {
+      toast.success('Event archived | تم أرشفة الحدث')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to archive event | فشل أرشفة الحدث')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  })
+}
+
+export const useUnarchiveEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => eventsService.unarchiveEvent(id),
+    onSuccess: () => {
+      toast.success('Event unarchived | تم إلغاء أرشفة الحدث')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unarchive event | فشل إلغاء أرشفة الحدث')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.events.all(),
+        invalidateCache.events.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  })
+}
+
+// ==================== ARCHIVED EVENTS QUERY ====================
+
+export const useArchivedEvents = (filters?: EventFilters) => {
+  return useQuery({
+    queryKey: [...QueryKeys.events.all(), 'archived', filters],
+    queryFn: () => eventsService.getArchived(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+  })
+}
+
+// ==================== GET ALL EVENT IDS ====================
+
+export const useEventIds = (filters?: EventFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QueryKeys.events.all(), 'ids', filters],
+    queryFn: () => eventsService.getAllIds(filters),
+    staleTime: LIST_STALE_TIME,
+    enabled,
+  })
+}
+
 // ==================== AGGREGATED EVENTS WITH STATS ====================
 // Single API call for events list + stats
 

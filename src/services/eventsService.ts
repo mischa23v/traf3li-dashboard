@@ -966,6 +966,93 @@ const eventsService = {
     }
   },
 
+  /**
+   * Bulk complete events
+   */
+  bulkComplete: async (eventIds: string[], completionNote?: string): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/events/bulk/complete', { eventIds, completionNote })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk archive events
+   */
+  bulkArchive: async (eventIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/events/bulk/archive', { eventIds })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk unarchive events
+   */
+  bulkUnarchive: async (eventIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/events/bulk/unarchive', { eventIds })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Archive single event
+   */
+  archiveEvent: async (id: string): Promise<Event> => {
+    try {
+      const response = await apiClient.post(`/events/${id}/archive`)
+      return response.data.event || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Unarchive single event
+   */
+  unarchiveEvent: async (id: string): Promise<Event> => {
+    try {
+      const response = await apiClient.post(`/events/${id}/unarchive`)
+      return response.data.event || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get archived events
+   */
+  getArchived: async (filters?: EventFilters): Promise<{ events: Event[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/events/archived', { params: filters })
+      return {
+        events: response.data.events || response.data.data || [],
+        total: response.data.total || 0
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get all event IDs (for select all functionality)
+   */
+  getAllIds: async (filters?: EventFilters): Promise<string[]> => {
+    try {
+      const response = await apiClient.get('/events/ids', { params: filters })
+      return response.data.ids || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== Templates ====================
 
   /**

@@ -20,7 +20,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats } from '@/hooks/useRemindersAndEvents'
+import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats, useBulkCompleteEvents, useBulkArchiveEvents, useBulkUnarchiveEvents } from '@/hooks/useRemindersAndEvents'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -166,6 +166,11 @@ export function EventsView() {
     const cancelEventMutation = useCancelEvent()
     const postponeEventMutation = usePostponeEvent()
 
+    // Bulk operation mutations
+    const bulkCompleteMutation = useBulkCompleteEvents()
+    const bulkArchiveMutation = useBulkArchiveEvents()
+    const bulkUnarchiveMutation = useBulkUnarchiveEvents()
+
     // Performance: Track API load completion
     useEffect(() => {
         if (eventsData) perfLog('API LOADED: events', { count: eventsData?.events?.length })
@@ -293,6 +298,67 @@ export function EventsView() {
             }
         })
     }, [rsvpEvent, t])
+
+    // Bulk Operation Handlers
+    const handleSelectAll = useCallback(() => {
+        if (!events) return
+        if (selectedEventIds.length === events.length && events.length > 0) {
+            setSelectedEventIds([])
+        } else {
+            setSelectedEventIds(events.map(e => e.id))
+        }
+    }, [events, selectedEventIds])
+
+    const handleBulkComplete = useCallback(async () => {
+        if (selectedEventIds.length === 0) return
+
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من إكمال ${selectedEventIds.length} أحداث؟ | Are you sure you want to complete ${selectedEventIds.length} events?`
+            : `Are you sure you want to complete ${selectedEventIds.length} events? | هل أنت متأكد من إكمال ${selectedEventIds.length} أحداث؟`
+
+        if (confirm(confirmMessage)) {
+            bulkCompleteMutation.mutate({ eventIds: selectedEventIds }, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedEventIds([])
+                }
+            })
+        }
+    }, [selectedEventIds, i18n.language, bulkCompleteMutation])
+
+    const handleBulkArchive = useCallback(async () => {
+        if (selectedEventIds.length === 0) return
+
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من أرشفة ${selectedEventIds.length} أحداث؟ | Are you sure you want to archive ${selectedEventIds.length} events?`
+            : `Are you sure you want to archive ${selectedEventIds.length} events? | هل أنت متأكد من أرشفة ${selectedEventIds.length} أحداث؟`
+
+        if (confirm(confirmMessage)) {
+            bulkArchiveMutation.mutate(selectedEventIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedEventIds([])
+                }
+            })
+        }
+    }, [selectedEventIds, i18n.language, bulkArchiveMutation])
+
+    const handleBulkUnarchive = useCallback(async () => {
+        if (selectedEventIds.length === 0) return
+
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من إلغاء أرشفة ${selectedEventIds.length} أحداث؟ | Are you sure you want to unarchive ${selectedEventIds.length} events?`
+            : `Are you sure you want to unarchive ${selectedEventIds.length} events? | هل أنت متأكد من إلغاء أرشفة ${selectedEventIds.length} أحداث؟`
+
+        if (confirm(confirmMessage)) {
+            bulkUnarchiveMutation.mutate(selectedEventIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedEventIds([])
+                }
+            })
+        }
+    }, [selectedEventIds, i18n.language, bulkUnarchiveMutation])
 
     const topNav = [
         { title: t('events.nav.overview'), href: ROUTES.dashboard.home, isActive: false },
@@ -670,6 +736,15 @@ export function EventsView() {
                         onToggleSelectionMode={handleToggleSelectionMode}
                         selectedCount={selectedEventIds.length}
                         onDeleteSelected={handleDeleteSelected}
+                        onBulkComplete={handleBulkComplete}
+                        onBulkArchive={handleBulkArchive}
+                        onBulkUnarchive={handleBulkUnarchive}
+                        onSelectAll={handleSelectAll}
+                        totalTaskCount={events?.length || 0}
+                        isBulkCompletePending={bulkCompleteMutation.isPending}
+                        isBulkArchivePending={bulkArchiveMutation.isPending}
+                        isBulkUnarchivePending={bulkUnarchiveMutation.isPending}
+                        isViewingArchived={false}
                     />
                 </div>
             </Main>
