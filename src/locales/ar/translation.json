@@ -123,7 +123,7 @@
       "products": "المنتجات",
       "quotes": "عروض الأسعار",
       "campaigns": "الحملات",
-      "gantt": "مخطط جانت",
+      "gantt": "مخطط مهام",
       "libraryGroup": "المكتبة",
       "library": "المكتبة",
       "laws": "القوانين",
@@ -4326,6 +4326,29 @@
       "title": "لا توجد عناصر",
       "description": "لا توجد مهام أو تذكيرات أو أحداث لعرضها."
     }
+  },
+  "gantt": {
+    "badge": "مخطط مهام",
+    "title": "مخطط مهام",
+    "today": "اليوم",
+    "goToToday": "الذهاب لليوم",
+    "week": "أسبوع",
+    "month": "شهر",
+    "quarter": "ربع سنة",
+    "listView": "القائمة",
+    "taskName": "المهمة",
+    "allTasks": "جميع المهام",
+    "noGrouping": "بدون تجميع",
+    "groupByAssignee": "تجميع حسب المسؤول",
+    "tasks": "مهام",
+    "inProgress": "قيد التنفيذ",
+    "overdue": "متأخرة",
+    "blockedBy": "معطل",
+    "blocks": "يعطل",
+    "noTasks": "لا توجد مهام",
+    "noTasksDescription": "لا توجد مهام في هذه الفترة الزمنية",
+    "loadError": "خطأ في تحميل المخطط",
+    "todayLine": "اليوم"
   },
   "passwordStrength": {
     "label": "قوة كلمة المرور",

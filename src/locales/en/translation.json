@@ -4362,6 +4362,28 @@
       "description": "There are no tasks, reminders, or events to display."
     }
   },
+  "gantt": {
+    "badge": "Gantt Chart",
+    "title": "Project Timeline",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "quarter": "Quarter",
+    "listView": "List",
+    "taskName": "Task",
+    "allTasks": "All Tasks",
+    "noGrouping": "No Grouping",
+    "groupByAssignee": "Group by Assignee",
+    "tasks": "tasks",
+    "inProgress": "in progress",
+    "overdue": "overdue",
+    "blockedBy": "blocker",
+    "blocks": "blocks",
+    "noTasks": "No Tasks",
+    "noTasksDescription": "No tasks found in this time range",
+    "loadError": "Error Loading Chart",
+    "todayLine": "Today"
+  },
   "passwordStrength": {
     "label": "Password Strength",
     "levels": {
