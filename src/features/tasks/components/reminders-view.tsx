@@ -19,7 +19,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats, useUpdateReminder } from '@/hooks/useRemindersAndEvents'
+import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats, useUpdateReminder, useBulkCompleteReminders, useBulkArchiveReminders, useBulkUnarchiveReminders } from '@/hooks/useRemindersAndEvents'
 import { useTeamMembers, useCases } from '@/hooks/useCasesAndClients'
 import { Briefcase, User } from 'lucide-react'
 import {
@@ -252,6 +252,9 @@ export function RemindersView() {
     const snoozeReminderMutation = useSnoozeReminder()
     const delegateReminderMutation = useDelegateReminder()
     const updateReminderMutation = useUpdateReminder()
+    const bulkCompleteMutation = useBulkCompleteReminders()
+    const bulkArchiveMutation = useBulkArchiveReminders()
+    const bulkUnarchiveMutation = useBulkUnarchiveReminders()
 
     // Team members and cases for filter dropdowns (DEFERRED)
     const { data: teamMembers } = useTeamMembers(isFilterDataReady)
@@ -422,16 +425,48 @@ export function RemindersView() {
             : `Are you sure you want to complete ${selectedReminderIds.length} reminders? | هل أنت متأكد من إكمال ${selectedReminderIds.length} تذكيرات؟`
 
         if (confirm(confirmMessage)) {
-            try {
-                await Promise.all(selectedReminderIds.map(id => completeReminderMutation.mutateAsync(id)))
-                toast.success(i18n.language === 'ar' ? 'تم إكمال التذكيرات بنجاح' : 'Reminders completed successfully')
-                setIsSelectionMode(false)
-                setSelectedReminderIds([])
-            } catch (error) {
-                toast.error(i18n.language === 'ar' ? 'فشل في إكمال التذكيرات' : 'Failed to complete reminders')
-            }
+            bulkCompleteMutation.mutate(selectedReminderIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedReminderIds([])
+                }
+            })
         }
-    }, [selectedReminderIds, i18n.language, completeReminderMutation])
+    }, [selectedReminderIds, i18n.language, bulkCompleteMutation])
+
+    const handleBulkArchive = useCallback(async () => {
+        if (selectedReminderIds.length === 0) return
+
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من أرشفة ${selectedReminderIds.length} تذكيرات؟ | Are you sure you want to archive ${selectedReminderIds.length} reminders?`
+            : `Are you sure you want to archive ${selectedReminderIds.length} reminders? | هل أنت متأكد من أرشفة ${selectedReminderIds.length} تذكيرات؟`
+
+        if (confirm(confirmMessage)) {
+            bulkArchiveMutation.mutate(selectedReminderIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedReminderIds([])
+                }
+            })
+        }
+    }, [selectedReminderIds, i18n.language, bulkArchiveMutation])
+
+    const handleBulkUnarchive = useCallback(async () => {
+        if (selectedReminderIds.length === 0) return
+
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من إلغاء أرشفة ${selectedReminderIds.length} تذكيرات؟ | Are you sure you want to unarchive ${selectedReminderIds.length} reminders?`
+            : `Are you sure you want to unarchive ${selectedReminderIds.length} reminders? | هل أنت متأكد من إلغاء أرشفة ${selectedReminderIds.length} تذكيرات؟`
+
+        if (confirm(confirmMessage)) {
+            bulkUnarchiveMutation.mutate(selectedReminderIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedReminderIds([])
+                }
+            })
+        }
+    }, [selectedReminderIds, i18n.language, bulkUnarchiveMutation])
 
     const topNav = [
         { title: t('reminders.nav.overview'), href: ROUTES.dashboard.overview, isActive: false },
@@ -1011,9 +1046,13 @@ export function RemindersView() {
                         selectedCount={selectedReminderIds.length}
                         onDeleteSelected={handleDeleteSelected}
                         onBulkComplete={handleBulkComplete}
+                        onBulkArchive={handleBulkArchive}
+                        onBulkUnarchive={handleBulkUnarchive}
                         onSelectAll={handleSelectAll}
                         totalTaskCount={reminders?.length || 0}
-                        isBulkCompletePending={completeReminderMutation.isPending}
+                        isBulkCompletePending={bulkCompleteMutation.isPending}
+                        isBulkArchivePending={bulkArchiveMutation.isPending}
+                        isBulkUnarchivePending={bulkUnarchiveMutation.isPending}
                         isViewingArchived={false}
                     />
                 </div>

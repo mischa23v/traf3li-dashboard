@@ -1005,6 +1005,85 @@ const remindersService = {
     }
   },
 
+  /**
+   * Bulk archive reminders
+   */
+  bulkArchive: async (reminderIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/reminders/bulk/archive', { reminderIds })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk unarchive reminders
+   */
+  bulkUnarchive: async (reminderIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/reminders/bulk/unarchive', { reminderIds })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Archive Operations ====================
+
+  /**
+   * Archive single reminder
+   */
+  archiveReminder: async (id: string): Promise<Reminder> => {
+    try {
+      const response = await apiClient.post(`/reminders/${id}/archive`)
+      return response.data.reminder || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Unarchive single reminder
+   */
+  unarchiveReminder: async (id: string): Promise<Reminder> => {
+    try {
+      const response = await apiClient.post(`/reminders/${id}/unarchive`)
+      return response.data.reminder || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get archived reminders
+   */
+  getArchived: async (filters?: ReminderFilters): Promise<{ data: Reminder[]; total: number }> => {
+    try {
+      const response = await apiClient.get('/reminders/archived', { params: filters })
+      return {
+        data: response.data.data || response.data.reminders || [],
+        total: response.data.total || 0
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Select All ====================
+
+  /**
+   * Get all reminder IDs (for select all functionality)
+   */
+  getAllIds: async (filters?: ReminderFilters): Promise<string[]> => {
+    try {
+      const response = await apiClient.get('/reminders/ids', { params: filters })
+      return response.data.ids || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== Import/Export ====================
 
   /**

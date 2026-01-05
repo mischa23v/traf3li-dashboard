@@ -799,6 +799,108 @@ export const useBulkCancelEvents = () => {
   })
 }
 
+// ==================== BULK ARCHIVE/UNARCHIVE REMINDERS ====================
+
+export const useBulkArchiveReminders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (reminderIds: string[]) => remindersService.bulkArchive(reminderIds),
+    onSuccess: (_, reminderIds) => {
+      toast.success(`Archived ${reminderIds.length} reminders | تم أرشفة ${reminderIds.length} تذكير`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to archive reminders | فشل أرشفة التذكيرات')
+    },
+    onSettled: async () => {
+      await invalidateCache.reminders.related()
+    },
+  })
+}
+
+export const useBulkUnarchiveReminders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (reminderIds: string[]) => remindersService.bulkUnarchive(reminderIds),
+    onSuccess: (_, reminderIds) => {
+      toast.success(`Unarchived ${reminderIds.length} reminders | تم إلغاء أرشفة ${reminderIds.length} تذكير`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unarchive reminders | فشل إلغاء أرشفة التذكيرات')
+    },
+    onSettled: async () => {
+      await invalidateCache.reminders.related()
+    },
+  })
+}
+
+// ==================== SINGLE ARCHIVE/UNARCHIVE REMINDER ====================
+
+export const useArchiveReminder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => remindersService.archiveReminder(id),
+    onSuccess: () => {
+      toast.success('Reminder archived | تم أرشفة التذكير')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to archive reminder | فشل أرشفة التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  })
+}
+
+export const useUnarchiveReminder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => remindersService.unarchiveReminder(id),
+    onSuccess: () => {
+      toast.success('Reminder unarchived | تم إلغاء أرشفة التذكير')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unarchive reminder | فشل إلغاء أرشفة التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await Promise.all([
+        invalidateCache.reminders.all(),
+        invalidateCache.reminders.detail(id),
+        invalidateCache.calendar.all(),
+      ])
+    },
+  })
+}
+
+// ==================== ARCHIVED REMINDERS QUERY ====================
+
+export const useArchivedReminders = (filters?: ReminderFilters) => {
+  return useQuery({
+    queryKey: [...QueryKeys.reminders.all(), 'archived', filters],
+    queryFn: () => remindersService.getArchived(filters),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+  })
+}
+
+// ==================== GET ALL REMINDER IDS ====================
+
+export const useReminderIds = (filters?: ReminderFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QueryKeys.reminders.all(), 'ids', filters],
+    queryFn: () => remindersService.getAllIds(filters),
+    staleTime: LIST_STALE_TIME,
+    enabled,
+  })
+}
+
 // ==================== AGGREGATED EVENTS WITH STATS ====================
 // Single API call for events list + stats
 
