@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
-    Edit3, Eye
+    Edit3, Eye, CheckCircle, Archive, ArchiveRestore, Users, CheckCheck
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +20,16 @@ interface TasksSidebarProps {
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
+    // Bulk action props
+    onBulkComplete?: () => void
+    onBulkArchive?: () => void
+    onBulkUnarchive?: () => void
+    onSelectAll?: () => void
+    totalTaskCount?: number
+    isBulkCompletePending?: boolean
+    isBulkArchivePending?: boolean
+    isBulkUnarchivePending?: boolean
+    isViewingArchived?: boolean
     // Task details specific props
     taskId?: string
     isTaskCompleted?: boolean
@@ -35,6 +45,16 @@ export function TasksSidebar({
     onToggleSelectionMode,
     selectedCount = 0,
     onDeleteSelected,
+    // Bulk action props
+    onBulkComplete,
+    onBulkArchive,
+    onBulkUnarchive,
+    onSelectAll,
+    totalTaskCount = 0,
+    isBulkCompletePending = false,
+    isBulkArchivePending = false,
+    isBulkUnarchivePending = false,
+    isViewingArchived = false,
     // Task details props
     taskId,
     isTaskCompleted = false,
@@ -44,6 +64,7 @@ export function TasksSidebar({
     isDeletePending = false
 }: TasksSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
+    const [quickActionsTab, setQuickActionsTab] = useState<'main' | 'bulk'>('main')
     const [selectedDate, setSelectedDate] = useState(new Date())
 
     // Calculate date range for the strip (Today + 4 days)
@@ -148,6 +169,28 @@ export function TasksSidebar({
                             onDeleteSelected?.()
                         }
                         break
+                    case 'a':
+                        e.preventDefault()
+                        if (isSelectionMode && selectedCount > 0) {
+                            if (isViewingArchived) {
+                                onBulkUnarchive?.()
+                            } else {
+                                onBulkArchive?.()
+                            }
+                        }
+                        break
+                    case 'c':
+                        e.preventDefault()
+                        if (isSelectionMode && selectedCount > 0) {
+                            onBulkComplete?.()
+                        }
+                        break
+                    case 'l':
+                        e.preventDefault()
+                        if (isSelectionMode && totalTaskCount > 0) {
+                            onSelectAll?.()
+                        }
+                        break
                     case 'v':
                         e.preventDefault()
                         navigate({ to: currentLinks.viewAll })
@@ -158,7 +201,7 @@ export function TasksSidebar({
 
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
-    }, [taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount])
+    }, [taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkUnarchive, onBulkComplete, onSelectAll, isViewingArchived, totalTaskCount])
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -241,9 +284,44 @@ export function TasksSidebar({
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
 
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6 relative z-10">
-                    <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
+                {/* Header with Toggle - Same style as Calendar/Notifications */}
+                <div className="flex justify-start items-center mb-6 relative z-10">
+                    {!taskId && (
+                        <div className="flex bg-[#033a2d] p-1 rounded-xl">
+                            <button
+                                onClick={() => setQuickActionsTab('main')}
+                                className={cn(
+                                    "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                    quickActionsTab === 'main'
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                        : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                                )}
+                            >
+                                أساسي
+                            </button>
+                            <button
+                                onClick={() => setQuickActionsTab('bulk')}
+                                className={cn(
+                                    "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200 flex items-center gap-2",
+                                    quickActionsTab === 'bulk'
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                        : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                                )}
+                            >
+                                جماعي
+                                {selectedCount > 0 && (
+                                    <span className={cn(
+                                        "min-w-[20px] h-5 px-1.5 rounded-full text-xs font-bold flex items-center justify-center",
+                                        quickActionsTab === 'bulk'
+                                            ? "bg-white text-emerald-600"
+                                            : "bg-emerald-500 text-white"
+                                    )}>
+                                        {selectedCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Content */}
@@ -291,7 +369,7 @@ export function TasksSidebar({
                             {/* Delete Button */}
                             <Button
                                 variant="ghost"
-                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
                                 onClick={onDeleteTask}
                                 disabled={isDeletePending}
                             >
@@ -318,64 +396,186 @@ export function TasksSidebar({
                             </Button>
                         </>
                     ) : (
-                        // List View - Show Create, Select, Delete, View All
+                        // List View - Tabbed Quick Actions
                         <>
-                            {/* Create Button */}
-                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                                <Link to={currentLinks.create}>
-                                    <Plus className="h-7 w-7" aria-hidden="true" />
-                                    <span className="flex items-center gap-1.5 text-sm font-bold">
-                                        <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">N</kbd>
-                                        إنشاء
-                                    </span>
-                                </Link>
-                            </Button>
+                            {quickActionsTab === 'main' ? (
+                                // MAIN TAB: New, Select, Delete, Archive
+                                <>
+                                    {/* Create Button - White */}
+                                    <Link
+                                        to={currentLinks.create}
+                                        className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                                    >
+                                        <Plus className="h-7 w-7" aria-hidden="true" />
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">N</kbd>
+                                            إنشاء
+                                        </span>
+                                    </Link>
 
-                            {/* Select Button */}
-                            <Button
-                                variant="ghost"
-                                className={cn(
-                                    "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                                    isSelectionMode
-                                        ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                        : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                                )}
-                                onClick={onToggleSelectionMode}
-                            >
-                                {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" aria-hidden="true" />}
-                                <span className="flex items-center gap-1.5 text-sm font-bold">
-                                    <kbd className={cn(
-                                        "text-[10px] font-mono px-1.5 py-0.5 rounded",
-                                        isSelectionMode ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-500"
-                                    )}>S</kbd>
-                                    {isSelectionMode ? 'إلغاء' : 'تحديد'}
-                                </span>
-                            </Button>
+                                    {/* Select Button - White */}
+                                    <button
+                                        className={cn(
+                                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                            isSelectionMode
+                                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400"
+                                                : "bg-white hover:bg-slate-50 text-slate-700"
+                                        )}
+                                        onClick={onToggleSelectionMode}
+                                    >
+                                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" aria-hidden="true" />}
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className={cn(
+                                                "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                                                isSelectionMode ? "bg-emerald-200 text-emerald-700" : "bg-slate-100 text-slate-500"
+                                            )}>S</kbd>
+                                            {isSelectionMode ? 'إلغاء' : 'تحديد'}
+                                        </span>
+                                    </button>
 
-                            {/* Delete Button */}
-                            <Button
-                                variant="ghost"
-                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                                onClick={onDeleteSelected}
-                                disabled={!isSelectionMode || selectedCount === 0}
-                            >
-                                <Trash2 className="h-6 w-6" aria-hidden="true" />
-                                <span className="flex items-center gap-1.5 text-sm font-bold">
-                                    <kbd className="text-[10px] font-mono bg-red-100 text-red-500 px-1.5 py-0.5 rounded">D</kbd>
-                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
-                                </span>
-                            </Button>
+                                    {/* Delete Button - White */}
+                                    <button
+                                        className="bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                        onClick={onDeleteSelected}
+                                        disabled={!isSelectionMode || selectedCount === 0}
+                                        title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                    >
+                                        <Trash2 className="h-6 w-6" aria-hidden="true" />
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">D</kbd>
+                                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                        </span>
+                                    </button>
 
-                            {/* View All Button */}
-                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                                <Link to={currentLinks.viewAll}>
-                                    <List className="h-6 w-6" aria-hidden="true" />
-                                    <span className="flex items-center gap-1.5 text-sm font-bold">
-                                        <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">V</kbd>
-                                        عرض مسبق
-                                    </span>
-                                </Link>
-                            </Button>
+                                    {/* Archive / Unarchive Button - White */}
+                                    {isViewingArchived ? (
+                                        <button
+                                            className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                            onClick={onBulkUnarchive}
+                                            disabled={!isSelectionMode || selectedCount === 0 || isBulkUnarchivePending}
+                                            title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                        >
+                                            {isBulkUnarchivePending ? (
+                                                <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                            ) : (
+                                                <ArchiveRestore className="h-6 w-6" aria-hidden="true" />
+                                            )}
+                                            <span className="flex items-center gap-1.5 text-sm font-bold">
+                                                <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">A</kbd>
+                                                {selectedCount > 0 ? `إلغاء أرشفة (${selectedCount})` : 'إلغاء أرشفة'}
+                                            </span>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="bg-white hover:bg-slate-50 text-slate-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                            onClick={onBulkArchive}
+                                            disabled={!isSelectionMode || selectedCount === 0 || isBulkArchivePending}
+                                            title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                        >
+                                            {isBulkArchivePending ? (
+                                                <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                            ) : (
+                                                <Archive className="h-6 w-6" aria-hidden="true" />
+                                            )}
+                                            <span className="flex items-center gap-1.5 text-sm font-bold">
+                                                <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">A</kbd>
+                                                {selectedCount > 0 ? `أرشفة (${selectedCount})` : 'أرشفة'}
+                                            </span>
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                // BULK TAB: Select All, Complete, Delete, Archive
+                                <>
+                                    {/* Select All Button - White */}
+                                    <button
+                                        className={cn(
+                                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                            isSelectionMode && selectedCount === totalTaskCount && totalTaskCount > 0
+                                                ? "bg-blue-100 text-blue-700 ring-2 ring-blue-400"
+                                                : "bg-white hover:bg-blue-50 text-blue-600"
+                                        )}
+                                        onClick={onSelectAll}
+                                        disabled={!isSelectionMode || totalTaskCount === 0}
+                                        title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : totalTaskCount === 0 ? 'لا توجد مهام' : undefined}
+                                    >
+                                        <CheckCheck className="h-6 w-6" aria-hidden="true" />
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className="text-[10px] font-mono bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">L</kbd>
+                                            {selectedCount === totalTaskCount && totalTaskCount > 0 ? 'إلغاء الكل' : 'تحديد الكل'}
+                                        </span>
+                                    </button>
+
+                                    {/* Complete Button - White */}
+                                    <button
+                                        className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                        onClick={onBulkComplete}
+                                        disabled={!isSelectionMode || selectedCount === 0 || isBulkCompletePending}
+                                        title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                    >
+                                        {isBulkCompletePending ? (
+                                            <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                        ) : (
+                                            <CheckCircle className="h-6 w-6" aria-hidden="true" />
+                                        )}
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">C</kbd>
+                                            {selectedCount > 0 ? `إكمال (${selectedCount})` : 'إكمال'}
+                                        </span>
+                                    </button>
+
+                                    {/* Delete Button - White */}
+                                    <button
+                                        className="bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                        onClick={onDeleteSelected}
+                                        disabled={!isSelectionMode || selectedCount === 0}
+                                        title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                    >
+                                        <Trash2 className="h-6 w-6" aria-hidden="true" />
+                                        <span className="flex items-center gap-1.5 text-sm font-bold">
+                                            <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">D</kbd>
+                                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                        </span>
+                                    </button>
+
+                                    {/* Archive / Unarchive Button - White */}
+                                    {isViewingArchived ? (
+                                        <button
+                                            className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                            onClick={onBulkUnarchive}
+                                            disabled={!isSelectionMode || selectedCount === 0 || isBulkUnarchivePending}
+                                            title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                        >
+                                            {isBulkUnarchivePending ? (
+                                                <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                            ) : (
+                                                <ArchiveRestore className="h-6 w-6" aria-hidden="true" />
+                                            )}
+                                            <span className="flex items-center gap-1.5 text-sm font-bold">
+                                                <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">A</kbd>
+                                                {selectedCount > 0 ? `إلغاء أرشفة (${selectedCount})` : 'إلغاء أرشفة'}
+                                            </span>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="bg-white hover:bg-slate-50 text-slate-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                            onClick={onBulkArchive}
+                                            disabled={!isSelectionMode || selectedCount === 0 || isBulkArchivePending}
+                                            title={!isSelectionMode ? 'اضغط على "تحديد" أولاً' : selectedCount === 0 ? 'حدد مهام أولاً' : undefined}
+                                        >
+                                            {isBulkArchivePending ? (
+                                                <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                                            ) : (
+                                                <Archive className="h-6 w-6" aria-hidden="true" />
+                                            )}
+                                            <span className="flex items-center gap-1.5 text-sm font-bold">
+                                                <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">A</kbd>
+                                                {selectedCount > 0 ? `أرشفة (${selectedCount})` : 'أرشفة'}
+                                            </span>
+                                        </button>
+                                    )}
+                                </>
+                            )}
                         </>
                     )}
                 </div>
