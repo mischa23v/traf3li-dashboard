@@ -11,11 +11,11 @@ import apiClient, { handleApiError } from '@/lib/api'
  */
 
 // Backend Event Types: hearing | court_date | meeting | client_meeting | deposition | mediation | arbitration | deadline | filing_deadline | conference_call | internal_meeting | training | webinar | consultation | task | other
-export type EventType = 'hearing' | 'court_date' | 'meeting' | 'client_meeting' | 'deposition' | 'mediation' | 'arbitration' | 'deadline' | 'filing_deadline' | 'conference_call' | 'internal_meeting' | 'training' | 'webinar' | 'consultation' | 'task' | 'other' | 'conference' | 'court_session' | 'document_review'
+export type EventType = 'hearing' | 'court_date' | 'meeting' | 'client_meeting' | 'deposition' | 'mediation' | 'arbitration' | 'deadline' | 'filing_deadline' | 'conference_call' | 'internal_meeting' | 'training' | 'webinar' | 'consultation' | 'task' | 'other'
 // Backend Event Status: scheduled | confirmed | tentative | canceled | cancelled | postponed | completed | in_progress | rescheduled
 export type EventStatus = 'scheduled' | 'confirmed' | 'tentative' | 'canceled' | 'cancelled' | 'postponed' | 'completed' | 'in_progress' | 'rescheduled'
 export type EventPriority = 'low' | 'medium' | 'high' | 'critical'
-export type RSVPStatus = 'pending' | 'accepted' | 'declined' | 'tentative' | 'no_response'
+export type RSVPStatus = 'pending' | 'accepted' | 'declined' | 'tentative'
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
 export type ReminderType = 'notification' | 'email' | 'sms' | 'push' | 'whatsapp'
 export type CalendarProvider = 'google' | 'outlook' | 'apple' | 'ics'
@@ -65,8 +65,8 @@ export interface EventLocation {
     lat: number
     lng: number
   }
-  // Virtual location
-  platform?: 'zoom' | 'teams' | 'meet' | 'webex' | 'custom'
+  // Virtual location - matches backend: ['zoom', 'teams', 'google_meet', 'webex', 'other']
+  platform?: 'zoom' | 'teams' | 'google_meet' | 'webex' | 'other'
   meetingUrl?: string
   meetingId?: string
   password?: string
