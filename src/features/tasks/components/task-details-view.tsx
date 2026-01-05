@@ -29,6 +29,7 @@ import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { AttachmentVersionsDialog } from './attachment-versions-dialog'
+import { useTaskReport } from './task-report-template'
 import { ROUTES } from '@/constants/routes'
 
 // Lazy load DocumentEditorDialog - contains TipTap editor (~150KB)
@@ -113,6 +114,9 @@ export function TaskDetailsView() {
 
     // Time tracking details
     const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
+
+    // Task report (PDF export)
+    const { print: printTaskReport } = useTaskReport()
 
     // TipTap Documents
     const { data: documentsData, refetch: refetchDocuments, isLoading: isLoadingDocuments } = useDocuments(taskId)
@@ -605,7 +609,7 @@ export function TaskDetailsView() {
                                     <GosiCard className="min-h-[600px] p-0">
                                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                                             {/* Gosi Premium Tabs Header */}
-                                            <div className="border-b border-slate-100/50 px-4 sm:px-6 py-4">
+                                            <div className="border-b border-slate-100/50 px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
                                                 <TabsList className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-100/80 p-1.5 text-slate-500 w-full sm:w-auto gap-1">
                                                     {['overview', 'files', 'comments'].map((tab) => (
                                                         <TabsTrigger
@@ -625,6 +629,16 @@ export function TaskDetailsView() {
                                                         </TabsTrigger>
                                                     ))}
                                                 </TabsList>
+                                                {/* Export PDF Button - Left side (end in RTL) */}
+                                                <Button
+                                                    onClick={() => printTaskReport(task)}
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shrink-0"
+                                                >
+                                                    <Download className="h-4 w-4" />
+                                                    <span className="font-medium hidden sm:inline">تصدير PDF</span>
+                                                </Button>
                                             </div>
 
                                             <div className="p-4 sm:p-6 bg-slate-50/50 min-h-[400px] sm:min-h-[500px]">
