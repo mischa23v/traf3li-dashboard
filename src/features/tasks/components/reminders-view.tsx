@@ -20,7 +20,8 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats, useUpdateReminder } from '@/hooks/useRemindersAndEvents'
-import { useTeamMembers } from '@/hooks/useCasesAndClients'
+import { useTeamMembers, useCases } from '@/hooks/useCasesAndClients'
+import { Briefcase, User } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -83,15 +84,15 @@ export function RemindersView() {
         })
     }
 
-    // Performance optimization: Defer team members loading
-    const [isDelegationDataReady, setIsDelegationDataReady] = useState(false)
+    // Performance optimization: Defer filter dropdown data loading
+    const [isFilterDataReady, setIsFilterDataReady] = useState(false)
 
     useEffect(() => {
-        perfLog('Scheduling delegation data load (250ms)')
+        perfLog('Scheduling filter data load (200ms)')
         const timer = setTimeout(() => {
-            perfLog('Delegation data load TRIGGERED - loading teamMembers')
-            setIsDelegationDataReady(true)
-        }, 250)
+            perfLog('Filter data load TRIGGERED - loading teamMembers & cases')
+            setIsFilterDataReady(true)
+        }, 200)
         return () => clearTimeout(timer)
     }, [])
 
@@ -106,6 +107,9 @@ export function RemindersView() {
     const [searchQuery, setSearchQuery] = useState('')
     const [priorityFilter, setPriorityFilter] = useState<string>('all')
     const [typeFilter, setTypeFilter] = useState<string>('all')
+    const [assignedFilter, setAssignedFilter] = useState<string>('all')
+    const [dueDateFilter, setDueDateFilter] = useState<string>('all')
+    const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('reminderDateTime')
 
     // Gold Standard: Adaptive Debounce Search
@@ -143,18 +147,50 @@ export function RemindersView() {
             f.type = typeFilter
         }
 
+        // Assigned To filter
+        if (assignedFilter === 'me') {
+            f.assignedTo = 'me'
+        } else if (assignedFilter === 'unassigned') {
+            f.assignedTo = 'unassigned'
+        } else if (assignedFilter !== 'all') {
+            f.assignedTo = assignedFilter
+        }
+
+        // Due Date filter
+        if (dueDateFilter === 'today') {
+            f.dueDateFrom = todayStr
+            f.dueDateTo = todayStr
+        } else if (dueDateFilter === 'thisWeek') {
+            const endOfWeek = new Date(today)
+            endOfWeek.setDate(today.getDate() + (7 - today.getDay()))
+            f.dueDateFrom = todayStr
+            f.dueDateTo = endOfWeek.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'overdue') {
+            const yesterday = new Date(today)
+            yesterday.setDate(today.getDate() - 1)
+            f.dueDateTo = yesterday.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'noDueDate') {
+            f.noDueDate = true
+        }
+
+        // Case filter
+        if (caseFilter !== 'all') {
+            f.caseId = caseFilter
+        }
+
         if (sortBy) {
             f.sortBy = sortBy
             f.sortOrder = sortBy === 'priority' ? 'desc' : 'asc'
         }
 
         return f
-    }, [activeTab, searchQuery, priorityFilter, typeFilter, sortBy])
+    }, [activeTab, searchQuery, priorityFilter, typeFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Check if any filter is active
     const hasActiveFilters = useMemo(() =>
-        searchQuery || priorityFilter !== 'all' || typeFilter !== 'all',
-        [searchQuery, priorityFilter, typeFilter]
+        searchQuery || priorityFilter !== 'all' || typeFilter !== 'all' ||
+        assignedFilter !== 'all' || dueDateFilter !== 'all' || caseFilter !== 'all',
+        [searchQuery, priorityFilter, typeFilter, assignedFilter, dueDateFilter, caseFilter]
     )
 
     // Clear all filters
@@ -162,12 +198,15 @@ export function RemindersView() {
         setSearchQuery('')
         setPriorityFilter('all')
         setTypeFilter('all')
+        setAssignedFilter('all')
+        setDueDateFilter('all')
+        setCaseFilter('all')
     }, [])
 
     // Reset visible count when filters change
     useEffect(() => {
         setVisibleCount(10)
-    }, [activeTab, searchQuery, priorityFilter, typeFilter, sortBy])
+    }, [activeTab, searchQuery, priorityFilter, typeFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Helper function to format dates based on current locale
     const formatDualDate = useCallback((dateString: string | null | undefined) => {
@@ -214,8 +253,9 @@ export function RemindersView() {
     const delegateReminderMutation = useDelegateReminder()
     const updateReminderMutation = useUpdateReminder()
 
-    // Team members for delegation (DEFERRED)
-    const { data: teamMembers } = useTeamMembers(isDelegationDataReady)
+    // Team members and cases for filter dropdowns (DEFERRED)
+    const { data: teamMembers } = useTeamMembers(isFilterDataReady)
+    const { data: casesData } = useCases(undefined, isFilterDataReady)
 
     // Performance: Track API load completion
     useEffect(() => {
@@ -229,6 +269,10 @@ export function RemindersView() {
     useEffect(() => {
         if (teamMembers) perfLog('API LOADED: teamMembers (DEFERRED)', { count: teamMembers?.length })
     }, [teamMembers])
+
+    useEffect(() => {
+        if (casesData) perfLog('API LOADED: cases (DEFERRED)', { count: casesData?.length })
+    }, [casesData])
 
     useEffect(() => {
         const fetchingStatus = { reminders: isFetching, stats: statsFetching }
@@ -533,6 +577,70 @@ export function RemindersView() {
                                                 <GosiSelectItem value="follow_up" className="font-bold">{t('reminders.list.followUp')}</GosiSelectItem>
                                                 <GosiSelectItem value="meeting" className="font-bold">{t('reminders.list.meeting', 'اجتماع')}</GosiSelectItem>
                                                 <GosiSelectItem value="task_due" className="font-bold">{t('reminders.list.taskDue', 'مهمة')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Assigned To Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={assignedFilter} onValueChange={setAssignedFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <User className="h-4 w-4 text-emerald-600" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.assignedTo', 'المسند إليه')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allAssignees', 'الكل')}</GosiSelectItem>
+                                                <GosiSelectItem value="me" className="font-bold">{t('tasks.list.assignedToMe', 'مهامي')}</GosiSelectItem>
+                                                <GosiSelectItem value="unassigned" className="font-bold">{t('tasks.list.unassigned', 'غير مسند')}</GosiSelectItem>
+                                                {teamMembers?.map((member: any) => (
+                                                    <GosiSelectItem key={member.id} value={member.id} className="font-bold">
+                                                        {member.name || member.email}
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Due Date Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={dueDateFilter} onValueChange={setDueDateFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <CalendarIcon className="h-4 w-4 text-emerald-600" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.dueDate', 'تاريخ الاستحقاق')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allDates', 'الكل')}</GosiSelectItem>
+                                                <GosiSelectItem value="today" className="font-bold">{t('tasks.list.today', 'اليوم')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisWeek" className="font-bold">{t('tasks.list.thisWeek', 'هذا الأسبوع')}</GosiSelectItem>
+                                                <GosiSelectItem value="overdue" className="font-bold">{t('tasks.list.overdue', 'متأخر')}</GosiSelectItem>
+                                                <GosiSelectItem value="noDueDate" className="font-bold">{t('tasks.list.noDueDate', 'بدون تاريخ')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Case Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={caseFilter} onValueChange={setCaseFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <Briefcase className="h-4 w-4 text-emerald-600" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('tasks.list.case', 'القضية')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allCases', 'كل القضايا')}</GosiSelectItem>
+                                                {casesData?.map((caseItem: any) => (
+                                                    <GosiSelectItem key={caseItem.id} value={caseItem.id} className="font-bold">
+                                                        {caseItem.title || caseItem.caseNumber}
+                                                    </GosiSelectItem>
+                                                ))}
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
