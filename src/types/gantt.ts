@@ -8,7 +8,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 export type GanttTaskType = 'task' | 'project' | 'milestone'
-export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent' | 'critical'
 export type DependencyType = '0' | '1' | '2' | '3' // 0=FS, 1=SS, 2=FF, 3=SF
 export type SourceType = 'task' | 'reminder' | 'event'
 
@@ -42,7 +42,7 @@ export interface GanttTask {
 }
 
 export interface GanttLink {
-  id: string
+  id: number | string
   source: string
   target: string
   type: DependencyType
@@ -78,13 +78,15 @@ export interface Milestone {
 }
 
 export interface CreateMilestoneData {
-  caseId: string
-  name: string
-  date: Date
+  title: string
+  dueDate: Date | string
+  caseId?: string
+  projectId?: string
   description?: string
-  linkedTaskIds?: string[]
+  priority?: TaskPriority
+  status?: 'pending' | 'completed' | 'missed'
+  tags?: string[]
   color?: string
-  notifyBefore?: number
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -182,10 +184,7 @@ export interface AddDependencyData {
 }
 
 export interface AutoScheduleOptions {
-  respectDependencies: boolean
-  respectResourceAvailability: boolean
-  allowWeekends: boolean
-  startFromToday: boolean
+  startDate?: Date | string
 }
 
 export interface AutoScheduleResult {

@@ -410,10 +410,15 @@ export const ganttResourceService = {
   /**
    * Get resource conflicts
    * Backend route: GET /gantt/resources/conflicts
+   * Required params: userId, startDate, endDate
    */
-  getResourceConflicts: async (): Promise<any> => {
+  getResourceConflicts: async (params: {
+    userId: string
+    startDate: string
+    endDate: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/gantt/resources/conflicts')
+      const response = await apiClient.get('/gantt/resources/conflicts', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -423,8 +428,9 @@ export const ganttResourceService = {
   /**
    * Suggest optimal assignee for task
    * Backend route: POST /gantt/resources/suggest
+   * Body: { taskId }
    */
-  suggestAssignee: async (data: any): Promise<any> => {
+  suggestAssignee: async (data: { taskId: string }): Promise<any> => {
     try {
       const response = await apiClient.post('/gantt/resources/suggest', data)
       return response.data.data
@@ -555,8 +561,9 @@ export const ganttCollaborationService = {
   /**
    * Update user presence
    * Backend route: POST /gantt/collaboration/presence
+   * Body: { location: { type, id } }
    */
-  updatePresence: async (data: any): Promise<any> => {
+  updatePresence: async (data: { location: { type: string; id: string } }): Promise<any> => {
     try {
       const response = await apiClient.post('/gantt/collaboration/presence', data)
       return response.data.data
