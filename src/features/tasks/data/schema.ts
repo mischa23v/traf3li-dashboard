@@ -387,6 +387,11 @@ export const taskSchema = z.object({
   progress: z.number().min(0).max(100).optional(),
   notes: z.string().max(5000).optional(),
 
+  // Archive status
+  isArchived: z.boolean().optional(),
+  archivedAt: z.string().optional(),
+  archivedBy: z.string().optional(),
+
   // Timestamps
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
@@ -441,6 +446,7 @@ export const taskFiltersSchema = z.object({
   clientId: z.string().optional(),
   courtType: courtTypeEnum.optional(),
   isTemplate: z.boolean().optional(),
+  isArchived: z.boolean().optional(),
   hasSubtasks: z.boolean().optional(),
   isRecurring: z.boolean().optional(),
   overdue: z.boolean().optional(),

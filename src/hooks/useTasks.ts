@@ -1076,6 +1076,154 @@ export const useBulkAssignTasks = () => {
   })
 }
 
+export const useBulkArchiveTasks = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<BulkOperationResult, Error, string[]>({
+    mutationFn: (taskIds) => tasksService.bulkArchive(taskIds),
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
+      toast.success(bilingualError(`${result.success} tasks archived`, `تم أرشفة ${result.success} مهمة`))
+      if (result.failed > 0) {
+        toast.warning(bilingualError(`${result.failed} tasks failed to archive`, `فشل أرشفة ${result.failed} مهمة`))
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to bulk archive tasks', 'فشل الأرشفة الجماعية'))
+    },
+  })
+}
+
+export const useBulkUnarchiveTasks = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<BulkOperationResult, Error, string[]>({
+    mutationFn: (taskIds) => tasksService.bulkUnarchive(taskIds),
+    onSuccess: async (result) => {
+      await invalidateCache.tasks.all()
+      toast.success(bilingualError(`${result.success} tasks unarchived`, `تم إلغاء أرشفة ${result.success} مهمة`))
+      if (result.failed > 0) {
+        toast.warning(bilingualError(`${result.failed} tasks failed to unarchive`, `فشل إلغاء أرشفة ${result.failed} مهمة`))
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to bulk unarchive tasks', 'فشل إلغاء الأرشفة الجماعية'))
+    },
+  })
+}
+
+// ==================== Clone/Archive/Reschedule Hooks ====================
+
+export const useCloneTask = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (taskId: string) => tasksService.cloneTask(taskId),
+    onSuccess: async (newTask) => {
+      await invalidateCache.tasks.all()
+      toast.success(bilingualError('Task cloned successfully', 'تم نسخ المهمة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to clone task', 'فشل نسخ المهمة'))
+    },
+  })
+}
+
+export const useArchiveTask = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (taskId: string) => tasksService.archiveTask(taskId),
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(taskId)
+      toast.success(bilingualError('Task archived', 'تم أرشفة المهمة'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to archive task', 'فشل أرشفة المهمة'))
+    },
+  })
+}
+
+export const useUnarchiveTask = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (taskId: string) => tasksService.unarchiveTask(taskId),
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(taskId)
+      toast.success(bilingualError('Task unarchived', 'تم إلغاء أرشفة المهمة'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to unarchive task', 'فشل إلغاء أرشفة المهمة'))
+    },
+  })
+}
+
+export const useRescheduleTask = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, dueDate, dueTime }: { taskId: string; dueDate: string; dueTime?: string }) =>
+      tasksService.rescheduleTask(taskId, dueDate, dueTime),
+    onSuccess: async (_, { taskId }) => {
+      await invalidateCache.tasks.all()
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.calendar.all()
+      toast.success(bilingualError('Task rescheduled', 'تم إعادة جدولة المهمة'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to reschedule task', 'فشل إعادة جدولة المهمة'))
+    },
+  })
+}
+
+export const useReorderTasks = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (taskIds: string[]) => tasksService.reorderTasks(taskIds),
+    onSuccess: async () => {
+      await invalidateCache.tasks.all()
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to reorder tasks', 'فشل إعادة ترتيب المهام'))
+    },
+  })
+}
+
+export const useGetAllTaskIds = () => {
+  return useMutation({
+    mutationFn: (filters?: TaskFilters) => tasksService.getAllTaskIds(filters),
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to get task IDs', 'فشل الحصول على معرفات المهام'))
+    },
+  })
+}
+
+export const useExportTasksWithFormat = () => {
+  return useMutation({
+    mutationFn: ({ format, filters }: { format: 'csv' | 'excel' | 'pdf' | 'json'; filters?: TaskFilters }) =>
+      tasksService.exportTasksWithFormat(format, filters),
+    onSuccess: (blob, { format }) => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const ext = format === 'excel' ? 'xlsx' : format
+      a.download = `tasks-export-${new Date().toISOString().split('T')[0]}.${ext}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      toast.success(bilingualError('Tasks exported successfully', 'تم تصدير المهام بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to export tasks', 'فشل تصدير المهام'))
+    },
+  })
+}
+
 // ==================== Import/Export Hooks ====================
 
 export const useImportTasks = () => {

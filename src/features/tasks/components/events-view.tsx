@@ -7,7 +7,7 @@ import {
     Calendar as CalendarIcon, MoreHorizontal, Plus, Filter,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users, Briefcase, User,
     CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock,
-    SortAsc, X, CheckSquare, ArrowRight
+    SortAsc, X, CheckSquare, ArrowRight, Edit3, Copy, Archive, ArchiveRestore, AlertTriangle, ArrowUpDown
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,7 +20,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats, useBulkCompleteEvents, useBulkArchiveEvents, useBulkUnarchiveEvents } from '@/hooks/useRemindersAndEvents'
+import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats, useBulkCompleteEvents, useBulkArchiveEvents, useBulkUnarchiveEvents, useArchiveEvent, useUnarchiveEvent, useUpdateEvent } from '@/hooks/useRemindersAndEvents'
 import { useTeamMembers, useCases } from '@/hooks/useCasesAndClients'
 import {
     DropdownMenu,
@@ -63,9 +63,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
+import { format, isToday, isTomorrow, isPast, differenceInDays } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
+import { cn } from '@/lib/utils'
 
 export function EventsView() {
     const { t, i18n } = useTranslation()
@@ -96,7 +97,7 @@ export function EventsView() {
         const timer = setTimeout(() => {
             perfLog('Filter data load TRIGGERED - loading teamMembers & cases')
             setIsFilterDataReady(true)
-        }, 500)
+        }, 200)
         return () => clearTimeout(timer)
     }, [])
 
@@ -106,8 +107,10 @@ export function EventsView() {
 
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
+    const [priorityFilter, setPriorityFilter] = useState<string>('all')
     const [typeFilter, setTypeFilter] = useState<string>('all')
     const [assignedFilter, setAssignedFilter] = useState<string>('all')
+    const [dueDateFilter, setDueDateFilter] = useState<string>('all')
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('startDate')
 
@@ -142,6 +145,11 @@ export function EventsView() {
             f.type = typeFilter
         }
 
+        // Priority filter
+        if (priorityFilter !== 'all') {
+            f.priority = priorityFilter
+        }
+
         // Assigned To filter
         if (assignedFilter === 'me') {
             f.assignedTo = 'me'
@@ -151,6 +159,23 @@ export function EventsView() {
             f.assignedTo = assignedFilter
         }
 
+        // Due Date filter
+        if (dueDateFilter === 'today') {
+            f.dueDateFrom = todayStr
+            f.dueDateTo = todayStr
+        } else if (dueDateFilter === 'thisWeek') {
+            const endOfWeek = new Date(today)
+            endOfWeek.setDate(today.getDate() + (7 - today.getDay()))
+            f.dueDateFrom = todayStr
+            f.dueDateTo = endOfWeek.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'overdue') {
+            const yesterday = new Date(today)
+            yesterday.setDate(today.getDate() - 1)
+            f.dueDateTo = yesterday.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'noDueDate') {
+            f.noDueDate = true
+        }
+
         // Case filter
         if (caseFilter !== 'all') {
             f.caseId = caseFilter
@@ -158,30 +183,33 @@ export function EventsView() {
 
         if (sortBy) {
             f.sortBy = sortBy
-            f.sortOrder = 'asc'
+            f.sortOrder = sortBy === 'priority' ? 'desc' : 'asc'
         }
 
         return f
-    }, [activeTab, searchQuery, typeFilter, assignedFilter, caseFilter, sortBy])
+    }, [activeTab, searchQuery, typeFilter, priorityFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Check if any filter is active
     const hasActiveFilters = useMemo(() =>
-        searchQuery || typeFilter !== 'all' || assignedFilter !== 'all' || caseFilter !== 'all',
-        [searchQuery, typeFilter, assignedFilter, caseFilter]
+        searchQuery || priorityFilter !== 'all' || typeFilter !== 'all' ||
+        assignedFilter !== 'all' || dueDateFilter !== 'all' || caseFilter !== 'all',
+        [searchQuery, priorityFilter, typeFilter, assignedFilter, dueDateFilter, caseFilter]
     )
 
     // Clear all filters
     const clearFilters = useCallback(() => {
         setSearchQuery('')
+        setPriorityFilter('all')
         setTypeFilter('all')
         setAssignedFilter('all')
+        setDueDateFilter('all')
         setCaseFilter('all')
     }, [])
 
     // Reset visible count when filters change
     useEffect(() => {
         setVisibleCount(10)
-    }, [activeTab, searchQuery, typeFilter, assignedFilter, caseFilter, sortBy])
+    }, [activeTab, searchQuery, priorityFilter, typeFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
 
     // Helper function to format dates based on current locale
     const formatDualDate = useCallback((dateString: string | null | undefined) => {
@@ -193,6 +221,30 @@ export function EventsView() {
             english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
     }, [t])
+
+    // Smart date helper (like Tasks)
+    const getSmartDate = useCallback((dateString: string | null | undefined) => {
+        if (!dateString) return { label: t('events.list.notSet'), isOverdue: false, daysRemaining: null }
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) return { label: t('events.list.notSet'), isOverdue: false, daysRemaining: null }
+
+        const now = new Date()
+        const isOverdue = isPast(date) && !isToday(date)
+        const daysRemaining = differenceInDays(date, now)
+
+        let label = ''
+        if (isToday(date)) {
+            label = t('events.smartDates.today', 'اليوم')
+        } else if (isTomorrow(date)) {
+            label = t('events.smartDates.tomorrow', 'غداً')
+        } else if (isOverdue) {
+            label = t('events.smartDates.overdue', 'فات الموعد')
+        } else {
+            label = format(date, 'd MMM', { locale: i18n.language === 'ar' ? arSA : enUS })
+        }
+
+        return { label, isOverdue, daysRemaining }
+    }, [t, i18n.language])
 
     // Fetch events
     const { data: eventsData, isLoading, isError, error, refetch, isFetching } = useEvents(filters)
@@ -207,6 +259,11 @@ export function EventsView() {
     const bulkCompleteMutation = useBulkCompleteEvents()
     const bulkArchiveMutation = useBulkArchiveEvents()
     const bulkUnarchiveMutation = useBulkUnarchiveEvents()
+
+    // Single archive/unarchive mutations
+    const archiveEventMutation = useArchiveEvent()
+    const unarchiveEventMutation = useUnarchiveEvent()
+    const updateEventMutation = useUpdateEvent()
 
     // Team members and cases for filter dropdowns (DEFERRED)
     const { data: teamMembers } = useTeamMembers(isFilterDataReady)
@@ -243,6 +300,7 @@ export function EventsView() {
             // Handle different date field names from API
             const eventDate = event.startDate || event.startDateTime || event.date
             const parsedDate = eventDate ? new Date(eventDate) : null
+            const smartDate = getSmartDate(eventDate)
 
             return {
                 id: event._id,
@@ -251,27 +309,44 @@ export function EventsView() {
                 time: parsedDate ? parsedDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : (event.time || 'غير محدد'),
                 location: typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد'),
                 type: event.type || 'meeting',
+                priority: event.priority || 'medium',
                 status: event.status || 'scheduled',
+                isArchived: event.isArchived || false,
                 attendees: event.attendees?.length || 0,
                 startDateTime: eventDate,
                 createdAt: event.createdAt,
                 eventDateFormatted: formatDualDate(eventDate),
                 createdAtFormatted: formatDualDate(event.createdAt),
+                smartDate,
                 taskId: event.taskId, // Event ↔ Task sync
                 _id: event._id,
             }
         })
-    }, [eventsData])
+    }, [eventsData, getSmartDate, formatDualDate])
 
-    // Visible events with load more pagination
-    const visibleEvents = useMemo(() => events.slice(0, visibleCount), [events, visibleCount])
-    const hasMoreEvents = events.length > visibleCount
-    const handleLoadMore = useCallback(() => setVisibleCount(prev => prev + 10), [])
+    // Show all events (no pagination - "View All" link navigates to full list)
+    const visibleEvents = events
 
     // Single event actions
     const handleViewEvent = useCallback((eventId: string) => {
         navigate({ to: ROUTES.dashboard.tasks.events.detail(eventId) })
     }, [navigate])
+
+    const handleEditEvent = useCallback((eventId: string) => {
+        navigate({ to: ROUTES.dashboard.tasks.events.edit(eventId) })
+    }, [navigate])
+
+    const handleArchiveEvent = useCallback((eventId: string) => {
+        archiveEventMutation.mutate(eventId)
+    }, [archiveEventMutation])
+
+    const handleUnarchiveEvent = useCallback((eventId: string) => {
+        unarchiveEventMutation.mutate(eventId)
+    }, [unarchiveEventMutation])
+
+    const handlePriorityChange = useCallback((eventId: string, priority: string) => {
+        updateEventMutation.mutate({ id: eventId, data: { priority: priority as 'low' | 'medium' | 'high' | 'critical' } })
+    }, [updateEventMutation])
 
     const handleDeleteEvent = useCallback(async (eventId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
@@ -509,6 +584,25 @@ export function EventsView() {
                                         </GosiSelect>
                                     </div>
 
+                                    {/* Priority Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={priorityFilter} onValueChange={setPriorityFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.priority', 'الأولوية')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('events.list.allPriorities', 'كل الأولويات')}</GosiSelectItem>
+                                                <GosiSelectItem value="critical" className="font-bold">{t('events.list.critical', 'حرجة')}</GosiSelectItem>
+                                                <GosiSelectItem value="high" className="font-bold">{t('events.list.high', 'عالية')}</GosiSelectItem>
+                                                <GosiSelectItem value="medium" className="font-bold">{t('events.list.medium', 'متوسطة')}</GosiSelectItem>
+                                                <GosiSelectItem value="low" className="font-bold">{t('events.list.low', 'منخفضة')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
                                     {/* Type Filter */}
                                     <div className="flex-1 min-w-[180px]">
                                         <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
@@ -548,6 +642,26 @@ export function EventsView() {
                                                         {member.name || member.email}
                                                     </GosiSelectItem>
                                                 ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Due Date Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={dueDateFilter} onValueChange={setDueDateFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <CalendarIcon className="h-4 w-4 text-emerald-600" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.dueDate', 'تاريخ الاستحقاق')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('events.list.allDates', 'الكل')}</GosiSelectItem>
+                                                <GosiSelectItem value="today" className="font-bold">{t('events.list.today', 'اليوم')}</GosiSelectItem>
+                                                <GosiSelectItem value="thisWeek" className="font-bold">{t('events.list.thisWeek', 'هذا الأسبوع')}</GosiSelectItem>
+                                                <GosiSelectItem value="overdue" className="font-bold">{t('events.list.overdue', 'فات الموعد')}</GosiSelectItem>
+                                                <GosiSelectItem value="noDueDate" className="font-bold">{t('events.list.noDueDate', 'بدون تاريخ')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -683,110 +797,182 @@ export function EventsView() {
                                     onClick={() => handleViewEvent(event.id)}
                                     className={`
                                         animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards
-                                        bg-white rounded-[2rem] p-5 md:p-7
-                                        border-0 ring-1 ring-black/[0.03] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]
-                                        transition-all duration-300 group 
-                                        hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1),0_8px_24px_-8px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 
-                                        cursor-pointer relative overflow-hidden flex flex-col
-                                        ${selectedEventIds.includes(event.id) ? 'ring-2 ring-blue-500 bg-blue-50/20' : ''}
+                                        rounded-2xl p-3 md:p-4
+                                        border-0 ring-1 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
+                                        transition-all duration-300 group
+                                        hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-1
+                                        cursor-pointer relative overflow-hidden
+                                        ${event.smartDate.isOverdue && event.status !== 'completed'
+                                            ? 'bg-red-50/50 ring-red-200/50'
+                                            : selectedEventIds.includes(event.id)
+                                                ? 'ring-2 ring-emerald-500 bg-emerald-50/20'
+                                                : 'bg-white ring-black/[0.03]'
+                                        }
                                     `}
                                 >
-                                    {/* Status Strip Indicator (Blue/Red based on urgency or type could be nice, for now consistent Blue) */}
-                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 bg-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                                    {/* Priority Strip - Always Visible */}
+                                    <div className={`absolute start-0 top-0 bottom-0 w-1.5 rounded-s-2xl transition-all duration-300 ${
+                                        event.priority === 'critical' ? 'bg-red-500' :
+                                        event.priority === 'high' ? 'bg-orange-500' :
+                                        event.priority === 'medium' ? 'bg-amber-400' :
+                                        'bg-emerald-400'
+                                    }`} />
 
-                                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4 ps-2">
-                                        {/* LEFT SIDE: Checkbox + DateBox + Info */}
-                                        <div className="flex gap-5 items-start w-full md:w-auto">
-                                            {isSelectionMode && (
-                                                <div onClick={(e) => e.stopPropagation()}>
-                                                    <Checkbox
-                                                        checked={selectedEventIds.includes(event.id)}
-                                                        onCheckedChange={() => handleSelectEvent(event.id)}
-                                                        className="h-6 w-6 mt-1 rounded-md border-slate-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 flex-shrink-0 transition-all duration-200"
-                                                    />
-                                                </div>
-                                            )}
-
-                                            {/* Date Box (Replaces Icon Box for Events) */}
-                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white flex flex-col items-center justify-center shadow-inner border border-slate-100 text-center overflow-hidden group-hover:scale-105 transition-all duration-300">
-                                                <div className="bg-blue-500 text-white text-[10px] w-full py-0.5 font-bold tracking-wider">
-                                                    {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('ar-SA', { month: 'short' }) : 'NA'}
-                                                </div>
-                                                <div className="text-xl font-bold text-slate-800 pt-1 group-hover:text-blue-600">
-                                                    {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('en-US', { day: 'numeric' }) : '-'}
-                                                </div>
+                                    <div className="flex items-center gap-3 ps-4">
+                                        {/* Selection Checkbox */}
+                                        {isSelectionMode && (
+                                            <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+                                                <Checkbox
+                                                    checked={selectedEventIds.includes(event.id)}
+                                                    onCheckedChange={() => handleSelectEvent(event.id)}
+                                                    className="h-5 w-5 rounded-md border-slate-300 data-[state=checked]:bg-navy data-[state=checked]:border-navy flex-shrink-0 transition-all duration-200"
+                                                />
                                             </div>
+                                        )}
 
-                                            <div className="min-w-0 flex-1 space-y-1.5">
-                                                <div className="flex flex-wrap items-center gap-3 mb-1">
-                                                    <h4 className="font-bold text-slate-800 text-lg md:text-xl group-hover:text-blue-800 transition-colors truncate leading-tight tracking-tight">{event.title}</h4>
+                                        {/* Event Icon */}
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0 border ${
+                                            event.smartDate.isOverdue && event.status !== 'completed' ? 'bg-red-50 text-red-600 border-red-200' :
+                                            event.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                            'bg-slate-50 text-slate-500 border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600'
+                                        }`}>
+                                            {event.smartDate.isOverdue && event.status !== 'completed' ? <AlertTriangle className="h-5 w-5" strokeWidth={1.5} /> :
+                                             event.status === 'completed' ? <CheckCircle className="h-5 w-5" strokeWidth={1.5} /> :
+                                             <CalendarIcon className="h-5 w-5" strokeWidth={1.5} />}
+                                        </div>
 
-                                                    <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 rounded-lg px-2 text-[11px]">
-                                                        {event.type}
+                                        {/* Event Info */}
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h4 className={`font-bold text-sm md:text-base group-hover:text-blue-900 transition-colors truncate leading-tight ${event.status === 'completed' ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                                                    {event.title}
+                                                </h4>
+
+                                                {/* Status Badges */}
+                                                {event.status !== 'completed' && event.smartDate.isOverdue && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                                        {t('events.smartDates.overdue', 'فات الموعد')}
+                                                    </div>
+                                                )}
+
+                                                {event.status === 'completed' && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                                        <CheckCircle className="w-3 h-3" />
+                                                        {t('events.statuses.completed', 'مكتمل')}
+                                                    </div>
+                                                )}
+
+                                                {event.isArchived && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                                        <Archive className="w-3 h-3" />
+                                                        {t('events.statuses.archived', 'مؤرشف')}
+                                                    </div>
+                                                )}
+
+                                                {event.priority === 'critical' && event.status !== 'completed' && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
+                                                        <AlertCircle className="w-3 h-3" />
+                                                        {t('events.list.critical', 'حرجة')}
+                                                    </div>
+                                                )}
+
+                                                {/* Type Badge */}
+                                                <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 rounded-lg px-2 text-[10px]">
+                                                    {t(`events.types.${event.type}`, event.type)}
+                                                </Badge>
+
+                                                {event.taskId && (
+                                                    <Badge
+                                                        className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100 rounded-lg px-2 flex items-center gap-1 cursor-pointer transition-all text-[10px]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
+                                                            navigate({ to: ROUTES.dashboard.tasks.detail(taskId) })
+                                                        }}
+                                                    >
+                                                        <CheckSquare className="h-3 w-3" />
+                                                        مرتبط بمهمة
                                                     </Badge>
-
-                                                    {event.taskId && (
-                                                        <Badge
-                                                            className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100 rounded-lg px-2 flex items-center gap-1 cursor-pointer transition-all text-[11px]"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
-                                                                navigate({ to: ROUTES.dashboard.tasks.detail(taskId) })
-                                                            }}
-                                                        >
-                                                            <CheckSquare className="h-3 w-3" />
-                                                            مرتبط بمهمة
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm font-medium">
-                                                    <span className="flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-blue-500" />
-                                                        {event.time}
-                                                    </span>
-                                                    <span className="flex items-center gap-2">
-                                                        <MapPin className="w-4 h-4 text-blue-500" />
-                                                        {event.location}
-                                                    </span>
-                                                </div>
+                                                )}
                                             </div>
-
-                                            {/* Mobile Chevron */}
-                                            <div className="md:hidden ms-auto text-slate-300 group-hover:text-blue-500 group-hover:translate-x-[-4px] transition-all duration-300 rtl:rotate-180 self-center">
-                                                <ChevronLeft className="h-6 w-6 rtl:rotate-0 ltr:rotate-180" />
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <p className="text-slate-500 text-xs font-medium flex items-center gap-1">
+                                                    <Clock className="w-3 h-3 text-emerald-500" />
+                                                    {event.time}
+                                                </p>
+                                                <span className="text-slate-300">•</span>
+                                                <p className="text-slate-500 text-xs font-medium flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3 text-emerald-500" />
+                                                    {event.location}
+                                                </p>
                                             </div>
                                         </div>
 
+                                        {/* Mobile Chevron */}
+                                        <div className="md:hidden text-slate-400 group-hover:text-emerald-600 transition-all duration-300 rtl:rotate-180">
+                                            <ChevronLeft className="h-5 w-5 rtl:rotate-0 ltr:rotate-180" />
+                                        </div>
+
+                                        {/* Quick Complete Checkbox */}
+                                        <div onClick={(e) => e.stopPropagation()} className="hidden md:flex items-center">
+                                            <Checkbox
+                                                checked={event.status === 'completed'}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) handleCompleteEvent(event.id)
+                                                }}
+                                                disabled={event.status === 'completed'}
+                                                className="h-5 w-5 rounded-md border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200 hover:border-emerald-400 me-2"
+                                            />
+                                        </div>
+
                                         {/* RIGHT SIDE: Action Menu */}
-                                        <div className="absolute end-4 top-4" onClick={(e) => e.stopPropagation()}>
+                                        <div onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl">
-                                                        <MoreHorizontal className="h-6 w-6" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy hover:bg-slate-100 rounded-xl h-8 w-8">
+                                                        <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-0 ring-1 ring-black/5">
                                                     <DropdownMenuItem onClick={() => handleViewEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                         <Eye className="h-4 w-4 ms-2" />
-                                                        عرض التفاصيل
+                                                        {t('events.actions.viewDetails', 'عرض التفاصيل')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleEditEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Edit3 className="h-4 w-4 ms-2" />
+                                                        {t('events.actions.edit', 'تعديل')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {event.status !== 'completed' && (
                                                         <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
-                                                            إكمال
+                                                            {t('events.actions.complete', 'إكمال')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancelEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <XCircle className="h-4 w-4 ms-2 text-orange-500" />
-                                                            إلغاء
+                                                            {t('events.actions.cancel', 'إلغاء')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'completed' && event.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => setPostponeEventId(event.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <CalendarClock className="h-4 w-4 ms-2 text-blue-500" />
-                                                            تأجيل
+                                                            {t('events.actions.postpone', 'تأجيل')}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    {/* Archive/Unarchive */}
+                                                    {!event.isArchived ? (
+                                                        <DropdownMenuItem onClick={() => handleArchiveEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <Archive className="h-4 w-4 ms-2 text-slate-500" />
+                                                            {t('events.actions.archive', 'أرشفة')}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleUnarchiveEvent(event.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <ArchiveRestore className="h-4 w-4 ms-2 text-blue-500" />
+                                                            {t('events.actions.unarchive', 'إلغاء الأرشفة')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -795,87 +981,28 @@ export function EventsView() {
                                                         className="text-red-600 focus:text-red-600 rounded-lg py-2.5 cursor-pointer bg-red-50/50 hover:bg-red-50"
                                                     >
                                                         <Trash2 className="h-4 w-4 ms-2" />
-                                                        حذف
+                                                        {t('events.actions.delete', 'حذف')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
 
-                                        {/* Desktop Action Buttons */}
-                                        <div className="hidden sm:inline-flex items-center gap-2 mt-auto self-center" onClick={(e) => e.stopPropagation()}>
-                                            {/* RSVP Buttons */}
-                                            {event.status === 'scheduled' && (
-                                                <div className="flex gap-2 me-2">
-                                                    <GosiButton
-                                                        variant="ghost"
-                                                        onClick={() => handleRSVP(event.id, 'declined')}
-                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl px-4 h-10 w-auto"
-                                                    >
-                                                        اعتذار
-                                                    </GosiButton>
-                                                    <GosiButton
-                                                        onClick={() => handleRSVP(event.id, 'accepted')}
-                                                        className="bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white border border-blue-100 hover:border-blue-500 rounded-xl px-4 h-10 w-auto shadow-sm hover:shadow-lg transition-all"
-                                                    >
-                                                        تأكيد
-                                                    </GosiButton>
-                                                </div>
-                                            )}
-
-                                            {/* View Details Button */}
-                                            <GosiButton onClick={() => handleViewEvent(event.id)} className="bg-slate-50 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-100 hover:border-slate-800 rounded-xl px-6 h-10 shadow-sm hover:shadow-lg w-auto transition-all duration-300 hover:scale-105 active:scale-95 group/btn">
-                                                {t('events.list.viewDetails', 'التفاصيل')}
-                                                <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180 transition-transform group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1" />
-                                            </GosiButton>
-                                        </div>
-                                    </div>
-
-                                    {/* Footer Info (Attendees, Creation Date) */}
-                                    <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-400">
-                                        <div className="flex items-center gap-4">
-                                            {/* Attendees Avatars */}
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex -space-x-2 rtl:space-x-reverse">
-                                                    {[...Array(Math.min(3, event.attendees))].map((_, i) => (
-                                                        <div key={i} className="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-500">
-                                                            <Users className="w-3 h-3" />
-                                                        </div>
-                                                    ))}
-                                                    {event.attendees > 3 && (
-                                                        <div className="w-6 h-6 rounded-full bg-slate-50 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-400">
-                                                            +{event.attendees - 3}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {event.attendees > 0 && <span>{event.attendees} حضور</span>}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-1">
-                                            <span>تم الإنشاء:</span>
-                                            <span className="font-medium text-slate-500">{event.createdAtFormatted.arabic}</span>
-                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Load More Button - Gold Standard Pattern */}
-                        {hasMoreEvents && !isLoading && (
-                            <div className="flex justify-center pt-4">
-                                <GosiButton
-                                    onClick={handleLoadMore}
-                                    variant="outline"
-                                    className="w-full max-w-sm h-12 rounded-2xl border-2 border-dashed border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-600 hover:text-emerald-600 font-bold transition-all"
-                                >
-                                    <Plus className="w-5 h-5 ms-2" aria-hidden="true" />
-                                    {t('events.list.showMore', 'عرض المزيد')}
-                                    <span className="text-xs text-slate-400 ms-2">
-                                        ({visibleCount} / {events.length})
-                                    </span>
-                                </GosiButton>
-                            </div>
-                        )}
+                        {/* View All Section */}
+                        <div className="flex flex-col items-center gap-3 pt-4">
+                            <Link
+                                to={ROUTES.dashboard.tasks.events.list}
+                                className="flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group py-2"
+                            >
+                                {t('events.list.viewAllEvents', 'عرض جميع الأحداث')}
+                                <span className="text-xs text-slate-400">({events.length})</span>
+                                <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1" />
+                            </Link>
+                        </div>
                     </div>
 
                     {/* LEFT COLUMN (Widgets) */}

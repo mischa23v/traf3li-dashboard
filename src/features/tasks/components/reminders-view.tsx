@@ -19,7 +19,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats, useUpdateReminder, useBulkCompleteReminders, useBulkArchiveReminders, useBulkUnarchiveReminders } from '@/hooks/useRemindersAndEvents'
+import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats, useUpdateReminder, useBulkCompleteReminders, useBulkArchiveReminders, useBulkUnarchiveReminders, useArchiveReminder, useUnarchiveReminder } from '@/hooks/useRemindersAndEvents'
 import { useTeamMembers, useCases } from '@/hooks/useCasesAndClients'
 import { Briefcase, User } from 'lucide-react'
 import {
@@ -255,6 +255,8 @@ export function RemindersView() {
     const bulkCompleteMutation = useBulkCompleteReminders()
     const bulkArchiveMutation = useBulkArchiveReminders()
     const bulkUnarchiveMutation = useBulkUnarchiveReminders()
+    const archiveReminderMutation = useArchiveReminder()
+    const unarchiveReminderMutation = useUnarchiveReminder()
 
     // Team members and cases for filter dropdowns (DEFERRED)
     const { data: teamMembers } = useTeamMembers(isFilterDataReady)
@@ -274,7 +276,7 @@ export function RemindersView() {
     }, [teamMembers])
 
     useEffect(() => {
-        if (casesData) perfLog('API LOADED: cases (DEFERRED)', { count: casesData?.length })
+        if (casesData) perfLog('API LOADED: cases (DEFERRED)', { count: casesData?.cases?.length })
     }, [casesData])
 
     useEffect(() => {
@@ -342,6 +344,14 @@ export function RemindersView() {
     const handlePriorityChange = useCallback((reminderId: string, priority: string) => {
         updateReminderMutation.mutate({ id: reminderId, data: { priority: priority as 'low' | 'medium' | 'high' | 'critical' } })
     }, [updateReminderMutation])
+
+    const handleArchiveReminder = useCallback((reminderId: string) => {
+        archiveReminderMutation.mutate(reminderId)
+    }, [archiveReminderMutation])
+
+    const handleUnarchiveReminder = useCallback((reminderId: string) => {
+        unarchiveReminderMutation.mutate(reminderId)
+    }, [unarchiveReminderMutation])
 
     // Transform API data
     const reminders = useMemo(() => {
@@ -671,7 +681,7 @@ export function RemindersView() {
                                             </GosiSelectTrigger>
                                             <GosiSelectContent>
                                                 <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allCases', 'كل القضايا')}</GosiSelectItem>
-                                                {casesData?.map((caseItem: any) => (
+                                                {casesData?.cases?.map((caseItem: any) => (
                                                     <GosiSelectItem key={caseItem.id} value={caseItem.id} className="font-bold">
                                                         {caseItem.title || caseItem.caseNumber}
                                                     </GosiSelectItem>
@@ -943,6 +953,19 @@ export function RemindersView() {
                                                                     <UserPlus className="h-4 w-4 ms-2 text-purple-500" />
                                                                     {t('reminders.list.delegate', 'تفويض')}
                                                                 </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                {/* Archive/Unarchive */}
+                                                                {!reminder.isArchived ? (
+                                                                    <DropdownMenuItem onClick={() => handleArchiveReminder(reminder.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                                        <Archive className="h-4 w-4 ms-2 text-slate-500" />
+                                                                        {t('reminders.actions.archive', 'أرشفة')}
+                                                                    </DropdownMenuItem>
+                                                                ) : (
+                                                                    <DropdownMenuItem onClick={() => handleUnarchiveReminder(reminder.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                                        <ArchiveRestore className="h-4 w-4 ms-2 text-blue-500" />
+                                                                        {t('reminders.actions.unarchive', 'إلغاء الأرشفة')}
+                                                                    </DropdownMenuItem>
+                                                                )}
                                                                 <DropdownMenuSeparator />
                                                                 <DropdownMenuItem
                                                                     onClick={() => handleDeleteReminder(reminder.id)}

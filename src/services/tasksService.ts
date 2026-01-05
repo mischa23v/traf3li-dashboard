@@ -2004,6 +2004,194 @@ const tasksService = {
       )
     }
   },
+
+  // ==================== Clone/Duplicate ====================
+
+  /**
+   * Clone/duplicate a task
+   * POST /tasks/:id/clone
+   */
+  cloneTask: async (taskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/clone`)
+      return response.data.task || response.data.data || response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to clone task: ${errorMsg}`,
+          `فشل في نسخ المهمة: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  // ==================== Archive Operations ====================
+
+  /**
+   * Archive a single task
+   * POST /tasks/:id/archive
+   */
+  archiveTask: async (taskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/archive`)
+      return response.data.task || response.data.data || response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to archive task: ${errorMsg}`,
+          `فشل في أرشفة المهمة: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  /**
+   * Unarchive a single task
+   * POST /tasks/:id/unarchive
+   */
+  unarchiveTask: async (taskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/unarchive`)
+      return response.data.task || response.data.data || response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to unarchive task: ${errorMsg}`,
+          `فشل في إلغاء أرشفة المهمة: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  /**
+   * Bulk archive tasks
+   * POST /tasks/bulk/archive
+   */
+  bulkArchive: async (taskIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/tasks/bulk/archive', { taskIds })
+      return response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to archive tasks: ${errorMsg}`,
+          `فشل في أرشفة المهام: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  /**
+   * Bulk unarchive tasks
+   * POST /tasks/bulk/unarchive
+   */
+  bulkUnarchive: async (taskIds: string[]): Promise<BulkOperationResult> => {
+    try {
+      const response = await apiClient.post('/tasks/bulk/unarchive', { taskIds })
+      return response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to unarchive tasks: ${errorMsg}`,
+          `فشل في إلغاء أرشفة المهام: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  // ==================== Reschedule ====================
+
+  /**
+   * Reschedule a task
+   * POST /tasks/:id/reschedule
+   */
+  rescheduleTask: async (taskId: string, dueDate: string, dueTime?: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/reschedule`, { dueDate, dueTime })
+      return response.data.task || response.data.data || response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to reschedule task: ${errorMsg}`,
+          `فشل في إعادة جدولة المهمة: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  // ==================== Reorder (Drag & Drop) ====================
+
+  /**
+   * Reorder tasks (for drag & drop)
+   * POST /tasks/reorder
+   */
+  reorderTasks: async (taskIds: string[]): Promise<void> => {
+    try {
+      await apiClient.post('/tasks/reorder', { taskIds })
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to reorder tasks: ${errorMsg}`,
+          `فشل في إعادة ترتيب المهام: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  // ==================== Select All (Get All IDs) ====================
+
+  /**
+   * Get all task IDs matching filters (for select all)
+   * GET /tasks/ids
+   */
+  getAllTaskIds: async (filters?: TaskFilters): Promise<string[]> => {
+    try {
+      const response = await apiClient.get('/tasks/ids', { params: filters })
+      return response.data.ids || response.data.taskIds || response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to get task IDs: ${errorMsg}`,
+          `فشل في الحصول على معرفات المهام: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  // ==================== Export with Format ====================
+
+  /**
+   * Export tasks with specific format
+   * GET /tasks/export?format=csv|excel|pdf|json
+   */
+  exportTasksWithFormat: async (
+    format: 'csv' | 'excel' | 'pdf' | 'json',
+    filters?: TaskFilters
+  ): Promise<Blob> => {
+    try {
+      const response = await apiClient.get('/tasks/export', {
+        params: { ...filters, format },
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to export tasks: ${errorMsg}`,
+          `فشل في تصدير المهام: ${errorMsg}`
+        )
+      )
+    }
+  },
 }
 
 // Task Document interface

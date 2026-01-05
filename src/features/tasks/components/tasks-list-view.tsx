@@ -34,14 +34,14 @@ import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { ProductivityHero } from '@/components/productivity-hero'
-import { useTasks, useTaskStats, useBulkDeleteTasks } from '@/hooks/useTasks'
+import { useTasks, useTaskStats, useBulkDeleteTasks, useBulkCompleteTasks, useBulkArchiveTasks, useBulkUnarchiveTasks, useCloneTask, useArchiveTask, useUnarchiveTask } from '@/hooks/useTasks'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Clock, AlertTriangle, User, Sparkles, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, ArrowRight, ArrowUpDown, Clock, AlertTriangle, User, Sparkles, Lightbulb, RefreshCw, Loader2, Copy, Archive, ArchiveRestore } from 'lucide-react'
 import { differenceInDays, isToday, isTomorrow, isThisWeek, isPast, startOfDay } from 'date-fns'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useUpdateTaskStatus, useUpdateTask } from '@/hooks/useTasks'
@@ -171,6 +171,12 @@ export function TasksListView() {
     const deleteTaskMutation = useDeleteTask()
     const updateTaskStatusMutation = useUpdateTaskStatus()
     const updateTaskMutation = useUpdateTask()
+    const cloneTaskMutation = useCloneTask()
+    const archiveTaskMutation = useArchiveTask()
+    const unarchiveTaskMutation = useUnarchiveTask()
+    const bulkCompleteTasksMutation = useBulkCompleteTasks()
+    const bulkArchiveTasksMutation = useBulkArchiveTasks()
+    const bulkUnarchiveTasksMutation = useBulkUnarchiveTasks()
 
     // AI Suggestion fetch function with proper cleanup, timeout, and rate limiting
     const fetchAiSuggestion = useCallback(async (taskList: any[], forceRefresh = false) => {
@@ -249,8 +255,14 @@ export function TasksListView() {
         // Status filter
         if (activeStatusTab === 'active') {
             f.status = ['backlog', 'todo', 'in_progress']
+            f.isArchived = false // Exclude archived tasks from active view
         } else if (activeStatusTab === 'completed') {
             f.status = 'done'
+            f.isArchived = false // Exclude archived tasks from completed view
+        } else if (activeStatusTab === 'archived') {
+            f.isArchived = true // Show only archived tasks
+        } else if (activeStatusTab === 'all') {
+            f.isArchived = false // Exclude archived from "all" view - archived is a separate category
         }
 
         // Search
@@ -551,6 +563,77 @@ export function TasksListView() {
         updateTaskMutation.mutate({ id: taskId, data: { priority: priority as any } })
     }, [updateTaskMutation])
 
+    const handleCloneTask = useCallback((taskId: string) => {
+        cloneTaskMutation.mutate(taskId)
+    }, [cloneTaskMutation])
+
+    const handleArchiveTask = useCallback((taskId: string) => {
+        archiveTaskMutation.mutate(taskId)
+    }, [archiveTaskMutation])
+
+    const handleUnarchiveTask = useCallback((taskId: string) => {
+        unarchiveTaskMutation.mutate(taskId)
+    }, [unarchiveTaskMutation])
+
+    // Bulk action handlers
+    const handleBulkComplete = useCallback(() => {
+        if (selectedTaskIds.length === 0) return
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من إكمال ${selectedTaskIds.length} مهمة؟ | Are you sure you want to complete ${selectedTaskIds.length} tasks?`
+            : `Are you sure you want to complete ${selectedTaskIds.length} tasks? | هل أنت متأكد من إكمال ${selectedTaskIds.length} مهمة؟`
+
+        if (confirm(confirmMessage)) {
+            bulkCompleteTasksMutation.mutate(selectedTaskIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedTaskIds([])
+                }
+            })
+        }
+    }, [selectedTaskIds, i18n.language, bulkCompleteTasksMutation])
+
+    const handleBulkArchive = useCallback(() => {
+        if (selectedTaskIds.length === 0) return
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من أرشفة ${selectedTaskIds.length} مهمة؟ | Are you sure you want to archive ${selectedTaskIds.length} tasks?`
+            : `Are you sure you want to archive ${selectedTaskIds.length} tasks? | هل أنت متأكد من أرشفة ${selectedTaskIds.length} مهمة؟`
+
+        if (confirm(confirmMessage)) {
+            bulkArchiveTasksMutation.mutate(selectedTaskIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedTaskIds([])
+                }
+            })
+        }
+    }, [selectedTaskIds, i18n.language, bulkArchiveTasksMutation])
+
+    const handleBulkUnarchive = useCallback(() => {
+        if (selectedTaskIds.length === 0) return
+        const confirmMessage = i18n.language === 'ar'
+            ? `هل أنت متأكد من إلغاء أرشفة ${selectedTaskIds.length} مهمة؟ | Are you sure you want to unarchive ${selectedTaskIds.length} tasks?`
+            : `Are you sure you want to unarchive ${selectedTaskIds.length} tasks? | هل أنت متأكد من إلغاء أرشفة ${selectedTaskIds.length} مهمة؟`
+
+        if (confirm(confirmMessage)) {
+            bulkUnarchiveTasksMutation.mutate(selectedTaskIds, {
+                onSuccess: () => {
+                    setIsSelectionMode(false)
+                    setSelectedTaskIds([])
+                }
+            })
+        }
+    }, [selectedTaskIds, i18n.language, bulkUnarchiveTasksMutation])
+
+    const handleSelectAll = useCallback(() => {
+        if (!tasks) return
+        // Toggle: if all selected, deselect all; otherwise select all
+        if (selectedTaskIds.length === tasks.length && tasks.length > 0) {
+            setSelectedTaskIds([])
+        } else {
+            setSelectedTaskIds(tasks.map(t => t.id))
+        }
+    }, [tasks, selectedTaskIds])
+
     const topNav = [
         { title: t('tasks.nav.overview'), href: ROUTES.dashboard.home, isActive: false },
         { title: t('tasks.nav.tasks'), href: ROUTES.dashboard.tasks.list, isActive: true },
@@ -654,6 +737,7 @@ export function TasksListView() {
                                                 <GosiSelectItem value="all" className="font-bold">{t('tasks.list.allTasks')}</GosiSelectItem>
                                                 <GosiSelectItem value="active" className="font-bold">{t('tasks.list.active')}</GosiSelectItem>
                                                 <GosiSelectItem value="completed" className="font-bold">{t('tasks.list.completed')}</GosiSelectItem>
+                                                <GosiSelectItem value="archived" className="font-bold">{t('tasks.list.archived', 'مؤرشفة')}</GosiSelectItem>
                                             </GosiSelectContent>
                                         </GosiSelect>
                                     </div>
@@ -1031,6 +1115,14 @@ export function TasksListView() {
                                                     </div>
                                                 )}
 
+                                                {/* Archived Badge */}
+                                                {task.isArchived && (
+                                                    <div className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">
+                                                        <Archive className="w-3 h-3" />
+                                                        {t('tasks.list.archived', 'مؤرشفة')}
+                                                    </div>
+                                                )}
+
                                                 {/* Task ↔ Event Sync Badge */}
                                                 {(task.linkedEventId || task.eventId) && (
                                                     <div
@@ -1102,6 +1194,10 @@ export function TasksListView() {
                                                         <Eye className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleCloneTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Copy className="h-4 w-4 ms-2 text-purple-500" />
+                                                        {t('tasks.list.cloneTask', 'نسخ المهمة')}
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
@@ -1112,6 +1208,18 @@ export function TasksListView() {
                                                         <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <XCircle className="h-4 w-4 ms-2 text-amber-500" />
                                                             {t('tasks.list.reopenTask')}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    {!(task as any).isArchived ? (
+                                                        <DropdownMenuItem onClick={() => handleArchiveTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <Archive className="h-4 w-4 ms-2 text-slate-500" />
+                                                            {t('tasks.list.archiveTask', 'أرشفة')}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleUnarchiveTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <ArchiveRestore className="h-4 w-4 ms-2 text-slate-500" />
+                                                            {t('tasks.list.unarchiveTask', 'إلغاء الأرشفة')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -1158,6 +1266,10 @@ export function TasksListView() {
                                                         <Eye className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleCloneTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                        <Copy className="h-4 w-4 ms-2 text-purple-500" />
+                                                        {t('tasks.list.cloneTask', 'نسخ المهمة')}
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
@@ -1168,6 +1280,18 @@ export function TasksListView() {
                                                         <DropdownMenuItem onClick={() => handleReopenTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
                                                             <XCircle className="h-4 w-4 ms-2 text-amber-500" />
                                                             {t('tasks.list.reopenTask')}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    {!(task as any).isArchived ? (
+                                                        <DropdownMenuItem onClick={() => handleArchiveTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <Archive className="h-4 w-4 ms-2 text-slate-500" />
+                                                            {t('tasks.list.archiveTask', 'أرشفة')}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleUnarchiveTask(task.id)} className="rounded-lg py-2.5 cursor-pointer">
+                                                            <ArchiveRestore className="h-4 w-4 ms-2 text-slate-500" />
+                                                            {t('tasks.list.unarchiveTask', 'إلغاء الأرشفة')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -1297,6 +1421,15 @@ export function TasksListView() {
                         onToggleSelectionMode={handleToggleSelectionMode}
                         selectedCount={selectedTaskIds.length}
                         onDeleteSelected={handleDeleteSelected}
+                        onBulkComplete={handleBulkComplete}
+                        onBulkArchive={handleBulkArchive}
+                        onBulkUnarchive={handleBulkUnarchive}
+                        onSelectAll={handleSelectAll}
+                        totalTaskCount={tasks?.length || 0}
+                        isBulkCompletePending={bulkCompleteTasksMutation.isPending}
+                        isBulkArchivePending={bulkArchiveTasksMutation.isPending}
+                        isBulkUnarchivePending={bulkUnarchiveTasksMutation.isPending}
+                        isViewingArchived={activeStatusTab === 'archived'}
                     />
                 </div >
             </Main >
