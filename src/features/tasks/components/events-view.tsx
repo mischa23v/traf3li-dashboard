@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDebouncedCallback } from 'use-debounce'
+import { useAdaptiveSearchDebounce } from '@/hooks/useAdaptiveDebounce'
 import { PERF_DEBUG, perfLog } from '@/lib/perf-debug'
 import { TasksSidebar } from './tasks-sidebar'
 import {
-    Calendar as CalendarIcon, MoreHorizontal, Plus,
-    MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
+    Calendar as CalendarIcon, MoreHorizontal, Plus, Filter,
+    MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users, Briefcase, User,
     CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock,
     SortAsc, X, CheckSquare, ArrowRight
 } from 'lucide-react'
@@ -21,6 +21,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats, useBulkCompleteEvents, useBulkArchiveEvents, useBulkUnarchiveEvents } from '@/hooks/useRemindersAndEvents'
+import { useTeamMembers, useCases } from '@/hooks/useCasesAndClients'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -89,20 +90,35 @@ export function EventsView() {
         })
     }
 
+    // Deferred filter data loading (performance optimization)
+    const [isFilterDataReady, setIsFilterDataReady] = useState(false)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            perfLog('Filter data load TRIGGERED - loading teamMembers & cases')
+            setIsFilterDataReady(true)
+        }, 500)
+        return () => clearTimeout(timer)
+    }, [])
+
+    // UI states
+    const [showFilters, setShowFilters] = useState(false)
+    const [visibleCount, setVisibleCount] = useState(10)
+
     // Filter states
     const [searchQuery, setSearchQuery] = useState('')
     const [typeFilter, setTypeFilter] = useState<string>('all')
+    const [assignedFilter, setAssignedFilter] = useState<string>('all')
+    const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('startDate')
 
-    // Debounced search handler (enterprise-grade: 300ms debounce, min 2 chars)
-    const debouncedSetSearch = useDebouncedCallback(
+    // Adaptive debounce search handler (enterprise-grade: typing speed aware)
+    const { debouncedCallback: debouncedSetSearch, recordKeypress } = useAdaptiveSearchDebounce(
         (value: string) => {
             // Only search if empty (clear) or has at least 2 characters
             if (value === '' || value.trim().length >= 2) {
                 setSearchQuery(value)
             }
-        },
-        300
+        }
     )
 
     // API filters - use date-based filters that backend supports
@@ -126,25 +142,46 @@ export function EventsView() {
             f.type = typeFilter
         }
 
+        // Assigned To filter
+        if (assignedFilter === 'me') {
+            f.assignedTo = 'me'
+        } else if (assignedFilter === 'unassigned') {
+            f.assignedTo = 'unassigned'
+        } else if (assignedFilter !== 'all') {
+            f.assignedTo = assignedFilter
+        }
+
+        // Case filter
+        if (caseFilter !== 'all') {
+            f.caseId = caseFilter
+        }
+
         if (sortBy) {
             f.sortBy = sortBy
             f.sortOrder = 'asc'
         }
 
         return f
-    }, [activeTab, searchQuery, typeFilter, sortBy])
+    }, [activeTab, searchQuery, typeFilter, assignedFilter, caseFilter, sortBy])
 
     // Check if any filter is active
     const hasActiveFilters = useMemo(() =>
-        searchQuery || typeFilter !== 'all',
-        [searchQuery, typeFilter]
+        searchQuery || typeFilter !== 'all' || assignedFilter !== 'all' || caseFilter !== 'all',
+        [searchQuery, typeFilter, assignedFilter, caseFilter]
     )
 
     // Clear all filters
     const clearFilters = useCallback(() => {
         setSearchQuery('')
         setTypeFilter('all')
+        setAssignedFilter('all')
+        setCaseFilter('all')
     }, [])
+
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(10)
+    }, [activeTab, searchQuery, typeFilter, assignedFilter, caseFilter, sortBy])
 
     // Helper function to format dates based on current locale
     const formatDualDate = useCallback((dateString: string | null | undefined) => {
@@ -170,6 +207,10 @@ export function EventsView() {
     const bulkCompleteMutation = useBulkCompleteEvents()
     const bulkArchiveMutation = useBulkArchiveEvents()
     const bulkUnarchiveMutation = useBulkUnarchiveEvents()
+
+    // Team members and cases for filter dropdowns (DEFERRED)
+    const { data: teamMembers } = useTeamMembers(isFilterDataReady)
+    const { data: casesData } = useCases(undefined, isFilterDataReady)
 
     // Performance: Track API load completion
     useEffect(() => {
@@ -221,6 +262,11 @@ export function EventsView() {
             }
         })
     }, [eventsData])
+
+    // Visible events with load more pagination
+    const visibleEvents = useMemo(() => events.slice(0, visibleCount), [events, visibleCount])
+    const hasMoreEvents = events.length > visibleCount
+    const handleLoadMore = useCallback(() => setVisibleCount(prev => prev + 10), [])
 
     // Single event actions
     const handleViewEvent = useCallback((eventId: string) => {
@@ -406,97 +452,190 @@ export function EventsView() {
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* FILTERS BAR - Responsive Flex Wrap */}
+                        {/* FILTERS BAR - Gold Standard Pattern */}
                         <GosiCard className="p-4 md:p-6 rounded-[2rem]">
-                            <div className="flex flex-wrap items-center gap-3 transition-all duration-300 ease-in-out">
-                                {/* Search Input - Debounced for enterprise-grade performance */}
-                                <div className="relative flex-1 min-w-[200px]">
-                                    <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
-                                    <GosiInput
-                                        type="text"
-                                        placeholder={t('events.list.searchPlaceholder')}
-                                        defaultValue={searchQuery}
-                                        onChange={(e) => debouncedSetSearch(e.target.value)}
-                                        className="pe-12 h-14 w-full text-base"
-                                        aria-label={t('events.list.searchPlaceholder')}
-                                    />
-                                </div>
-
-                                {/* Status Filter (Tab Switcher) */}
-                                <div className="flex-1 min-w-[150px]">
-                                    <GosiSelect value={activeTab} onValueChange={setActiveTab}>
-                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
-                                            <div className="flex items-center gap-2 truncate">
-                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.status')}:</span>
-                                                <GosiSelectValue />
+                            <div className="space-y-4">
+                                {/* Top Row: Search + Filter Toggle */}
+                                <div className="flex flex-col lg:flex-row gap-3">
+                                    {/* Search Input - Adaptive Debounce */}
+                                    <div className="relative flex-1 min-w-[200px]">
+                                        <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" aria-hidden="true" />
+                                        <GosiInput
+                                            type="text"
+                                            placeholder={t('events.list.searchPlaceholder')}
+                                            defaultValue={searchQuery}
+                                            onKeyDown={recordKeypress}
+                                            onChange={(e) => debouncedSetSearch(e.target.value)}
+                                            className="pe-12 h-14 w-full text-base"
+                                            aria-label={t('events.list.searchPlaceholder')}
+                                        />
+                                        {/* Loading indicator when searching */}
+                                        {isFetching && searchQuery && (
+                                            <div className="absolute start-4 top-1/2 -translate-y-1/2">
+                                                <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                                             </div>
-                                        </GosiSelectTrigger>
-                                        <GosiSelectContent>
-                                            <GosiSelectItem value="upcoming">{t('events.list.upcoming')}</GosiSelectItem>
-                                            <GosiSelectItem value="past">{t('events.list.past')}</GosiSelectItem>
-                                        </GosiSelectContent>
-                                    </GosiSelect>
-                                </div>
+                                        )}
+                                    </div>
 
-                                {/* Type Filter */}
-                                <div className="flex-1 min-w-[180px]">
-                                    <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
-                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
-                                            <div className="flex items-center gap-2 truncate">
-                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.type')}:</span>
-                                                <GosiSelectValue />
-                                            </div>
-                                        </GosiSelectTrigger>
-                                        <GosiSelectContent>
-                                            <GosiSelectItem value="all">{t('events.list.allTypes')}</GosiSelectItem>
-                                            <GosiSelectItem value="meeting">{t('events.list.meeting')}</GosiSelectItem>
-                                            <GosiSelectItem value="court_hearing">{t('events.list.courtHearing')}</GosiSelectItem>
-                                            <GosiSelectItem value="conference">{t('events.list.conference')}</GosiSelectItem>
-                                            <GosiSelectItem value="webinar">{t('events.list.webinar')}</GosiSelectItem>
-                                            <GosiSelectItem value="workshop">{t('events.list.workshop')}</GosiSelectItem>
-                                        </GosiSelectContent>
-                                    </GosiSelect>
-                                </div>
-
-                                {/* Sort By */}
-                                <div className="flex-[0.5] min-w-[160px]">
-                                    <GosiSelect value={sortBy} onValueChange={setSortBy}>
-                                        <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
-                                            <div className="flex items-center gap-2 truncate">
-                                                <SortAsc className="h-4 w-4 text-blue-500" />
-                                                <span className="text-slate-400 font-medium text-xs uppercase tracking-wider">{t('events.list.sortBy')}:</span>
-                                                <GosiSelectValue />
-                                            </div>
-                                        </GosiSelectTrigger>
-                                        <GosiSelectContent>
-                                            <GosiSelectItem value="startDate">{t('events.list.eventDate')}</GosiSelectItem>
-                                            <GosiSelectItem value="createdAt">{t('events.list.creationDate')}</GosiSelectItem>
-                                            <GosiSelectItem value="title">{t('events.list.name')}</GosiSelectItem>
-                                        </GosiSelectContent>
-                                    </GosiSelect>
-                                </div>
-
-                                {/* Clear Filters Button */}
-                                {hasActiveFilters && (
+                                    {/* Filter Toggle Button */}
                                     <GosiButton
-                                        variant="ghost"
-                                        onClick={clearFilters}
-                                        className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
+                                        variant={showFilters || hasActiveFilters ? "default" : "outline"}
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className={`h-14 w-full sm:w-auto px-6 whitespace-nowrap transition-all ${showFilters || hasActiveFilters ? 'bg-navy text-white border-navy' : ''}`}
                                     >
-                                        <X className="h-5 w-5 ms-2" aria-hidden="true" />
-                                        {t('events.list.clearFilters')}
+                                        <Filter className="h-5 w-5 ms-2" aria-hidden="true" />
+                                        {t('events.list.filters', 'تصفية')}
+                                        {hasActiveFilters && (
+                                            <span className="ms-2 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full">!</span>
+                                        )}
                                     </GosiButton>
-                                )}
+                                </div>
+
+                                {/* Collapsible Filters - Animated */}
+                                <div className={`flex-wrap gap-4 transition-all duration-300 ease-in-out overflow-hidden ${showFilters ? 'flex opacity-100 max-h-[500px] mt-4' : 'hidden opacity-0 max-h-0'}`}>
+                                    {/* Status Filter (Tab Switcher) */}
+                                    <div className="flex-1 min-w-[150px]">
+                                        <GosiSelect value={activeTab} onValueChange={setActiveTab}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.status')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="upcoming" className="font-bold">{t('events.list.upcoming')}</GosiSelectItem>
+                                                <GosiSelectItem value="past" className="font-bold">{t('events.list.past')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Type Filter */}
+                                    <div className="flex-1 min-w-[180px]">
+                                        <GosiSelect value={typeFilter} onValueChange={setTypeFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.type')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('events.list.allTypes')}</GosiSelectItem>
+                                                <GosiSelectItem value="meeting" className="font-bold">{t('events.list.meeting')}</GosiSelectItem>
+                                                <GosiSelectItem value="court_hearing" className="font-bold">{t('events.list.courtHearing')}</GosiSelectItem>
+                                                <GosiSelectItem value="conference" className="font-bold">{t('events.list.conference')}</GosiSelectItem>
+                                                <GosiSelectItem value="webinar" className="font-bold">{t('events.list.webinar')}</GosiSelectItem>
+                                                <GosiSelectItem value="workshop" className="font-bold">{t('events.list.workshop')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Assigned To Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={assignedFilter} onValueChange={setAssignedFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <User className="h-4 w-4 text-emerald-500" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.assignedTo', 'المسند إليه')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('events.list.allAssignees', 'الكل')}</GosiSelectItem>
+                                                <GosiSelectItem value="me" className="font-bold">{t('events.list.assignedToMe', 'المسندة إليّ')}</GosiSelectItem>
+                                                <GosiSelectItem value="unassigned" className="font-bold">{t('events.list.unassigned', 'غير مسندة')}</GosiSelectItem>
+                                                {teamMembers?.map((member: any) => (
+                                                    <GosiSelectItem key={member._id} value={member._id} className="font-bold">
+                                                        {member.name || member.email}
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Case Filter */}
+                                    <div className="flex-1 min-w-[220px]">
+                                        <GosiSelect value={caseFilter} onValueChange={setCaseFilter}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <Briefcase className="h-4 w-4 text-emerald-500" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.case', 'القضية')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="all" className="font-bold">{t('events.list.allCases', 'جميع القضايا')}</GosiSelectItem>
+                                                {casesData?.cases?.map((caseItem: any) => (
+                                                    <GosiSelectItem key={caseItem._id} value={caseItem._id} className="font-bold">
+                                                        {caseItem.title || caseItem.caseNumber}
+                                                    </GosiSelectItem>
+                                                ))}
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Sort By */}
+                                    <div className="flex-1 min-w-[160px]">
+                                        <GosiSelect value={sortBy} onValueChange={setSortBy}>
+                                            <GosiSelectTrigger className="w-full h-14 bg-white border-slate-100 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-emerald-500/20 transition-all text-xs font-bold text-slate-950">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <SortAsc className="h-4 w-4 text-emerald-500" />
+                                                    <span className="text-slate-600 font-bold text-xs uppercase tracking-wider">{t('events.list.sortBy')}:</span>
+                                                    <GosiSelectValue />
+                                                </div>
+                                            </GosiSelectTrigger>
+                                            <GosiSelectContent>
+                                                <GosiSelectItem value="startDate" className="font-bold">{t('events.list.eventDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="createdAt" className="font-bold">{t('events.list.creationDate')}</GosiSelectItem>
+                                                <GosiSelectItem value="title" className="font-bold">{t('events.list.name')}</GosiSelectItem>
+                                            </GosiSelectContent>
+                                        </GosiSelect>
+                                    </div>
+
+                                    {/* Clear Filters Button */}
+                                    {hasActiveFilters && (
+                                        <GosiButton
+                                            variant="ghost"
+                                            onClick={clearFilters}
+                                            className="h-14 w-full md:w-auto text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200 px-6 hover:shadow-lg hover:shadow-red-500/10 transition-all"
+                                        >
+                                            <X className="h-5 w-5 ms-2" aria-hidden="true" />
+                                            {t('events.list.clearFilters')}
+                                        </GosiButton>
+                                    )}
+                                </div>
                             </div>
                         </GosiCard>
 
                         {/* MAIN EVENTS LIST */}
                         <div className="flex flex-col gap-4">
-                            {/* Loading State */}
+                            {/* Loading State - Gold Standard Skeleton */}
                             {isLoading && (
                                 <div className="space-y-4">
-                                    {[1, 2, 3].map((i) => (
-                                        <Skeleton key={i} className="h-40 w-full rounded-[2rem] bg-slate-100" />
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <div
+                                            key={i}
+                                            className="bg-white rounded-2xl p-4 border border-slate-100 animate-pulse"
+                                            style={{ animationDelay: `${i * 100}ms` }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton className="h-5 w-5 rounded-full" />
+                                                <Skeleton className="h-14 w-14 rounded-xl" />
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Skeleton className="h-4 w-48" />
+                                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                                    </div>
+                                                    <Skeleton className="h-3 w-32" />
+                                                </div>
+                                                <Skeleton className="h-8 w-8 rounded-lg" />
+                                            </div>
+                                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-50">
+                                                <Skeleton className="h-6 w-20 rounded-lg" />
+                                                <Skeleton className="h-6 w-24 rounded-lg" />
+                                                <div className="flex-1" />
+                                                <Skeleton className="h-6 w-24 rounded-lg" />
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             )}
@@ -536,8 +675,8 @@ export function EventsView() {
                                 </div>
                             )}
 
-                            {/* Success State */}
-                            {!isLoading && !isError && events.map((event, index) => (
+                            {/* Success State - Using visibleEvents for pagination */}
+                            {!isLoading && !isError && visibleEvents.map((event, index) => (
                                 <div
                                     key={event.id}
                                     style={{ animationDelay: `${index * 50}ms` }}
@@ -721,12 +860,22 @@ export function EventsView() {
                             ))}
                         </div>
 
-                        <div className="p-4 pt-0 text-center">
-                            <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-2xl py-6 border border-dashed border-blue-200 hover:border-blue-300">
-                                عرض جميع الفعاليات
-                                <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                            </Button>
-                        </div>
+                        {/* Load More Button - Gold Standard Pattern */}
+                        {hasMoreEvents && !isLoading && (
+                            <div className="flex justify-center pt-4">
+                                <GosiButton
+                                    onClick={handleLoadMore}
+                                    variant="outline"
+                                    className="w-full max-w-sm h-12 rounded-2xl border-2 border-dashed border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-600 hover:text-emerald-600 font-bold transition-all"
+                                >
+                                    <Plus className="w-5 h-5 ms-2" aria-hidden="true" />
+                                    {t('events.list.showMore', 'عرض المزيد')}
+                                    <span className="text-xs text-slate-400 ms-2">
+                                        ({visibleCount} / {events.length})
+                                    </span>
+                                </GosiButton>
+                            </div>
+                        )}
                     </div>
 
                     {/* LEFT COLUMN (Widgets) */}
