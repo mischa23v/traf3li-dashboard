@@ -1,40 +1,63 @@
 import api from './api'
 
+/**
+ * Entity types that can have tags
+ * Matches backend contract: contract2/types/tag.ts
+ */
+export type EntityType = 'case' | 'client' | 'invoice' | 'document' | 'task' | 'appointment' | 'contact' | 'lead' | 'expense' | 'note'
+
 export interface Tag {
   _id: string
-  lawyerId: string
   name: string
   nameAr?: string
-  color: string // Hex color
+  color?: string // Hex color
+  icon?: string
   description?: string
-  entityType: 'case' | 'client' | 'contact' | 'document' | 'all' // Which entities can use this tag
+  category?: string
+  entityTypes: EntityType[] // Which entities can use this tag
   usageCount: number
+  isSystem: boolean
+  firmId?: string
+  lawyerId?: string
+  createdBy: string
   createdAt: string
   updatedAt: string
 }
 
 export interface TagFilters {
-  entityType?: string
+  entityType?: EntityType
   search?: string
+  category?: string
   page?: number
   limit?: number
+  sortBy?: 'name' | 'usageCount' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export interface CreateTagData {
   name: string
   nameAr?: string
-  color: string
+  color?: string
+  icon?: string
   description?: string
-  entityType?: string
+  category?: string
+  entityTypes?: EntityType[]
 }
 
 export interface UpdateTagData extends Partial<CreateTagData> {}
 
-export interface TagsResponse {
-  data: Tag[]
-  total: number
+export interface Pagination {
   page: number
   limit: number
+  total: number
+  totalPages: number
+}
+
+export interface TagsResponse {
+  data: {
+    tags: Tag[]
+    pagination: Pagination
+  }
 }
 
 const tagsService = {
@@ -62,10 +85,10 @@ const tagsService = {
     return response.data
   },
 
-  // Update tag
+  // Update tag (PUT /api/tags/:id)
   updateTag: async (id: string, data: UpdateTagData): Promise<Tag> => {
-    const response = await api.patch(`/tags/${id}`, data)
-    return response.data
+    const response = await api.put(`/tags/${id}`, data)
+    return response.data?.data || response.data
   },
 
   // Delete tag
@@ -73,28 +96,28 @@ const tagsService = {
     await api.delete(`/tags/${id}`)
   },
 
-  // Search tags (for autocomplete)
-  searchTags: async (query: string, entityType?: string): Promise<Tag[]> => {
+  // Search tags (for autocomplete) - uses list endpoint with search param
+  searchTags: async (query: string, entityType?: EntityType): Promise<Tag[]> => {
     const params = new URLSearchParams()
-    params.append('q', query)
+    params.append('search', query)
     if (entityType) params.append('entityType', entityType)
-    const response = await api.get(`/tags/search?${params.toString()}`)
-    return response.data
+    const response = await api.get(`/tags?${params.toString()}`)
+    return response.data?.data?.tags || response.data?.tags || response.data || []
   },
 
-  // Get popular tags
-  getPopularTags: async (entityType?: string, limit?: number): Promise<Tag[]> => {
+  // Get popular tags (GET /api/tags/popular)
+  getPopularTags: async (entityType?: EntityType, limit?: number): Promise<Tag[]> => {
     const params = new URLSearchParams()
     if (entityType) params.append('entityType', entityType)
     if (limit) params.append('limit', limit.toString())
     const response = await api.get(`/tags/popular?${params.toString()}`)
-    return response.data
+    return response.data?.data?.tags || response.data?.tags || response.data || []
   },
 
   // Add tag to entity
   addTagToEntity: async (
     tagId: string,
-    entityType: 'case' | 'client' | 'contact' | 'document',
+    entityType: EntityType,
     entityId: string
   ): Promise<void> => {
     await api.post(`/tags/${tagId}/attach`, { entityType, entityId })
@@ -103,19 +126,33 @@ const tagsService = {
   // Remove tag from entity
   removeTagFromEntity: async (
     tagId: string,
-    entityType: 'case' | 'client' | 'contact' | 'document',
+    entityType: EntityType,
     entityId: string
   ): Promise<void> => {
     await api.post(`/tags/${tagId}/detach`, { entityType, entityId })
   },
 
-  // Get tags for entity
-  getTagsForEntity: async (
-    entityType: 'case' | 'client' | 'contact' | 'document',
-    entityId: string
-  ): Promise<Tag[]> => {
-    const response = await api.get(`/tags/entity/${entityType}/${entityId}`)
-    return response.data
+  // Get tags for entity type (GET /api/tags/entity/:entityType)
+  getTagsForEntityType: async (entityType: EntityType): Promise<{ tags: Tag[]; count: number }> => {
+    const response = await api.get(`/tags/entity/${entityType}`)
+    return response.data?.data || { tags: response.data, count: response.data?.length || 0 }
+  },
+
+  // Merge tags (POST /api/tags/merge)
+  mergeTags: async (sourceTagIds: string[], targetTagId: string): Promise<{ mergedTag: Tag; deletedCount: number; updatedEntitiesCount: number }> => {
+    const response = await api.post('/tags/merge', { sourceTagIds, targetTagId })
+    return response.data?.data || response.data
+  },
+
+  // Bulk tag operations (POST /api/tags/bulk)
+  bulkTagOperation: async (
+    operation: 'add' | 'remove',
+    tagIds: string[],
+    entityType: EntityType,
+    entityIds: string[]
+  ): Promise<{ processedCount: number; failedCount: number; errors?: Array<{ entityId: string; error: string }> }> => {
+    const response = await api.post('/tags/bulk', { operation, tagIds, entityType, entityIds })
+    return response.data?.data || response.data
   },
 }
 

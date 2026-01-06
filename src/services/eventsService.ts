@@ -8,14 +8,51 @@ import apiClient, { handleApiError } from '@/lib/api'
 
 /**
  * ==================== ENUMS ====================
+ * Based on contract2/types/integrations.ts
  */
 
-// Backend Event Types: hearing | court_date | meeting | client_meeting | deposition | mediation | arbitration | deadline | filing_deadline | conference_call | internal_meeting | training | webinar | consultation | task | other
-export type EventType = 'hearing' | 'court_date' | 'meeting' | 'client_meeting' | 'deposition' | 'mediation' | 'arbitration' | 'deadline' | 'filing_deadline' | 'conference_call' | 'internal_meeting' | 'training' | 'webinar' | 'consultation' | 'task' | 'other'
-// Backend Event Status: scheduled | confirmed | tentative | canceled | cancelled | postponed | completed | in_progress | rescheduled
-export type EventStatus = 'scheduled' | 'confirmed' | 'tentative' | 'canceled' | 'cancelled' | 'postponed' | 'completed' | 'in_progress' | 'rescheduled'
-export type EventPriority = 'low' | 'medium' | 'high' | 'critical'
+// Event Types - matches contract EventType + extended legal types
+export type EventType =
+  | 'meeting'       // Contract: Meeting
+  | 'session'       // Contract: Session
+  | 'hearing'       // Contract: Hearing
+  | 'deadline'      // Contract: Deadline
+  | 'task'          // Contract: Task
+  | 'other'         // Contract: Other
+  // Extended legal types (frontend)
+  | 'court_date'
+  | 'client_meeting'
+  | 'deposition'
+  | 'mediation'
+  | 'arbitration'
+  | 'filing_deadline'
+  | 'conference_call'
+  | 'internal_meeting'
+  | 'training'
+  | 'webinar'
+  | 'consultation'
+
+// Event Status - matches contract EventStatus
+export type EventStatus =
+  | 'scheduled'     // Contract: Scheduled
+  | 'confirmed'     // Contract: Confirmed
+  | 'in_progress'   // Contract: InProgress
+  | 'completed'     // Contract: Completed
+  | 'cancelled'     // Contract: Cancelled
+  | 'postponed'     // Contract: Postponed
+
+// Event Priority - matches contract EventPriority
+export type EventPriority = 'low' | 'medium' | 'high' | 'critical' | 'urgent'
+
+// Event Visibility - matches contract EventVisibility
+export type EventVisibility = 'public' | 'private' | 'confidential'
+
+// Attendee Status - matches contract AttendeeStatus
+export type AttendeeStatus = 'invited' | 'confirmed' | 'declined' | 'tentative' | 'attended'
+
+// Legacy RSVP Status (for backward compatibility)
 export type RSVPStatus = 'pending' | 'accepted' | 'declined' | 'tentative'
+
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
 export type ReminderType = 'notification' | 'email' | 'sms' | 'push' | 'whatsapp'
 export type CalendarProvider = 'google' | 'outlook' | 'apple' | 'ics'
@@ -151,6 +188,7 @@ export interface CalendarSync {
 
 export interface Event {
   _id: string
+  eventId?: string // Unique event identifier (matches contract)
   // Basic info
   title: string
   description?: string
@@ -159,6 +197,7 @@ export interface Event {
   type: EventType
   status: EventStatus
   priority?: EventPriority
+  visibility?: EventVisibility // Contract: EventVisibility
   color: string
   tags?: string[]
   // Timing
@@ -254,6 +293,7 @@ export interface CreateEventData {
   type: EventType
   status?: EventStatus
   priority?: EventPriority
+  visibility?: EventVisibility
   color?: string
   tags?: string[]
   startDate: string

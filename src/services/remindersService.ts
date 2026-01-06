@@ -9,9 +9,21 @@ import apiClient, { handleApiError } from '@/lib/api'
 
 /**
  * ==================== ENUMS ====================
+ * Based on contract2/types/reminder.ts
  */
 
-export type ReminderPriority = 'low' | 'medium' | 'high' | 'critical'
+// Reminder Priority - matches contract
+export type ReminderPriority = 'low' | 'medium' | 'high' | 'urgent'
+
+// Reminder Type - matches contract
+export type ReminderType =
+  | 'general'      // Contract: General
+  | 'case'         // Contract: Case
+  | 'task'         // Contract: Task
+  | 'appointment'  // Contract: Appointment
+  | 'invoice'      // Contract: Invoice
+  | 'client'       // Contract: Client
+  | 'deadline'     // Contract: Deadline
 
 // Legacy Type (for backwards compatibility)
 export type ReminderTypeLegacy =
@@ -26,9 +38,9 @@ export type ReminderTypeLegacy =
   | 'general'
   | 'task'
 
-// Enhanced Reminder Type (Saudi Legal)
-export type ReminderType =
-  | 'general'
+// Enhanced Reminder Type (Saudi Legal - extended)
+export type ReminderTypeExtended =
+  | ReminderType
   | 'court_hearing'
   | 'filing_deadline'
   | 'appeal_deadline'
@@ -42,14 +54,23 @@ export type ReminderType =
   | 'najiz_deadline'
   | 'other'
 
-// Enhanced Status (API valid values)
-export type ReminderStatus = 'pending' | 'snoozed' | 'completed' | 'dismissed' | 'delegated'
+// Reminder Status - matches contract
+export type ReminderStatus = 'pending' | 'completed' | 'snoozed' | 'dismissed'
+
+// Repeat Type - matches contract
+export type RepeatType = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'
+
+// Notification Channels - matches contract
+export type NotificationChannel = 'push' | 'email' | 'sms' | 'whatsapp'
+
+// Location Trigger Type - matches contract
+export type LocationTriggerType = 'enter' | 'exit'
+
+// Location Type - matches contract
+export type LocationType = 'home' | 'office' | 'court' | 'client' | 'custom'
 
 // Deadline Type (Saudi Legal)
 export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal' | 'none'
-
-// Notification Channels
-export type NotificationChannel = 'push' | 'email' | 'sms' | 'whatsapp' | 'in_app'
 
 // Recurrence Frequency
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
