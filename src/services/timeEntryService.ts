@@ -14,23 +14,93 @@ import apiClient, { handleApiError } from '@/lib/api'
 
 // ==================== TYPE DEFINITIONS ====================
 
+/**
+ * Time Entry Status - matches Task/TimeEntry API documentation
+ * Workflow: draft → pending → submitted → changes_requested → approved → rejected → billed → locked
+ */
+export type TimeEntryStatus =
+  | 'draft'
+  | 'pending'
+  | 'submitted'
+  | 'changes_requested'
+  | 'approved'
+  | 'rejected'
+  | 'billed'
+  | 'locked'
+
+/**
+ * Bill Status - matches Task/TimeEntry API documentation
+ */
+export type BillStatus = 'draft' | 'unbilled' | 'billed' | 'written_off'
+
+/**
+ * Time Type - matches Task/TimeEntry API documentation
+ */
+export type TimeType = 'billable' | 'non_billable' | 'pro_bono' | 'internal'
+
+/**
+ * UTBMS Activity Codes - matches Task/TimeEntry API documentation
+ */
+export type ActivityCode =
+  | 'L110' // Legal consultation
+  | 'L120' // Legal research
+  | 'L130' // Drafting documents
+  | 'L140' // Document review
+  | 'L150' // Case analysis
+  | 'L210' // Court attendance
+  | 'L220' // Client meeting
+  | 'L230' // Phone call/conference
+  | 'L240' // Correspondence
+  | 'L250' // Negotiations
+  | 'L260' // Mediation
+  | 'L270' // Arbitration
+  | 'L310' // Travel time
+  | 'L320' // Waiting time
+  | 'L410' // Administrative tasks
+  | 'L420' // File organization
+  | 'L510' // Training & development
+  | 'L520' // Legal research (educational)
+  // Legacy codes
+  | 'court_appearance'
+  | 'client_meeting'
+  | 'research'
+  | 'document_preparation'
+  | 'phone_call'
+  | 'email'
+  | 'travel'
+  | 'administrative'
+  | 'other'
+
 export interface TimeEntry {
   _id: string
   id: string
+  entryId?: string // Auto-generated: TE-YYYY-NNNN
   lawyerId: string
+  assigneeId?: string
+  userId?: string
   caseId?: string
   clientId?: string
+  taskId?: string
+  departmentId?: string
   activityCode: string
   description: string
   notes?: string
   date: string
+  startTime?: string
+  endTime?: string
+  breakMinutes?: number
   hours: number
   minutes: number
+  duration?: number // Duration in minutes
   rate: number
+  hourlyRate?: number // Rate in halalas (SAR*100)
   amount: number
+  totalAmount?: number // Computed total
+  finalAmount?: number // After write-down
   isBillable: boolean
-  status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'billed' | 'invoiced'
-  billStatus?: 'draft' | 'unbilled' | 'billed' | 'invoiced'
+  timeType?: TimeType
+  status: TimeEntryStatus
+  billStatus?: BillStatus
   wasTimerBased: boolean
   timerStartedAt?: string
   isLocked?: boolean
