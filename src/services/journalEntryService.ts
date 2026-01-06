@@ -6,49 +6,58 @@
 import apiClient from '@/lib/api'
 
 // ==================== TYPES ====================
+// Matches contract: contract2/types/accounting.ts
 
-export type JournalEntryStatus = 'draft' | 'pending' | 'posted' | 'voided'
+/**
+ * Journal Entry Status
+ * Matches contract: contract2/types/accounting.ts - JournalEntryStatus
+ */
+export type JournalEntryStatus = 'draft' | 'posted' | 'voided'
 
+/**
+ * Journal Entry Type
+ * Matches contract: contract2/types/accounting.ts - JournalEntryType
+ */
+export type JournalEntryType = 'general' | 'adjusting' | 'closing' | 'reversing' | 'opening' | 'other'
+
+/**
+ * Journal Entry
+ * Matches contract: contract2/types/accounting.ts - JournalEntry
+ */
 export interface JournalEntry {
   _id: string
-  entryNumber: string
-  transactionDate: string
+  entryNumber?: string
+  date: string
   description: string
-  memo?: string
-  lines: JournalEntryLine[]
+  descriptionAr?: string
+  entryType: JournalEntryType
   status: JournalEntryStatus
-  totalDebit: number
-  totalCredit: number
-  isBalanced: boolean
-  glEntryId?: string
-  firmId: string
-  createdBy: string | {
-    _id: string
-    firstName: string
-    lastName: string
-    email: string
-  }
-  postedBy?: string | {
-    _id: string
-    firstName: string
-    lastName: string
-    email: string
-  }
+  lines: JournalEntryLine[]
+  notes?: string
+  attachments?: string[]
+  glEntries?: string[]
+  firmId?: string
+  lawyerId?: string
+  createdBy?: string
+  updatedBy?: string
+  postedBy?: string
   postedAt?: string
   voidedBy?: string
   voidedAt?: string
   voidReason?: string
-  attachments?: Array<{
-    fileName: string
-    fileUrl: string
-    uploadedAt: string
-  }>
+  totalDebit?: number
+  totalCredit?: number
+  isBalanced?: boolean
+  difference?: number
   createdAt: string
   updatedAt: string
 }
 
+/**
+ * Journal Entry Line
+ * Matches contract: contract2/types/accounting.ts - JournalEntryLine
+ */
 export interface JournalEntryLine {
-  _id?: string
   accountId: string | {
     _id: string
     code: string
@@ -56,72 +65,67 @@ export interface JournalEntryLine {
     nameAr?: string
     type: string
   }
-  debit: number
-  credit: number
+  debit?: number
+  credit?: number
   description?: string
-  caseId?: string | {
-    _id: string
-    caseNumber: string
-    title: string
-  }
-  clientId?: string | {
-    _id: string
-    firstName: string
-    lastName: string
-  }
+  caseId?: string
 }
 
+/**
+ * Create Journal Entry Data
+ * Matches contract: contract2/types/accounting.ts - CreateJournalEntryRequest
+ */
 export interface CreateJournalEntryData {
-  transactionDate: string
+  date: string
   description: string
-  memo?: string
-  lines: Array<{
-    accountId: string
-    debit: number
-    credit: number
-    description?: string
-    caseId?: string
-    clientId?: string
-  }>
-  attachments?: File[]
+  descriptionAr?: string
+  entryType?: JournalEntryType
+  lines: JournalEntryLine[]
+  notes?: string
+  attachments?: string[]
 }
 
+/**
+ * Update Journal Entry Data
+ * Matches contract: contract2/types/accounting.ts - UpdateJournalEntryRequest
+ */
 export interface UpdateJournalEntryData {
-  transactionDate?: string
+  date?: string
   description?: string
-  memo?: string
-  lines?: Array<{
-    accountId: string
-    debit: number
-    credit: number
-    description?: string
-    caseId?: string
-    clientId?: string
-  }>
+  descriptionAr?: string
+  entryType?: JournalEntryType
+  lines?: JournalEntryLine[]
+  notes?: string
+  attachments?: string[]
 }
 
+/**
+ * Simple Journal Entry Data
+ * Matches contract: contract2/types/accounting.ts - CreateSimpleEntryRequest
+ */
 export interface SimpleJournalEntryData {
-  transactionDate: string
+  date: string
   description: string
+  descriptionAr?: string
   debitAccountId: string
   creditAccountId: string
   amount: number
   caseId?: string
-  clientId?: string
-  memo?: string
+  notes?: string
+  entryType?: JournalEntryType
 }
 
+/**
+ * Journal Entry Filters
+ * Matches contract: contract2/types/accounting.ts - GetJournalEntriesQuery
+ */
 export interface JournalEntryFilters {
   status?: JournalEntryStatus
   startDate?: string
   endDate?: string
-  createdBy?: string
-  accountId?: string
-  caseId?: string
-  clientId?: string
+  entryType?: JournalEntryType
   page?: number
   limit?: number
-  sort?: string
 }
 
 // ==================== SERVICE ====================
@@ -167,27 +171,9 @@ const journalEntryService = {
   /**
    * Create draft journal entry
    * POST /api/journal-entries
+   * Matches contract: contract2/types/accounting.ts - CreateJournalEntryRequest
    */
   createEntry: async (data: CreateJournalEntryData): Promise<JournalEntry> => {
-    // If attachments are included, use FormData
-    if (data.attachments && data.attachments.length > 0) {
-      const formData = new FormData()
-      formData.append('transactionDate', data.transactionDate)
-      formData.append('description', data.description)
-      if (data.memo) formData.append('memo', data.memo)
-      formData.append('lines', JSON.stringify(data.lines))
-
-      data.attachments.forEach((file) => {
-        formData.append('attachments', file)
-      })
-
-      const response = await apiClient.post('/journal-entries', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      return response.data.data
-    }
-
-    // Standard JSON request
     const response = await apiClient.post('/journal-entries', data)
     return response.data.data
   },
@@ -218,11 +204,9 @@ const journalEntryService = {
    * Void posted journal entry
    * Creates reversing entry in GL
    * POST /api/journal-entries/:id/void
+   * Matches contract: contract2/types/accounting.ts - VoidJournalEntryRequest
    */
-  voidEntry: async (id: string, reason?: string): Promise<{
-    journalEntry: JournalEntry
-    reversingGLEntry?: any
-  }> => {
+  voidEntry: async (id: string, reason: string): Promise<JournalEntry> => {
     const response = await apiClient.post(`/journal-entries/${id}/void`, { reason })
     return response.data.data
   },
@@ -267,7 +251,6 @@ const journalEntryService = {
     total: number
     byStatus: {
       draft: number
-      pending: number
       posted: number
       voided: number
     }
@@ -336,7 +319,7 @@ const journalEntryService = {
    * POST /api/journal-entries/from-template/:templateId
    */
   createFromTemplate: async (templateId: string, data: {
-    transactionDate: string
+    date: string
     amount: number
     description?: string
   }): Promise<JournalEntry> => {

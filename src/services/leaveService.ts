@@ -1,18 +1,21 @@
 import api from './api'
 
 // Leave Types (Saudi Labor Law)
+// Matches contract: contract2/types/hr-full.ts - LeaveType
+// Extended with additional Saudi Labor Law specific types
 export type LeaveType =
-  | 'annual'      // إجازة سنوية (المادة 109)
-  | 'sick'        // إجازة مرضية (المادة 117)
-  | 'hajj'        // إجازة حج (المادة 114)
-  | 'marriage'    // إجازة زواج (المادة 113)
-  | 'birth'       // إجازة ولادة (المادة 113)
-  | 'death'       // إجازة وفاة (المادة 113)
-  | 'eid'         // إجازة عيد (المادة 112)
-  | 'maternity'   // إجازة وضع (المادة 151)
-  | 'paternity'   // إجازة أبوة
-  | 'exam'        // إجازة امتحان (المادة 115)
-  | 'unpaid'      // إجازة بدون راتب
+  | 'annual'       // إجازة سنوية (المادة 109)
+  | 'sick'         // إجازة مرضية (المادة 117)
+  | 'hajj'         // إجازة حج (المادة 114)
+  | 'marriage'     // إجازة زواج (المادة 113)
+  | 'birth'        // إجازة ولادة (المادة 113)
+  | 'death'        // إجازة وفاة (المادة 113)
+  | 'bereavement'  // إجازة عزاء (alias for death - matches contract)
+  | 'eid'          // إجازة عيد (المادة 112)
+  | 'maternity'    // إجازة وضع (المادة 151)
+  | 'paternity'    // إجازة أبوة
+  | 'exam'         // إجازة امتحان (المادة 115)
+  | 'unpaid'       // إجازة بدون راتب
 
 export type LeaveStatus = 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected' | 'cancelled' | 'completed'
 
@@ -26,6 +29,7 @@ export const LEAVE_TYPE_LABELS: Record<LeaveType, { ar: string; en: string; arti
   marriage: { ar: 'إجازة زواج', en: 'Marriage Leave', article: 'المادة 113', maxDays: 3 },
   birth: { ar: 'إجازة ولادة', en: 'Birth Leave', article: 'المادة 113', maxDays: 1 },
   death: { ar: 'إجازة وفاة', en: 'Death Leave', article: 'المادة 113', maxDays: 3 },
+  bereavement: { ar: 'إجازة عزاء', en: 'Bereavement Leave', article: 'المادة 113', maxDays: 3 },
   eid: { ar: 'إجازة عيد', en: 'Eid Leave', article: 'المادة 112' },
   maternity: { ar: 'إجازة وضع', en: 'Maternity Leave', article: 'المادة 151', maxDays: 70 },
   paternity: { ar: 'إجازة أبوة', en: 'Paternity Leave', maxDays: 3 },

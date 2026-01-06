@@ -24,7 +24,7 @@ export interface Bill {
   amountPaid: number
   balanceDue: number
   currency: string
-  status: 'draft' | 'pending' | 'approved' | 'received' | 'paid' | 'partial' | 'overdue' | 'cancelled'
+  status: 'draft' | 'pending' | 'pending_approval' | 'approved' | 'received' | 'paid' | 'partial' | 'overdue' | 'cancelled' | 'void'
   items: BillItem[]
   subtotal: number
   taxAmount: number
@@ -141,12 +141,14 @@ export interface BillSummary {
   byStatus: {
     draft: number
     pending: number
+    pending_approval: number
     approved: number
     received: number
     paid: number
     partial: number
     overdue: number
     cancelled: number
+    void: number
   }
 }
 

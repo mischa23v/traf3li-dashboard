@@ -7,85 +7,126 @@ import apiClient, { handleApiError } from '@/lib/api'
 
 /**
  * ==================== TYPES ====================
+ * Matches contract: contract2/types/accounting.ts
  */
 
+/**
+ * Account Type enum
+ */
+export type AccountTypeEnum = 'Asset' | 'Liability' | 'Equity' | 'Income' | 'Expense'
+
+/**
+ * Account Sub Type enum
+ */
+export type AccountSubType =
+  | 'Current Asset'
+  | 'Fixed Asset'
+  | 'Other Asset'
+  | 'Current Liability'
+  | 'Long-term Liability'
+  | 'Other Liability'
+  | "Owner's Equity"
+  | 'Retained Earnings'
+  | 'Operating Income'
+  | 'Other Income'
+  | 'Cost of Goods Sold'
+  | 'Operating Expense'
+  | 'Other Expense'
+
+/**
+ * Account Balance structure
+ */
+export interface AccountBalanceData {
+  debit: number
+  credit: number
+  balance: number
+}
+
+/**
+ * Account Interface
+ * Matches contract: contract2/types/accounting.ts - Account
+ */
 export interface Account {
   _id: string
-  accountCode: string
-  accountName: string
-  accountNameAr?: string
-  accountType: string
+  code: string
+  name: string
+  nameAr?: string
+  type: AccountTypeEnum
+  subType?: AccountSubType
   parentAccountId?: string | Account
   description?: string
+  descriptionAr?: string
   isActive: boolean
-  balance?: number
-  debit?: number
-  credit?: number
-  currency?: string
-  taxSettings?: {
-    isTaxable: boolean
-    taxRate?: number
-    taxCode?: string
-  }
+  isSystem: boolean
+  firmId?: string
+  lawyerId?: string
+  createdBy?: string
+  updatedBy?: string
   createdAt: string
   updatedAt: string
   children?: Account[]
+  balance?: AccountBalanceData
 }
 
-export interface AccountType {
-  value: string
+/**
+ * Account Type Option (for dropdown data)
+ */
+export interface AccountTypeOption {
+  value: AccountTypeEnum
   label: string
-  labelAr?: string
-  category: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
+  labelAr: string
 }
 
+/**
+ * Account Sub Type Option (for dropdown data)
+ */
+export interface AccountSubTypeOption {
+  value: AccountSubType
+  label: string
+  type: AccountTypeEnum
+}
+
+/**
+ * Create Account Data
+ * Matches contract: contract2/types/accounting.ts - CreateAccountRequest
+ */
 export interface CreateAccountData {
-  accountCode: string
-  accountName: string
-  accountNameAr?: string
-  accountType: string
+  code: string
+  name: string
+  nameAr?: string
+  type: AccountTypeEnum
+  subType?: AccountSubType
   parentAccountId?: string
   description?: string
-  isActive?: boolean
-  currency?: string
-  taxSettings?: {
-    isTaxable: boolean
-    taxRate?: number
-    taxCode?: string
-  }
+  descriptionAr?: string
 }
 
+/**
+ * Account Balance Response (for getAccountBalance endpoint)
+ */
 export interface AccountBalance {
-  accountId: string
-  accountCode: string
-  accountName: string
-  balance: number
   debit: number
   credit: number
-  currency: string
-  asOfDate: string
-  transactions?: Array<{
-    transactionId: string
-    date: string
-    description: string
-    debit: number
-    credit: number
-    balance: number
-  }>
+  balance: number
 }
 
+/**
+ * Account Filters
+ * Matches contract: contract2/types/accounting.ts - GetAccountsQuery
+ */
 export interface AccountFilters {
-  accountType?: string
+  type?: AccountTypeEnum
   isActive?: boolean
-  parentAccountId?: string
-  search?: string
   includeHierarchy?: boolean
 }
 
+/**
+ * Balance Filters
+ * Matches contract: contract2/types/accounting.ts - GetAccountBalanceQuery
+ */
 export interface BalanceFilters {
-  startDate?: string
-  endDate?: string
-  includeTransactions?: boolean
+  asOfDate?: string
+  caseId?: string
 }
 
 /**
@@ -138,11 +179,15 @@ const accountService = {
   /**
    * Get account types (dropdown data)
    * GET /api/accounts/types
+   * Matches contract: contract2/types/accounting.ts - GetAccountTypesResponse
    */
-  getAccountTypes: async (): Promise<AccountType[]> => {
+  getAccountTypes: async (): Promise<{ types: AccountTypeOption[]; subTypes: AccountSubTypeOption[] }> => {
     try {
       const response = await apiClient.get('/accounts/types')
-      return response.data.types || response.data.data || []
+      return {
+        types: response.data.data?.types || response.data.types || [],
+        subTypes: response.data.data?.subTypes || response.data.subTypes || [],
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
