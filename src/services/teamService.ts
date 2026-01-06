@@ -2,13 +2,26 @@
  * Team Service
  *
  * Handles team management operations for the RBAC system.
- * This service works with the /api/team endpoints for team member management.
+ * This service works with:
+ * - /api/team endpoints for general team management
+ * - /api/firms/:id/team endpoints for firm-specific team management (gold standard)
  *
  * For firm-level operations (permissions, roles, invitations), use firmService.ts
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
-import type { FirmRole, DepartureReason, PermissionLevel, ModuleKey, SpecialPermissionKey } from '@/types/rbac'
+import type {
+  FirmRole,
+  DepartureReason,
+  PermissionLevel,
+  ModuleKey,
+  SpecialPermissionKey,
+  Permissions,
+  MyPermissionsData,
+  RoleInfo,
+  TeamMember as RBACTeamMember,
+  MemberStatus,
+} from '@/types/rbac'
 
 // ==================== TYPES ====================
 
@@ -415,6 +428,216 @@ const teamService = {
         members: response.data.data || [],
         total: response.data.meta?.total || response.data.data?.length || 0,
       }
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // FIRM-BASED ENDPOINTS (Gold Standard)
+  // These endpoints use /api/firms/:firmId/... pattern
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Get current user's permissions
+   * GET /api/firms/my/permissions
+   */
+  getMyPermissions: async (): Promise<{ success: boolean; data: MyPermissionsData }> => {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: MyPermissionsData }>(
+        '/firms/my/permissions'
+      )
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get available roles with default permissions
+   * GET /api/firms/roles
+   */
+  getAvailableRoles: async (): Promise<{ success: boolean; data: RoleInfo[] }> => {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: RoleInfo[] }>('/firms/roles')
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get firm team members
+   * GET /api/firms/:firmId/team
+   * Query params: ?includeAll=true (admin/owner only - includes departed)
+   */
+  getFirmTeam: async (
+    firmId: string,
+    options?: { includeAll?: boolean }
+  ): Promise<{
+    success: boolean
+    data: RBACTeamMember[]
+    meta: { total: number; activeCount: number; departedCount: number }
+  }> => {
+    try {
+      const params = new URLSearchParams()
+      if (options?.includeAll) params.append('includeAll', 'true')
+
+      const response = await apiClient.get<{
+        success: boolean
+        data: RBACTeamMember[]
+        meta: { total: number; activeCount: number; departedCount: number }
+      }>(`/firms/${firmId}/team${params.toString() ? `?${params}` : ''}`)
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get all firm members
+   * GET /api/firms/:firmId/members
+   */
+  getFirmMembers: async (
+    firmId: string
+  ): Promise<{ success: boolean; data: RBACTeamMember[] }> => {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: RBACTeamMember[] }>(
+        `/firms/${firmId}/members`
+      )
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get departed firm members
+   * GET /api/firms/:firmId/departed
+   */
+  getFirmDepartedMembers: async (
+    firmId: string
+  ): Promise<{ success: boolean; data: RBACTeamMember[]; count: number }> => {
+    try {
+      const response = await apiClient.get<{
+        success: boolean
+        data: RBACTeamMember[]
+        count: number
+      }>(`/firms/${firmId}/departed`)
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update firm member
+   * PUT /api/firms/:firmId/members/:memberId
+   */
+  updateFirmMember: async (
+    firmId: string,
+    memberId: string,
+    updates: {
+      role?: FirmRole
+      permissions?: Partial<Permissions>
+      title?: string
+      department?: string
+      status?: string
+    }
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.put<{ success: boolean; message: string }>(
+        `/firms/${firmId}/members/${memberId}`,
+        updates
+      )
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove firm member
+   * DELETE /api/firms/:firmId/members/:memberId
+   */
+  removeFirmMember: async (
+    firmId: string,
+    memberId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.delete<{ success: boolean; message: string }>(
+        `/firms/${firmId}/members/${memberId}`
+      )
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Process member departure
+   * POST /api/firms/:firmId/members/:memberId/depart
+   */
+  processFirmDeparture: async (
+    firmId: string,
+    memberId: string,
+    payload: { reason?: string; notes?: string }
+  ): Promise<{
+    success: boolean
+    message: string
+    data: { userId: string; status: string; previousRole: string; departedAt: string }
+  }> => {
+    try {
+      const response = await apiClient.post<{
+        success: boolean
+        message: string
+        data: { userId: string; status: string; previousRole: string; departedAt: string }
+      }>(`/firms/${firmId}/members/${memberId}/depart`, payload)
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reinstate departed member
+   * POST /api/firms/:firmId/members/:memberId/reinstate
+   */
+  reinstateFirmMember: async (
+    firmId: string,
+    memberId: string,
+    payload: { role?: FirmRole }
+  ): Promise<{
+    success: boolean
+    message: string
+    data: { userId: string; status: string; role: string }
+  }> => {
+    try {
+      const response = await apiClient.post<{
+        success: boolean
+        message: string
+        data: { userId: string; status: string; role: string }
+      }>(`/firms/${firmId}/members/${memberId}/reinstate`, payload)
+      return response.data
+    } catch (error: unknown) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Transfer firm ownership
+   * POST /api/firms/:firmId/transfer-ownership
+   */
+  transferOwnership: async (
+    firmId: string,
+    newOwnerId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.post<{ success: boolean; message: string }>(
+        `/firms/${firmId}/transfer-ownership`,
+        { newOwnerId }
+      )
+      return response.data
     } catch (error: unknown) {
       throw new Error(handleApiError(error))
     }
