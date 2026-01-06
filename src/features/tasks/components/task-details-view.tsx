@@ -3,7 +3,7 @@ import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, Briefcase, Trash2, Edit3, Loader2, Mic,
     History, Link as LinkIcon, Send, Eye, Download, Search, Bell, AlertCircle, X,
-    Timer, Play, Pause, AlertTriangle, Target, TrendingUp
+    Timer, Play, Pause, AlertTriangle, Target, TrendingUp, RotateCcw, Ban, MapPin
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 // Gosi Design System Components
@@ -20,7 +20,7 @@ import {
     useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask,
     useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
     useAddDependency, useRemoveDependency, useTimeTrackingDetails,
-    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome,
+    useStartTimeTracking, useStopTimeTracking, useResetTimeTracking, useUpdateOutcome,
     useDocuments, useDeleteDocument
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
@@ -110,10 +110,27 @@ export function TaskDetailsView() {
     const removeDependencyMutation = useRemoveDependency()
     const startTimeTrackingMutation = useStartTimeTracking()
     const stopTimeTrackingMutation = useStopTimeTracking()
+    const resetTimeTrackingMutation = useResetTimeTracking()
     const updateOutcomeMutation = useUpdateOutcome()
 
     // Time tracking details
     const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
+
+    // Time Entry Status badge styling helper
+    const getTimeEntryStatusBadge = (status?: string) => {
+        const statusConfig: Record<string, { label: string; className: string }> = {
+            draft: { label: 'مسودة', className: 'bg-slate-100 text-slate-600' },
+            pending: { label: 'قيد المراجعة', className: 'bg-yellow-100 text-yellow-700' },
+            submitted: { label: 'مُقدم', className: 'bg-blue-100 text-blue-700' },
+            changes_requested: { label: 'تعديلات مطلوبة', className: 'bg-orange-100 text-orange-700' },
+            approved: { label: 'معتمد', className: 'bg-emerald-100 text-emerald-700' },
+            rejected: { label: 'مرفوض', className: 'bg-red-100 text-red-700' },
+            billed: { label: 'مفوتر', className: 'bg-purple-100 text-purple-700' },
+            locked: { label: 'مقفل', className: 'bg-gray-200 text-gray-700' },
+        }
+        const config = statusConfig[status || 'draft'] || statusConfig.draft
+        return config
+    }
 
     // Task report (PDF export)
     const { print: printTaskReport } = useTaskReport()
@@ -194,11 +211,26 @@ export function TaskDetailsView() {
         )
     }
     const handleStartTimeTracking = () => {
+        // Block starting timer on completed or canceled tasks
+        if (taskData?.status === 'done' || taskData?.status === 'canceled') {
+            toast.error('لا يمكن بدء المؤقت على مهمة مكتملة أو ملغاة. أعد فتح المهمة أولاً. | Cannot start timer on completed or canceled task. Reopen the task first.')
+            return
+        }
         startTimeTrackingMutation.mutate(taskId)
     }
 
     const handleStopTimeTracking = () => {
         stopTimeTrackingMutation.mutate({ taskId })
+    }
+
+    const handleResetTimeTracking = () => {
+        if (isTimeTrackingActive) {
+            toast.error('أوقف المؤقت أولاً قبل إعادة التعيين | Stop the timer first before resetting')
+            return
+        }
+        if (confirm('هل أنت متأكد من إعادة تعيين تتبع الوقت؟ سيتم حذف جميع جلسات الوقت. | Are you sure you want to reset time tracking? All time sessions will be deleted.')) {
+            resetTimeTrackingMutation.mutate(taskId)
+        }
     }
 
     // Dependency handler
@@ -465,6 +497,22 @@ export function TaskDetailsView() {
             sessions: []
         }
 
+        // Location info
+        const locationInfo = (t as any).location ? {
+            name: (t as any).location.name || '',
+            address: (t as any).location.address || '',
+            latitude: (t as any).location.latitude,
+            longitude: (t as any).location.longitude
+        } : null
+
+        // Location trigger info
+        const locationTriggerInfo = (t as any).locationTrigger ? {
+            enabled: (t as any).locationTrigger.enabled || false,
+            type: (t as any).locationTrigger.type || 'arrive',
+            radius: (t as any).locationTrigger.radius || 100,
+            triggered: (t as any).locationTrigger.triggered || false
+        } : null
+
         return {
             id: t._id,
             title: t.title || t.description || 'مهمة غير محددة',
@@ -489,7 +537,9 @@ export function TaskDetailsView() {
             outcome: mappedOutcome,
             timeTracking: timeTrackingInfo,
             linkedEventId: t.linkedEventId, // Task ↔ Event sync
-            eventId: t.eventId // Manual event link
+            eventId: t.eventId, // Manual event link
+            location: locationInfo,
+            locationTrigger: locationTriggerInfo
         }
     }, [taskData])
 
@@ -585,20 +635,6 @@ export function TaskDetailsView() {
                         {/* HERO CARD - Same as task list/create */}
                         <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks" listMode={true} />
 
-                        {/* Task ↔ Event Sync Badge */}
-                        {(task.linkedEventId || task.eventId) && (
-                            <div className="flex items-center justify-center gap-2">
-                                <Button
-                                    onClick={() => navigate({ to: ROUTES.dashboard.tasks.events.detail(task.linkedEventId || task.eventId) })}
-                                    variant="outline"
-                                    className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 rounded-xl px-4 py-2 flex items-center gap-2"
-                                >
-                                    <Calendar className="h-4 w-4" />
-                                    <span className="font-medium">مرتبط بحدث في التقويم</span>
-                                    <span className="text-xs opacity-75">(انقر للعرض)</span>
-                                </Button>
-                            </div>
-                        )}
 
                         {/* MAIN GRID LAYOUT - Same as task list/create */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -613,6 +649,7 @@ export function TaskDetailsView() {
                                                 <div className="flex items-center gap-2 border-b border-slate-200 pb-0 flex-1">
                                                     {[
                                                         { id: 'overview', label: 'نظرة عامة' },
+                                                        { id: 'time-tracking', label: 'تتبع الوقت' },
                                                         { id: 'files', label: 'المرفقات' },
                                                         { id: 'comments', label: 'التعليقات' }
                                                     ].map((tab) => (
@@ -646,180 +683,61 @@ export function TaskDetailsView() {
                                                         <CardHeader>
                                                             <CardTitle className="text-lg font-bold text-navy">وصف المهمة</CardTitle>
                                                         </CardHeader>
-                                                        <CardContent>
+                                                        <CardContent className="space-y-4">
                                                             <p className="text-slate-600 leading-relaxed">
                                                                 {task.description}
                                                             </p>
-                                                        </CardContent>
-                                                    </Card>
 
-                                                    {/* KEY METRICS STRIP - Premium Design */}
-                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                                        {/* Progress Bar Header */}
-                                                        <div className="px-6 pt-4 pb-3">
-                                                            <div className="flex items-center justify-between mb-2">
-                                                                <span className="text-sm font-semibold text-slate-700">نسبة الإنجاز</span>
-                                                                <span className="text-lg font-bold text-navy">{task.completion}%</span>
-                                                            </div>
-                                                            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500"
-                                                                    style={{ width: `${task.completion}%` }}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Metrics Grid */}
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-slate-100 border-t border-slate-100">
-                                                            {/* Due Date */}
-                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
-                                                                <div className="flex items-center justify-center gap-2 mb-1">
-                                                                    <Calendar className="w-4 h-4 text-slate-400" />
-                                                                    <span className="text-xs font-medium text-slate-500">تاريخ الاستحقاق</span>
-                                                                </div>
-                                                                <p className="text-sm font-bold text-navy">{task.dueDate}</p>
-                                                            </div>
-
-                                                            {/* Assignee */}
-                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
-                                                                <div className="flex items-center justify-center gap-2 mb-1">
-                                                                    <User className="w-4 h-4 text-slate-400" />
-                                                                    <span className="text-xs font-medium text-slate-500">المسؤول</span>
-                                                                </div>
-                                                                <p className="text-sm font-bold text-navy">{task.assignee.name}</p>
-                                                            </div>
-
-                                                            {/* Subtasks */}
-                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
-                                                                <div className="flex items-center justify-center gap-2 mb-1">
-                                                                    <CheckSquare className="w-4 h-4 text-slate-400" />
-                                                                    <span className="text-xs font-medium text-slate-500">المهام الفرعية</span>
-                                                                </div>
-                                                                <p className="text-sm font-bold text-navy">
-                                                                    {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
-                                                                </p>
-                                                            </div>
-
-                                                            {/* Time Tracking */}
-                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
-                                                                <div className="flex items-center justify-center gap-2 mb-1">
-                                                                    <Clock className="w-4 h-4 text-slate-400" />
-                                                                    <span className="text-xs font-medium text-slate-500">الوقت المستغرق</span>
-                                                                </div>
-                                                                <p className="text-sm font-bold text-navy">
-                                                                    {task.timeTracking.actualMinutes > 0
-                                                                        ? `${Math.floor(task.timeTracking.actualMinutes / 60)}س ${task.timeTracking.actualMinutes % 60}د`
-                                                                        : '0س 0د'
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </Card>
-
-                                                    {/* TIME TRACKING CARD - Premium Design */}
-                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                                        <div className="p-5">
-                                                            <div className="flex items-center justify-between mb-4">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isTimeTrackingActive ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                                        <Timer className="w-5 h-5" />
+                                                            {/* Compact Info Row: Due Date, Assignee, Progress */}
+                                                            <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100">
+                                                                {/* Due Date */}
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                                                        <Calendar className="w-4 h-4 text-blue-600" />
                                                                     </div>
                                                                     <div>
-                                                                        <h3 className="text-sm font-bold text-navy">تتبع الوقت</h3>
-                                                                        <p className="text-xs text-slate-500">
-                                                                            {isTimeTrackingActive ? 'جاري التسجيل...' : 'ابدأ تسجيل الوقت'}
-                                                                        </p>
+                                                                        <p className="text-xs text-slate-500">تاريخ الاستحقاق</p>
+                                                                        <p className="text-sm font-semibold text-navy">{task.dueDate}</p>
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Timer Control Button */}
-                                                                <Button
-                                                                    onClick={isTimeTrackingActive ? handleStopTimeTracking : handleStartTimeTracking}
-                                                                    disabled={startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending}
-                                                                    className={`rounded-xl px-4 py-2 flex items-center gap-2 transition-all ${
-                                                                        isTimeTrackingActive
-                                                                            ? 'bg-red-500 hover:bg-red-600 text-white'
-                                                                            : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                                                                    }`}
-                                                                >
-                                                                    {(startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending) ? (
-                                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                                    ) : isTimeTrackingActive ? (
-                                                                        <>
-                                                                            <Pause className="w-4 h-4" />
-                                                                            <span className="font-medium">إيقاف</span>
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <Play className="w-4 h-4" />
-                                                                            <span className="font-medium">بدء</span>
-                                                                        </>
-                                                                    )}
-                                                                </Button>
-                                                            </div>
+                                                                {/* Divider */}
+                                                                <div className="h-8 w-px bg-slate-200" />
 
-                                                            {/* Time Stats Grid */}
-                                                            <div className="grid grid-cols-3 gap-3">
-                                                                {/* Estimated Time */}
-                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
-                                                                    <p className="text-xs text-slate-500 mb-1">الوقت المقدر</p>
-                                                                    <p className="text-lg font-bold text-navy">
-                                                                        {task.timeTracking.estimatedMinutes > 0
-                                                                            ? `${Math.floor(task.timeTracking.estimatedMinutes / 60)}س ${task.timeTracking.estimatedMinutes % 60}د`
-                                                                            : '-'
-                                                                        }
-                                                                    </p>
-                                                                </div>
-
-                                                                {/* Actual Time */}
-                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
-                                                                    <p className="text-xs text-slate-500 mb-1">الوقت الفعلي</p>
-                                                                    <p className="text-lg font-bold text-emerald-600">
-                                                                        {task.timeTracking.actualMinutes > 0
-                                                                            ? `${Math.floor(task.timeTracking.actualMinutes / 60)}س ${task.timeTracking.actualMinutes % 60}د`
-                                                                            : '0س 0د'
-                                                                        }
-                                                                    </p>
-                                                                </div>
-
-                                                                {/* Efficiency */}
-                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
-                                                                    <p className="text-xs text-slate-500 mb-1">نسبة الاستهلاك</p>
-                                                                    <p className={`text-lg font-bold ${
-                                                                        task.timeTracking.estimatedMinutes > 0
-                                                                            ? (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
-                                                                                ? 'text-red-600'
-                                                                                : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
-                                                                                    ? 'text-amber-600'
-                                                                                    : 'text-emerald-600'
-                                                                            : 'text-slate-400'
-                                                                    }`}>
-                                                                        {task.timeTracking.estimatedMinutes > 0
-                                                                            ? `${Math.round((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%`
-                                                                            : '-'
-                                                                        }
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Progress Bar for Time */}
-                                                            {task.timeTracking.estimatedMinutes > 0 && (
-                                                                <div className="mt-4">
-                                                                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                                        <div
-                                                                            className={`h-full rounded-full transition-all duration-500 ${
-                                                                                (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
-                                                                                    ? 'bg-red-500'
-                                                                                    : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
-                                                                                        ? 'bg-amber-500'
-                                                                                        : 'bg-emerald-500'
-                                                                            }`}
-                                                                            style={{ width: `${Math.min(100, (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%` }}
-                                                                        />
+                                                                {/* Assignee */}
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                                                        <User className="w-4 h-4 text-emerald-600" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-xs text-slate-500">المسؤول</p>
+                                                                        <p className="text-sm font-semibold text-navy">{task.assignee.name}</p>
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                        </div>
+
+                                                                {/* Divider */}
+                                                                <div className="h-8 w-px bg-slate-200" />
+
+                                                                {/* Progress */}
+                                                                <div className="flex items-center gap-3 flex-1 min-w-[150px]">
+                                                                    <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                                                                        <CheckSquare className="w-4 h-4 text-purple-600" />
+                                                                    </div>
+                                                                    <div className="flex-1">
+                                                                        <div className="flex items-center justify-between mb-1">
+                                                                            <p className="text-xs text-slate-500">نسبة الإنجاز</p>
+                                                                            <p className="text-sm font-bold text-navy">{task.completion}%</p>
+                                                                        </div>
+                                                                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                                            <div
+                                                                                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500"
+                                                                                style={{ width: `${task.completion}%` }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </CardContent>
                                                     </Card>
 
                                                     {/* DEPENDENCIES CARD - Premium Design (Only show if has dependencies) */}
@@ -891,6 +809,49 @@ export function TaskDetailsView() {
                                                                                         </Badge>
                                                                                     </div>
                                                                                 ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </Card>
+                                                    )}
+
+                                                    {/* LOCATION CARD - Only show if location is set */}
+                                                    {(task.location?.name || task.location?.address) && (
+                                                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                            <div className="p-5">
+                                                                <div className="flex items-center gap-3 mb-4">
+                                                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-100 text-blue-600">
+                                                                        <MapPin className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div className="flex-1">
+                                                                        <h3 className="text-sm font-bold text-navy">الموقع</h3>
+                                                                        <p className="text-xs text-slate-500">موقع تنفيذ المهمة</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Location Details */}
+                                                                <div className="space-y-3 bg-slate-50 rounded-xl p-4">
+                                                                    {task.location?.name && (
+                                                                        <div className="flex items-start gap-3">
+                                                                            <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center shadow-sm">
+                                                                                <Target className="w-3.5 h-3.5 text-slate-500" />
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs text-slate-500">اسم الموقع</p>
+                                                                                <p className="text-sm font-medium text-navy">{task.location.name}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                    {task.location?.address && (
+                                                                        <div className="flex items-start gap-3">
+                                                                            <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center shadow-sm">
+                                                                                <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs text-slate-500">العنوان</p>
+                                                                                <p className="text-sm font-medium text-navy">{task.location.address}</p>
                                                                             </div>
                                                                         </div>
                                                                     )}
@@ -1136,6 +1097,263 @@ export function TaskDetailsView() {
                                                                         )}
                                                                     </div>
                                                                 )}
+                                                            </CardContent>
+                                                        </Card>
+                                                    )}
+                                                </TabsContent>
+
+                                                {/* TIME TRACKING TAB */}
+                                                <TabsContent value="time-tracking" className="mt-0 space-y-6">
+                                                    {/* Warning Banner for Completed/Canceled Tasks */}
+                                                    {(task.status === 'مكتملة' || taskData?.status === 'done' || taskData?.status === 'canceled') && (
+                                                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
+                                                            <Ban className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                                                            <div>
+                                                                <p className="text-sm font-medium text-amber-800">
+                                                                    لا يمكن تتبع الوقت على مهمة مكتملة أو ملغاة
+                                                                </p>
+                                                                <p className="text-xs text-amber-600 mt-1">
+                                                                    أعد فتح المهمة لاستئناف تتبع الوقت
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Timer Control Card */}
+                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                        <div className="p-6">
+                                                            <div className="flex items-center justify-between mb-6">
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+                                                                        isTimeTrackingActive
+                                                                            ? 'bg-emerald-100 text-emerald-600'
+                                                                            : (taskData?.status === 'done' || taskData?.status === 'canceled')
+                                                                                ? 'bg-slate-200 text-slate-400'
+                                                                                : 'bg-slate-100 text-slate-500'
+                                                                    }`}>
+                                                                        <Timer className="w-7 h-7" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="text-lg font-bold text-navy">تتبع الوقت</h3>
+                                                                        <p className="text-sm text-slate-500">
+                                                                            {isTimeTrackingActive
+                                                                                ? 'جاري التسجيل...'
+                                                                                : (taskData?.status === 'done' || taskData?.status === 'canceled')
+                                                                                    ? 'المهمة مغلقة'
+                                                                                    : 'ابدأ تسجيل الوقت'
+                                                                            }
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Timer Control Buttons */}
+                                                                <div className="flex items-center gap-2">
+                                                                    {/* Reset Button */}
+                                                                    {task.timeTracking.actualMinutes > 0 && !isTimeTrackingActive && (
+                                                                        <Button
+                                                                            onClick={handleResetTimeTracking}
+                                                                            disabled={resetTimeTrackingMutation.isPending}
+                                                                            size="lg"
+                                                                            variant="outline"
+                                                                            className="rounded-xl px-4 py-3 flex items-center gap-2 border-slate-200 text-slate-600 hover:bg-slate-50"
+                                                                        >
+                                                                            {resetTimeTrackingMutation.isPending ? (
+                                                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                                            ) : (
+                                                                                <>
+                                                                                    <RotateCcw className="w-4 h-4" />
+                                                                                    <span className="font-medium">إعادة تعيين</span>
+                                                                                </>
+                                                                            )}
+                                                                        </Button>
+                                                                    )}
+
+                                                                    {/* Start/Stop Button */}
+                                                                    <Button
+                                                                        onClick={isTimeTrackingActive ? handleStopTimeTracking : handleStartTimeTracking}
+                                                                        disabled={
+                                                                            startTimeTrackingMutation.isPending ||
+                                                                            stopTimeTrackingMutation.isPending ||
+                                                                            (!isTimeTrackingActive && (taskData?.status === 'done' || taskData?.status === 'canceled'))
+                                                                        }
+                                                                        size="lg"
+                                                                        className={`rounded-xl px-6 py-3 flex items-center gap-2 transition-all ${
+                                                                            isTimeTrackingActive
+                                                                                ? 'bg-red-500 hover:bg-red-600 text-white'
+                                                                                : (taskData?.status === 'done' || taskData?.status === 'canceled')
+                                                                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                                                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                                                        }`}
+                                                                    >
+                                                                        {(startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending) ? (
+                                                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                                                        ) : isTimeTrackingActive ? (
+                                                                            <>
+                                                                                <Pause className="w-5 h-5" />
+                                                                                <span className="font-semibold">إيقاف</span>
+                                                                            </>
+                                                                        ) : (taskData?.status === 'done' || taskData?.status === 'canceled') ? (
+                                                                            <>
+                                                                                <Ban className="w-5 h-5" />
+                                                                                <span className="font-semibold">محظور</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <Play className="w-5 h-5" />
+                                                                                <span className="font-semibold">بدء</span>
+                                                                            </>
+                                                                        )}
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Time Stats Grid */}
+                                                            <div className="grid grid-cols-3 gap-4">
+                                                                {/* Estimated Time */}
+                                                                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                                                                    <p className="text-xs text-slate-500 mb-2">الوقت المقدر</p>
+                                                                    <p className="text-2xl font-bold text-navy">
+                                                                        {task.timeTracking.estimatedMinutes > 0
+                                                                            ? `${Math.floor(task.timeTracking.estimatedMinutes / 60)}س ${task.timeTracking.estimatedMinutes % 60}د`
+                                                                            : '-'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Actual Time */}
+                                                                <div className="bg-emerald-50 rounded-xl p-4 text-center">
+                                                                    <p className="text-xs text-emerald-600 mb-2">الوقت الفعلي</p>
+                                                                    <p className="text-2xl font-bold text-emerald-600">
+                                                                        {task.timeTracking.actualMinutes > 0
+                                                                            ? `${Math.floor(task.timeTracking.actualMinutes / 60)}س ${task.timeTracking.actualMinutes % 60}د`
+                                                                            : '0س 0د'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Efficiency */}
+                                                                <div className={`rounded-xl p-4 text-center ${
+                                                                    task.timeTracking.estimatedMinutes > 0
+                                                                        ? (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                            ? 'bg-red-50'
+                                                                            : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                ? 'bg-amber-50'
+                                                                                : 'bg-emerald-50'
+                                                                        : 'bg-slate-50'
+                                                                }`}>
+                                                                    <p className={`text-xs mb-2 ${
+                                                                        task.timeTracking.estimatedMinutes > 0
+                                                                            ? (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                                ? 'text-red-600'
+                                                                                : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                    ? 'text-amber-600'
+                                                                                    : 'text-emerald-600'
+                                                                            : 'text-slate-500'
+                                                                    }`}>نسبة الاستهلاك</p>
+                                                                    <p className={`text-2xl font-bold ${
+                                                                        task.timeTracking.estimatedMinutes > 0
+                                                                            ? (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                                ? 'text-red-600'
+                                                                                : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                    ? 'text-amber-600'
+                                                                                    : 'text-emerald-600'
+                                                                            : 'text-slate-400'
+                                                                    }`}>
+                                                                        {task.timeTracking.estimatedMinutes > 0
+                                                                            ? `${Math.round((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%`
+                                                                            : '-'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Progress Bar for Time */}
+                                                            {task.timeTracking.estimatedMinutes > 0 && (
+                                                                <div className="mt-6">
+                                                                    <div className="flex items-center justify-between mb-2">
+                                                                        <span className="text-sm text-slate-500">التقدم</span>
+                                                                        <span className="text-sm font-medium text-slate-700">
+                                                                            {Math.round((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                                                        <div
+                                                                            className={`h-full rounded-full transition-all duration-500 ${
+                                                                                (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                                    ? 'bg-red-500'
+                                                                                    : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                        ? 'bg-amber-500'
+                                                                                        : 'bg-emerald-500'
+                                                                            }`}
+                                                                            style={{ width: `${Math.min(100, (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%` }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </Card>
+
+                                                    {/* Time Entries History */}
+                                                    {timeTrackingData?.entries && timeTrackingData.entries.length > 0 && (
+                                                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                            <CardHeader>
+                                                                <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                                                    <History className="w-4 h-4 text-slate-500" />
+                                                                    سجل الوقت
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent>
+                                                                <div className="space-y-3">
+                                                                    {timeTrackingData.entries.map((entry: any, index: number) => {
+                                                                        const statusBadge = getTimeEntryStatusBadge(entry.status)
+                                                                        return (
+                                                                        <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                                                    entry.status === 'approved' ? 'bg-emerald-100 text-emerald-600' :
+                                                                                    entry.status === 'rejected' ? 'bg-red-100 text-red-600' :
+                                                                                    entry.status === 'changes_requested' ? 'bg-orange-100 text-orange-600' :
+                                                                                    entry.status === 'billed' ? 'bg-purple-100 text-purple-600' :
+                                                                                    'bg-emerald-100 text-emerald-600'
+                                                                                }`}>
+                                                                                    <Clock className="w-4 h-4" />
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <p className="text-sm font-medium text-slate-700">
+                                                                                            {entry.startTime} - {entry.endTime || 'جاري...'}
+                                                                                        </p>
+                                                                                        {entry.status && (
+                                                                                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusBadge.className}`}>
+                                                                                                {statusBadge.label}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                                                        <p className="text-xs text-slate-500">{entry.date}</p>
+                                                                                        {entry.isBillable !== undefined && (
+                                                                                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                                                                                entry.isBillable ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500'
+                                                                                            }`}>
+                                                                                                {entry.isBillable ? 'قابل للفوترة' : 'غير قابل للفوترة'}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="text-end">
+                                                                                <span className="text-sm font-bold text-navy block">
+                                                                                    {entry.duration || '-'}
+                                                                                </span>
+                                                                                {entry.billableAmount !== undefined && entry.billableAmount > 0 && (
+                                                                                    <span className="text-xs text-slate-500">
+                                                                                        {entry.billableAmount.toLocaleString('ar-SA')} ر.س
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    )})}
+                                                                </div>
                                                             </CardContent>
                                                         </Card>
                                                     )}
