@@ -426,62 +426,49 @@ const oauthService = {
 
       // Try to extract tokens - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
       // OAuth 2.0 format takes precedence
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       let accessToken = response.data.access_token || response.data.accessToken
       let refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || (response.data as any).expiresIn // seconds until access token expires
 
-      // Check alternate locations if not found at root level
-      if (!accessToken || !refreshToken) {
+      // Check alternate locations if accessToken not found at root level
+      if (!accessToken) {
         const data = response.data as any
         // Try nested structures (common backend variations)
-        accessToken = accessToken || data.token || data.tokens?.access_token || data.tokens?.accessToken || data.data?.access_token || data.data?.accessToken || data.auth?.access_token || data.auth?.accessToken
+        accessToken = data.token || data.tokens?.access_token || data.tokens?.accessToken || data.data?.access_token || data.data?.accessToken || data.auth?.access_token || data.auth?.accessToken
         refreshToken = refreshToken || data.tokens?.refresh_token || data.tokens?.refreshToken || data.data?.refresh_token || data.data?.refreshToken || data.auth?.refresh_token || data.auth?.refreshToken
 
-        if (accessToken || refreshToken) {
-          oauthWarn('Found tokens in alternate location!', {
-            accessTokenLocation: accessToken ? 'found' : 'missing',
-            refreshTokenLocation: refreshToken ? 'found' : 'missing',
-          })
+        if (accessToken) {
+          oauthLog('Found accessToken in alternate location')
         }
       }
 
-      // Store tokens if provided
-      if (accessToken && refreshToken) {
+      // Store tokens if accessToken is provided (refreshToken may be in httpOnly cookie)
+      if (accessToken) {
         oauthLog('Storing tokens from callback response...', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
         logTokenDetails('  New accessToken', accessToken)
-        logTokenDetails('  New refreshToken', refreshToken)
+        if (refreshToken) {
+          logTokenDetails('  New refreshToken', refreshToken)
+        }
 
         storeTokens(accessToken, refreshToken, expiresIn)
 
-        // Verify tokens were stored correctly
+        // Verify accessToken was stored correctly
         const storedAccess = getAccessToken()
-        const storedRefresh = getRefreshToken()
         oauthLog('Token storage verification:', {
           accessTokenStored: storedAccess === accessToken,
-          refreshTokenStored: storedRefresh === refreshToken,
           accessTokenInLocalStorage: !!localStorage.getItem('accessToken'),
           refreshTokenInLocalStorage: !!localStorage.getItem('refreshToken'),
+          refreshTokenStrategy: refreshToken ? 'localStorage' : 'httpOnly cookie',
         })
       } else {
-        // =========================================================================
-        // 🚨 BACKEND_TODO: This is where the SSO flow breaks!
-        // =========================================================================
-        // The backend /auth/sso/callback endpoint did NOT return tokens.
-        // The user will appear logged in but ALL API calls will fail with 401.
-        //
-        // SYMPTOMS:
-        // - User sees dashboard briefly then gets redirected to login
-        // - Console shows "401 Unauthorized" on subsequent requests
-        // - User data in localStorage but no tokens
-        //
-        // BACKEND FIX: Return tokens in /auth/sso/callback response
-        // See: src/config/BACKEND_AUTH_ISSUES.ts for full fix instructions
-        // =========================================================================
-        console.error('🚨 NO TOKENS TO STORE - User will NOT be authenticated!')
+        // accessToken is required - if missing, SSO callback failed
+        console.error('🚨 NO accessToken RETURNED - User will NOT be authenticated!')
         console.error('[OAUTH] Without tokens, subsequent API calls will fail with 401')
         console.error('[OAUTH] The user appears logged in but actually is not authenticated')
         console.error('[OAUTH] 📋 BACKEND FIX REQUIRED: Return accessToken & refreshToken from /auth/sso/callback')

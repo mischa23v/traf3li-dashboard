@@ -123,11 +123,12 @@ const mfaService = {
       }
 
       // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = (response.data as any).access_token || response.data.accessToken
       const refreshToken = (response.data as any).refresh_token || response.data.refreshToken
-      const expiresIn = (response.data as any).expires_in // seconds until access token expires
+      const expiresIn = (response.data as any).expires_in || (response.data as any).expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
       }
 

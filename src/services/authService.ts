@@ -487,21 +487,22 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('Login tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Login response did not include tokens!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/login')
+        authWarn('Login response did not include accessToken!')
         authLog('Response keys:', Object.keys(response.data))
       }
 
@@ -1025,21 +1026,22 @@ const authService = {
         throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('OTP verify tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('OTP verify did not return tokens - user will not be authenticated!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/verify-otp')
+        authWarn('OTP verify did not return accessToken!')
       }
 
       // Normalize user data to ensure firmId is set
@@ -1145,21 +1147,22 @@ const authService = {
         )
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('Magic link tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Magic link verify did not return tokens!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/magic-link/verify')
+        authWarn('Magic link verify did not return accessToken!')
       }
 
       // Normalize user data to ensure firmId is set
