@@ -39,7 +39,7 @@ import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -608,36 +608,35 @@ export function TaskDetailsView() {
                                     {/* Main Content Card - Gosi Premium Design */}
                                     <GosiCard className="min-h-[600px] p-0">
                                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                            {/* Gosi Premium Tabs Header */}
-                                            <div className="border-b border-slate-100/50 px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-                                                <TabsList className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-100/80 p-1.5 text-slate-500 w-full sm:w-auto gap-1">
-                                                    {['overview', 'files', 'comments'].map((tab) => (
-                                                        <TabsTrigger
-                                                            key={tab}
-                                                            value={tab}
-                                                            className="
-                                                                inline-flex items-center justify-center whitespace-nowrap rounded-xl px-4 sm:px-6 py-2.5 text-sm font-semibold ring-offset-white transition-all duration-200
-                                                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
-                                                                disabled:pointer-events-none disabled:opacity-50
-                                                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20
-                                                                data-[state=inactive]:hover:bg-white data-[state=inactive]:hover:text-slate-900
-                                                                flex-1 sm:flex-initial
-                                                            "
+                                            {/* Tab Navigation - Matching Overview Page Style */}
+                                            <div className="px-4 sm:px-6 pt-4 flex items-center justify-between gap-4">
+                                                <div className="flex items-center gap-2 border-b border-slate-200 pb-0 flex-1">
+                                                    {[
+                                                        { id: 'overview', label: 'نظرة عامة' },
+                                                        { id: 'files', label: 'المرفقات' },
+                                                        { id: 'comments', label: 'التعليقات' }
+                                                    ].map((tab) => (
+                                                        <button
+                                                            key={tab.id}
+                                                            onClick={() => setActiveTab(tab.id)}
+                                                            className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors relative ${
+                                                                activeTab === tab.id
+                                                                    ? 'bg-emerald-500 text-white'
+                                                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                                            }`}
                                                         >
-                                                            {tab === 'overview' ? 'نظرة عامة' :
-                                                                tab === 'files' ? 'المرفقات' : 'التعليقات'}
-                                                        </TabsTrigger>
+                                                            {tab.label}
+                                                        </button>
                                                     ))}
-                                                </TabsList>
-                                                {/* Export PDF Button - Left side (end in RTL) */}
+                                                </div>
+                                                {/* Export Button */}
                                                 <Button
                                                     onClick={() => printTaskReport(task)}
-                                                    variant="outline"
                                                     size="sm"
-                                                    className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shrink-0"
+                                                    className="bg-[#022c22] hover:bg-[#064e3b] text-white rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm shrink-0"
                                                 >
                                                     <Download className="h-4 w-4" />
-                                                    <span className="font-medium hidden sm:inline">تصدير PDF</span>
+                                                    <span className="font-medium">تصدير</span>
                                                 </Button>
                                             </div>
 
@@ -653,6 +652,252 @@ export function TaskDetailsView() {
                                                             </p>
                                                         </CardContent>
                                                     </Card>
+
+                                                    {/* KEY METRICS STRIP - Premium Design */}
+                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                        {/* Progress Bar Header */}
+                                                        <div className="px-6 pt-4 pb-3">
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <span className="text-sm font-semibold text-slate-700">نسبة الإنجاز</span>
+                                                                <span className="text-lg font-bold text-navy">{task.completion}%</span>
+                                                            </div>
+                                                            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                                                <div
+                                                                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500"
+                                                                    style={{ width: `${task.completion}%` }}
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Metrics Grid */}
+                                                        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-slate-100 border-t border-slate-100">
+                                                            {/* Due Date */}
+                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
+                                                                <div className="flex items-center justify-center gap-2 mb-1">
+                                                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                                                    <span className="text-xs font-medium text-slate-500">تاريخ الاستحقاق</span>
+                                                                </div>
+                                                                <p className="text-sm font-bold text-navy">{task.dueDate}</p>
+                                                            </div>
+
+                                                            {/* Assignee */}
+                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
+                                                                <div className="flex items-center justify-center gap-2 mb-1">
+                                                                    <User className="w-4 h-4 text-slate-400" />
+                                                                    <span className="text-xs font-medium text-slate-500">المسؤول</span>
+                                                                </div>
+                                                                <p className="text-sm font-bold text-navy">{task.assignee.name}</p>
+                                                            </div>
+
+                                                            {/* Subtasks */}
+                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
+                                                                <div className="flex items-center justify-center gap-2 mb-1">
+                                                                    <CheckSquare className="w-4 h-4 text-slate-400" />
+                                                                    <span className="text-xs font-medium text-slate-500">المهام الفرعية</span>
+                                                                </div>
+                                                                <p className="text-sm font-bold text-navy">
+                                                                    {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
+                                                                </p>
+                                                            </div>
+
+                                                            {/* Time Tracking */}
+                                                            <div className="p-4 text-center hover:bg-slate-50/50 transition-colors">
+                                                                <div className="flex items-center justify-center gap-2 mb-1">
+                                                                    <Clock className="w-4 h-4 text-slate-400" />
+                                                                    <span className="text-xs font-medium text-slate-500">الوقت المستغرق</span>
+                                                                </div>
+                                                                <p className="text-sm font-bold text-navy">
+                                                                    {task.timeTracking.actualMinutes > 0
+                                                                        ? `${Math.floor(task.timeTracking.actualMinutes / 60)}س ${task.timeTracking.actualMinutes % 60}د`
+                                                                        : '0س 0د'
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+
+                                                    {/* TIME TRACKING CARD - Premium Design */}
+                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                        <div className="p-5">
+                                                            <div className="flex items-center justify-between mb-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isTimeTrackingActive ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                                                                        <Timer className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="text-sm font-bold text-navy">تتبع الوقت</h3>
+                                                                        <p className="text-xs text-slate-500">
+                                                                            {isTimeTrackingActive ? 'جاري التسجيل...' : 'ابدأ تسجيل الوقت'}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Timer Control Button */}
+                                                                <Button
+                                                                    onClick={isTimeTrackingActive ? handleStopTimeTracking : handleStartTimeTracking}
+                                                                    disabled={startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending}
+                                                                    className={`rounded-xl px-4 py-2 flex items-center gap-2 transition-all ${
+                                                                        isTimeTrackingActive
+                                                                            ? 'bg-red-500 hover:bg-red-600 text-white'
+                                                                            : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                                                    }`}
+                                                                >
+                                                                    {(startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending) ? (
+                                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                                    ) : isTimeTrackingActive ? (
+                                                                        <>
+                                                                            <Pause className="w-4 h-4" />
+                                                                            <span className="font-medium">إيقاف</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Play className="w-4 h-4" />
+                                                                            <span className="font-medium">بدء</span>
+                                                                        </>
+                                                                    )}
+                                                                </Button>
+                                                            </div>
+
+                                                            {/* Time Stats Grid */}
+                                                            <div className="grid grid-cols-3 gap-3">
+                                                                {/* Estimated Time */}
+                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                                                                    <p className="text-xs text-slate-500 mb-1">الوقت المقدر</p>
+                                                                    <p className="text-lg font-bold text-navy">
+                                                                        {task.timeTracking.estimatedMinutes > 0
+                                                                            ? `${Math.floor(task.timeTracking.estimatedMinutes / 60)}س ${task.timeTracking.estimatedMinutes % 60}د`
+                                                                            : '-'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Actual Time */}
+                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                                                                    <p className="text-xs text-slate-500 mb-1">الوقت الفعلي</p>
+                                                                    <p className="text-lg font-bold text-emerald-600">
+                                                                        {task.timeTracking.actualMinutes > 0
+                                                                            ? `${Math.floor(task.timeTracking.actualMinutes / 60)}س ${task.timeTracking.actualMinutes % 60}د`
+                                                                            : '0س 0د'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Efficiency */}
+                                                                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                                                                    <p className="text-xs text-slate-500 mb-1">نسبة الاستهلاك</p>
+                                                                    <p className={`text-lg font-bold ${
+                                                                        task.timeTracking.estimatedMinutes > 0
+                                                                            ? (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                                ? 'text-red-600'
+                                                                                : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                    ? 'text-amber-600'
+                                                                                    : 'text-emerald-600'
+                                                                            : 'text-slate-400'
+                                                                    }`}>
+                                                                        {task.timeTracking.estimatedMinutes > 0
+                                                                            ? `${Math.round((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%`
+                                                                            : '-'
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Progress Bar for Time */}
+                                                            {task.timeTracking.estimatedMinutes > 0 && (
+                                                                <div className="mt-4">
+                                                                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                                        <div
+                                                                            className={`h-full rounded-full transition-all duration-500 ${
+                                                                                (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 1
+                                                                                    ? 'bg-red-500'
+                                                                                    : (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) > 0.8
+                                                                                        ? 'bg-amber-500'
+                                                                                        : 'bg-emerald-500'
+                                                                            }`}
+                                                                            style={{ width: `${Math.min(100, (task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100)}%` }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </Card>
+
+                                                    {/* DEPENDENCIES CARD - Premium Design (Only show if has dependencies) */}
+                                                    {(task.dependencies.blockedBy.length > 0 || task.dependencies.blocks.length > 0) && (
+                                                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                            <div className="p-5">
+                                                                <div className="flex items-center gap-3 mb-4">
+                                                                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                                                                        <LinkIcon className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="text-sm font-bold text-navy">التبعيات</h3>
+                                                                        <p className="text-xs text-slate-500">المهام المرتبطة</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="space-y-4">
+                                                                    {/* Blocked By */}
+                                                                    {task.dependencies.blockedBy.length > 0 && (
+                                                                        <div>
+                                                                            <p className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1">
+                                                                                <AlertCircle className="w-3 h-3 text-red-500" />
+                                                                                محجوب بواسطة
+                                                                            </p>
+                                                                            <div className="space-y-2">
+                                                                                {task.dependencies.blockedBy.map((dep) => (
+                                                                                    <div key={dep.taskId} className="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
+                                                                                        <Link
+                                                                                            to={ROUTES.dashboard.tasks.detail(dep.taskId)}
+                                                                                            className="text-sm font-medium text-slate-700 hover:text-red-600 transition-colors"
+                                                                                        >
+                                                                                            {dep.taskTitle}
+                                                                                        </Link>
+                                                                                        <Badge className={`text-xs ${
+                                                                                            dep.status === 'done' ? 'bg-emerald-100 text-emerald-700' :
+                                                                                            dep.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                                                                                            'bg-slate-100 text-slate-600'
+                                                                                        }`}>
+                                                                                            {dep.status === 'done' ? 'مكتمل' : dep.status === 'in_progress' ? 'قيد التنفيذ' : 'قيد الانتظار'}
+                                                                                        </Badge>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Blocks */}
+                                                                    {task.dependencies.blocks.length > 0 && (
+                                                                        <div>
+                                                                            <p className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1">
+                                                                                <AlertTriangle className="w-3 h-3 text-amber-500" />
+                                                                                يحجب
+                                                                            </p>
+                                                                            <div className="space-y-2">
+                                                                                {task.dependencies.blocks.map((dep) => (
+                                                                                    <div key={dep.taskId} className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
+                                                                                        <Link
+                                                                                            to={ROUTES.dashboard.tasks.detail(dep.taskId)}
+                                                                                            className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors"
+                                                                                        >
+                                                                                            {dep.taskTitle}
+                                                                                        </Link>
+                                                                                        <Badge className={`text-xs ${
+                                                                                            dep.status === 'done' ? 'bg-emerald-100 text-emerald-700' :
+                                                                                            dep.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                                                                                            'bg-slate-100 text-slate-600'
+                                                                                        }`}>
+                                                                                            {dep.status === 'done' ? 'مكتمل' : dep.status === 'in_progress' ? 'قيد التنفيذ' : 'قيد الانتظار'}
+                                                                                        </Badge>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </Card>
+                                                    )}
 
                                                     {/* Subtasks Section - Moved from separate tab */}
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
