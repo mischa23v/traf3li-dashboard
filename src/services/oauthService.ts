@@ -188,9 +188,11 @@ export const OAUTH_PROVIDERS: OAuthProviderConfig[] = [
 
 /**
  * OAuth Authorization Response
+ * Backend returns 'authorizationUrl' per documentation
  */
 interface OAuthAuthorizeResponse {
-  authUrl: string
+  authorizationUrl: string
+  authUrl?: string  // Legacy support
   pkceEnabled?: boolean
   state?: string
 }
@@ -224,7 +226,8 @@ interface OAuthCallbackResponse {
 const oauthService = {
   /**
    * Get OAuth authorization URL
-   * Redirects user to provider's login page
+   * Initiates OAuth flow and returns authorization URL
+   * POST /api/auth/sso/initiate
    *
    * @param provider - OAuth provider (google, facebook, etc.)
    * @param returnUrl - URL to redirect after auth (default: /dashboard)
@@ -236,17 +239,20 @@ const oauthService = {
     usePKCE: boolean = false
   ): Promise<OAuthAuthorizeResponse> => {
     try {
-      const response = await authApi.get<OAuthAuthorizeResponse>(
-        `/auth/sso/${provider}/authorize`,
+      const response = await authApi.post<OAuthAuthorizeResponse>(
+        '/auth/sso/initiate',
         {
-          params: {
-            returnUrl,
-            use_pkce: usePKCE,
-          },
+          provider,
+          returnUrl,
+          use_pkce: usePKCE,
         }
       )
 
-      return response.data
+      // Backend returns 'authorizationUrl', normalize to include legacy 'authUrl'
+      return {
+        ...response.data,
+        authUrl: response.data.authorizationUrl || response.data.authUrl,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -263,12 +269,17 @@ const oauthService = {
     provider: OAuthProvider,
     returnUrl: string = '/dashboard'
   ): Promise<void> => {
-    const { authUrl } = await oauthService.getAuthorizationUrl(
+    const response = await oauthService.getAuthorizationUrl(
       provider,
       returnUrl,
       false
     )
-    window.location.href = authUrl
+    // Use authorizationUrl (primary) or authUrl (legacy fallback)
+    const redirectUrl = response.authorizationUrl || response.authUrl
+    if (!redirectUrl) {
+      throw new Error('No authorization URL returned from backend')
+    }
+    window.location.href = redirectUrl
   },
 
   /**
@@ -576,14 +587,60 @@ const oauthService = {
 
   /**
    * Get linked OAuth providers for current user
+   * GET /api/auth/sso/linked
+   * Backend returns links array with provider details
    */
   getLinkedProviders: async (): Promise<OAuthProvider[]> => {
     try {
       const response = await authApi.get<{
-        providers: OAuthProvider[]
+        error?: boolean
+        message?: string
+        // Backend format
+        links?: Array<{
+          providerType: OAuthProvider
+          externalEmail?: string
+          lastLoginAt?: string
+          isActive?: boolean
+        }>
+        // Legacy format
+        providers?: OAuthProvider[]
       }>('/auth/sso/linked')
 
-      return response.data.providers
+      // Handle backend format (links array)
+      if (response.data.links) {
+        return response.data.links.map((link) => link.providerType)
+      }
+
+      // Fallback to legacy format
+      return response.data.providers || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get linked OAuth providers with details
+   * Returns full link information including email and last login
+   */
+  getLinkedProvidersWithDetails: async (): Promise<Array<{
+    providerType: OAuthProvider
+    externalEmail?: string
+    lastLoginAt?: string
+    isActive?: boolean
+  }>> => {
+    try {
+      const response = await authApi.get<{
+        error?: boolean
+        message?: string
+        links?: Array<{
+          providerType: OAuthProvider
+          externalEmail?: string
+          lastLoginAt?: string
+          isActive?: boolean
+        }>
+      }>('/auth/sso/linked')
+
+      return response.data.links || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

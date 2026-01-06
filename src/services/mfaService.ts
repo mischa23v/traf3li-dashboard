@@ -159,15 +159,26 @@ const mfaService = {
   },
 
   /**
-   * Regenerate backup codes
+   * Generate backup codes
    * Invalidates all previous backup codes
+   * POST /api/auth/mfa/backup-codes/generate
    */
-  regenerateBackupCodes: async (): Promise<{ backupCodes: string[] }> => {
+  regenerateBackupCodes: async (): Promise<{ backupCodes: string[]; remainingCodes: number }> => {
     try {
-      const response = await authApi.post<{ backupCodes: string[] }>(
-        '/auth/mfa/backup-codes/regenerate'
-      )
-      return { backupCodes: response.data.backupCodes }
+      const response = await authApi.post<{
+        error?: boolean
+        message?: string
+        codes?: string[]
+        backupCodes?: string[]
+        remainingCodes?: number
+      }>('/auth/mfa/backup-codes/generate')
+
+      // Backend may return 'codes' or 'backupCodes'
+      const codes = response.data.codes || response.data.backupCodes || []
+      return {
+        backupCodes: codes,
+        remainingCodes: response.data.remainingCodes || codes.length,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -175,13 +186,24 @@ const mfaService = {
 
   /**
    * Get remaining backup codes count
+   * GET /api/auth/mfa/backup-codes/count
    */
   getBackupCodesCount: async (): Promise<number> => {
     try {
-      const status = await mfaService.getStatus()
-      return status.backupCodesCount
+      // Try dedicated endpoint first
+      const response = await authApi.get<{
+        error?: boolean
+        remainingCodes: number
+      }>('/auth/mfa/backup-codes/count')
+      return response.data.remainingCodes
     } catch {
-      return 0
+      // Fallback to status endpoint
+      try {
+        const status = await mfaService.getStatus()
+        return status.backupCodesCount
+      } catch {
+        return 0
+      }
     }
   },
 
