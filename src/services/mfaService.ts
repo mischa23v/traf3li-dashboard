@@ -81,13 +81,13 @@ const mfaService = {
    * Verify TOTP setup with a code from authenticator app
    * Completes the MFA setup process
    *
-   * @param code - 6-digit TOTP code
+   * @param token - 6-digit TOTP code (backend expects 'token' field per contract)
    */
-  verifySetup: async (code: string): Promise<{ success: boolean }> => {
+  verifySetup: async (token: string): Promise<{ success: boolean }> => {
     try {
       const response = await authApi.post<{ success: boolean; message: string }>(
         '/auth/mfa/verify-setup',
-        { code }
+        { token }
       )
       return { success: response.data.success }
     } catch (error: any) {
@@ -100,12 +100,12 @@ const mfaService = {
    * Called after successful password login when MFA is enabled
    *
    * @param userId - User ID from login response
-   * @param code - MFA code (TOTP or backup code)
+   * @param token - MFA token/code (backend expects 'token' field per contract)
    * @param method - MFA method being used
    */
   verify: async (
     userId: string,
-    code: string,
+    token: string,
     method: MFAMethod = 'totp'
   ): Promise<User> => {
     try {
@@ -113,7 +113,7 @@ const mfaService = {
         '/auth/mfa/verify',
         {
           userId,
-          code,
+          token,
           method,
         }
       )
