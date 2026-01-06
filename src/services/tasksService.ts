@@ -8,6 +8,13 @@
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
+import {
+  parseFileError,
+  isMalwareDetectedError,
+  MalwareDetectedError,
+  ScanFailedError,
+} from '@/lib/file-error-handling'
+import { FILE_ERROR_MESSAGES } from '@/types/file-storage'
 
 /**
  * Create bilingual error message
@@ -1187,10 +1194,30 @@ const tasksService = {
   },
 
   // ==================== Attachments ====================
+  // ✅ All attachment endpoints now support malware scanning (ClamAV)
+  // @see docs/FRONTEND_DOCUMENT_SYSTEM_GUIDE.md
 
   /**
-   * Upload attachment (supports S3 and local storage)
+   * Upload attachment (supports R2/S3 and local storage)
    * Backend automatically detects storage type
+   *
+   * ⚠️ MALWARE SCANNING: All uploads are scanned by ClamAV.
+   * Throws MalwareDetectedError if malware is found.
+   * Throws ScanFailedError if scanner is unavailable.
+   *
+   * @throws {MalwareDetectedError} If malware is detected
+   * @throws {ScanFailedError} If malware scanner fails
+   *
+   * @example
+   * ```ts
+   * try {
+   *   const attachment = await tasksService.uploadAttachment(taskId, file, setProgress)
+   * } catch (error) {
+   *   if (isMalwareDetectedError(error)) {
+   *     toast.error(error.messageAr) // Arabic malware message
+   *   }
+   * }
+   * ```
    */
   uploadAttachment: async (
     taskId: string,
@@ -1211,6 +1238,14 @@ const tasksService = {
       })
       return response.data.attachment || response.data.data
     } catch (error: any) {
+      // Handle malware detection errors
+      const fileError = parseFileError(error)
+      if (fileError instanceof MalwareDetectedError) {
+        throw fileError // Re-throw with Arabic message
+      }
+      if (fileError instanceof ScanFailedError) {
+        throw fileError
+      }
       throw new Error(handleApiError(error))
     }
   },
@@ -2041,10 +2076,18 @@ const tasksService = {
   },
 
   // ==================== Voice Memos ====================
+  // ✅ Voice memo uploads now support malware scanning (ClamAV)
+  // @see docs/FRONTEND_DOCUMENT_SYSTEM_GUIDE.md
 
   /**
    * Upload voice memo
-   * ⚠️ WARNING: This endpoint is NOT documented in backend API
+   * ✅ IMPLEMENTED - POST /api/tasks/:taskId/voice-memos
+   *
+   * ⚠️ MALWARE SCANNING: All uploads are scanned by ClamAV.
+   * Throws MalwareDetectedError if malware is found.
+   *
+   * @throws {MalwareDetectedError} If malware is detected
+   * @throws {ScanFailedError} If malware scanner fails
    */
   uploadVoiceMemo: async (
     taskId: string,
@@ -2063,6 +2106,15 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
+      // Handle malware detection errors
+      const fileError = parseFileError(error)
+      if (fileError instanceof MalwareDetectedError) {
+        throw fileError // Re-throw with Arabic message
+      }
+      if (fileError instanceof ScanFailedError) {
+        throw fileError
+      }
+
       if (error?.response?.status === 404) {
         throw new Error(
           bilingualError(

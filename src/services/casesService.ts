@@ -1224,59 +1224,248 @@ const casesService = {
   },
 
   // ==================== DOCUMENT MANAGEMENT ====================
+  // ✅ All document endpoints are now IMPLEMENTED using Cloudflare R2 storage
+  // @see docs/FRONTEND_DOCUMENT_SYSTEM_GUIDE.md
 
   /**
    * Get presigned URL for document upload
-   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/documents/upload-url
-   * Backend endpoint does not exist yet. Use addDocument() with direct URLs instead.
+   * ✅ IMPLEMENTED - POST /api/cases/:id/documents/upload-url
+   *
+   * Step 1 of presigned URL upload flow:
+   * 1. Call this to get presigned URL
+   * 2. Upload directly to R2 using uploadFileToR2()
+   * 3. Call confirmDocumentUpload() to finalize
    */
   getDocumentUploadUrl: async (caseId: string, data: GetUploadUrlData): Promise<UploadUrlResponse> => {
-    throwNotImplemented('Get Document Upload URL | الحصول على رابط رفع المستند')
+    try {
+      const response = await apiClient.post<UploadUrlApiResponse>(
+        `/cases/${caseId}/documents/upload-url`,
+        {
+          filename: data.filename,
+          contentType: data.contentType,
+          fileSize: (data as any).fileSize, // Extended field
+          category: data.category,
+        }
+      )
+      return {
+        uploadUrl: response.data.uploadUrl,
+        fileKey: response.data.fileKey,
+        bucket: response.data.bucket,
+      }
+    } catch (error: any) {
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
+    }
   },
 
   /**
    * Confirm document upload (save metadata to DB)
-   * ❌ NOT IMPLEMENTED - POST /api/cases/:id/documents/confirm
-   * Backend endpoint does not exist yet. Use addDocument() directly instead.
+   * ✅ IMPLEMENTED - POST /api/cases/:id/documents/confirm-upload
+   *
+   * Step 3 of presigned URL upload flow.
+   * Call AFTER successfully uploading to R2.
    */
   confirmDocumentUpload: async (caseId: string, data: ConfirmUploadData): Promise<Case> => {
-    throwNotImplemented('Confirm Document Upload | تأكيد رفع المستند')
+    try {
+      const response = await apiClient.post<CaseResponse>(
+        `/cases/${caseId}/documents/confirm-upload`,
+        {
+          fileKey: data.fileKey,
+          filename: data.filename,
+          contentType: data.type,
+          size: data.size,
+          category: data.category,
+          description: data.description,
+        }
+      )
+      return response.data.case
+    } catch (error: any) {
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
+    }
   },
 
   /**
    * Get presigned URL for document download
-   * ❌ NOT IMPLEMENTED - GET /api/cases/:id/documents/:docId/download
-   * Backend endpoint does not exist yet. Documents are stored directly in case.documents array.
+   * ✅ IMPLEMENTED - GET /api/cases/:id/documents/:docId/download-url
+   *
+   * URLs expire after 15 minutes - don't cache them!
+   * Always get a fresh URL before download/preview.
+   *
+   * @param disposition 'attachment' for download, 'inline' for preview
    */
-  getDocumentDownloadUrl: async (caseId: string, docId: string): Promise<{ downloadUrl: string; filename: string }> => {
-    throwNotImplemented('Get Document Download URL | الحصول على رابط تحميل المستند')
+  getDocumentDownloadUrl: async (
+    caseId: string,
+    docId: string,
+    disposition: 'attachment' | 'inline' = 'attachment'
+  ): Promise<{ downloadUrl: string; filename: string }> => {
+    try {
+      const response = await apiClient.get<DownloadUrlResponse>(
+        `/cases/${caseId}/documents/${docId}/download-url`,
+        { params: { disposition } }
+      )
+      return {
+        downloadUrl: response.data.downloadUrl,
+        filename: (response.data as any).document?.fileName || 'download',
+      }
+    } catch (error: any) {
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
+    }
   },
 
   /**
    * Delete document from case
-   * ❌ NOT IMPLEMENTED - DELETE /api/cases/:id/documents/:docId
-   * Backend endpoint does not exist yet. Use updateCase() to modify documents array instead.
+   * ✅ IMPLEMENTED - DELETE /api/cases/:id/documents/:docId
+   *
+   * Deletes both the file from R2 storage and the metadata from DB.
    */
-  deleteDocument: async (caseId: string, docId: string): Promise<Case> => {
-    throwNotImplemented('Delete Document | حذف المستند')
+  deleteDocument: async (caseId: string, docId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/cases/${caseId}/documents/${docId}`)
+    } catch (error: any) {
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
+    }
   },
 
   /**
-   * Upload file directly to S3 using presigned URL
-   * ⚠️ UTILITY FUNCTION - Works if presigned URL is provided
+   * Upload file directly to R2 using presigned URL
+   * ✅ UTILITY FUNCTION - Step 2 of presigned URL upload flow
+   *
+   * @example
+   * ```ts
+   * // Complete upload flow
+   * const { uploadUrl, fileKey } = await casesService.getDocumentUploadUrl(caseId, {
+   *   filename: file.name,
+   *   contentType: file.type,
+   *   category: 'contract',
+   * })
+   *
+   * await casesService.uploadFileToR2(uploadUrl, file)
+   *
+   * const updatedCase = await casesService.confirmDocumentUpload(caseId, {
+   *   fileKey,
+   *   filename: file.name,
+   *   type: file.type,
+   *   size: file.size,
+   *   category: 'contract',
+   *   bucket: 'general',
+   * })
+   * ```
    */
-  uploadFileToS3: async (uploadUrl: string, file: File): Promise<void> => {
+  uploadFileToR2: async (uploadUrl: string, file: File): Promise<void> => {
     try {
-      await fetch(uploadUrl, {
+      const response = await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: {
           'Content-Type': file.type,
         },
       })
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`)
+      }
     } catch (error: any) {
       throw new Error(formatBilingualError(CASE_ERRORS.UPLOAD_FAILED))
     }
+  },
+
+  /**
+   * Upload document with progress tracking
+   * ✅ UTILITY FUNCTION - Combines all 3 steps with progress
+   *
+   * @param onProgress Progress callback (0-100)
+   */
+  uploadDocument: async (
+    caseId: string,
+    file: File,
+    category: 'contract' | 'evidence' | 'correspondence' | 'judgment' | 'pleading' | 'other',
+    description?: string,
+    onProgress?: (percent: number) => void
+  ): Promise<Case> => {
+    try {
+      // Step 1: Get presigned URL (5% progress)
+      if (onProgress) onProgress(5)
+      const { uploadUrl, fileKey, bucket } = await casesService.getDocumentUploadUrl(caseId, {
+        filename: file.name,
+        contentType: file.type,
+        category,
+      })
+
+      // Step 2: Upload to R2 (5-90% progress)
+      if (onProgress) onProgress(10)
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable && onProgress) {
+            // Map 0-100 to 10-90
+            const percent = 10 + Math.round((event.loaded / event.total) * 80)
+            onProgress(percent)
+          }
+        })
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve()
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`))
+          }
+        })
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')))
+        xhr.open('PUT', uploadUrl)
+        xhr.setRequestHeader('Content-Type', file.type)
+        xhr.send(file)
+      })
+
+      // Step 3: Confirm upload (90-100% progress)
+      if (onProgress) onProgress(90)
+      const result = await casesService.confirmDocumentUpload(caseId, {
+        fileKey,
+        filename: file.name,
+        type: file.type,
+        size: file.size,
+        category,
+        description,
+        bucket,
+      })
+
+      if (onProgress) onProgress(100)
+      return result
+    } catch (error: any) {
+      handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
+    }
+  },
+
+  /**
+   * Preview document (opens in new tab)
+   * ✅ UTILITY FUNCTION
+   */
+  previewDocument: async (caseId: string, docId: string): Promise<void> => {
+    const { downloadUrl } = await casesService.getDocumentDownloadUrl(caseId, docId, 'inline')
+    window.open(downloadUrl, '_blank')
+  },
+
+  /**
+   * Download document (triggers save dialog)
+   * ✅ UTILITY FUNCTION
+   */
+  downloadDocument: async (caseId: string, docId: string, filename?: string): Promise<void> => {
+    const { downloadUrl, filename: defaultFilename } = await casesService.getDocumentDownloadUrl(
+      caseId,
+      docId,
+      'attachment'
+    )
+    const a = document.createElement('a')
+    a.href = downloadUrl
+    a.download = filename || defaultFilename
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  },
+
+  /**
+   * @deprecated Use uploadFileToR2 instead
+   */
+  uploadFileToS3: async (uploadUrl: string, file: File): Promise<void> => {
+    console.warn('uploadFileToS3 is deprecated. Use uploadFileToR2 instead.')
+    return casesService.uploadFileToR2(uploadUrl, file)
   },
 
   // ==================== AUDIT LOGGING ====================
