@@ -284,10 +284,11 @@ export interface OTPResponse {
 
 /**
  * Verify OTP Data Interface
+ * Note: Backend expects 'otp' field, not 'code'
  */
 export interface VerifyOTPData {
   email: string
-  code: string
+  otp: string
 }
 
 /**

@@ -128,6 +128,7 @@ const passwordService = {
 
   /**
    * Get password status and requirements
+   * Note: Endpoint is /auth/password-status (hyphen, not slash)
    */
   getStatus: async (): Promise<PasswordStatus> => {
     try {
@@ -144,7 +145,7 @@ const passwordService = {
           requireNumbers: boolean
           requireSpecialChars: boolean
         }
-      }>('/auth/password/status')
+      }>('/auth/password-status')
 
       return {
         hasPassword: response.data.hasPassword,
