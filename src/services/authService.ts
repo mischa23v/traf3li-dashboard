@@ -350,27 +350,12 @@ interface AuthResponse {
 }
 
 /**
- * DEVELOPMENT ONLY: Test credentials
- * Only available in development mode - automatically stripped in production builds
+ * SECURITY: Test credentials removed from production code
+ * Test credentials should be loaded from environment variables in test environments only
+ * See: src/test/auth-fixtures.ts for test-only auth helpers
  */
-const TEST_CREDENTIALS = import.meta.env.DEV ? {
-  username: 'test',
-  email: 'test@example.com',
-  password: 'test123',
-} : null
-
-const TEST_USER: User | null = import.meta.env.DEV ? {
-  _id: 'test-user-id',
-  username: 'test',
-  email: 'test@example.com',
-  role: 'admin',
-  country: 'SA',
-  phone: '+966500000000',
-  description: 'Test user account',
-  isSeller: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-} : null
+// TEST_CREDENTIALS and TEST_USER have been removed for security
+// If you need test auth, use the test fixtures or environment variables
 
 /**
  * Helper to normalize user data from backend
@@ -392,15 +377,17 @@ const normalizeUser = (user: User): User => {
 /**
  * Track auth state for resilience against intermittent failures
  *
- * PRINCIPLE: NEVER auto-logout on errors. Only logout on explicit user action.
- * If auth is truly expired, backend will reject all requests and user can
- * manually refresh or logout. Random errors should NEVER kick users out.
+ * SECURITY FIX: Reduced grace period from 30 minutes to 2 minutes
+ * SECURITY FIX: Reduced max consecutive 401s from 10 to 3
+ *
+ * Previous values were too permissive and could allow attackers to maintain
+ * access after token revocation.
  */
 let lastSuccessfulAuth: number = 0
 let consecutive401Count: number = 0
 let memoryCachedUser: User | null = null // Keep user in memory as backup to localStorage
-const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for extended period
-const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
+const AUTH_GRACE_PERIOD = 2 * 60 * 1000 // 2 minutes - SECURITY: reduced from 30 minutes
+const MAX_CONSECUTIVE_401 = 3 // SECURITY: reduced from 10 - prompt re-auth after 3 failures
 
 /**
  * Request deduplication for getCurrentUser
