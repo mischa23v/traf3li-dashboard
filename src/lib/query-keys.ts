@@ -830,6 +830,30 @@ export const QueryKeys = {
     details: () => [...QueryKeys.firms.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.firms.details(), id] as const,
     current: () => [...QueryKeys.firms.all(), 'current'] as const,
+    my: () => [...QueryKeys.firms.all(), 'my'] as const,
+    stats: (firmId: string) => [...QueryKeys.firms.all(), firmId, 'stats'] as const,
+  },
+
+  // ==================== IP WHITELIST ====================
+  ipWhitelist: {
+    all: () => ['ip-whitelist'] as const,
+    byFirm: (firmId: string) => ['ip-whitelist', firmId] as const,
+    test: (firmId: string) => ['ip-whitelist', firmId, 'test'] as const,
+  },
+
+  // ==================== COMPANY HIERARCHY ====================
+  hierarchy: {
+    all: () => ['hierarchy'] as const,
+    tree: () => ['hierarchy', 'tree'] as const,
+    children: (firmId: string) => ['hierarchy', 'children', firmId] as const,
+    accessible: () => ['hierarchy', 'accessible'] as const,
+    active: () => ['hierarchy', 'active'] as const,
+  },
+
+  // ==================== COMPANY ACCESS ====================
+  companyAccess: {
+    all: () => ['company-access'] as const,
+    byFirm: (firmId: string) => ['company-access', firmId] as const,
   },
 
   // ==================== ASSETS ====================
@@ -1649,6 +1673,40 @@ export const QueryKeys = {
       calendars: () => [...QueryKeys.calendarIntegration.microsoft.all(), 'calendars'] as const,
       events: () => [...QueryKeys.calendarIntegration.microsoft.all(), 'events'] as const,
     },
+  },
+
+  // ==================== TEAM MANAGEMENT ====================
+  team: {
+    all: () => ['team'] as const,
+    lists: () => [...QueryKeys.team.all(), 'list'] as const,
+    list: (firmId: string, filters?: Record<string, any>) => [...QueryKeys.team.lists(), firmId, filters] as const,
+    details: () => [...QueryKeys.team.all(), 'detail'] as const,
+    detail: (firmId: string, memberId: string) => [...QueryKeys.team.details(), firmId, memberId] as const,
+    // Firm-specific team queries
+    firmTeam: (firmId: string, options?: { includeAll?: boolean }) =>
+      [...QueryKeys.team.all(), 'firm', firmId, options] as const,
+    firmMembers: (firmId: string) => [...QueryKeys.team.all(), 'firm', firmId, 'members'] as const,
+    firmDeparted: (firmId: string) => [...QueryKeys.team.all(), 'firm', firmId, 'departed'] as const,
+    // Roles
+    roles: () => [...QueryKeys.team.all(), 'roles'] as const,
+    availableRoles: () => [...QueryKeys.team.roles(), 'available'] as const,
+    // Permissions
+    myPermissions: () => [...QueryKeys.team.all(), 'my-permissions'] as const,
+  },
+
+  // ==================== INVITATIONS ====================
+  invitations: {
+    all: () => ['invitations'] as const,
+    lists: () => [...QueryKeys.invitations.all(), 'list'] as const,
+    list: (firmId: string, filters?: { status?: string }) =>
+      [...QueryKeys.invitations.lists(), firmId, filters] as const,
+    details: () => [...QueryKeys.invitations.all(), 'detail'] as const,
+    detail: (invitationId: string) => [...QueryKeys.invitations.details(), invitationId] as const,
+    // Public validation
+    validate: (code: string) => [...QueryKeys.invitations.all(), 'validate', code] as const,
+    // Firm-specific
+    byFirm: (firmId: string) => [...QueryKeys.invitations.all(), 'firm', firmId] as const,
+    pending: (firmId: string) => [...QueryKeys.invitations.byFirm(firmId), 'pending'] as const,
   },
 } as const
 

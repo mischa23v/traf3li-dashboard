@@ -1319,12 +1319,43 @@ export const invalidateCache = {
   // Companies/Firms
   companies: {
     all: () => queryClient.invalidateQueries({ queryKey: ['firms'] }),
-    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['firm', id] }),
+    detail: (id: string) => queryClient.invalidateQueries({ queryKey: ['firms', 'detail', id] }),
     tree: (rootFirmId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', 'tree', rootFirmId] }),
-    children: (parentId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', parentId, 'children'] }),
+    children: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', firmId, 'children'] }),
     accessible: () => queryClient.invalidateQueries({ queryKey: ['firms', 'accessible'] }),
-    active: () => queryClient.invalidateQueries({ queryKey: ['firm', 'active'] }),
-    access: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firm', firmId, 'access'] }),
+    active: () => queryClient.invalidateQueries({ queryKey: ['firms', 'active'] }),
+    access: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', firmId, 'access'] }),
+    stats: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', firmId, 'stats'] }),
+    // IP Whitelist
+    ipWhitelist: (firmId?: string) => queryClient.invalidateQueries({ queryKey: ['firms', firmId, 'ip-whitelist'] }),
+    // Composite invalidation helpers
+    onFirmMove: async (firmId: string, oldParentId?: string, newParentId?: string) => {
+      await Promise.all([
+        invalidateCache.companies.tree(),
+        invalidateCache.companies.accessible(),
+        oldParentId ? invalidateCache.companies.children(oldParentId) : Promise.resolve(),
+        newParentId ? invalidateCache.companies.children(newParentId) : Promise.resolve(),
+      ])
+    },
+    onIPWhitelistChange: (firmId: string) => {
+      invalidateCache.companies.ipWhitelist(firmId)
+      // Also invalidate the new dedicated IP whitelist keys
+      invalidateCache.ipWhitelist.onChange(firmId)
+    },
+    onAccessChange: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.companies.access(firmId),
+        invalidateCache.companies.accessible(),
+      ])
+    },
+    onFirmDelete: async (firmId: string, parentId?: string) => {
+      await Promise.all([
+        invalidateCache.companies.all(),
+        invalidateCache.companies.tree(),
+        invalidateCache.companies.accessible(),
+        parentId ? invalidateCache.companies.children(parentId) : Promise.resolve(),
+      ])
+    },
   },
 
   // Organizations
@@ -2175,6 +2206,154 @@ export const invalidateCache = {
     related: async () => {
       await Promise.all([
         invalidateCache.sessions.all(),
+      ])
+    },
+  },
+
+  // IP Whitelist (using new dedicated query keys)
+  ipWhitelist: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['ip-whitelist'] }),
+    byFirm: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['ip-whitelist', firmId] }),
+    test: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['ip-whitelist', firmId, 'test'] }),
+    // Composite invalidation for IP whitelist changes
+    onChange: (firmId: string) => {
+      invalidateCache.ipWhitelist.byFirm(firmId)
+      invalidateCache.ipWhitelist.test(firmId)
+    },
+    related: async () => {
+      await Promise.all([
+        invalidateCache.ipWhitelist.all(),
+      ])
+    },
+  },
+
+  // Company Hierarchy
+  hierarchy: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['hierarchy'] }),
+    tree: () => queryClient.invalidateQueries({ queryKey: ['hierarchy', 'tree'] }),
+    children: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['hierarchy', 'children', firmId] }),
+    accessible: () => queryClient.invalidateQueries({ queryKey: ['hierarchy', 'accessible'] }),
+    active: () => queryClient.invalidateQueries({ queryKey: ['hierarchy', 'active'] }),
+    // Composite invalidation for hierarchy changes
+    onChange: async () => {
+      await Promise.all([
+        invalidateCache.hierarchy.all(),
+        invalidateCache.hierarchy.tree(),
+        invalidateCache.hierarchy.accessible(),
+      ])
+    },
+    related: async () => {
+      await Promise.all([
+        invalidateCache.hierarchy.all(),
+      ])
+    },
+  },
+
+  // Company Access
+  companyAccess: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['company-access'] }),
+    byFirm: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['company-access', firmId] }),
+    // Composite invalidation for access changes
+    onChange: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.companyAccess.byFirm(firmId),
+        invalidateCache.hierarchy.accessible(),
+      ])
+    },
+    related: async () => {
+      await Promise.all([
+        invalidateCache.companyAccess.all(),
+      ])
+    },
+  },
+
+  // Team Management
+  team: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['team'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['team', 'list'] }),
+    list: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['team', 'list', firmId] }),
+    detail: (firmId: string, memberId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['team', 'detail', firmId, memberId] }),
+    // Firm-specific team queries
+    firmTeam: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['team', 'firm', firmId] }),
+    firmMembers: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['team', 'firm', firmId, 'members'] }),
+    firmDeparted: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['team', 'firm', firmId, 'departed'] }),
+    // Roles
+    roles: () => queryClient.invalidateQueries({ queryKey: ['team', 'roles'] }),
+    availableRoles: () => queryClient.invalidateQueries({ queryKey: ['team', 'roles', 'available'] }),
+    // Permissions
+    myPermissions: () => queryClient.invalidateQueries({ queryKey: ['team', 'my-permissions'] }),
+    // Composite invalidation for team changes
+    onMemberChange: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.team.firmTeam(firmId),
+        invalidateCache.team.firmMembers(firmId),
+        invalidateCache.team.lists(),
+      ])
+    },
+    onMemberDepart: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.team.firmTeam(firmId),
+        invalidateCache.team.firmMembers(firmId),
+        invalidateCache.team.firmDeparted(firmId),
+        invalidateCache.team.lists(),
+      ])
+    },
+    onRoleChange: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.team.firmTeam(firmId),
+        invalidateCache.team.firmMembers(firmId),
+        invalidateCache.team.myPermissions(),
+      ])
+    },
+    related: async () => {
+      await Promise.all([
+        invalidateCache.team.all(),
+        invalidateCache.team.myPermissions(),
+      ])
+    },
+  },
+
+  // Invitations
+  invitations: {
+    all: () => queryClient.invalidateQueries({ queryKey: ['invitations'] }),
+    lists: () => queryClient.invalidateQueries({ queryKey: ['invitations', 'list'] }),
+    list: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['invitations', 'list', firmId] }),
+    detail: (invitationId: string) =>
+      queryClient.invalidateQueries({ queryKey: ['invitations', 'detail', invitationId] }),
+    // Firm-specific
+    byFirm: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['invitations', 'firm', firmId] }),
+    pending: (firmId: string) => queryClient.invalidateQueries({ queryKey: ['invitations', 'firm', firmId, 'pending'] }),
+    // Public validation
+    validate: (code: string) => queryClient.invalidateQueries({ queryKey: ['invitations', 'validate', code] }),
+    // Composite invalidation for invitation changes
+    onCreate: async (firmId: string) => {
+      await Promise.all([
+        invalidateCache.invitations.byFirm(firmId),
+        invalidateCache.invitations.pending(firmId),
+        invalidateCache.invitations.lists(),
+      ])
+    },
+    onCancel: async (firmId: string, invitationId: string) => {
+      await Promise.all([
+        invalidateCache.invitations.detail(invitationId),
+        invalidateCache.invitations.byFirm(firmId),
+        invalidateCache.invitations.pending(firmId),
+        invalidateCache.invitations.lists(),
+      ])
+    },
+    onAccept: async (firmId: string, invitationId: string) => {
+      await Promise.all([
+        invalidateCache.invitations.detail(invitationId),
+        invalidateCache.invitations.byFirm(firmId),
+        invalidateCache.invitations.pending(firmId),
+        invalidateCache.team.firmTeam(firmId),
+        invalidateCache.team.firmMembers(firmId),
+      ])
+    },
+    related: async () => {
+      await Promise.all([
+        invalidateCache.invitations.all(),
       ])
     },
   },
