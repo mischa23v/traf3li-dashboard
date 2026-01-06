@@ -15,6 +15,7 @@ import {
   ScanFailedError,
 } from '@/lib/file-error-handling'
 import { FILE_ERROR_MESSAGES } from '@/types/file-storage'
+import { documentLogger } from '@/lib/document-debug-logger'
 
 /**
  * Create bilingual error message
@@ -1224,28 +1225,47 @@ const tasksService = {
     file: File,
     onProgress?: (percent: number) => void
   ): Promise<Attachment> => {
+    const startTime = Date.now()
+    documentLogger.uploadStart(file, { taskId, operation: 'task-attachment' })
+
     try {
       const formData = new FormData()
       formData.append('file', file)
       const response = await apiClient.post(`/tasks/${taskId}/attachments`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
+          if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            onProgress(percent)
+            documentLogger.uploadProgress(file.name, percent)
+            if (onProgress) {
+              onProgress(percent)
+            }
           }
         }
       })
-      return response.data.attachment || response.data.data
+
+      const attachment = response.data.attachment || response.data.data
+      const duration = Date.now() - startTime
+      documentLogger.uploadSuccess(
+        { name: file.name, size: file.size },
+        attachment?._id || 'unknown',
+        duration
+      )
+
+      return attachment
     } catch (error: any) {
       // Handle malware detection errors
       const fileError = parseFileError(error)
       if (fileError instanceof MalwareDetectedError) {
+        documentLogger.malwareDetected(file.name, fileError.threatType || 'unknown')
         throw fileError // Re-throw with Arabic message
       }
       if (fileError instanceof ScanFailedError) {
+        documentLogger.scanFailed(file.name, fileError.message)
         throw fileError
       }
+
+      documentLogger.uploadError(file.name, error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1260,13 +1280,21 @@ const tasksService = {
     attachmentId: string,
     disposition: 'inline' | 'attachment' = 'attachment'
   ): Promise<string> => {
+    const startTime = Date.now()
+    documentLogger.downloadStart(attachmentId, { taskId, disposition })
+
     try {
       const response = await apiClient.get(
         `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
         { params: { disposition } }
       )
+
+      const duration = Date.now() - startTime
+      documentLogger.downloadSuccess(attachmentId, duration)
+
       return response.data.downloadUrl
     } catch (error: any) {
+      documentLogger.downloadError(attachmentId, error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1276,13 +1304,21 @@ const tasksService = {
    * Best practice: Use this for previewing files in browser
    */
   getAttachmentPreviewUrl: async (taskId: string, attachmentId: string): Promise<string> => {
+    const startTime = Date.now()
+    documentLogger.previewStart(attachmentId, { taskId })
+
     try {
       const response = await apiClient.get(
         `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
         { params: { disposition: 'inline' } }
       )
+
+      const duration = Date.now() - startTime
+      documentLogger.previewSuccess(attachmentId, duration)
+
       return response.data.downloadUrl
     } catch (error: any) {
+      documentLogger.previewError(attachmentId, error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1291,9 +1327,16 @@ const tasksService = {
    * Delete attachment (handles both S3 and local storage)
    */
   deleteAttachment: async (taskId: string, attachmentId: string): Promise<void> => {
+    const startTime = Date.now()
+    documentLogger.deleteStart(attachmentId, { taskId })
+
     try {
       await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
+
+      const duration = Date.now() - startTime
+      documentLogger.deleteSuccess(attachmentId, duration)
     } catch (error: any) {
+      documentLogger.deleteError(attachmentId, error)
       throw new Error(handleApiError(error))
     }
   },
@@ -2094,9 +2137,16 @@ const tasksService = {
     file: Blob,
     duration: number
   ): Promise<{ voiceMemo: any }> => {
+    const startTime = Date.now()
+    const fileName = `voice-memo-${Date.now()}.webm`
+    documentLogger.uploadStart(
+      { name: fileName, size: file.size, type: 'audio/webm' } as File,
+      { taskId, operation: 'voice-memo', duration }
+    )
+
     try {
       const formData = new FormData()
-      formData.append('file', file, `voice-memo-${Date.now()}.webm`)
+      formData.append('file', file, fileName)
       formData.append('duration', String(duration))
 
       const response = await apiClient.post(`/tasks/${taskId}/voice-memos`, formData, {
@@ -2104,16 +2154,28 @@ const tasksService = {
           'Content-Type': 'multipart/form-data'
         }
       })
+
+      const uploadDuration = Date.now() - startTime
+      documentLogger.uploadSuccess(
+        { name: fileName, size: file.size },
+        response.data.voiceMemo?._id || 'unknown',
+        uploadDuration
+      )
+
       return response.data
     } catch (error: any) {
       // Handle malware detection errors
       const fileError = parseFileError(error)
       if (fileError instanceof MalwareDetectedError) {
+        documentLogger.malwareDetected(fileName, fileError.threatType || 'unknown')
         throw fileError // Re-throw with Arabic message
       }
       if (fileError instanceof ScanFailedError) {
+        documentLogger.scanFailed(fileName, fileError.message)
         throw fileError
       }
+
+      documentLogger.uploadError(fileName, error)
 
       if (error?.response?.status === 404) {
         throw new Error(

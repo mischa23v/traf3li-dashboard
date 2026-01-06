@@ -9,6 +9,7 @@
 
 import apiClient, { handleApiError } from '@/lib/api'
 import { formatBilingualError } from '@/lib/bilingualErrorHandler'
+import { documentLogger } from '@/lib/document-debug-logger'
 
 /**
  * Bilingual error messages for case operations
@@ -1380,34 +1381,54 @@ const casesService = {
     description?: string,
     onProgress?: (percent: number) => void
   ): Promise<Case> => {
+    const startTime = Date.now()
+    documentLogger.uploadStart(file, { caseId, category })
+
     try {
       // Step 1: Get presigned URL (5% progress)
       if (onProgress) onProgress(5)
+      documentLogger.presignedUrlRequest(`/cases/${caseId}/documents/upload-url`, {
+        filename: file.name,
+        contentType: file.type,
+        category,
+      })
+
       const { uploadUrl, fileKey, bucket } = await casesService.getDocumentUploadUrl(caseId, {
         filename: file.name,
         contentType: file.type,
         category,
       })
 
+      documentLogger.presignedUrlReceived(fileKey)
+
       // Step 2: Upload to R2 (5-90% progress)
       if (onProgress) onProgress(10)
+      documentLogger.r2UploadStart(uploadUrl, file.size)
+
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest()
         xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable && onProgress) {
+          if (event.lengthComputable) {
             // Map 0-100 to 10-90
             const percent = 10 + Math.round((event.loaded / event.total) * 80)
-            onProgress(percent)
+            documentLogger.uploadProgress(file.name, Math.round((event.loaded / event.total) * 100))
+            if (onProgress) onProgress(percent)
           }
         })
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve()
           } else {
-            reject(new Error(`Upload failed: ${xhr.status}`))
+            const error = new Error(`Upload failed: ${xhr.status}`)
+            documentLogger.uploadError(file, error, 'r2')
+            reject(error)
           }
         })
-        xhr.addEventListener('error', () => reject(new Error('Upload failed')))
+        xhr.addEventListener('error', () => {
+          const error = new Error('Upload failed')
+          documentLogger.uploadError(file, error, 'r2')
+          reject(error)
+        })
         xhr.open('PUT', uploadUrl)
         xhr.setRequestHeader('Content-Type', file.type)
         xhr.send(file)
@@ -1415,6 +1436,12 @@ const casesService = {
 
       // Step 3: Confirm upload (90-100% progress)
       if (onProgress) onProgress(90)
+      documentLogger.uploadConfirm(fileKey, {
+        filename: file.name,
+        size: file.size,
+        category,
+      })
+
       const result = await casesService.confirmDocumentUpload(caseId, {
         fileKey,
         filename: file.name,
@@ -1426,8 +1453,13 @@ const casesService = {
       })
 
       if (onProgress) onProgress(100)
+
+      const duration = Date.now() - startTime
+      documentLogger.uploadSuccess({ name: file.name, size: file.size }, 'case-document', duration)
+
       return result
     } catch (error: any) {
+      documentLogger.uploadError(file, error, 'confirm')
       handleCaseError(error, 'DOCUMENT_OPERATION_FAILED')
     }
   },
@@ -1437,8 +1469,15 @@ const casesService = {
    * ✅ UTILITY FUNCTION
    */
   previewDocument: async (caseId: string, docId: string): Promise<void> => {
-    const { downloadUrl } = await casesService.getDocumentDownloadUrl(caseId, docId, 'inline')
-    window.open(downloadUrl, '_blank')
+    documentLogger.previewStart(docId)
+    try {
+      const { downloadUrl, filename } = await casesService.getDocumentDownloadUrl(caseId, docId, 'inline')
+      window.open(downloadUrl, '_blank')
+      documentLogger.previewSuccess(docId, filename)
+    } catch (error: any) {
+      documentLogger.previewError(docId, error)
+      throw error
+    }
   },
 
   /**
@@ -1446,18 +1485,25 @@ const casesService = {
    * ✅ UTILITY FUNCTION
    */
   downloadDocument: async (caseId: string, docId: string, filename?: string): Promise<void> => {
-    const { downloadUrl, filename: defaultFilename } = await casesService.getDocumentDownloadUrl(
-      caseId,
-      docId,
-      'attachment'
-    )
-    const a = document.createElement('a')
-    a.href = downloadUrl
-    a.download = filename || defaultFilename
-    a.style.display = 'none'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    documentLogger.downloadStart(docId, 'attachment')
+    try {
+      const { downloadUrl, filename: defaultFilename } = await casesService.getDocumentDownloadUrl(
+        caseId,
+        docId,
+        'attachment'
+      )
+      const a = document.createElement('a')
+      a.href = downloadUrl
+      a.download = filename || defaultFilename
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      documentLogger.downloadSuccess(docId, filename || defaultFilename)
+    } catch (error: any) {
+      documentLogger.downloadError(docId, error)
+      throw error
+    }
   },
 
   /**
