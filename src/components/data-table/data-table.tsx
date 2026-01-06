@@ -88,10 +88,11 @@ export function DataTable<TData, TValue = unknown>({
     [totalCount, pageSize]
   )
 
-  // Create internal table only if external table is not provided
-  const internalTable = columns && data ? useReactTable({
-    data,
-    columns,
+  // Always call useReactTable to follow Rules of Hooks
+  // Use empty arrays as fallback when data/columns not provided
+  const internalTable = useReactTable({
+    data: data ?? [],
+    columns: columns ?? [],
     ...tableConfig,
     state: {
       sorting,
@@ -99,10 +100,11 @@ export function DataTable<TData, TValue = unknown>({
       columnVisibility,
       rowSelection,
     },
-  }) : null
+  })
 
   // Use external table if provided, otherwise use internal table
-  const table = externalTable || internalTable
+  // Only use internal table if columns and data were actually provided
+  const table = externalTable || (columns && data ? internalTable : null)
 
   // Memoize rows for performance - must be called before early returns
   const rowModel = table?.getRowModel()

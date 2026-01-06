@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import authService from '@/services/authService'
 import { ROUTES } from '@/constants/routes'
+import { validateRedirectUrl } from '@/lib/security-headers'
 
 // ============================================
 // SVG ICONS
@@ -63,8 +64,10 @@ export function MagicLinkVerify() {
         setStatus('success')
 
         // Redirect to dashboard after short delay
+        // SECURITY: Validate redirect URL to prevent open redirect attacks
         setTimeout(() => {
-          const redirectTo = (search as any)?.redirect || '/'
+          const rawRedirect = (search as { redirect?: string })?.redirect;
+          const redirectTo = validateRedirectUrl(rawRedirect, { defaultUrl: '/' });
           navigate({ to: redirectTo })
         }, 2000)
       } catch (err: any) {

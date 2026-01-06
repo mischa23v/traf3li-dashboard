@@ -10,6 +10,7 @@ import {
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
 import { ROUTES } from '@/constants/routes'
+import { validateRedirectUrl } from '@/lib/security-headers'
 
 // ============================================
 // SVG ICONS
@@ -140,8 +141,10 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
         setSuccess(t('otpLogin.success', 'تم تسجيل الدخول بنجاح'))
 
         // Navigate after short delay
+        // SECURITY: Validate redirect URL to prevent open redirect attacks
         setTimeout(() => {
-          const redirectTo = (search as any)?.redirect || '/'
+          const rawRedirect = (search as { redirect?: string })?.redirect;
+          const redirectTo = validateRedirectUrl(rawRedirect, { defaultUrl: '/' });
           navigate({ to: redirectTo })
         }, 500)
       }

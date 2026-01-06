@@ -3,7 +3,7 @@
  * Conditionally renders children based on permission checks
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { usePermissions } from '@/hooks/use-permissions'
 import type { ModuleKey, PermissionLevel } from '@/types/rbac'
 import type { CheckPermissionRequest, PolicyResource } from '@/types/permissions'
@@ -138,13 +138,29 @@ export function ActionGuard({
 }: ActionPermissionGuardProps) {
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
   const checkPermission = useCheckPermission()
+  // Track if permission check was already initiated to prevent infinite loops
+  const hasCheckedRef = useRef(false)
+  // Create a stable key for the permission request
+  const requestKey = `${action}:${resource}`
 
   useEffect(() => {
+    // Reset check flag when request key changes
+    hasCheckedRef.current = false
+    setHasAccess(null)
+  }, [requestKey])
+
+  useEffect(() => {
+    // Prevent infinite API calls - only check once per request key
+    if (hasCheckedRef.current) return
+    hasCheckedRef.current = true
+
     const request: CheckPermissionRequest = { action, resource }
     checkPermission.mutateAsync(request)
       .then((result) => setHasAccess(result.allowed))
       .catch(() => setHasAccess(false))
-  }, [action, resource, checkPermission])
+    // Only depend on action and resource, not checkPermission (which changes on every render)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [action, resource])
 
   if (hasAccess === null) {
     return <>{fallback}</>

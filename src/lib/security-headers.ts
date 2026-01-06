@@ -443,3 +443,108 @@ export interface CSPDirectives {
   'base-uri'?: string[];
   'upgrade-insecure-requests'?: boolean;
 }
+
+// ═══════════════════════════════════════════════════════════════
+// REDIRECT URL VALIDATION (Prevent Open Redirect Attacks)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Validates a redirect URL to prevent open redirect attacks
+ *
+ * Rules:
+ * 1. Only relative URLs (starting with /) are allowed by default
+ * 2. Absolute URLs must be from the same origin
+ * 3. javascript:, data:, vbscript: protocols are blocked
+ * 4. URLs must not contain encoded characters that could bypass validation
+ *
+ * @param url - The URL to validate
+ * @param options - Validation options
+ * @returns The validated URL or the default fallback
+ *
+ * @example
+ * validateRedirectUrl('/dashboard') // Returns '/dashboard'
+ * validateRedirectUrl('https://evil.com') // Returns '/'
+ * validateRedirectUrl('javascript:alert(1)') // Returns '/'
+ */
+export function validateRedirectUrl(
+  url: string | undefined | null,
+  options: {
+    /** Default URL if validation fails (default: '/') */
+    defaultUrl?: string;
+    /** Additional allowed hostnames (for same-org domains) */
+    allowedHosts?: string[];
+  } = {}
+): string {
+  const { defaultUrl = '/', allowedHosts = [] } = options;
+
+  // Return default for empty/null/undefined values
+  if (!url || typeof url !== 'string') {
+    return defaultUrl;
+  }
+
+  // Trim and decode the URL
+  const trimmedUrl = url.trim();
+
+  // Block dangerous protocols
+  const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:'];
+  const lowerUrl = trimmedUrl.toLowerCase();
+  if (dangerousProtocols.some(protocol => lowerUrl.startsWith(protocol))) {
+    console.warn('[Security] Blocked dangerous protocol in redirect URL:', trimmedUrl);
+    return defaultUrl;
+  }
+
+  // Block URLs with encoded characters that could bypass validation
+  // Check for double encoding attacks
+  if (/%[0-9a-f]{2}/i.test(trimmedUrl)) {
+    const decodedUrl = decodeURIComponent(trimmedUrl);
+    if (dangerousProtocols.some(protocol => decodedUrl.toLowerCase().startsWith(protocol))) {
+      console.warn('[Security] Blocked encoded dangerous protocol in redirect URL:', trimmedUrl);
+      return defaultUrl;
+    }
+  }
+
+  // Allow relative URLs (must start with single /)
+  // Block protocol-relative URLs (//evil.com)
+  if (trimmedUrl.startsWith('/')) {
+    if (trimmedUrl.startsWith('//')) {
+      console.warn('[Security] Blocked protocol-relative URL:', trimmedUrl);
+      return defaultUrl;
+    }
+    // Valid relative URL
+    return trimmedUrl;
+  }
+
+  // For absolute URLs, validate the hostname
+  try {
+    const parsedUrl = new URL(trimmedUrl);
+    const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+
+    // Check if hostname matches current origin or allowed hosts
+    const isAllowedHost =
+      parsedUrl.hostname === currentHost ||
+      allowedHosts.includes(parsedUrl.hostname);
+
+    if (isAllowedHost) {
+      // Return just the path to avoid any origin manipulation
+      return parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
+    }
+
+    console.warn('[Security] Blocked redirect to external host:', parsedUrl.hostname);
+    return defaultUrl;
+  } catch {
+    // Invalid URL, return default
+    console.warn('[Security] Invalid redirect URL:', trimmedUrl);
+    return defaultUrl;
+  }
+}
+
+/**
+ * Check if a URL is safe for redirection (boolean version)
+ *
+ * @param url - The URL to check
+ * @returns true if the URL is safe to redirect to
+ */
+export function isSafeRedirectUrl(url: string | undefined | null): boolean {
+  if (!url) return false;
+  return validateRedirectUrl(url) === url.trim();
+}

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { verifyMFA, verifyBackupCode } from '@/services/mfa.service'
 import { useAuthStore } from '@/stores/auth-store'
 import { ROUTES } from '@/constants/routes'
+import { validateRedirectUrl } from '@/lib/security-headers'
 
 /**
  * MFA Challenge Page
@@ -40,9 +41,11 @@ export function MFAChallenge() {
   const [backupCode, setBackupCode] = useState('')
 
   // Get redirect URL from search params
-  const redirectTo = (search as any)?.redirect || '/'
+  // SECURITY: Validate redirect URL to prevent open redirect attacks
+  const rawRedirect = (search as { redirect?: string })?.redirect;
+  const redirectTo = validateRedirectUrl(rawRedirect, { defaultUrl: '/' });
   // Get userId - either from user object or from search params (set during login)
-  const userId = user?._id || (search as any)?.userId || ''
+  const userId = user?._id || (search as { userId?: string })?.userId || ''
 
   // If user is not in MFA pending state and no userId, redirect appropriately
   useEffect(() => {

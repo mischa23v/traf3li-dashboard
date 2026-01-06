@@ -1,4 +1,5 @@
 import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -12,22 +13,31 @@ export function GeneralError({
 }: GeneralErrorProps) {
   const navigate = useNavigate()
   const { history } = useRouter()
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+
   return (
-    <div className={cn('h-svh w-full', className)}>
+    <div className={cn('h-svh w-full', className)} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
         {!minimal && (
           <h1 className='text-[7rem] leading-tight font-bold'>500</h1>
         )}
-        <span className='font-medium'>Oops! Something went wrong {`:')`}</span>
+        <span className='font-medium'>
+          {isRTL ? 'عذراً! حدث خطأ ما' : 'Oops! Something went wrong'}
+        </span>
         <p className='text-muted-foreground text-center'>
-          We apologize for the inconvenience. <br /> Please try again later.
+          {isRTL
+            ? 'نعتذر عن هذا الإزعاج. يرجى المحاولة مرة أخرى لاحقاً.'
+            : 'We apologize for the inconvenience. Please try again later.'}
         </p>
         {!minimal && (
           <div className='mt-6 flex gap-4'>
             <Button variant='outline' onClick={() => history.go(-1)}>
-              Go Back
+              {isRTL ? 'رجوع' : 'Go Back'}
             </Button>
-            <Button onClick={() => navigate({ to: '/' })}>Back to Home</Button>
+            <Button onClick={() => navigate({ to: '/' })}>
+              {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
+            </Button>
           </div>
         )}
       </div>
