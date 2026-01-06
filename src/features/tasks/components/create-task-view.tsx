@@ -4,7 +4,7 @@ import {
     ArrowRight, Save, Calendar, User,
     Flag, FileText, Briefcase, Users, Loader2, Scale,
     Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown, ChevronUp,
-    LayoutGrid, Settings2
+    LayoutGrid, Settings2, MapPin
 } from 'lucide-react'
 import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
@@ -120,6 +120,14 @@ export function CreateTaskView() {
     // Section toggles
     const [showAdvanced, setShowAdvanced] = useState(false)
     const [showRecurring, setShowRecurring] = useState(false)
+    const [showLocation, setShowLocation] = useState(false)
+
+    // Location state
+    const [locationEnabled, setLocationEnabled] = useState(false)
+    const [locationConfig, setLocationConfig] = useState({
+        name: '',
+        address: '',
+    })
 
     // Form mode: basic (required fields only) or advanced (all fields)
     const [formMode, setFormMode] = useState<'basic' | 'advanced'>('basic')
@@ -254,6 +262,13 @@ export function CreateTaskView() {
                     type: r.type as 'notification' | 'email' | 'sms' | 'push',
                     beforeMinutes: r.beforeMinutes,
                 }))
+            }),
+            // Location
+            ...(locationEnabled && (locationConfig.name || locationConfig.address) && {
+                location: {
+                    name: locationConfig.name,
+                    address: locationConfig.address,
+                },
             }),
         }
 
@@ -510,8 +525,7 @@ export function CreateTaskView() {
                                                     <Input
                                                         type="number"
                                                         min="0"
-                                                        placeholder="60"
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 max-w-[120px]"
+                                                                                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 max-w-[120px]"
                                                         value={formData.estimatedMinutes || ''}
                                                         onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
                                                     />
@@ -652,8 +666,7 @@ export function CreateTaskView() {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <Input
-                                                        placeholder="أضف وسم..."
-                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                                                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
                                                         value={tagInput}
                                                         onChange={(e) => setTagInput(e.target.value)}
                                                         onKeyDown={(e) => {
@@ -677,8 +690,7 @@ export function CreateTaskView() {
                                                     <FieldTooltip content={FIELD_TOOLTIPS.description} />
                                                 </label>
                                                 <Textarea
-                                                    placeholder="أدخل تفاصيل إضافية عن المهمة..."
-                                                    className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                                                                        className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                     value={formData.description}
                                                     onChange={(e) => handleChange('description', e.target.value)}
                                                 />
@@ -721,8 +733,7 @@ export function CreateTaskView() {
                                         ))}
                                         <div className="flex gap-2">
                                             <Input
-                                                placeholder="أضف مهمة فرعية..."
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
                                                 value={newSubtask}
                                                 onChange={(e) => setNewSubtask(e.target.value)}
                                                 onKeyDown={(e) => {
@@ -964,6 +975,69 @@ export function CreateTaskView() {
                                                     <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                     إضافة تذكير
                                                 </Button>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
+                                )}
+
+                                {/* Location Section - Advanced only */}
+                                {formMode === 'advanced' && (
+                                <Collapsible open={showLocation} onOpenChange={setShowLocation}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <MapPin className="w-5 h-5 text-emerald-500" />
+                                                        الموقع
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content="تحديد موقع المهمة مثل المحكمة أو مكتب العميل" />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showLocation ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                                                <div className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        id="locationEnabled"
+                                                        checked={locationEnabled}
+                                                        onCheckedChange={(checked) => setLocationEnabled(checked === true)}
+                                                    />
+                                                    <label htmlFor="locationEnabled" className="text-sm font-medium text-slate-700">
+                                                        إضافة موقع للمهمة
+                                                    </label>
+                                                </div>
+
+                                                {locationEnabled && (
+                                                    <div className="space-y-4 pt-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">اسم الموقع</label>
+                                                                <Input
+                                                                                                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                                    value={locationConfig.name}
+                                                                    onChange={(e) => setLocationConfig(prev => ({ ...prev, name: e.target.value }))}
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">العنوان</label>
+                                                                <Input
+                                                                                                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                                    value={locationConfig.address}
+                                                                    onChange={(e) => setLocationConfig(prev => ({ ...prev, address: e.target.value }))}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </CollapsibleContent>
                                     </div>
