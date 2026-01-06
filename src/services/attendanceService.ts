@@ -5,7 +5,7 @@ export type CheckMethod = 'biometric' | 'mobile' | 'manual' | 'web' | 'card_swip
 
 // Attendance Status
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'early_departure' |
-  'on_leave' | 'weekend' | 'holiday' | 'half_day'
+  'on_leave' | 'weekend' | 'holiday' | 'half_day' | 'work_from_home'
 
 // Location Type
 export type LocationType = 'office' | 'remote' | 'client_site' | 'court' | 'field' | 'other'
@@ -32,6 +32,7 @@ export const ATTENDANCE_STATUS_LABELS: Record<AttendanceStatus, { ar: string; en
   weekend: { ar: 'عطلة نهاية الأسبوع', en: 'Weekend', color: 'slate' },
   holiday: { ar: 'عطلة رسمية', en: 'Holiday', color: 'blue' },
   half_day: { ar: 'نصف يوم', en: 'Half Day', color: 'cyan' },
+  work_from_home: { ar: 'عمل من المنزل', en: 'Work From Home', color: 'teal' },
 }
 
 // Check Method Labels

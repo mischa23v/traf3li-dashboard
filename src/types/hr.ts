@@ -10,10 +10,11 @@ export type EmployeeType = 'full_time' | 'part_time' | 'contractor' | 'intern'
 export type Gender = 'male' | 'female'
 export type MaritalStatus = 'single' | 'married' | 'divorced' | 'widowed'
 
-export type LeaveStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
-export type LeaveType = 'annual' | 'sick' | 'maternity' | 'paternity' | 'unpaid' | 'emergency' | 'hajj' | 'bereavement' | 'study' | 'other'
+export type LeaveStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed'
+export type LeaveType = 'annual' | 'sick' | 'hajj' | 'marriage' | 'birth' | 'death' | 'eid' | 'maternity' | 'paternity' | 'exam' | 'unpaid' | 'emergency' | 'bereavement' | 'study' | 'other'
+export type LeaveCategory = 'paid' | 'unpaid' | 'partial_pay'
 
-export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'half_day' | 'remote'
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'half_day' | 'remote' | 'on_leave' | 'weekend' | 'holiday' | 'work_from_home' | 'early_departure'
 
 export type SalaryStatus = 'draft' | 'approved' | 'paid' | 'cancelled'
 export type PaymentMethod = 'bank_transfer' | 'cash' | 'cheque'
