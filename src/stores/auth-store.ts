@@ -44,8 +44,10 @@ export const useAuthStore = create<AuthState>()(
           const user = await authService.login(credentials)
 
           // Check if MFA verification is required
-          // Backend may return mfaEnabled or mfaPending flag
-          const mfaPending = user.mfaEnabled && !user.mfaPending ? true : user.mfaPending
+          // SECURITY FIX: Trust backend's mfaPending flag - don't override it
+          // Previously, this incorrectly set mfaPending=true whenever mfaEnabled=true,
+          // which broke login for users with MFA enabled who had already verified
+          const mfaPending = user.mfaPending ?? false
 
           set({
             user: { ...user, mfaPending },
@@ -76,8 +78,11 @@ export const useAuthStore = create<AuthState>()(
           if (user.role === 'lawyer') {
             if (user.firmId) {
               // Firm member - fetch permissions from firm API (non-blocking)
-              usePermissionsStore.getState().fetchPermissions().catch(() => {
-                // Don't fail login if permissions fetch fails
+              usePermissionsStore.getState().fetchPermissions().catch((err) => {
+                // Don't fail login if permissions fetch fails, but log it
+                if (import.meta.env.DEV) {
+                  console.warn('[Auth] Non-blocking permissions fetch failed:', err)
+                }
               })
             } else {
               // No firm = solo lawyer

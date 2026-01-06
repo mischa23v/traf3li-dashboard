@@ -163,16 +163,24 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
   )
 
   // Check page access (UI access control)
+  // SECURITY: Fail-closed by default - deny access on error
   const checkPageAccess = useCallback(
     async (path: string): Promise<PageAccessResult> => {
       try {
         const { default: uiAccessService } = await import('@/services/uiAccessService')
         return await uiAccessService.checkPageAccess(path)
       } catch (error) {
+        // SECURITY FIX: Fail-closed - deny access on error (was fail-open!)
+        // This prevents unauthorized access when permission service is unavailable
         if (import.meta.env.DEV) {
-          console.warn('[Permission] Page access check failed:', error)
+          console.warn('[Permission] Page access check failed - denying access:', error)
         }
-        return { allowed: true } // Fail-safe: allow on error
+        return {
+          allowed: false,
+          reason: 'permission_check_failed',
+          message: 'Unable to verify access permissions. Please try again.',
+          messageAr: 'تعذر التحقق من صلاحيات الوصول. يرجى المحاولة مرة أخرى.'
+        }
       }
     },
     []
@@ -257,6 +265,7 @@ export function usePermissionContext() {
 
 /**
  * Hook for checking if user can perform action on resource
+ * Includes proper cleanup to prevent memory leaks
  */
 export function useCanAccess(resourceType: string, resourceId: string, action: string) {
   const { canAccessResource, isLoading } = usePermissionContext()
@@ -269,10 +278,33 @@ export function useCanAccess(resourceType: string, resourceId: string, action: s
       return
     }
 
+    // Track if component is mounted to prevent state updates after unmount
+    let isMounted = true
     setChecking(true)
+
     canAccessResource(resourceType, resourceId, action)
-      .then(setCanAccess)
-      .finally(() => setChecking(false))
+      .then((result) => {
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setCanAccess(result)
+        }
+      })
+      .catch(() => {
+        // SECURITY: Fail-closed on error
+        if (isMounted) {
+          setCanAccess(false)
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setChecking(false)
+        }
+      })
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      isMounted = false
+    }
   }, [resourceType, resourceId, action, canAccessResource])
 
   return {
