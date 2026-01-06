@@ -91,6 +91,7 @@ import {
 } from '@/services/crmSettingsService'
 import { ROUTES } from '@/constants/routes'
 import { TipTapEditor } from '@/components/tiptap-editor'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const topNav = [
   { title: 'sidebar.nav.overview', href: '/' },
@@ -968,7 +969,7 @@ export function EmailTemplatesView() {
                     <div
                       className="mt-2 p-4 border rounded-xl bg-white"
                       dangerouslySetInnerHTML={{
-                        __html: previewTemplate.body,
+                        __html: sanitizeHtml(previewTemplate.body),
                       }}
                       dir="ltr"
                     />
@@ -990,7 +991,7 @@ export function EmailTemplatesView() {
                     <div
                       className="mt-2 p-4 border rounded-xl bg-white"
                       dangerouslySetInnerHTML={{
-                        __html: previewTemplate.bodyAr,
+                        __html: sanitizeHtml(previewTemplate.bodyAr),
                       }}
                       dir="rtl"
                     />

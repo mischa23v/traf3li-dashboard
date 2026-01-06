@@ -102,27 +102,41 @@ let tokenRefreshTimeoutId: ReturnType<typeof setTimeout> | null = null
 const TOKEN_REFRESH_BUFFER_SECONDS = 60 // Refresh 1 minute before expiry
 
 // ==================== TOKEN DEBUG LOGGING ====================
-// Always enabled to help diagnose auth issues on production
-const tokenLog = (message: string, data?: any) => {
-  console.log(`[TOKEN] ${message}`, data !== undefined ? data : '')
-}
-const tokenWarn = (message: string, data?: any) => {
-  console.warn(`[TOKEN] ⚠️ ${message}`, data !== undefined ? data : '')
-}
+// SECURITY: Only log in development mode - NEVER log tokens in production
+const tokenLog = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.log(`[TOKEN] ${message}`, data !== undefined ? data : '')
+  : () => {} // No-op in production
+
+const tokenWarn = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.warn(`[TOKEN] ⚠️ ${message}`, data !== undefined ? data : '')
+  : () => {} // No-op in production
 
 /**
  * Decode JWT to see its contents (without verifying signature)
  * This is safe for debugging - verification happens on backend
+ * SECURITY: Only used in development mode
  */
-const decodeJWTForDebug = (token: string): { payload: any; valid: boolean; isExpired: boolean } => {
+interface JWTPayload {
+  exp?: number
+  userId?: string
+  sub?: string
+  [key: string]: unknown
+}
+
+const decodeJWTForDebug = (token: string): { payload: JWTPayload | null; valid: boolean; isExpired: boolean } => {
+  // SECURITY: Skip in production to avoid any token processing
+  if (!import.meta.env.DEV) {
+    return { payload: null, valid: true, isExpired: false }
+  }
+
   try {
     const parts = token.split('.')
     if (parts.length !== 3) {
       return { payload: null, valid: false, isExpired: true }
     }
-    const payload = JSON.parse(atob(parts[1]))
+    const payload = JSON.parse(atob(parts[1])) as JWTPayload
     const now = Math.floor(Date.now() / 1000)
-    const isExpired = payload.exp && payload.exp < now
+    const isExpired = payload.exp ? payload.exp < now : false
     return { payload, valid: true, isExpired }
   } catch {
     return { payload: null, valid: false, isExpired: true }
@@ -131,8 +145,14 @@ const decodeJWTForDebug = (token: string): { payload: any; valid: boolean; isExp
 
 /**
  * Log request token state for debugging
+ * SECURITY: Only enabled in development mode
  */
 const logRequestTokenState = (method: string, url: string, accessToken: string | null) => {
+  // SECURITY: Never log token state in production
+  if (!import.meta.env.DEV) {
+    return
+  }
+
   // Only log for auth-related or important requests
   if (!url.includes('/auth/') && !url.includes('/me')) {
     return
@@ -145,19 +165,16 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
 
   const decoded = decodeJWTForDebug(accessToken)
   if (!decoded.valid) {
-    tokenWarn(`Request with INVALID token: ${method.toUpperCase()} ${url}`, {
-      tokenPreview: accessToken.substring(0, 30) + '...',
-    })
+    tokenWarn(`Request with INVALID token: ${method.toUpperCase()} ${url}`)
     return
   }
 
   const now = Math.floor(Date.now() / 1000)
-  const exp = decoded.payload.exp
+  const exp = decoded.payload?.exp
   const expiresIn = exp ? Math.round((exp - now) / 60) : 0
 
   tokenLog(`Request with token: ${method.toUpperCase()} ${url}`, {
-    tokenPreview: accessToken.substring(0, 20) + '...' + accessToken.substring(accessToken.length - 10),
-    userId: decoded.payload.userId || decoded.payload.sub,
+    userId: decoded.payload?.userId || decoded.payload?.sub,
     isExpired: decoded.isExpired,
     expiresIn: `${expiresIn} minutes`,
   })
@@ -368,15 +385,15 @@ export const hasTokens = (): boolean => {
  */
 let isRefreshing = false
 let failedQueue: Array<{
-  resolve: (value: any) => void
-  reject: (error: any) => void
+  resolve: (value: AxiosResponse) => void
+  reject: (error: Error | AxiosError) => void
   config: InternalAxiosRequestConfig
 }> = []
 
 /**
  * Process queued requests after token refresh
  */
-const processQueue = (error: any = null): void => {
+const processQueue = (error: Error | AxiosError | null = null): void => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error)
@@ -544,15 +561,22 @@ let cachedCsrfToken: string | null = null
  * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
  * ============================================================================
  */
+// SECURITY: CSRF logging only in development
+const csrfLog = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.log(`[CSRF] ${message}`, data !== undefined ? data : '')
+  : () => {}
+
+const csrfWarn = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.warn(`[CSRF] ⚠️ ${message}`, data !== undefined ? data : '')
+  : () => {}
+
 const getCsrfToken = (): string => {
   const cookies = document.cookie
-  console.log('[CSRF] getCsrfToken called. Document cookies:', cookies ? cookies.substring(0, 100) + '...' : '(empty)')
 
   // Try cookie first (primary method) - backend uses 'csrfToken' cookie name
   const match = cookies.match(/csrfToken=([^;]+)/)
   if (match && match[1]) {
     cachedCsrfToken = match[1] // Cache it
-    console.log('[CSRF] Found csrfToken cookie:', match[1].substring(0, 20) + '...')
     return match[1]
   }
 
@@ -560,7 +584,6 @@ const getCsrfToken = (): string => {
   const csrfDashMatch = cookies.match(/csrf-token=([^;]+)/)
   if (csrfDashMatch && csrfDashMatch[1]) {
     cachedCsrfToken = csrfDashMatch[1]
-    console.log('[CSRF] Found csrf-token cookie:', csrfDashMatch[1].substring(0, 20) + '...')
     return csrfDashMatch[1]
   }
 
@@ -568,23 +591,19 @@ const getCsrfToken = (): string => {
   const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/)
   if (xsrfMatch && xsrfMatch[1]) {
     cachedCsrfToken = xsrfMatch[1]
-    console.log('[CSRF] Found XSRF-TOKEN cookie:', xsrfMatch[1].substring(0, 20) + '...')
     return xsrfMatch[1]
   }
 
   // Fallback to cached token from response headers
   if (cachedCsrfToken) {
-    console.log('[CSRF] Using cached token from response headers:', cachedCsrfToken.substring(0, 20) + '...')
     return cachedCsrfToken
   }
 
-  // Always log when no token found (important for debugging)
-  const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
-  console.warn('[CSRF] ⚠️ No csrf-token found!', {
-    availableCookies,
-    cachedToken: cachedCsrfToken ? 'exists' : 'none',
-    documentCookieLength: cookies?.length || 0,
-  })
+  // Log warning in dev mode when no token found
+  if (import.meta.env.DEV) {
+    const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
+    csrfWarn('No csrf-token found!', { availableCookies })
+  }
 
   return ''
 }
@@ -606,8 +625,7 @@ export const updateCsrfTokenFromResponse = (token: string) => {
  * Backend endpoint: GET /api/auth/csrf
  */
 export const refreshCsrfToken = async (): Promise<string | null> => {
-  console.log('[CSRF] Refreshing token from backend...')
-  console.log('[CSRF] Request URL:', `${API_BASE_URL_NO_VERSION}/auth/csrf`)
+  csrfLog('Refreshing token from backend...')
 
   try {
     // Use a separate axios instance to avoid circular interceptor issues
@@ -622,37 +640,29 @@ export const refreshCsrfToken = async (): Promise<string | null> => {
       }
     )
 
-    console.log('[CSRF] Refresh response:', {
-      status: response.status,
-      hasBodyToken: !!response.data?.csrfToken,
-      hasHeaderToken: !!response.headers['x-csrf-token'],
-      setCookieHeader: response.headers['set-cookie'] ? 'present' : 'absent',
-    })
-
     // Token is set in cookie automatically by backend
     // Also capture from response body/header as fallback
     const token = response.data?.csrfToken || response.headers['x-csrf-token']
     if (token) {
       cachedCsrfToken = token
-      console.log('[CSRF] ✅ Token refreshed successfully from response:', token.substring(0, 20) + '...')
+      csrfLog('Token refreshed successfully')
       return token
     }
 
     // Try reading from cookie after the request
     const cookieToken = getCsrfToken()
     if (cookieToken) {
-      console.log('[CSRF] ✅ Token available from cookie after refresh')
+      csrfLog('Token available from cookie after refresh')
       return cookieToken
     }
 
-    console.warn('[CSRF] ⚠️ Token refresh completed but no token found in response or cookies')
+    csrfWarn('Token refresh completed but no token found')
     return null
-  } catch (error: any) {
-    console.error('[CSRF] ❌ Token refresh failed:', {
-      message: error?.message,
-      status: error?.response?.status,
-      data: error?.response?.data,
-    })
+  } catch (error: unknown) {
+    // SECURITY: Only log error details in development
+    if (import.meta.env.DEV) {
+      console.error('[CSRF] Token refresh failed:', error)
+    }
     return null
   }
 }
@@ -1498,10 +1508,12 @@ apiClient.interceptors.response.use(
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
-            console.log('[CSRF] Retrying request with fresh token')
+            csrfLog('Retrying request with fresh token')
             return apiClient(originalRequest)
           } catch (csrfError) {
-            console.error('[CSRF] Token refresh failed, redirecting to login:', csrfError)
+            if (import.meta.env.DEV) {
+              console.error('[CSRF] Token refresh failed:', csrfError)
+            }
             // If refresh fails, redirect to login
             import('sonner').then(({ toast }) => {
               toast.error('انتهت صلاحية الجلسة | Session expired', {
@@ -1644,7 +1656,7 @@ export interface RateLimitInfo {
 /**
  * Get rate limit info from response headers
  */
-export const getRateLimitInfo = (headers: any): RateLimitInfo | null => {
+export const getRateLimitInfo = (headers: Record<string, string | undefined>): RateLimitInfo | null => {
   const limit = headers['x-ratelimit-limit']
   const remaining = headers['x-ratelimit-remaining']
   const reset = headers['x-ratelimit-reset']
@@ -1677,12 +1689,22 @@ export const formatRetryAfter = (seconds: number): string => {
 /**
  * Helper function to handle API errors consistently
  */
-export const handleApiError = (error: any): string => {
-  if (error?.message) {
-    return error.message
+interface ApiErrorResponse {
+  message?: string
+  response?: {
+    data?: {
+      message?: string
+    }
   }
-  if (error?.response?.data?.message) {
-    return error.response.data.message
+}
+
+export const handleApiError = (error: unknown): string => {
+  const apiError = error as ApiErrorResponse
+  if (apiError?.message) {
+    return apiError.message
+  }
+  if (apiError?.response?.data?.message) {
+    return apiError.response.data.message
   }
   return 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
 }

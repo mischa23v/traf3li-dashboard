@@ -55,12 +55,17 @@ export function SocketProvider({ children }: SocketProviderProps) {
   // Refs for batching and throttling
   const pendingNotifications = useRef<Notification[]>([])
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const countThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastCountUpdate = useRef<number>(0)
+  const isMountedRef = useRef<boolean>(true)
   const COUNT_THROTTLE_MS = 500 // Throttle count updates to max once per 500ms
   const BATCH_DELAY_MS = 100 // Batch notifications every 100ms
 
   // Initialize socket connection
   useEffect(() => {
+    // Reset mounted flag for this effect instance
+    isMountedRef.current = true
+
     if (!isAuthenticated || !user?._id) {
       // Disconnect if not authenticated
       if (socket) {
@@ -132,13 +137,22 @@ export function SocketProvider({ children }: SocketProviderProps) {
       const timeSinceLastUpdate = now - lastCountUpdate.current
 
       if (timeSinceLastUpdate >= COUNT_THROTTLE_MS) {
-        setUnreadCount(count)
+        if (isMountedRef.current) {
+          setUnreadCount(count)
+        }
         lastCountUpdate.current = now
       } else {
-        // Schedule delayed update
-        setTimeout(() => {
-          setUnreadCount(count)
-          lastCountUpdate.current = Date.now()
+        // Clear any existing throttle timeout
+        if (countThrottleTimeoutRef.current) {
+          clearTimeout(countThrottleTimeoutRef.current)
+        }
+        // Schedule delayed update with mounted check
+        countThrottleTimeoutRef.current = setTimeout(() => {
+          if (isMountedRef.current) {
+            setUnreadCount(count)
+            lastCountUpdate.current = Date.now()
+          }
+          countThrottleTimeoutRef.current = null
         }, COUNT_THROTTLE_MS - timeSinceLastUpdate)
       }
     }
@@ -163,10 +177,17 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
     // Cleanup on unmount
     return () => {
-      // Flush any pending notifications before cleanup
+      // Mark as unmounted to prevent state updates
+      isMountedRef.current = false
+
+      // Clear all pending timeouts
       if (batchTimeoutRef.current) {
         clearTimeout(batchTimeoutRef.current)
-        flushNotifications()
+        batchTimeoutRef.current = null
+      }
+      if (countThrottleTimeoutRef.current) {
+        clearTimeout(countThrottleTimeoutRef.current)
+        countThrottleTimeoutRef.current = null
       }
 
       // Remove event listeners with stable references

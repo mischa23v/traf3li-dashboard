@@ -47,15 +47,22 @@ import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiS
 const authApi = apiClientNoVersion
 
 // ==================== AUTH DEBUG LOGGING ====================
-// Always enabled to help diagnose auth issues on production
-const authLog = (message: string, data?: any) => {
-  console.log(`[AUTH-SVC] ${message}`, data !== undefined ? data : '')
-}
-const authWarn = (message: string, data?: any) => {
-  console.warn(`[AUTH-SVC] ⚠️ ${message}`, data !== undefined ? data : '')
-}
-const authError = (message: string, error?: any) => {
-  console.error(`[AUTH-SVC] ❌ ${message}`, error || '')
+// SECURITY: Only log in development mode to prevent sensitive data leakage
+const authLog = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.log(`[AUTH-SVC] ${message}`, data !== undefined ? data : '')
+  : () => {} // No-op in production
+
+const authWarn = import.meta.env.DEV
+  ? (message: string, data?: unknown) => console.warn(`[AUTH-SVC] ⚠️ ${message}`, data !== undefined ? data : '')
+  : () => {} // No-op in production
+
+const authError = (message: string, error?: unknown) => {
+  // Errors are always logged (but without sensitive data in production)
+  if (import.meta.env.DEV) {
+    console.error(`[AUTH-SVC] ❌ ${message}`, error || '')
+  } else {
+    console.error(`[AUTH-SVC] ❌ ${message}`) // No error details in production
+  }
 }
 
 /**

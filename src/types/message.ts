@@ -302,6 +302,7 @@ export function parseMentions(body: string): ParsedMention[] {
 
 /**
  * Convert mention syntax to HTML for display
+ * SECURITY: Sanitizes input to prevent XSS attacks before rendering
  *
  * @param body - Message body with mention syntax
  * @returns HTML string with mentions rendered as spans
@@ -311,7 +312,12 @@ export function parseMentions(body: string): ParsedMention[] {
  * // Returns: "Hey <span class="mention" data-user-id="123">@John</span>"
  */
 export function renderMentions(body: string): string {
-  return body.replace(
+  // SECURITY: Import sanitizeHtml dynamically to avoid circular deps
+  // The sanitization happens before mention replacement to ensure XSS protection
+  const { sanitizeHtml } = require('@/utils/sanitize')
+  const sanitizedBody = sanitizeHtml(body)
+
+  return sanitizedBody.replace(
     MENTION_REGEX,
     '<span class="mention" data-user-id="$2">@$1</span>'
   )
