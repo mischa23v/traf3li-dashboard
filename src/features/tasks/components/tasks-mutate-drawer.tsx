@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -119,6 +119,13 @@ const billingTypeOptions = [
   { value: 'not_billable', label: 'غير قابل للفوترة' },
 ]
 
+// Location Trigger Type Options (Arabic)
+const locationTriggerTypeOptions = [
+  { value: 'arrive', label: 'عند الوصول' },
+  { value: 'leave', label: 'عند المغادرة' },
+  { value: 'nearby', label: 'عند الاقتراب' },
+]
+
 // Label Options (Arabic)
 const labelOptions = [
   { value: 'legal', label: 'قانوني' },
@@ -139,6 +146,7 @@ export function TasksMutateDrawer({
   const isUpdate = !!currentRow
   const [billingOpen, setBillingOpen] = useState(false)
   const [courtOpen, setCourtOpen] = useState(false)
+  const [locationOpen, setLocationOpen] = useState(false)
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskFormSchema),
@@ -165,6 +173,15 @@ export function TasksMutateDrawer({
           },
           estimatedMinutes: currentRow.estimatedMinutes,
           notes: currentRow.notes || '',
+          location: (currentRow as any).location || {
+            name: '',
+            address: '',
+          },
+          locationTrigger: (currentRow as any).locationTrigger || {
+            enabled: false,
+            type: 'arrive',
+            radius: 100,
+          },
         }
       : {
           title: '',
@@ -183,12 +200,22 @@ export function TasksMutateDrawer({
             invoiceStatus: 'not_invoiced',
           },
           notes: '',
+          location: {
+            name: '',
+            address: '',
+          },
+          locationTrigger: {
+            enabled: false,
+            type: 'arrive',
+            radius: 100,
+          },
         },
   })
 
   const taskType = form.watch('taskType')
   const isBillable = form.watch('billing.isBillable')
   const billingType = form.watch('billing.billingType')
+  const locationTriggerEnabled = form.watch('locationTrigger.enabled')
 
   // Show court section for court-related task types
   const showCourtSection = [
@@ -650,6 +677,125 @@ export function TasksMutateDrawer({
                         )}
                       />
                     )}
+                  </>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+
+            {/* Location Trigger Section (Collapsible) */}
+            <Collapsible open={locationOpen} onOpenChange={setLocationOpen}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant='ghost'
+                  className='flex w-full justify-between p-0 hover:bg-transparent'
+                >
+                  <span className='font-semibold flex items-center gap-2'>
+                    <MapPin size={16} />
+                    تنبيه الموقع
+                  </span>
+                  {locationOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className='space-y-4 pt-4'>
+                <FormField
+                  control={form.control}
+                  name='locationTrigger.enabled'
+                  render={({ field }) => (
+                    <FormItem className='flex items-center gap-2'>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className='cursor-pointer'>تفعيل تنبيه الموقع</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                {locationTriggerEnabled && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='location.name'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>اسم الموقع</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ''} placeholder='مثال: المحكمة العامة بالرياض' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='location.address'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>العنوان</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ''} placeholder='العنوان الكامل للموقع' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='locationTrigger.type'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>نوع التنبيه</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder='اختر نوع التنبيه' />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {locationTriggerTypeOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            حدد متى تريد تلقي التنبيه بالنسبة للموقع
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='locationTrigger.radius'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>نطاق التنبيه (متر)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              min={50}
+                              max={5000}
+                              placeholder='100'
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 100)
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            المسافة بالأمتار التي يتم فيها تفعيل التنبيه
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </>
                 )}
               </CollapsibleContent>

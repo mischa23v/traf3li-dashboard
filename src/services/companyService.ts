@@ -61,6 +61,7 @@ export interface Company {
   _id: string
   name: string
   nameAr?: string
+  nameEn?: string // Added to match backend
   code?: string
   logo?: string
   parentFirmId?: string | null
@@ -68,15 +69,23 @@ export interface Company {
   industry?: string
   taxId?: string
   commercialRegistration?: string
+  // Saudi Business Info (added to match backend)
+  unifiedNumber?: string // الرقم الموحد (700 number)
+  licenseNumber?: string // رقم ترخيص المحاماة
   address?: {
     street?: string
+    building?: string // Added
+    district?: string // Added
     city?: string
+    region?: string // Added
     country?: string
     postalCode?: string
+    additionalNumber?: string // Added - الرقم الإضافي
   }
   contact?: {
     email?: string
     phone?: string
+    fax?: string // Added
     website?: string
   }
   status: 'active' | 'inactive' | 'suspended'
@@ -111,7 +120,11 @@ export interface UserCompanyAccess {
   canAccessChildren?: boolean // Can access child companies
   canAccessParent?: boolean // Can access parent company
   isDefault?: boolean // Default company for user
-  status: 'active' | 'inactive' | 'pending'
+  status: 'active' | 'inactive' | 'pending' | 'revoked' // Added 'revoked' to match backend
+  grantedBy?: string // User ID who granted access
+  grantedAt?: string // When access was granted
+  expiresAt?: string // Optional expiration date
+  notes?: string // Optional notes about the access
   createdAt: string
   updatedAt: string
 }
@@ -373,11 +386,13 @@ const companyService = {
     firmId: string,
     userId: string,
     data: {
-      role: UserCompanyAccess['role']
+      role?: UserCompanyAccess['role']
       permissions?: string[]
       canAccessChildren?: boolean
       canAccessParent?: boolean
       isDefault?: boolean
+      expiresAt?: string // Optional expiration date
+      notes?: string // Optional notes
     }
   ): Promise<UserCompanyAccess> => {
     try {

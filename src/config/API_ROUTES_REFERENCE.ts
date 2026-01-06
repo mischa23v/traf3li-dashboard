@@ -401,10 +401,10 @@ export const API_ROUTES = {
     UPDATE_APPEARANCE: 'PATCH /settings/appearance',
     UPDATE_DISPLAY: 'PATCH /settings/display',
     UPDATE_NOTIFICATIONS: 'PATCH /settings/notifications',
-    // Company
-    GET_COMPANY: 'GET /settings/company',
-    UPDATE_COMPANY: 'PUT /settings/company',
-    UPLOAD_LOGO: 'POST /settings/company/logo',
+    // Company Settings (uses Firm endpoints)
+    GET_COMPANY: 'GET /firms/my',
+    UPDATE_COMPANY: 'PUT /firms/:id',
+    UPLOAD_LOGO: 'POST /firms/:id/logo',
     // Taxes
     LIST_TAXES: 'GET /settings/taxes',
     CREATE_TAX: 'POST /settings/taxes',

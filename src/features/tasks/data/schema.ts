@@ -245,6 +245,25 @@ export const relatedDocumentSchema = z.object({
 })
 export type RelatedDocument = z.infer<typeof relatedDocumentSchema>
 
+export const locationTriggerTypeEnum = z.enum(['arrive', 'leave', 'nearby'])
+export type LocationTriggerType = z.infer<typeof locationTriggerTypeEnum>
+
+export const locationSchema = z.object({
+  name: z.string().optional(),
+  address: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional()
+})
+export type Location = z.infer<typeof locationSchema>
+
+export const locationTriggerSchema = z.object({
+  enabled: z.boolean().default(false),
+  type: locationTriggerTypeEnum.default('arrive'),
+  radius: z.number().default(100),
+  triggered: z.boolean().default(false)
+})
+export type LocationTrigger = z.infer<typeof locationTriggerSchema>
+
 export const recurringConfigSchema = z.object({
   enabled: z.boolean().default(false),
   frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'yearly', 'custom']).optional(),
@@ -426,7 +445,9 @@ export const taskFormSchema = z.object({
   estimatedMinutes: z.number().optional(),
   notes: z.string().max(5000).optional(),
   isTemplate: z.boolean().default(false),
-  templateName: z.string().optional()
+  templateName: z.string().optional(),
+  location: locationSchema.optional(),
+  locationTrigger: locationTriggerSchema.optional()
 })
 
 export type TaskFormData = z.infer<typeof taskFormSchema>
