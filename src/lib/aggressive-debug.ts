@@ -331,60 +331,93 @@ const setupUnhandledRejectionHandler = (): void => {
 
 /**
  * Intercept console.error for additional logging
+ * Includes defensive checks to prevent crashes if console is in an unexpected state
  */
 const setupConsoleInterceptor = (): void => {
+  // Store originals and validate they are functions
   const originalError = console.error
   const originalWarn = console.warn
 
+  // Defensive: only intercept if originals are valid functions
+  if (typeof originalError !== 'function' || typeof originalWarn !== 'function') {
+    return // Don't intercept if console is in an unexpected state
+  }
+
   console.error = (...args: unknown[]) => {
-    if (isAggressiveDebugEnabled()) {
-      const message = args.map(arg => {
-        if (arg instanceof Error) return arg.message
-        if (typeof arg === 'object') return JSON.stringify(arg, null, 2)
-        return String(arg)
-      }).join(' ')
+    try {
+      if (isAggressiveDebugEnabled()) {
+        const message = args.map(arg => {
+          if (arg instanceof Error) return arg.message
+          if (typeof arg === 'object') {
+            try {
+              return JSON.stringify(arg, null, 2)
+            } catch {
+              return String(arg)
+            }
+          }
+          return String(arg)
+        }).join(' ')
 
-      // Only log if not already an aggressive debug log
-      if (!message.includes('AGGRESSIVE DEBUG') && !message.includes('[err_')) {
-        const debugError: DebugError = {
-          id: generateErrorId(),
-          type: 'console',
-          message,
-          stack: new Error().stack,
-          timestamp: new Date().toISOString(),
+        // Only log if not already an aggressive debug log
+        if (!message.includes('AGGRESSIVE DEBUG') && !message.includes('[err_')) {
+          const debugError: DebugError = {
+            id: generateErrorId(),
+            type: 'console',
+            message,
+            stack: new Error().stack,
+            timestamp: new Date().toISOString(),
+          }
+
+          storeError(debugError)
+          // Don't log again - just store
         }
-
-        storeError(debugError)
-        // Don't log again - just store
       }
+    } catch {
+      // Ignore errors in debug code
     }
 
-    originalError.apply(console, args)
+    // Call original - with safety check
+    if (typeof originalError === 'function') {
+      originalError.apply(console, args)
+    }
   }
 
   // Also capture warnings
   console.warn = (...args: unknown[]) => {
-    if (isAggressiveDebugEnabled()) {
-      const message = args.map(arg => {
-        if (arg instanceof Error) return arg.message
-        if (typeof arg === 'object') return JSON.stringify(arg, null, 2)
-        return String(arg)
-      }).join(' ')
+    try {
+      if (isAggressiveDebugEnabled()) {
+        const message = args.map(arg => {
+          if (arg instanceof Error) return arg.message
+          if (typeof arg === 'object') {
+            try {
+              return JSON.stringify(arg, null, 2)
+            } catch {
+              return String(arg)
+            }
+          }
+          return String(arg)
+        }).join(' ')
 
-      // Store but don't log (too noisy)
-      if (!message.includes('AGGRESSIVE DEBUG')) {
-        const debugError: DebugError = {
-          id: generateErrorId(),
-          type: 'console',
-          message: `[WARN] ${message}`,
-          stack: new Error().stack,
-          timestamp: new Date().toISOString(),
+        // Store but don't log (too noisy)
+        if (!message.includes('AGGRESSIVE DEBUG')) {
+          const debugError: DebugError = {
+            id: generateErrorId(),
+            type: 'console',
+            message: `[WARN] ${message}`,
+            stack: new Error().stack,
+            timestamp: new Date().toISOString(),
+          }
+          storeError(debugError)
         }
-        storeError(debugError)
       }
+    } catch {
+      // Ignore errors in debug code
     }
 
-    originalWarn.apply(console, args)
+    // Call original - with safety check
+    if (typeof originalWarn === 'function') {
+      originalWarn.apply(console, args)
+    }
   }
 }
 
@@ -647,51 +680,63 @@ export const disableAggressiveDebug = (): void => {
 
 /**
  * Initialize all debug handlers
+ * Wrapped in try-catch to prevent debug code from crashing the app
  */
 export const initAggressiveDebug = (): void => {
   if (typeof window === 'undefined') return
 
-  setupGlobalErrorHandler()
-  setupUnhandledRejectionHandler()
-  setupConsoleInterceptor()
-  setupFetchInterceptor()
+  try {
+    setupGlobalErrorHandler()
+    setupUnhandledRejectionHandler()
+    setupConsoleInterceptor()
+    setupFetchInterceptor()
 
-  // Expose to window for console access
-  ;(window as any).errorDebug = {
-    enable: enableAggressiveDebug,
-    disable: disableAggressiveDebug,
-    isEnabled: isAggressiveDebugEnabled,
-    getAll: getCapturedErrors,
-    getByType: getErrorsByType,
-    clear: clearCapturedErrors,
-    printSummary: printErrorSummary,
-    export: exportErrors,
-    download: downloadErrors,
-    captureApi: captureApiError,
-    captureReact: captureReactError,
-  }
+    // Expose to window for console access
+    ;(window as any).errorDebug = {
+      enable: enableAggressiveDebug,
+      disable: disableAggressiveDebug,
+      isEnabled: isAggressiveDebugEnabled,
+      getAll: getCapturedErrors,
+      getByType: getErrorsByType,
+      clear: clearCapturedErrors,
+      printSummary: printErrorSummary,
+      export: exportErrors,
+      download: downloadErrors,
+      captureApi: captureApiError,
+      captureReact: captureReactError,
+    }
 
-  // Show startup message
-  if (isAggressiveDebugEnabled()) {
-    setTimeout(() => {
-      console.log('')
-      console.log(
-        '%c🔥 AGGRESSIVE DEBUG MODE ACTIVE',
-        'background: linear-gradient(135deg, #ff3366, #ff6600); color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;'
-      )
-      console.log('%cAll errors are being captured with full details.', 'color: #ff3366;')
-      console.log('')
-      console.log('%cQuick Commands:', 'font-weight: bold; font-size: 12px;')
-      console.log('  errorDebug.printSummary()  - Show all captured errors')
-      console.log('  errorDebug.getAll()        - Get errors as array')
-      console.log('  errorDebug.download()      - Download error log as JSON')
-      console.log('  errorDebug.clear()         - Clear error history')
-      console.log('  errorDebug.disable()       - Turn off aggressive debugging')
-      console.log('')
-      console.log('  apiDebug.printSummary()    - Show API call history')
-      console.log('  apiDebug.printFailedEndpoints() - Show failing endpoints')
-      console.log('')
-    }, 500)
+    // Show startup message
+    if (isAggressiveDebugEnabled()) {
+      setTimeout(() => {
+        try {
+          console.log('')
+          console.log(
+            '%c🔥 AGGRESSIVE DEBUG MODE ACTIVE',
+            'background: linear-gradient(135deg, #ff3366, #ff6600); color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;'
+          )
+          console.log('%cAll errors are being captured with full details.', 'color: #ff3366;')
+          console.log('')
+          console.log('%cQuick Commands:', 'font-weight: bold; font-size: 12px;')
+          console.log('  errorDebug.printSummary()  - Show all captured errors')
+          console.log('  errorDebug.getAll()        - Get errors as array')
+          console.log('  errorDebug.download()      - Download error log as JSON')
+          console.log('  errorDebug.clear()         - Clear error history')
+          console.log('  errorDebug.disable()       - Turn off aggressive debugging')
+          console.log('')
+          console.log('  apiDebug.printSummary()    - Show API call history')
+          console.log('  apiDebug.printFailedEndpoints() - Show failing endpoints')
+          console.log('')
+        } catch {
+          // Ignore console errors
+        }
+      }, 500)
+    }
+  } catch (e) {
+    // Debug initialization failed - non-critical, app should still work
+    if (import.meta.env.DEV) {
+      console.warn('[AggressiveDebug] Failed to initialize:', e)
+    }
   }
 }
 
