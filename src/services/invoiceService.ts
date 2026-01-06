@@ -26,7 +26,7 @@ export interface Invoice {
   totalAmount: number
   amountPaid: number
   balanceDue: number
-  status: 'draft' | 'pending' | 'sent' | 'paid' | 'partial' | 'overdue' | 'cancelled'
+  status: 'draft' | 'pending' | 'sent' | 'paid' | 'partial' | 'overdue' | 'cancelled' | 'void'
   issueDate: string
   dueDate: string
   paidDate?: string
@@ -840,7 +840,7 @@ const invoiceService = {
     }
 
     try {
-      const response = await apiClient.patch('/invoices/confirm-payment', data)
+      const response = await apiClient.post('/invoices/confirm-payment', data)
       return response.data
     } catch (error) {
       handleError(error, 'confirm payment | تأكيد الدفع')

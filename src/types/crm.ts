@@ -23,10 +23,12 @@ export type LeadStatus =
   | 'contacted'
   | 'qualified'
   | 'proposal'
+  | 'proposal_sent'
   | 'negotiation'
   | 'won'
   | 'lost'
   | 'dormant'
+  | 'on_hold'
 
 export type LeadType = 'individual' | 'company'
 
@@ -650,8 +652,13 @@ export type ActivityType =
   | 'proposal'
   | 'status_change'
   | 'stage_change'
+  | 'assignment'
   | 'lead_created'
   | 'lead_converted'
+  | 'case_created'
+  | 'case_updated'
+  | 'case_deleted'
+  | 'other'
 
 export type ActivityEntityType =
   | 'lead'

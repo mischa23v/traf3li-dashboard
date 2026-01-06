@@ -29,7 +29,8 @@ export interface TimeEntry {
   rate: number
   amount: number
   isBillable: boolean
-  status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'billed'
+  status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'billed' | 'invoiced'
+  billStatus?: 'draft' | 'unbilled' | 'billed' | 'invoiced'
   wasTimerBased: boolean
   timerStartedAt?: string
   isLocked?: boolean

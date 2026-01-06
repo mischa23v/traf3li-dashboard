@@ -11,7 +11,7 @@ import apiClient, { handleApiError } from '@/lib/api'
 
 // ==================== TYPES ====================
 
-export type ExpenseStatus = 'draft' | 'submitted' | 'approved' | 'rejected' | 'reimbursed'
+export type ExpenseStatus = 'draft' | 'pending_approval' | 'submitted' | 'approved' | 'rejected' | 'paid' | 'reimbursed'
 export type ExpenseCategory =
   | 'travel'
   | 'meals'
@@ -20,7 +20,24 @@ export type ExpenseCategory =
   | 'office_supplies'
   | 'professional_services'
   | 'client_expenses'
+  | 'court_fees'
+  | 'filing_fees'
+  | 'research'
+  | 'expert_witness'
+  | 'translation'
+  | 'courier'
+  | 'printing'
+  | 'postage'
+  | 'telecommunications'
+  | 'government_fees'
+  | 'marketing'
+  | 'training'
+  | 'software'
+  | 'equipment'
   | 'other'
+
+export type ExpenseType = 'reimbursable' | 'non_reimbursable' | 'billable' | 'non_billable'
+export type BillingStatus = 'unbilled' | 'pending' | 'billed' | 'written_off'
 
 export interface Expense {
   _id: string
@@ -28,6 +45,8 @@ export interface Expense {
   description: string
   descriptionAr?: string
   amount: number
+  taxAmount?: number
+  totalAmount?: number
   category: ExpenseCategory
   date: string
   status: ExpenseStatus
@@ -36,6 +55,40 @@ export interface Expense {
   caseId?: string
   clientId?: string
   receiptUrl?: string
+  receiptNumber?: string
+  currency?: string
+  expenseType?: ExpenseType
+  markupType?: 'percentage' | 'fixed' | 'none'
+  markupValue?: number
+  taxRate?: number
+  taxReclaimable?: boolean
+  vendorTaxNumber?: string
+  vendor?: string
+  vendorAr?: string
+  travelDetails?: {
+    origin?: string
+    destination?: string
+    purpose?: string
+    distanceKm?: number
+  }
+  governmentReference?: string
+  departmentId?: string
+  locationId?: string
+  projectId?: string
+  costCenterId?: string
+  firmId?: string
+  lawyerId?: string
+  hasReceipt?: boolean
+  internalNotes?: string
+  submittedBy?: string
+  submittedAt?: string
+  approvedBy?: string
+  approvedAt?: string
+  reimbursementStatus?: 'pending' | 'processing' | 'completed' | 'failed'
+  reimbursedAmount?: number
+  invoiceId?: string
+  billingStatus?: BillingStatus
+  updatedBy?: string
   reimbursementDetails?: {
     method: string
     reference?: string
@@ -320,6 +373,110 @@ const expenseService = {
       handleExpenseError(error, 'FETCH_FAILED')
     }
   },
+
+  /**
+   * Submit expense for approval
+   * POST /api/expenses/:id/submit
+   */
+  submitForApproval: async (id: string): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/submit`)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      handleExpenseError(error, 'UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Approve expense
+   * POST /api/expenses/:id/approve
+   */
+  approveExpense: async (id: string, data?: { notes?: string }): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/approve`, data)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      handleExpenseError(error, 'UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Reject expense
+   * POST /api/expenses/:id/reject
+   */
+  rejectExpense: async (id: string, data: { reason: string }): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/reject`, data)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      handleExpenseError(error, 'UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Bulk approve expenses
+   * POST /api/expenses/bulk-approve
+   */
+  bulkApprove: async (ids: string[]): Promise<{ approved: number; failed: number }> => {
+    try {
+      const response = await apiClient.post('/expenses/bulk-approve', { ids })
+      return response.data
+    } catch (error: any) {
+      handleExpenseError(error, 'UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Bulk delete expenses
+   * POST /api/expenses/bulk-delete
+   */
+  bulkDelete: async (ids: string[]): Promise<{ deletedCount: number }> => {
+    try {
+      const response = await apiClient.post('/expenses/bulk-delete', { ids })
+      return response.data
+    } catch (error: any) {
+      handleExpenseError(error, 'DELETE_FAILED')
+    }
+  },
+
+  /**
+   * Suggest category using AI
+   * POST /api/expenses/suggest-category
+   */
+  suggestCategory: async (description: string): Promise<{ category: ExpenseCategory; confidence: number }> => {
+    try {
+      const response = await apiClient.post('/expenses/suggest-category', { description })
+      return response.data.data || response.data
+    } catch (error: any) {
+      handleExpenseError(error, 'FETCH_FAILED')
+    }
+  },
+
+  /**
+   * Get expense categories list
+   * GET /api/expenses/categories
+   */
+  getCategories: async (): Promise<ExpenseCategory[]> => {
+    try {
+      const response = await apiClient.get('/expenses/categories')
+      return response.data.categories || response.data.data || response.data
+    } catch (error: any) {
+      handleExpenseError(error, 'FETCH_FAILED')
+    }
+  },
+
+  /**
+   * Get new expense defaults
+   * GET /api/expenses/new
+   */
+  getNewExpenseDefaults: async (): Promise<Partial<Expense>> => {
+    try {
+      const response = await apiClient.get('/expenses/new')
+      return response.data.defaults || response.data.data || response.data
+    } catch (error: any) {
+      handleExpenseError(error, 'FETCH_FAILED')
+    }
+  },
 }
 
 export default expenseService
@@ -335,4 +492,12 @@ export const {
   uploadReceipt,
   getExpenseStats,
   getExpensesByCategory,
+  submitForApproval,
+  approveExpense,
+  rejectExpense,
+  bulkApprove,
+  bulkDelete,
+  suggestCategory,
+  getCategories,
+  getNewExpenseDefaults,
 } = expenseService

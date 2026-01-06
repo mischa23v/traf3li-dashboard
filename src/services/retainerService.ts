@@ -10,7 +10,9 @@ import apiClient, { handleApiError } from '@/lib/api'
 /**
  * Retainer Status
  */
-export type RetainerStatus = 'active' | 'depleted' | 'expired' | 'cancelled'
+export type RetainerStatus = 'active' | 'depleted' | 'refunded' | 'expired' | 'cancelled'
+
+export type RetainerType = 'general' | 'evergreen' | 'fixed_fee' | 'advance'
 
 /**
  * Transaction Type
@@ -25,8 +27,29 @@ export type Currency = 'SAR' | 'USD' | 'EUR' | 'GBP' | 'AED'
 /**
  * Retainer
  */
+export interface RetainerConsumption {
+  _id?: string
+  invoiceId?: string
+  timeEntryId?: string
+  expenseId?: string
+  amount: number
+  description?: string
+  date: string
+}
+
+export interface RetainerDeposit {
+  _id?: string
+  paymentId?: string
+  amount: number
+  method?: string
+  reference?: string
+  date: string
+}
+
 export interface Retainer {
   _id: string
+  retainerId?: string
+  retainerNumber?: string
   clientId: string
   caseId?: string
   clientName: string
@@ -35,18 +58,25 @@ export interface Retainer {
   nameAr: string
   description?: string
   descriptionAr?: string
+  retainerType?: RetainerType
   initialAmount: number
   currentBalance: number
   currency: Currency
   status: RetainerStatus
   startDate: string
   expiryDate?: string
+  agreementUrl?: string
+  agreementSignedDate?: string
+  termsAndConditions?: string
   minimumBalance?: number
   autoReplenish?: boolean
   replenishAmount?: number
   replenishThreshold?: number
+  lowBalanceAlertSent?: boolean
   notes?: string
   transactions: RetainerTransaction[]
+  consumptions?: RetainerConsumption[]
+  deposits?: RetainerDeposit[]
   createdBy: string
   createdAt: string
   updatedAt: string
