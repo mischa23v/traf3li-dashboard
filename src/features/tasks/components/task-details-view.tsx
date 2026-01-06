@@ -21,7 +21,7 @@ import {
     useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
     useAddDependency, useRemoveDependency, useTimeTrackingDetails,
     useStartTimeTracking, useStopTimeTracking, useResetTimeTracking, useUpdateOutcome,
-    useDocuments, useDeleteDocument
+    useDocuments, useDeleteDocument, useAttachmentVersionDownload
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
@@ -112,6 +112,7 @@ export function TaskDetailsView() {
     const stopTimeTrackingMutation = useStopTimeTracking()
     const resetTimeTrackingMutation = useResetTimeTracking()
     const updateOutcomeMutation = useUpdateOutcome()
+    const attachmentDownloadMutation = useAttachmentVersionDownload()
 
     // Time tracking details
     const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
@@ -280,18 +281,40 @@ export function TaskDetailsView() {
     }
 
     const handlePreviewAttachment = (attachmentId: string, fileName: string, url: string, storageType?: string) => {
-        const fullUrl = getFullDocumentUrl(url)
-        window.open(fullUrl, '_blank', 'noopener,noreferrer')
+        // For S3 files, fetch a fresh presigned URL to avoid expiration issues
+        if (storageType === 's3') {
+            attachmentDownloadMutation.mutate({
+                taskId,
+                attachmentId,
+                disposition: 'inline',
+                fileName
+            })
+        } else {
+            // For local files, use the cached URL directly
+            const fullUrl = getFullDocumentUrl(url)
+            window.open(fullUrl, '_blank', 'noopener,noreferrer')
+        }
     }
 
     const handleDownloadAttachment = (attachmentId: string, fileName: string, url: string, storageType?: string) => {
-        const fullUrl = getFullDocumentUrl(url)
-        const link = document.createElement('a')
-        link.href = fullUrl
-        link.download = fileName
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        // For S3 files, fetch a fresh presigned URL to avoid expiration issues
+        if (storageType === 's3') {
+            attachmentDownloadMutation.mutate({
+                taskId,
+                attachmentId,
+                disposition: 'attachment',
+                fileName
+            })
+        } else {
+            // For local files, use the cached URL directly
+            const fullUrl = getFullDocumentUrl(url)
+            const link = document.createElement('a')
+            link.href = fullUrl
+            link.download = fileName
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        }
     }
 
     const handleDeleteAttachment = (attachmentId: string) => {
