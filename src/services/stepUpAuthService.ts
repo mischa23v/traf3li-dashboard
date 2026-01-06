@@ -93,15 +93,15 @@ const stepUpAuthService = {
   /**
    * Reauthenticate with TOTP code
    *
-   * @param code - 6-digit TOTP code
+   * @param totpCode - 6-digit TOTP code
    */
-  withTOTP: async (code: string): Promise<{ success: boolean }> => {
+  withTOTP: async (totpCode: string): Promise<{ success: boolean }> => {
     try {
       const response = await authApi.post<{ success: boolean; message: string }>(
         '/auth/reauthenticate',
         {
           method: 'totp',
-          code,
+          totpCode,
         }
       )
       return { success: response.data.success }
