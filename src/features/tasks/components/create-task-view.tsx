@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     ArrowRight, Save, Calendar, User,
@@ -135,9 +135,54 @@ export function CreateTaskView() {
     // Tags input
     const [tagInput, setTagInput] = useState('')
 
+    // Form ref for programmatic submission
+    const formRef = useRef<HTMLFormElement>(null)
+
     // Form validation state
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+    // Clear form handler
+    const handleClearForm = () => {
+        setFormData({
+            title: '',
+            description: '',
+            status: 'todo' as TaskStatus,
+            priority: 'medium' as TaskPriority,
+            label: '' as TaskLabel | '',
+            tags: [],
+            dueDate: '',
+            dueTime: '',
+            startDate: '',
+            clientId: '',
+            caseId: '',
+            assignedTo: '',
+            estimatedMinutes: 0,
+        })
+        setSubtasks([])
+        setNewSubtask('')
+        setIsRecurring(false)
+        setRecurringConfig({
+            enabled: false,
+            frequency: 'weekly',
+            type: 'due_date' as RecurrenceType,
+            daysOfWeek: [],
+            interval: 1,
+            assigneeStrategy: 'fixed' as AssigneeStrategy,
+            assigneePool: [],
+        })
+        setReminders([])
+        setLocationEnabled(false)
+        setLocationConfig({ name: '', address: '' })
+        setTagInput('')
+        setErrors({})
+        setTouched({})
+    }
+
+    // Save form handler (triggers form submit)
+    const handleSaveForm = () => {
+        formRef.current?.requestSubmit()
+    }
 
     // Validate a single field (validation disabled for testing)
     const validateField = (_field: string, _value: any): string => {
@@ -389,7 +434,7 @@ export function CreateTaskView() {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-8">
+                            <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
                                 {/* Basic Info */}
                                 <div className="space-y-6">
                                     {/* Title - Full width */}
@@ -1074,7 +1119,13 @@ export function CreateTaskView() {
                     </div>
 
                     {/* Sidebar Widgets */}
-                    <TasksSidebar context="tasks" />
+                    <TasksSidebar
+                        context="tasks"
+                        mode="create"
+                        onClearForm={handleClearForm}
+                        onSaveForm={handleSaveForm}
+                        isSaving={createTaskMutation.isPending}
+                    />
                 </div>
             </Main>
         </>

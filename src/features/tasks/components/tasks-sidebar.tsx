@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
-    Edit3, Eye, CheckCircle, Archive, ArchiveRestore, Users, CheckCheck
+    Edit3, Eye, CheckCircle, Archive, ArchiveRestore, Users, CheckCheck, Eraser, Save
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +16,7 @@ import { ROUTES } from '@/constants/routes'
 
 interface TasksSidebarProps {
     context?: 'tasks' | 'reminders' | 'events' | 'reports'
+    mode?: 'list' | 'create' | 'details'  // New prop to distinguish page modes
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -37,10 +38,15 @@ interface TasksSidebarProps {
     onDeleteTask?: () => void
     isCompletePending?: boolean
     isDeletePending?: boolean
+    // Create page specific props
+    onClearForm?: () => void
+    onSaveForm?: () => void
+    isSaving?: boolean
 }
 
 export function TasksSidebar({
     context = 'tasks',
+    mode = 'list',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
@@ -61,7 +67,11 @@ export function TasksSidebar({
     onCompleteTask,
     onDeleteTask,
     isCompletePending = false,
-    isDeletePending = false
+    isDeletePending = false,
+    // Create page props
+    onClearForm,
+    onSaveForm,
+    isSaving = false
 }: TasksSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [quickActionsTab, setQuickActionsTab] = useState<'main' | 'bulk'>('main')
@@ -132,7 +142,27 @@ export function TasksSidebar({
             }
 
             // Handle shortcuts based on view mode
-            if (taskId) {
+            if (mode === 'create') {
+                // Create Page shortcuts
+                switch (e.key.toLowerCase()) {
+                    case 'n':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.create })
+                        break
+                    case 'c':
+                        e.preventDefault()
+                        onClearForm?.()
+                        break
+                    case 'd':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.viewAll })
+                        break
+                    case 's':
+                        e.preventDefault()
+                        onSaveForm?.()
+                        break
+                }
+            } else if (taskId) {
                 // Task Details View shortcuts
                 switch (e.key.toLowerCase()) {
                     case 'c':
@@ -201,7 +231,7 @@ export function TasksSidebar({
 
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
-    }, [taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkUnarchive, onBulkComplete, onSelectAll, isViewingArchived, totalTaskCount])
+    }, [mode, taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkUnarchive, onBulkComplete, onSelectAll, isViewingArchived, totalTaskCount, onClearForm, onSaveForm])
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -285,8 +315,9 @@ export function TasksSidebar({
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
 
                 {/* Header with Toggle - Same style as Calendar/Notifications */}
+                {/* Only show tabs for list mode (not create or details) */}
                 <div className="flex justify-start items-center mb-6 relative z-10">
-                    {!taskId && (
+                    {mode === 'list' && !taskId && (
                         <div className="flex bg-[#033a2d] p-1 rounded-xl">
                             <button
                                 onClick={() => setQuickActionsTab('main')}
@@ -326,7 +357,63 @@ export function TasksSidebar({
 
                 {/* Content */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {taskId ? (
+                    {mode === 'create' ? (
+                        // Create Page View - Show Create, Clear, Cancel, Save (4 buttons)
+                        <>
+                            {/* Create Button - Links to create page (already here but acts as refresh) */}
+                            <Link
+                                to={currentLinks.create}
+                                className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                            >
+                                <Plus className="h-7 w-7" aria-hidden="true" />
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">N</kbd>
+                                    إنشاء
+                                </span>
+                            </Link>
+
+                            {/* Clear Button */}
+                            <button
+                                className="bg-white hover:bg-amber-50 text-amber-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                                onClick={onClearForm}
+                            >
+                                <Eraser className="h-7 w-7" aria-hidden="true" />
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded">C</kbd>
+                                    مسح
+                                </span>
+                            </button>
+
+                            {/* Cancel Button - Same grey style as Delete had */}
+                            <Link
+                                to={currentLinks.viewAll}
+                                className="bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                            >
+                                <Trash2 className="h-7 w-7" aria-hidden="true" />
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">D</kbd>
+                                    إلغاء
+                                </span>
+                            </Link>
+
+                            {/* Save Button */}
+                            <button
+                                className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                                onClick={onSaveForm}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? (
+                                    <Loader2 className="h-7 w-7 animate-spin" aria-hidden="true" />
+                                ) : (
+                                    <Save className="h-7 w-7" aria-hidden="true" />
+                                )}
+                                <span className="flex items-center gap-1.5 text-sm font-bold">
+                                    <kbd className="text-[10px] font-mono bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">S</kbd>
+                                    حفظ
+                                </span>
+                            </button>
+                        </>
+                    ) : taskId ? (
                         // Task Details View - Show Complete, Edit, Delete, View All
                         <>
                             {/* Complete/Reopen Button */}

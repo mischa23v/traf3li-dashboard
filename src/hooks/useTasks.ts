@@ -452,11 +452,30 @@ export const useCompleteTask = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, completionNote }: { id: string; completionNote?: string }) =>
-      tasksService.completeTask(id, completionNote),
+    mutationFn: async ({ id, completionNote }: { id: string; completionNote?: string }) => {
+      // Get current task to check if timer is running
+      const currentTask = queryClient.getQueryData<Task>(['tasks', id])
+      const isTimerRunning = currentTask?.timeTracking?.sessions?.some(
+        (s: any) => s.startedAt && !s.endedAt
+      )
+
+      // Auto-stop timer if running before completing task
+      if (isTimerRunning) {
+        try {
+          await tasksService.stopTimeTracking(id)
+          toast.info('تم إيقاف المؤقت تلقائياً | Timer auto-stopped')
+        } catch (e) {
+          // Continue with completion even if stop fails
+          console.warn('Failed to auto-stop timer:', e)
+        }
+      }
+
+      return tasksService.completeTask(id, completionNote)
+    },
     onSuccess: async (_, { id }) => {
       await invalidateCache.tasks.all()
       await invalidateCache.tasks.detail(id)
+      await invalidateCache.tasks.timeTracking(id)
       await invalidateCache.calendar.all()
       toast.success('تم إكمال المهمة بنجاح | Task completed successfully')
     },
@@ -712,6 +731,22 @@ export const useAddTimeEntry = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || bilingualError('Failed to add time entry', 'فشل إضافة الوقت'))
+    },
+  })
+}
+
+export const useResetTimeTracking = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (taskId: string) => tasksService.resetTimeTracking(taskId),
+    onSuccess: async (_, taskId) => {
+      await invalidateCache.tasks.detail(taskId)
+      await invalidateCache.tasks.timeTracking(taskId)
+      toast.success('تم إعادة تعيين تتبع الوقت | Time tracking reset')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || bilingualError('Failed to reset time tracking', 'فشل إعادة تعيين تتبع الوقت'))
     },
   })
 }

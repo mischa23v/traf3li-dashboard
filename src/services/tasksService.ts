@@ -42,14 +42,24 @@ export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 
 export type RecurrenceType = 'due_date' | 'completion_date' // From Donetick: based on due date or completion date
 export type AssigneeStrategy = 'fixed' | 'round_robin' | 'random' | 'least_assigned' // From Donetick: assignee rotation
 
-// Saudi Legal Task Types
+// Task Types (Backend Contract)
 export type TaskType =
+  | 'general'
   | 'court_hearing'
+  | 'document_review'
+  | 'client_meeting'
   | 'filing_deadline'
   | 'appeal_deadline'
+  | 'discovery'
+  | 'deposition'
+  | 'mediation'
+  | 'settlement'
+  | 'research'
+  | 'drafting'
+  | 'other'
+  // Legacy Saudi Legal Types (for backward compatibility)
   | 'document_drafting'
   | 'contract_review'
-  | 'client_meeting'
   | 'client_call'
   | 'consultation'
   | 'najiz_procedure'
@@ -59,7 +69,6 @@ export type TaskType =
   | 'billing_task'
   | 'administrative'
   | 'follow_up'
-  | 'other'
 
 // Saudi Court Types
 export type CourtType =
@@ -116,6 +125,8 @@ export interface TimeTracking {
   estimatedMinutes?: number
   actualMinutes?: number
   sessions: TimeSession[]
+  isTracking?: boolean // Is timer currently running
+  currentSessionStart?: string // Start time of current session
 }
 
 export interface TimeSession {
@@ -123,8 +134,9 @@ export interface TimeSession {
   startedAt: string
   endedAt?: string
   duration?: number // in minutes
-  userId: string
+  userId?: string
   notes?: string
+  isBillable?: boolean
 }
 
 export interface RecurringConfig {
@@ -232,7 +244,31 @@ export interface Comment {
 
 export interface TaskHistory {
   _id?: string
-  action: 'created' | 'updated' | 'status_changed' | 'assigned' | 'completed' | 'reopened' | 'commented' | 'attachment_added'
+  action:
+    | 'created'
+    | 'updated'
+    | 'status_changed'
+    | 'assigned'
+    | 'completed'
+    | 'reopened'
+    | 'commented'
+    | 'attachment_added'
+    | 'attachment_removed'
+    | 'subtask_added'
+    | 'subtask_completed'
+    | 'subtask_uncompleted'
+    | 'subtask_deleted'
+    | 'dependency_added'
+    | 'dependency_removed'
+    | 'created_from_template'
+    | 'archived'
+    | 'unarchived'
+    | 'cloned'
+    | 'reordered'
+    | 'rescheduled'
+    | 'timer_paused'
+    | 'timer_resumed'
+    | 'time_reset'
   userId: string
   userName?: string
   timestamp: string
@@ -456,6 +492,28 @@ export interface Task {
   actualMinutes?: number
   progress?: number // 0-100 calculated from subtasks
   notes?: string // Max 5000 chars
+  // Multi-tenancy
+  firmId?: string
+  lawyerId?: string
+  // Archive
+  isArchived?: boolean
+  archivedAt?: string
+  archivedBy?: string
+  // Sort Order (for drag & drop)
+  sortOrder?: number
+  // Location & Location Trigger
+  location?: {
+    name?: string
+    address?: string
+    latitude?: number
+    longitude?: number
+  }
+  locationTrigger?: {
+    enabled: boolean
+    type: 'arrive' | 'leave' | 'nearby'
+    radius: number
+    triggered: boolean
+  }
   // Timestamps
   createdAt: string
   updatedAt: string
@@ -886,6 +944,7 @@ const tasksService = {
   /**
    * Start time tracking session
    * Note: Backend API uses /time-tracking/start, but trying /timer/start first for compatibility
+   * BREAKING CHANGE: Returns 400 if task status is 'done' or 'canceled'
    */
   startTimeTracking: async (taskId: string): Promise<Task> => {
     try {
@@ -893,12 +952,29 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/timer/start`)
       return response.data.task || response.data.data
     } catch (error: any) {
+      // Handle completed/canceled task error (new backend behavior)
+      if (error?.response?.status === 400) {
+        throw new Error(
+          bilingualError(
+            'Cannot start timer on completed or canceled task. Reopen the task first.',
+            'لا يمكن بدء المؤقت على مهمة مكتملة أو ملغاة. أعد فتح المهمة أولاً.'
+          )
+        )
+      }
       // If that fails, try the documented endpoint
       if (error?.response?.status === 404) {
         try {
           const response = await apiClient.post(`/tasks/${taskId}/time-tracking/start`)
           return response.data.task || response.data.data
         } catch (fallbackError: any) {
+          if (fallbackError?.response?.status === 400) {
+            throw new Error(
+              bilingualError(
+                'Cannot start timer on completed or canceled task. Reopen the task first.',
+                'لا يمكن بدء المؤقت على مهمة مكتملة أو ملغاة. أعد فتح المهمة أولاً.'
+              )
+            )
+          }
           const errorMsg = handleApiError(fallbackError)
           throw new Error(
             bilingualError(
@@ -956,6 +1032,7 @@ const tasksService = {
   /**
    * Add manual time entry
    * Note: Backend API uses /time-tracking/manual, but trying /time first for compatibility
+   * BREAKING CHANGE: Returns 400 if task status is 'done' or 'canceled'
    */
   addTimeEntry: async (taskId: string, data: { minutes: number; date: string; notes?: string }): Promise<Task> => {
     try {
@@ -963,12 +1040,29 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/time`, data)
       return response.data.task || response.data.data
     } catch (error: any) {
+      // Handle completed/canceled task error (new backend behavior)
+      if (error?.response?.status === 400) {
+        throw new Error(
+          bilingualError(
+            'Cannot add time to completed or canceled task. Reopen the task first.',
+            'لا يمكن إضافة وقت إلى مهمة مكتملة أو ملغاة. أعد فتح المهمة أولاً.'
+          )
+        )
+      }
       // If that fails, try the documented endpoint
       if (error?.response?.status === 404) {
         try {
           const response = await apiClient.post(`/tasks/${taskId}/time-tracking/manual`, data)
           return response.data.task || response.data.data
         } catch (fallbackError: any) {
+          if (fallbackError?.response?.status === 400) {
+            throw new Error(
+              bilingualError(
+                'Cannot add time to completed or canceled task. Reopen the task first.',
+                'لا يمكن إضافة وقت إلى مهمة مكتملة أو ملغاة. أعد فتح المهمة أولاً.'
+              )
+            )
+          }
           const errorMsg = handleApiError(fallbackError)
           throw new Error(
             bilingualError(
@@ -1018,6 +1112,37 @@ const tasksService = {
         bilingualError(
           `Failed to get time tracking summary: ${errorMsg}`,
           `فشل في الحصول على ملخص تتبع الوقت: ${errorMsg}`
+        )
+      )
+    }
+  },
+
+  /**
+   * Reset time tracking for a task
+   * DELETE /tasks/:id/time-tracking/reset
+   * Clears all sessions, resets actualMinutes to 0
+   * Preserves estimatedMinutes
+   * Returns 400 if timer is currently running
+   */
+  resetTimeTracking: async (taskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.delete(`/tasks/${taskId}/time-tracking/reset`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      // Handle running timer error
+      if (error?.response?.status === 400) {
+        throw new Error(
+          bilingualError(
+            'Stop the timer first before resetting time tracking',
+            'أوقف المؤقت أولاً قبل إعادة تعيين تتبع الوقت'
+          )
+        )
+      }
+      const errorMsg = handleApiError(error)
+      throw new Error(
+        bilingualError(
+          `Failed to reset time tracking: ${errorMsg}`,
+          `فشل في إعادة تعيين تتبع الوقت: ${errorMsg}`
         )
       )
     }
@@ -1689,6 +1814,16 @@ const tasksService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * ⚠️ NOTE: bulkReopenTasks does NOT exist in the backend
+   * Only single task reopen is available via POST /tasks/:id/reopen
+   * If you need to reopen multiple tasks, loop through them individually:
+   *
+   * for (const taskId of taskIds) {
+   *   await tasksService.reopenTask(taskId)
+   * }
+   */
 
   // ==================== Import/Export ====================
 

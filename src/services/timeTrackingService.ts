@@ -16,7 +16,33 @@ import { handleApiError } from '@/lib/api'
 
 // ==================== TYPES ====================
 
-export type TimeEntryStatus = 'draft' | 'submitted' | 'approved' | 'rejected' | 'changes_requested'
+// Time Type
+export type TimeType = 'billable' | 'non_billable' | 'pro_bono' | 'internal'
+
+// Bill Status
+export type BillStatus = 'draft' | 'unbilled' | 'billed' | 'written_off'
+
+// Entry Status (Full Workflow)
+// Workflow: draft → pending → submitted → changes_requested → approved → rejected → billed → locked
+export type TimeEntryStatus =
+  | 'draft'
+  | 'pending'
+  | 'submitted'
+  | 'changes_requested'
+  | 'approved'
+  | 'rejected'
+  | 'billed'
+  | 'locked'
+
+/**
+ * Requested change detail for a time entry field
+ */
+export interface RequestedChange {
+  field: string
+  currentValue: string
+  suggestedValue: string
+  note?: string
+}
 
 export interface TimeEntry {
   _id: string
@@ -33,6 +59,7 @@ export interface TimeEntry {
   taskId?: string
   taskName?: string
   taskNameAr?: string
+  activityCode?: string  // For request-changes feature
   date: string
   startTime: string
   endTime: string
@@ -54,6 +81,7 @@ export interface TimeEntry {
   changesRequestedAt?: string
   changesRequestedBy?: string
   changesRequestedReason?: string
+  requestedChanges?: RequestedChange[]  // NEW: Field-level change details
   createdAt: string
   updatedAt: string
 }
@@ -186,10 +214,22 @@ const timeTrackingService = {
    * Request changes on a time entry
    * ✅ ENDPOINT IMPLEMENTED IN BACKEND
    * POST /api/time-tracking/entries/:id/request-changes
+   *
+   * NEW: Now supports field-level change details with requestedChanges array
+   * @param entryId - Time entry ID
+   * @param reason - General reason for requesting changes
+   * @param requestedChanges - Optional array of specific field changes requested
    */
-  requestChanges: async (entryId: string, reason: string): Promise<TimeEntry> => {
+  requestChanges: async (
+    entryId: string,
+    reason: string,
+    requestedChanges?: RequestedChange[]
+  ): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.post(`/time-tracking/entries/${entryId}/request-changes`, { reason })
+      const response = await apiClient.post(`/time-tracking/entries/${entryId}/request-changes`, {
+        reason,
+        requestedChanges
+      })
       return response.data.entry || response.data
     } catch (error: any) {
       throw new Error(
