@@ -296,16 +296,26 @@ class ConsoleLogger {
 export const consoleLogger = new ConsoleLogger()
 
 // Auto-initialize in development
+// Wrapped in try-catch to prevent debug code from crashing the app
 if (typeof window !== 'undefined' && import.meta.env.DEV) {
   // Initialize on next tick to ensure DOM is ready
   setTimeout(() => {
-    consoleLogger.init()
+    try {
+      consoleLogger.init()
+    } catch (e) {
+      // Console logger initialization failed - non-critical
+      console.warn('[ConsoleLogger] Failed to initialize:', e)
+    }
   }, 0)
 }
 
 // Expose to window for easy access in browser console
 if (typeof window !== 'undefined') {
-  ;(window as any).consoleLogger = consoleLogger
+  try {
+    ;(window as any).consoleLogger = consoleLogger
+  } catch {
+    // Silently fail - debug tools are non-critical
+  }
 }
 
 export default consoleLogger

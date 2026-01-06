@@ -684,10 +684,18 @@ export const documentLogger = {
 }
 
 // Make available globally for debugging
+// Wrapped in try-catch to prevent module initialization failures from crashing the app
 if (typeof window !== 'undefined') {
-  (window as any).documentLogger = documentLogger
-  (window as any).enableDocumentDebug = enableDebugLogging
-  (window as any).disableDocumentDebug = disableDebugLogging
+  try {
+    (window as any).documentLogger = documentLogger
+    (window as any).enableDocumentDebug = enableDebugLogging
+    (window as any).disableDocumentDebug = disableDebugLogging
+  } catch (e) {
+    // Silently fail - debug tools are non-critical
+    if (import.meta.env.DEV) {
+      console.warn('[DocumentLogger] Failed to attach to window:', e)
+    }
+  }
 }
 
 export default documentLogger

@@ -457,32 +457,44 @@ export const printFailedEndpoints = () => {
 }
 
 // Expose to window for easy console access
+// Wrapped in try-catch to prevent debug code from crashing the app
 if (typeof window !== 'undefined') {
-  (window as any).apiDebug = {
-    enable: enableApiDebug,
-    disable: disableApiDebug,
-    isEnabled: isApiDebugEnabled,
-    getRecentCalls: getRecentApiCalls,
-    clearHistory: clearApiCallHistory,
-    printSummary: printApiCallSummary,
-    printFailedEndpoints,
-    getStats: getApiStats,
-    getPending: getPendingCount,
-  }
-
-  // Auto-show help on page load (debug is enabled by default)
-  setTimeout(() => {
-    if (isApiDebugEnabled()) {
-      console.log('')
-      console.log('%c🔍 API DEBUG MODE ACTIVE', 'background: #61affe; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 14px')
-      console.log('%cEvery API call shows timing and source location.', 'color: #888;')
-      console.log('')
-      console.log('%cCommands:', 'font-weight: bold;')
-      console.log('  apiDebug.printSummary()  - Show all calls with timing stats')
-      console.log('  apiDebug.getStats()      - Get { totalCalls, avgDuration, slowCalls, ... }')
-      console.log('  apiDebug.getPending()    - Count of in-flight requests')
-      console.log('  apiDebug.disable()       - Turn off debug mode')
-      console.log('')
+  try {
+    (window as any).apiDebug = {
+      enable: enableApiDebug,
+      disable: disableApiDebug,
+      isEnabled: isApiDebugEnabled,
+      getRecentCalls: getRecentApiCalls,
+      clearHistory: clearApiCallHistory,
+      printSummary: printApiCallSummary,
+      printFailedEndpoints,
+      getStats: getApiStats,
+      getPending: getPendingCount,
     }
-  }, 1000)
+
+    // Auto-show help on page load (debug is enabled by default)
+    setTimeout(() => {
+      try {
+        if (isApiDebugEnabled()) {
+          console.log('')
+          console.log('%c🔍 API DEBUG MODE ACTIVE', 'background: #61affe; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 14px')
+          console.log('%cEvery API call shows timing and source location.', 'color: #888;')
+          console.log('')
+          console.log('%cCommands:', 'font-weight: bold;')
+          console.log('  apiDebug.printSummary()  - Show all calls with timing stats')
+          console.log('  apiDebug.getStats()      - Get { totalCalls, avgDuration, slowCalls, ... }')
+          console.log('  apiDebug.getPending()    - Count of in-flight requests')
+          console.log('  apiDebug.disable()       - Turn off debug mode')
+          console.log('')
+        }
+      } catch {
+        // Ignore console errors
+      }
+    }, 1000)
+  } catch (e) {
+    // Debug initialization failed - non-critical
+    if (import.meta.env.DEV) {
+      console.warn('[ApiDebug] Failed to initialize:', e)
+    }
+  }
 }
