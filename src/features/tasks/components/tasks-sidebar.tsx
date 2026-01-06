@@ -142,7 +142,27 @@ export function TasksSidebar({
             }
 
             // Handle shortcuts based on view mode
-            if (taskId) {
+            if (mode === 'create') {
+                // Create Page shortcuts
+                switch (e.key.toLowerCase()) {
+                    case 'n':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.create })
+                        break
+                    case 'c':
+                        e.preventDefault()
+                        onClearForm?.()
+                        break
+                    case 'd':
+                        e.preventDefault()
+                        navigate({ to: currentLinks.viewAll })
+                        break
+                    case 's':
+                        e.preventDefault()
+                        onSaveForm?.()
+                        break
+                }
+            } else if (taskId) {
                 // Task Details View shortcuts
                 switch (e.key.toLowerCase()) {
                     case 'c':
@@ -211,7 +231,7 @@ export function TasksSidebar({
 
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
-    }, [taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkUnarchive, onBulkComplete, onSelectAll, isViewingArchived, totalTaskCount])
+    }, [mode, taskId, currentLinks, navigate, onCompleteTask, onDeleteTask, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkUnarchive, onBulkComplete, onSelectAll, isViewingArchived, totalTaskCount, onClearForm, onSaveForm])
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -364,14 +384,14 @@ export function TasksSidebar({
                                 </span>
                             </button>
 
-                            {/* Cancel Button - Same style as Delete */}
+                            {/* Cancel Button - Same grey style as Delete had */}
                             <Link
                                 to={currentLinks.viewAll}
-                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                                className="bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
                             >
                                 <Trash2 className="h-7 w-7" aria-hidden="true" />
                                 <span className="flex items-center gap-1.5 text-sm font-bold">
-                                    <kbd className="text-[10px] font-mono bg-red-100 text-red-500 px-1.5 py-0.5 rounded">D</kbd>
+                                    <kbd className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">D</kbd>
                                     إلغاء
                                 </span>
                             </Link>
