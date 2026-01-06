@@ -71,10 +71,9 @@ function LockScreen({ title, message, showRequestAccess, redirectPath }: LockScr
   }
 
   const handleRequestAccess = () => {
-    // Could navigate to support page with context
-    // TODO: Add ROUTES.dashboard.support.requestAccess to routes constant
+    // Navigate to support page with context about requested path
     navigate({
-      to: '/dashboard/support/request-access',
+      to: ROUTES.dashboard.support.requestAccess,
       search: { requestedPath: location.pathname },
     })
   }
@@ -179,13 +178,38 @@ export function PageAccessGuard({
     return fallback ? <>{fallback}</> : <PageAccessSkeleton />
   }
 
-  // Handle error - allow access by default on error to avoid blocking users
+  // SECURITY: Fail closed on error - deny access when we can't verify permissions
+  // This prevents unauthorized access if the permission service is down
   if (error) {
     if (import.meta.env.DEV) {
       console.warn('[PageAccessGuard] Access check failed:', error)
     }
-    // Return children on error to avoid blocking legitimate users
-    return <>{children}</>
+    // Show error state with retry option
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
+        <div className="text-center max-w-md">
+          <div className="mb-4 text-red-500">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            {i18n.language === 'ar' ? 'تعذر التحقق من الصلاحيات' : 'Unable to verify permissions'}
+          </h3>
+          <p className="text-slate-500 mb-4">
+            {i18n.language === 'ar'
+              ? 'حدث خطأ أثناء التحقق من صلاحيات الوصول. يرجى المحاولة مرة أخرى.'
+              : 'An error occurred while checking access permissions. Please try again.'}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+          >
+            {i18n.language === 'ar' ? 'إعادة المحاولة' : 'Retry'}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Access granted

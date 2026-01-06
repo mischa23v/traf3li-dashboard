@@ -145,9 +145,8 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
 
   const decoded = decodeJWTForDebug(accessToken)
   if (!decoded.valid) {
-    tokenWarn(`Request with INVALID token: ${method.toUpperCase()} ${url}`, {
-      tokenPreview: accessToken.substring(0, 30) + '...',
-    })
+    // SECURITY: Don't log token preview in production - could leak tokens to logs
+    tokenWarn(`Request with INVALID token: ${method.toUpperCase()} ${url}`)
     return
   }
 
@@ -155,8 +154,8 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
   const exp = decoded.payload.exp
   const expiresIn = exp ? Math.round((exp - now) / 60) : 0
 
+  // SECURITY: Only log non-sensitive metadata, never token content
   tokenLog(`Request with token: ${method.toUpperCase()} ${url}`, {
-    tokenPreview: accessToken.substring(0, 20) + '...' + accessToken.substring(accessToken.length - 10),
     userId: decoded.payload.userId || decoded.payload.sub,
     isExpired: decoded.isExpired,
     expiresIn: `${expiresIn} minutes`,
@@ -546,13 +545,11 @@ let cachedCsrfToken: string | null = null
  */
 const getCsrfToken = (): string => {
   const cookies = document.cookie
-  console.log('[CSRF] getCsrfToken called. Document cookies:', cookies ? cookies.substring(0, 100) + '...' : '(empty)')
 
   // Try cookie first (primary method) - backend uses 'csrfToken' cookie name
   const match = cookies.match(/csrfToken=([^;]+)/)
   if (match && match[1]) {
     cachedCsrfToken = match[1] // Cache it
-    console.log('[CSRF] Found csrfToken cookie:', match[1].substring(0, 20) + '...')
     return match[1]
   }
 
@@ -560,7 +557,6 @@ const getCsrfToken = (): string => {
   const csrfDashMatch = cookies.match(/csrf-token=([^;]+)/)
   if (csrfDashMatch && csrfDashMatch[1]) {
     cachedCsrfToken = csrfDashMatch[1]
-    console.log('[CSRF] Found csrf-token cookie:', csrfDashMatch[1].substring(0, 20) + '...')
     return csrfDashMatch[1]
   }
 
@@ -568,23 +564,19 @@ const getCsrfToken = (): string => {
   const xsrfMatch = cookies.match(/XSRF-TOKEN=([^;]+)/)
   if (xsrfMatch && xsrfMatch[1]) {
     cachedCsrfToken = xsrfMatch[1]
-    console.log('[CSRF] Found XSRF-TOKEN cookie:', xsrfMatch[1].substring(0, 20) + '...')
     return xsrfMatch[1]
   }
 
   // Fallback to cached token from response headers
   if (cachedCsrfToken) {
-    console.log('[CSRF] Using cached token from response headers:', cachedCsrfToken.substring(0, 20) + '...')
     return cachedCsrfToken
   }
 
-  // Always log when no token found (important for debugging)
-  const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
-  console.warn('[CSRF] ⚠️ No csrf-token found!', {
-    availableCookies,
-    cachedToken: cachedCsrfToken ? 'exists' : 'none',
-    documentCookieLength: cookies?.length || 0,
-  })
+  // Log warning once when no token found (for debugging, no sensitive data)
+  if (import.meta.env.DEV) {
+    const availableCookies = cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).filter(Boolean) : []
+    console.warn('[CSRF] No csrf-token found. Available cookies:', availableCookies.join(', '))
+  }
 
   return ''
 }
@@ -606,9 +598,6 @@ export const updateCsrfTokenFromResponse = (token: string) => {
  * Backend endpoint: GET /api/auth/csrf
  */
 export const refreshCsrfToken = async (): Promise<string | null> => {
-  console.log('[CSRF] Refreshing token from backend...')
-  console.log('[CSRF] Request URL:', `${API_BASE_URL_NO_VERSION}/auth/csrf`)
-
   try {
     // Use a separate axios instance to avoid circular interceptor issues
     const response = await axios.get(
@@ -622,37 +611,28 @@ export const refreshCsrfToken = async (): Promise<string | null> => {
       }
     )
 
-    console.log('[CSRF] Refresh response:', {
-      status: response.status,
-      hasBodyToken: !!response.data?.csrfToken,
-      hasHeaderToken: !!response.headers['x-csrf-token'],
-      setCookieHeader: response.headers['set-cookie'] ? 'present' : 'absent',
-    })
-
     // Token is set in cookie automatically by backend
     // Also capture from response body/header as fallback
     const token = response.data?.csrfToken || response.headers['x-csrf-token']
     if (token) {
       cachedCsrfToken = token
-      console.log('[CSRF] ✅ Token refreshed successfully from response:', token.substring(0, 20) + '...')
       return token
     }
 
     // Try reading from cookie after the request
     const cookieToken = getCsrfToken()
     if (cookieToken) {
-      console.log('[CSRF] ✅ Token available from cookie after refresh')
       return cookieToken
     }
 
-    console.warn('[CSRF] ⚠️ Token refresh completed but no token found in response or cookies')
+    if (import.meta.env.DEV) {
+      console.warn('[CSRF] Token refresh completed but no token found')
+    }
     return null
   } catch (error: any) {
-    console.error('[CSRF] ❌ Token refresh failed:', {
-      message: error?.message,
-      status: error?.response?.status,
-      data: error?.response?.data,
-    })
+    if (import.meta.env.DEV) {
+      console.error('[CSRF] Token refresh failed:', error?.message)
+    }
     return null
   }
 }
@@ -910,43 +890,22 @@ apiClientNoVersion.interceptors.response.use(
       ;(error as any).retryAfter = retryAfter
     }
 
-    // Handle 401 with detailed token logging for debugging
+    // Handle 401 with minimal logging (no sensitive token data)
     if (error.response?.status === 401) {
       const currentToken = getAccessToken()
-      const authHeader = originalRequest?.headers?.get?.('Authorization') || originalRequest?.headers?.Authorization
 
-      console.error('[TOKEN] ❌ 401 UNAUTHORIZED - Full Debug Info:', {
-        endpoint: `${method.toUpperCase()} ${url}`,
-        errorMessage: error.response?.data?.message || error.response?.data?.error?.message,
-        errorCode: error.response?.data?.code || error.response?.data?.error?.code,
-        // Token info
-        hasAccessToken: !!currentToken,
-        accessTokenLength: currentToken?.length,
-        accessTokenPreview: currentToken ? currentToken.substring(0, 30) + '...' : 'NO TOKEN',
-        // Auth header info
-        authHeaderSent: !!authHeader,
-        authHeaderValue: authHeader ? String(authHeader).substring(0, 40) + '...' : 'NO HEADER',
-        // Decoded token info
-        tokenDecoded: currentToken ? (() => {
-          const decoded = decodeJWTForDebug(currentToken)
-          if (!decoded.valid) return { valid: false }
-          return {
-            valid: true,
-            userId: decoded.payload.userId || decoded.payload.sub,
-            email: decoded.payload.email,
-            exp: decoded.payload.exp ? new Date(decoded.payload.exp * 1000).toISOString() : 'N/A',
-            isExpired: decoded.isExpired,
-          }
-        })() : null,
-        // Response details
-        responseData: error.response?.data,
-        responseHeaders: Object.fromEntries(
-          Object.entries(error.response?.headers || {}).filter(([k]) =>
-            ['content-type', 'x-request-id', 'www-authenticate'].includes(k.toLowerCase())
-          )
-        ),
-        timestamp: new Date().toISOString(),
-      })
+      // SECURITY: Only log non-sensitive debug info in development
+      if (import.meta.env.DEV) {
+        const decoded = currentToken ? decodeJWTForDebug(currentToken) : null
+        console.error('[AUTH] 401 Unauthorized:', {
+          endpoint: `${method.toUpperCase()} ${url}`,
+          errorCode: error.response?.data?.code || error.response?.data?.error?.code,
+          hasToken: !!currentToken,
+          tokenValid: decoded?.valid ?? false,
+          tokenExpired: decoded?.isExpired ?? true,
+          userId: decoded?.payload?.userId || decoded?.payload?.sub || 'unknown',
+        })
+      }
     }
 
     // DON'T auto-redirect on 401 for auth routes
@@ -1498,10 +1457,11 @@ apiClient.interceptors.response.use(
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
-            console.log('[CSRF] Retrying request with fresh token')
             return apiClient(originalRequest)
           } catch (csrfError) {
-            console.error('[CSRF] Token refresh failed, redirecting to login:', csrfError)
+            if (import.meta.env.DEV) {
+              console.error('[CSRF] Token refresh failed:', csrfError)
+            }
             // If refresh fails, redirect to login
             import('sonner').then(({ toast }) => {
               toast.error('انتهت صلاحية الجلسة | Session expired', {

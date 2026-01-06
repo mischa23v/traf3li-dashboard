@@ -1054,6 +1054,7 @@ export const ROUTES = {
       list: '/dashboard/support',
       create: '/dashboard/support/create',
       settings: '/dashboard/support/settings',
+      requestAccess: '/dashboard/support/request-access',
       detail: (ticketId: string) => `/dashboard/support/${ticketId}`,
 
       // SLA (Service Level Agreement)

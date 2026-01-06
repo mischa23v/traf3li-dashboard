@@ -7,6 +7,8 @@
  * - See messageService.ts for full endpoint documentation
  */
 
+import DOMPurify from 'dompurify'
+
 // ═══════════════════════════════════════════════════════════════
 // MESSAGE TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════
@@ -302,17 +304,55 @@ export function parseMentions(body: string): ParsedMention[] {
 
 /**
  * Convert mention syntax to HTML for display
+ * SECURITY: Sanitizes input to prevent XSS attacks
  *
  * @param body - Message body with mention syntax
- * @returns HTML string with mentions rendered as spans
+ * @returns Sanitized HTML string with mentions rendered as spans
  *
  * @example
  * renderMentions("Hey @[John](user:123)")
  * // Returns: "Hey <span class="mention" data-user-id="123">@John</span>"
  */
 export function renderMentions(body: string): string {
-  return body.replace(
-    MENTION_REGEX,
-    '<span class="mention" data-user-id="$2">@$1</span>'
-  )
+  // First, escape any potentially dangerous HTML in the body
+  // We need to preserve our mention syntax, so we:
+  // 1. Extract mentions first
+  // 2. Sanitize the body
+  // 3. Re-apply mention formatting
+
+  const mentions: Array<{ original: string; displayName: string; userId: string }> = []
+  let match: RegExpExecArray | null
+
+  // Reset regex state and extract all mentions
+  const mentionRegex = new RegExp(MENTION_REGEX.source, 'g')
+  while ((match = mentionRegex.exec(body)) !== null) {
+    mentions.push({
+      original: match[0],
+      displayName: match[1],
+      userId: match[2],
+    })
+  }
+
+  // Sanitize the entire body first (this will escape any malicious HTML)
+  let sanitizedBody = DOMPurify.sanitize(body, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'br', 'p', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: ['href', 'target', 'rel'],
+  })
+
+  // Now safely replace mention syntax with styled spans
+  // The display names are already sanitized by DOMPurify
+  mentions.forEach(({ original, displayName, userId }) => {
+    // Escape the original for use in regex
+    const escapedOriginal = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    // Sanitize the display name and userId to be safe
+    const safeDisplayName = DOMPurify.sanitize(displayName, { ALLOWED_TAGS: [] })
+    const safeUserId = DOMPurify.sanitize(userId, { ALLOWED_TAGS: [] })
+
+    sanitizedBody = sanitizedBody.replace(
+      new RegExp(escapedOriginal, 'g'),
+      `<span class="mention" data-user-id="${safeUserId}">@${safeDisplayName}</span>`
+    )
+  })
+
+  return sanitizedBody
 }

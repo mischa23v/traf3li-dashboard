@@ -22,6 +22,7 @@ import {
 import { ROUTES } from '@/constants/routes';
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthFooter } from '@/components/auth/auth-footer';
+import { validateRedirectUrl } from '@/lib/security-headers';
 
 // ============================================
 // SVG ICONS
@@ -241,8 +242,9 @@ export function SignIn() {
       const currentUser = useAuthStore.getState().user;
 
       // Navigate to redirect URL or dashboard
-      // No firm check needed - lawyers without firm are treated as solo lawyers
-      const redirectTo = (search as any).redirect || '/';
+      // SECURITY: Validate redirect URL to prevent open redirect attacks
+      const rawRedirect = (search as { redirect?: string }).redirect;
+      const redirectTo = validateRedirectUrl(rawRedirect, { defaultUrl: '/' });
 
       // Check if MFA verification is required
       if (currentUser?.mfaEnabled || currentUser?.mfaPending) {
