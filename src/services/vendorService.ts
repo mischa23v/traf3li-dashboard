@@ -6,49 +6,88 @@
 import apiClient, { handleApiError } from '@/lib/api'
 
 /**
+ * Country Code
+ */
+export type CountryCode = 'SA' | 'AE' | 'US' | 'GB' | string
+
+/**
+ * Currency Type
+ */
+export type Currency = 'SAR' | 'USD' | 'EUR' | 'GBP' | 'AED' | string
+
+/**
  * Vendor Interface
+ * Matches contract: contract2/types/operations.ts
  */
 export interface Vendor {
   _id: string
   name: string
+  nameAr?: string
   email?: string
   phone?: string
+  taxNumber?: string
   address?: string
   city?: string
-  country?: string
-  taxNumber?: string
-  accountNumber?: string
+  country?: CountryCode
+  postalCode?: string
   bankName?: string
+  bankAccountNumber?: string
+  bankIban?: string
+  currency?: Currency
+  paymentTerms?: number // Days, 0-365
+  defaultCategory?: string
+  website?: string
   contactPerson?: string
   notes?: string
-  status: 'active' | 'inactive'
+  creditLimit?: number
+  openingBalance?: number
+  openingBalanceDate?: string
+  defaultExpenseAccountId?: string
+  payableAccountId?: string
+  lawyerId?: string
+  firmId?: string
+  isActive: boolean
   createdAt: string
   updatedAt: string
 }
 
 /**
  * Create Vendor Data
+ * Matches contract: contract2/types/operations.ts - CreateVendorRequest
  */
 export interface CreateVendorData {
   name: string
+  nameAr?: string
   email?: string
   phone?: string
+  taxNumber?: string
   address?: string
   city?: string
-  country?: string
-  taxNumber?: string
-  accountNumber?: string
+  country?: CountryCode
+  postalCode?: string
   bankName?: string
+  bankAccountNumber?: string
+  bankIban?: string
+  currency?: Currency
+  paymentTerms?: number
+  defaultCategory?: string
+  website?: string
   contactPerson?: string
   notes?: string
-  status?: 'active' | 'inactive'
+  creditLimit?: number
+  openingBalance?: number
+  openingBalanceDate?: string
+  defaultExpenseAccountId?: string
+  payableAccountId?: string
 }
 
 /**
  * Vendor Filters
+ * Matches contract: contract2/types/operations.ts - GetVendorsQuery
  */
 export interface VendorFilters {
-  status?: string
+  isActive?: 'true' | 'false'
+  country?: CountryCode
   search?: string
   page?: number
   limit?: number
@@ -56,13 +95,24 @@ export interface VendorFilters {
 
 /**
  * Vendor Summary
+ * Matches contract: contract2/types/operations.ts - VendorSummary
  */
 export interface VendorSummary {
   vendor: Vendor
-  totalPurchases: number
+  totalBills: number
+  totalAmount: number
   totalPaid: number
-  outstandingBalance: number
-  recentTransactions: any[]
+  totalDue: number
+  overdueBills: number
+  overdueAmount: number
+  recentBills: Array<{
+    _id: string
+    billNumber: string
+    billDate: string
+    dueDate: string
+    totalAmount: number
+    status: string
+  }>
 }
 
 /**
@@ -72,11 +122,15 @@ const vendorService = {
   /**
    * Get all vendors
    * GET /api/vendors
+   * Matches contract: contract2/types/operations.ts - GetVendorsResponse
    */
-  getVendors: async (filters?: VendorFilters): Promise<{ data: Vendor[]; pagination: any }> => {
+  getVendors: async (filters?: VendorFilters): Promise<{ vendors: Vendor[]; total: number }> => {
     try {
       const response = await apiClient.get('/vendors', { params: filters })
-      return response.data
+      return {
+        vendors: response.data.vendors || response.data.data || [],
+        total: response.data.total || response.data.vendors?.length || 0,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -136,11 +190,12 @@ const vendorService = {
   /**
    * Get vendor summary
    * GET /api/vendors/:id/summary
+   * Matches contract: contract2/types/operations.ts - GetVendorSummaryResponse
    */
   getVendorSummary: async (id: string): Promise<VendorSummary> => {
     try {
       const response = await apiClient.get(`/vendors/${id}/summary`)
-      return response.data.data || response.data
+      return response.data.summary || response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
