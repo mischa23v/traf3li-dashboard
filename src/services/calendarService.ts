@@ -114,14 +114,15 @@ export interface GridItem {
   priority?: string
   color: string
   // Appointment-specific fields (when type is 'appointment')
+  // Types aligned with contract2/types/integrations.ts
   clientName?: string
   clientEmail?: string
   clientPhone?: string
   startTime?: string
   endTime?: string
-  appointmentType?: 'consultation' | 'follow_up' | 'case_review' | 'initial_meeting' | 'other'
-  appointmentStatus?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show'
-  locationType?: 'in_person' | 'video' | 'phone'
+  appointmentType?: 'consultation' | 'follow_up' | 'case_review' | 'initial_meeting' | 'court_preparation' | 'document_review'
+  appointmentStatus?: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'no_show'
+  locationType?: 'office' | 'virtual' | 'phone' | 'client'
   location?: string
   notes?: string
   subject?: string

@@ -94,19 +94,34 @@ export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6
 export type AppointmentDuration = 15 | 30 | 45 | 60 | 90 | 120
 
 /**
- * Appointment type
+ * Appointment type - matches contract integrations.ts AppointmentType
  */
-export type AppointmentType = 'consultation' | 'follow_up' | 'case_review' | 'initial_meeting' | 'other'
+export type AppointmentType =
+  | 'consultation'      // Contract: Consultation
+  | 'follow_up'         // Contract: FollowUp
+  | 'case_review'       // Contract: CaseReview
+  | 'initial_meeting'   // Contract: InitialMeeting
+  | 'court_preparation' // Contract: CourtPreparation
+  | 'document_review'   // Contract: DocumentReview
 
 /**
- * Appointment status
+ * Appointment status - matches contract integrations.ts AppointmentStatus
  */
-export type AppointmentStatus = 'pending' | 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
+export type AppointmentStatus =
+  | 'scheduled'   // Contract: Scheduled
+  | 'confirmed'   // Contract: Confirmed
+  | 'completed'   // Contract: Completed
+  | 'cancelled'   // Contract: Cancelled
+  | 'no_show'     // Contract: NoShow
 
 /**
- * Booking source
+ * Booking source - matches contract integrations.ts AppointmentSource
  */
-export type BookingSource = 'marketplace' | 'manual' | 'client_dashboard' | 'website'
+export type BookingSource =
+  | 'manual'  // Contract: Manual
+  | 'public'  // Contract: Public
+  | 'import'  // Contract: Import
+  | 'api'     // Contract: API
 
 /**
  * Availability Slot - Recurring weekly schedule
@@ -285,14 +300,22 @@ export interface CreateBlockedTimeRequest {
 }
 
 /**
- * Location type for appointments
+ * Location type for appointments - matches contract integrations.ts AppointmentLocationType
  * نوع الموقع للمواعيد
  *
- * Frontend sends: 'video', 'in-person', 'phone'
- * Backend stores: 'virtual', 'office', 'phone', 'client_site', 'other'
- * Backend middleware auto-converts: video → virtual, in-person → office
+ * Contract types: 'office' | 'virtual' | 'phone' | 'client'
+ * Frontend aliases: 'video' → 'virtual', 'in-person' → 'office', 'client_site' → 'client'
  */
-export type LocationType = 'video' | 'virtual' | 'in-person' | 'office' | 'phone' | 'client_site' | 'other'
+export type LocationType =
+  | 'office'   // Contract: Office
+  | 'virtual'  // Contract: Virtual
+  | 'phone'    // Contract: Phone
+  | 'client'   // Contract: Client
+  // Legacy aliases for backwards compatibility
+  | 'video'       // Maps to 'virtual'
+  | 'in-person'   // Maps to 'office'
+  | 'client_site' // Maps to 'client'
+  | 'other'
 
 export interface BookAppointmentRequest {
   date: string
