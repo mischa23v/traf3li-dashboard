@@ -23,7 +23,6 @@ import type {
   TaskAttachment,
   VoiceMemo,
 } from '@/types/file-storage'
-import { URL_EXPIRY } from '@/types/file-storage'
 import { validateFile, type FileCategory } from '@/lib/file-validation'
 import {
   parseFileError,
@@ -32,6 +31,7 @@ import {
   UploadFailedError,
   retryFileOperation,
 } from '@/lib/file-error-handling'
+import { documentLogger } from '@/lib/document-debug-logger'
 
 // ============================================
 // TYPES
@@ -93,17 +93,23 @@ export async function uploadToR2(
   options: UploadOptions = {}
 ): Promise<UploadResult> {
   const { onProgress, signal, category = 'all', skipValidation = false } = options
+  const startTime = Date.now()
 
   // Client-side validation (defense in depth)
   if (!skipValidation) {
+    documentLogger.validationStart(file, category)
     const validation = validateFile(file, category)
     if (!validation.valid) {
+      documentLogger.validationError(file, validation.error?.code || 'UNKNOWN', validation.error?.message || 'Validation failed')
       throw new UploadFailedError({
         code: validation.error?.code,
         message: validation.error?.message,
       })
     }
+    documentLogger.validationSuccess(file.name)
   }
+
+  documentLogger.r2UploadStart(uploadUrl, file.size)
 
   try {
     // Use XMLHttpRequest for progress tracking
@@ -111,32 +117,39 @@ export async function uploadToR2(
       const xhr = new XMLHttpRequest()
 
       // Progress tracking
-      if (onProgress) {
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100)
-            onProgress(percent)
-          }
-        })
-      }
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100)
+          documentLogger.uploadProgress(file.name, percent)
+          if (onProgress) onProgress(percent)
+        }
+      })
 
       // Success handler
       xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
+          const duration = Date.now() - startTime
+          documentLogger.uploadSuccess({ name: file.name, size: file.size }, 'r2-direct', duration)
           resolve({ success: true, fileKey: '' }) // fileKey comes from initial request
         } else {
-          reject(new UploadFailedError({ status: xhr.status, response: xhr.responseText }))
+          const error = new UploadFailedError({ status: xhr.status, response: xhr.responseText })
+          documentLogger.uploadError(file, error, 'r2')
+          reject(error)
         }
       })
 
       // Error handler
       xhr.addEventListener('error', () => {
-        reject(new UploadFailedError({ status: xhr.status }))
+        const error = new UploadFailedError({ status: xhr.status })
+        documentLogger.uploadError(file, error, 'r2')
+        reject(error)
       })
 
       // Abort handler
       xhr.addEventListener('abort', () => {
-        reject(new Error('Upload cancelled'))
+        const error = new Error('Upload cancelled')
+        documentLogger.uploadError(file, error, 'r2')
+        reject(error)
       })
 
       // Handle abort signal
@@ -152,6 +165,7 @@ export async function uploadToR2(
       xhr.send(file)
     })
   } catch (error) {
+    documentLogger.uploadError(file, error as Error, 'r2')
     throw parseFileError(error)
   }
 }
@@ -206,47 +220,75 @@ export async function uploadCaseDocument(
   options: PresignedUploadOptions = {}
 ): Promise<CaseDocument> {
   const { onProgress, documentCategory = 'other', description } = options
+  const startTime = Date.now()
 
-  // Step 1: Get presigned URL
-  const { data: uploadData } = await apiClient.post<UploadUrlResponse>(
-    `/cases/${caseId}/documents/upload-url`,
-    {
+  documentLogger.uploadStart(file, { caseId, category: documentCategory })
+
+  try {
+    // Step 1: Get presigned URL
+    documentLogger.presignedUrlRequest(`/cases/${caseId}/documents/upload-url`, {
       filename: file.name,
       contentType: file.type,
       fileSize: file.size,
       category: documentCategory,
+    })
+
+    const { data: uploadData } = await apiClient.post<UploadUrlResponse>(
+      `/cases/${caseId}/documents/upload-url`,
+      {
+        filename: file.name,
+        contentType: file.type,
+        fileSize: file.size,
+        category: documentCategory,
+      }
+    )
+
+    if (!uploadData.success || !uploadData.uploadUrl) {
+      const error = new UploadFailedError({ step: 'getUploadUrl' })
+      documentLogger.presignedUrlError(error, { caseId })
+      throw error
     }
-  )
 
-  if (!uploadData.success || !uploadData.uploadUrl) {
-    throw new UploadFailedError({ step: 'getUploadUrl' })
-  }
+    documentLogger.presignedUrlReceived(uploadData.fileKey, uploadData.expiresIn)
 
-  // Step 2: Upload directly to R2
-  await uploadToR2(uploadData.uploadUrl, file, {
-    onProgress: (percent) => {
-      // Report 0-90% for upload, save 90-100% for confirmation
-      if (onProgress) onProgress(Math.round(percent * 0.9))
-    },
-    category: 'documents',
-  })
+    // Step 2: Upload directly to R2
+    await uploadToR2(uploadData.uploadUrl, file, {
+      onProgress: (percent) => {
+        // Report 0-90% for upload, save 90-100% for confirmation
+        if (onProgress) onProgress(Math.round(percent * 0.9))
+      },
+      category: 'documents',
+    })
 
-  // Step 3: Confirm upload with backend
-  const { data: confirmData } = await apiClient.post(
-    `/cases/${caseId}/documents/confirm-upload`,
-    {
-      fileKey: uploadData.fileKey,
+    // Step 3: Confirm upload with backend
+    documentLogger.uploadConfirm(uploadData.fileKey, {
       filename: file.name,
-      contentType: file.type,
       size: file.size,
       category: documentCategory,
-      description,
-    }
-  )
+    })
 
-  if (onProgress) onProgress(100)
+    const { data: confirmData } = await apiClient.post(
+      `/cases/${caseId}/documents/confirm-upload`,
+      {
+        fileKey: uploadData.fileKey,
+        filename: file.name,
+        contentType: file.type,
+        size: file.size,
+        category: documentCategory,
+        description,
+      }
+    )
 
-  return confirmData.document
+    if (onProgress) onProgress(100)
+
+    const duration = Date.now() - startTime
+    documentLogger.uploadSuccess({ name: file.name, size: file.size }, confirmData.document?._id || 'unknown', duration)
+
+    return confirmData.document
+  } catch (error) {
+    documentLogger.uploadError(file, error as Error, 'presigned')
+    throw error
+  }
 }
 
 /**
@@ -257,11 +299,18 @@ export async function getCaseDocumentDownloadUrl(
   documentId: string,
   disposition: ContentDisposition = 'attachment'
 ): Promise<string> {
-  const { data } = await apiClient.get<DownloadUrlResponse>(
-    `/cases/${caseId}/documents/${documentId}/download-url`,
-    { params: { disposition } }
-  )
-  return data.downloadUrl
+  documentLogger.downloadStart(documentId, disposition)
+  try {
+    const { data } = await apiClient.get<DownloadUrlResponse>(
+      `/cases/${caseId}/documents/${documentId}/download-url`,
+      { params: { disposition } }
+    )
+    documentLogger.downloadUrlReceived(documentId, data.document?.fileName)
+    return data.downloadUrl
+  } catch (error) {
+    documentLogger.downloadError(documentId, error as Error)
+    throw error
+  }
 }
 
 /**
@@ -271,7 +320,14 @@ export async function deleteCaseDocument(
   caseId: string,
   documentId: string
 ): Promise<void> {
-  await apiClient.delete(`/cases/${caseId}/documents/${documentId}`)
+  documentLogger.deleteStart(documentId)
+  try {
+    await apiClient.delete(`/cases/${caseId}/documents/${documentId}`)
+    documentLogger.deleteSuccess(documentId)
+  } catch (error) {
+    documentLogger.deleteError(documentId, error as Error)
+    throw error
+  }
 }
 
 // ============================================
@@ -293,22 +349,30 @@ export async function uploadTaskAttachment(
   options: UploadOptions = {}
 ): Promise<TaskAttachment> {
   const { onProgress, signal, category = 'all', skipValidation = false } = options
+  const startTime = Date.now()
+
+  documentLogger.uploadStart(file, { taskId, category })
 
   // Client-side validation
   if (!skipValidation) {
+    documentLogger.validationStart(file, category)
     const validation = validateFile(file, category)
     if (!validation.valid) {
+      documentLogger.validationError(file, validation.error?.code || 'UNKNOWN', validation.error?.message || 'Validation failed')
       throw new UploadFailedError({
         code: validation.error?.code,
         message: validation.error?.message,
       })
     }
+    documentLogger.validationSuccess(file.name)
   }
 
   const formData = new FormData()
   formData.append('file', file)
 
   try {
+    documentLogger.apiRequest('POST', `/tasks/${taskId}/attachments`, { fileName: file.name, fileSize: file.size })
+
     const { data } = await apiClient.post(
       `/tasks/${taskId}/attachments`,
       formData,
@@ -316,17 +380,32 @@ export async function uploadTaskAttachment(
         headers: { 'Content-Type': 'multipart/form-data' },
         signal,
         onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
+          if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            onProgress(percent)
+            documentLogger.uploadProgress(file.name, percent)
+            if (onProgress) onProgress(percent)
           }
         },
       }
     )
 
+    const duration = Date.now() - startTime
+    documentLogger.uploadSuccess({ name: file.name, size: file.size }, data.attachment?._id || 'unknown', duration)
+
     return data.attachment
   } catch (error) {
-    throw parseFileError(error)
+    const parsedError = parseFileError(error)
+
+    // Log malware detection specifically
+    if (parsedError instanceof MalwareDetectedError) {
+      documentLogger.malwareDetected(file.name, parsedError.virus)
+    } else if (parsedError instanceof ScanFailedError) {
+      documentLogger.scanFailed(file.name, parsedError)
+    } else {
+      documentLogger.uploadError(file, parsedError, 'confirm')
+    }
+
+    throw parsedError
   }
 }
 
@@ -339,14 +418,23 @@ export async function getTaskAttachmentDownloadUrl(
   disposition: ContentDisposition = 'attachment',
   versionId?: string
 ): Promise<string> {
-  const params: Record<string, string> = { disposition }
-  if (versionId) params.versionId = versionId
+  documentLogger.downloadStart(attachmentId, disposition)
 
-  const { data } = await apiClient.get<DownloadUrlResponse>(
-    `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
-    { params }
-  )
-  return data.downloadUrl
+  try {
+    const params: Record<string, string> = { disposition }
+    if (versionId) params.versionId = versionId
+
+    const { data } = await apiClient.get<DownloadUrlResponse>(
+      `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
+      { params }
+    )
+
+    documentLogger.downloadUrlReceived(attachmentId, data.attachment?.fileName)
+    return data.downloadUrl
+  } catch (error) {
+    documentLogger.downloadError(attachmentId, error as Error)
+    throw error
+  }
 }
 
 /**
@@ -356,7 +444,14 @@ export async function deleteTaskAttachment(
   taskId: string,
   attachmentId: string
 ): Promise<void> {
-  await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
+  documentLogger.deleteStart(attachmentId)
+  try {
+    await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
+    documentLogger.deleteSuccess(attachmentId)
+  } catch (error) {
+    documentLogger.deleteError(attachmentId, error as Error)
+    throw error
+  }
 }
 
 // ============================================
@@ -376,12 +471,21 @@ export async function uploadVoiceMemo(
   options: UploadOptions = {}
 ): Promise<VoiceMemo> {
   const { onProgress, signal } = options
+  const startTime = Date.now()
+  const fileName = `voice-memo-${Date.now()}.webm`
+
+  documentLogger.uploadStart(
+    { name: fileName, type: 'audio/webm', size: file.size } as File,
+    { taskId, category: 'audio' }
+  )
 
   const formData = new FormData()
-  formData.append('file', file, `voice-memo-${Date.now()}.webm`)
+  formData.append('file', file, fileName)
   formData.append('duration', String(duration))
 
   try {
+    documentLogger.apiRequest('POST', `/tasks/${taskId}/voice-memos`, { fileName, duration })
+
     const { data } = await apiClient.post(
       `/tasks/${taskId}/voice-memos`,
       formData,
@@ -389,17 +493,31 @@ export async function uploadVoiceMemo(
         headers: { 'Content-Type': 'multipart/form-data' },
         signal,
         onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
+          if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            onProgress(percent)
+            documentLogger.uploadProgress(fileName, percent)
+            if (onProgress) onProgress(percent)
           }
         },
       }
     )
 
+    const uploadDuration = Date.now() - startTime
+    documentLogger.uploadSuccess({ name: fileName, size: file.size }, data.voiceMemo?._id || 'unknown', uploadDuration)
+
     return data.voiceMemo
   } catch (error) {
-    throw parseFileError(error)
+    const parsedError = parseFileError(error)
+
+    if (parsedError instanceof MalwareDetectedError) {
+      documentLogger.malwareDetected(fileName, parsedError.virus)
+    } else if (parsedError instanceof ScanFailedError) {
+      documentLogger.scanFailed(fileName, parsedError)
+    } else {
+      documentLogger.uploadError({ name: fileName, type: 'audio/webm', size: file.size } as File, parsedError, 'confirm')
+    }
+
+    throw parsedError
   }
 }
 
