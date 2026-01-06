@@ -267,10 +267,18 @@ export interface CheckAvailabilityResponse {
 }
 
 /**
+ * OTP Purpose types
+ * Used to specify why the OTP is being requested
+ */
+export type OTPPurpose = 'login' | 'registration' | 'verify_email'
+
+/**
  * Send OTP Data Interface
+ * Backend expects 'purpose' field per documentation
  */
 export interface SendOTPData {
   email: string
+  purpose?: OTPPurpose  // login | registration | verify_email
 }
 
 /**
@@ -279,7 +287,9 @@ export interface SendOTPData {
 export interface OTPResponse {
   success: boolean
   message: string
+  messageEn?: string
   expiresIn?: number
+  email?: string  // Backend echoes back the email
 }
 
 /**
@@ -289,6 +299,7 @@ export interface OTPResponse {
 export interface VerifyOTPData {
   email: string
   otp: string
+  purpose?: OTPPurpose  // login | registration | verify_email
 }
 
 /**
@@ -476,21 +487,22 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('Login tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Login response did not include tokens!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/login')
+        authWarn('Login response did not include accessToken!')
         authLog('Response keys:', Object.keys(response.data))
       }
 
@@ -944,18 +956,32 @@ const authService = {
 
   /**
    * Send OTP to email for passwordless authentication
+   * POST /api/auth/send-otp
+   * @param data.email - Email address to send OTP to
+   * @param data.purpose - Purpose of OTP: 'login' | 'registration' | 'verify_email' (default: 'login')
    */
   sendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
     try {
-      const response = await authApi.post<{ success: boolean; message: string; expiresIn?: number }>(
+      const response = await authApi.post<{
+        success: boolean
+        message: string
+        messageEn?: string
+        expiresIn?: number
+        email?: string
+      }>(
         '/auth/send-otp',
-        data
+        {
+          email: data.email,
+          purpose: data.purpose || 'login',  // Default to 'login' if not specified
+        }
       )
 
       return {
         success: response.data.success,
         message: response.data.message,
-        expiresIn: response.data.expiresIn
+        messageEn: response.data.messageEn,
+        expiresIn: response.data.expiresIn,
+        email: response.data.email,
       }
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -1000,21 +1026,22 @@ const authService = {
         throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('OTP verify tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('OTP verify did not return tokens - user will not be authenticated!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/verify-otp')
+        authWarn('OTP verify did not return accessToken!')
       }
 
       // Normalize user data to ensure firmId is set
@@ -1047,22 +1074,12 @@ const authService = {
 
   /**
    * Resend OTP code
+   * Uses the same endpoint as sendOTP
+   * POST /api/auth/send-otp
    */
   resendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
-    try {
-      const response = await authApi.post<{ success: boolean; message: string; expiresIn?: number }>(
-        '/auth/resend-otp',
-        data
-      )
-
-      return {
-        success: response.data.success,
-        message: response.data.message,
-        expiresIn: response.data.expiresIn
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
+    // Resend uses the same endpoint as send
+    return authService.sendOTP(data)
   },
 
   /**
@@ -1130,21 +1147,22 @@ const authService = {
         )
       }
 
-      // Store dual tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
-      const expiresIn = response.data.expires_in // seconds until access token expires
+      const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
         authLog('Magic link tokens stored successfully', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Magic link verify did not return tokens!')
-        authWarn('📋 BACKEND FIX: Return access_token & refresh_token from /auth/magic-link/verify')
+        authWarn('Magic link verify did not return accessToken!')
       }
 
       // Normalize user data to ensure firmId is set
@@ -1179,18 +1197,21 @@ const authService = {
 
   /**
    * Send email verification link to user's email
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
-   * POST /api/auth/email/send-verification
+   * POST /api/auth/resend-verification
+   * Note: Backend uses same endpoint for initial send and resend
    */
   sendVerificationEmail: async (): Promise<EmailVerificationResponse> => {
     try {
       const response = await authApi.post<{
-        success: boolean
+        error: boolean
+        success?: boolean
         message: string
-      }>('/auth/email/send-verification')
+        messageEn?: string
+        expiresAt?: string
+      }>('/auth/resend-verification')
 
       return {
-        success: response.data.success,
+        success: !response.data.error && response.data.success !== false,
         message: response.data.message,
       }
     } catch (error: any) {
@@ -1200,24 +1221,31 @@ const authService = {
 
   /**
    * Verify email using token from verification link
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
-   * POST /api/auth/email/verify
+   * POST /api/auth/verify-email
    */
   verifyEmail: async (token: string): Promise<EmailVerificationResponse> => {
     try {
       const response = await authApi.post<{
-        success: boolean
+        error: boolean
+        success?: boolean
         message: string
-      }>('/auth/email/verify', { token })
+        messageEn?: string
+        user?: {
+          id: string
+          email: string
+          isEmailVerified: boolean
+          emailVerifiedAt: string
+        }
+      }>('/auth/verify-email', { token })
 
       // If verification successful, update cached user
-      if (response.data.success) {
+      if (!response.data.error) {
         const cachedUser = authService.getCachedUser()
         if (cachedUser) {
           const updatedUser = {
             ...cachedUser,
             isEmailVerified: true,
-            emailVerifiedAt: new Date().toISOString(),
+            emailVerifiedAt: response.data.user?.emailVerifiedAt || new Date().toISOString(),
           }
           localStorage.setItem('user', JSON.stringify(updatedUser))
           memoryCachedUser = updatedUser
@@ -1225,7 +1253,7 @@ const authService = {
       }
 
       return {
-        success: response.data.success,
+        success: !response.data.error,
         message: response.data.message,
       }
     } catch (error: any) {
@@ -1235,18 +1263,20 @@ const authService = {
 
   /**
    * Resend email verification link
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
-   * POST /api/auth/email/resend-verification
+   * POST /api/auth/resend-verification
    */
   resendVerificationEmail: async (): Promise<EmailVerificationResponse> => {
     try {
       const response = await authApi.post<{
-        success: boolean
+        error: boolean
+        success?: boolean
         message: string
-      }>('/auth/email/resend-verification')
+        messageEn?: string
+        expiresAt?: string
+      }>('/auth/resend-verification')
 
       return {
-        success: response.data.success,
+        success: !response.data.error && response.data.success !== false,
         message: response.data.message,
       }
     } catch (error: any) {

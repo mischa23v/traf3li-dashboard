@@ -301,20 +301,27 @@ export const isTokenExpiringSoon = (bufferSeconds: number = TOKEN_REFRESH_BUFFER
 
 /**
  * Store tokens in localStorage
- * @param accessToken - The access token to store
- * @param refreshToken - The refresh token to store
+ * @param accessToken - The access token to store (required)
+ * @param refreshToken - The refresh token to store (optional - backend may use httpOnly cookie instead)
  * @param expiresIn - Optional: seconds until access token expires (enables automatic refresh scheduling)
+ *
+ * Note: With httpOnly cookie strategy, refreshToken is NOT in the response body.
+ * The browser automatically sends the refresh_token cookie with requests to /api/auth/*.
+ * This is more secure as JavaScript cannot access the refresh token.
  */
-export const storeTokens = (accessToken: string, refreshToken: string, expiresIn?: number): void => {
+export const storeTokens = (accessToken: string, refreshToken?: string | null, expiresIn?: number): void => {
   tokenLog('Storing tokens in localStorage...', {
     accessTokenLength: accessToken?.length,
-    refreshTokenLength: refreshToken?.length,
+    refreshTokenLength: refreshToken?.length || '(httpOnly cookie)',
     hasExpiresIn: !!expiresIn,
     expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
   })
 
   localStorage.setItem(TOKEN_KEYS.ACCESS, accessToken)
-  localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+  // Only store refreshToken if provided (backend may use httpOnly cookie instead)
+  if (refreshToken) {
+    localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+  }
 
   // Store expiration time if expires_in was provided
   if (expiresIn && expiresIn > 0) {
@@ -462,20 +469,23 @@ const refreshAccessToken = async (): Promise<boolean> => {
     // Support both OAuth 2.0 (snake_case) and legacy (camelCase) token fields
     const accessToken = response.data.access_token || response.data.accessToken
     const newRefreshToken = response.data.refresh_token || response.data.refreshToken
-    const expiresIn = response.data.expires_in  // seconds until access token expires
+    const expiresIn = response.data.expires_in || response.data.expiresIn  // seconds until access token expires
 
-    if (accessToken && newRefreshToken) {
+    // accessToken is required; refreshToken is optional (may be in httpOnly cookie)
+    if (accessToken) {
       tokenLog('Token refresh successful', {
         hasExpiresIn: !!expiresIn,
         expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+        refreshTokenIn: newRefreshToken ? 'response body' : 'httpOnly cookie',
         tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
       })
+      // Pass refreshToken as optional - backend may use httpOnly cookie for security
       storeTokens(accessToken, newRefreshToken, expiresIn)
       return true
     }
 
-    // If only accessToken is returned, token rotation may be broken
-    tokenWarn('Token refresh response missing tokens:', {
+    // accessToken is required - if missing, refresh failed
+    tokenWarn('Token refresh response missing accessToken:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!newRefreshToken,
       responseKeys: Object.keys(response.data),

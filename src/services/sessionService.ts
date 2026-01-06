@@ -46,11 +46,21 @@ export interface Session {
 
 /**
  * Session Statistics
+ * Backend uses: activeCount, totalCount, suspiciousCount
  */
 export interface SessionStats {
-  totalSessions: number
-  activeSessions: number
-  suspiciousSessions: number
+  // Backend field names
+  activeCount: number
+  totalCount: number
+  suspiciousCount: number
+  maxConcurrentSessions: number
+  inactivityTimeoutSeconds: number
+  recentSessions?: Session[]
+
+  // Computed/legacy fields (for backwards compatibility)
+  totalSessions?: number
+  activeSessions?: number
+  suspiciousSessions?: number
   lastLoginAt?: Date
   lastLoginLocation?: SessionLocation
   loginHistory: Array<{
@@ -128,13 +138,16 @@ const sessionService = {
 
   /**
    * Terminate all sessions except current
+   * DELETE /api/auth/sessions
    */
-  terminateAllOtherSessions: async (): Promise<{ count: number }> => {
+  terminateAllOtherSessions: async (): Promise<{ count: number; terminatedCount: number }> => {
     try {
-      const response = await authApi.delete<{ count: number }>(
+      const response = await authApi.delete<{ terminatedCount: number; count?: number }>(
         '/auth/sessions'
       )
-      return { count: response.data.count }
+      // Backend returns 'terminatedCount', provide both for backwards compatibility
+      const count = response.data.terminatedCount || response.data.count || 0
+      return { count, terminatedCount: count }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -142,16 +155,47 @@ const sessionService = {
 
   /**
    * Get session statistics
+   * GET /api/auth/sessions/stats
    */
   getStats: async (): Promise<SessionStats> => {
     try {
-      const response = await authApi.get<SessionStats>('/auth/sessions/stats')
+      const response = await authApi.get<{
+        activeCount: number
+        totalCount: number
+        suspiciousCount: number
+        maxConcurrentSessions: number
+        inactivityTimeoutSeconds: number
+        recentSessions?: any[]
+        lastLoginAt?: string
+        lastLoginLocation?: SessionLocation
+        loginHistory?: Array<{
+          timestamp: string
+          location: SessionLocation
+          ip: string
+          success: boolean
+        }>
+      }>('/auth/sessions/stats')
+
+      const data = response.data
       return {
-        ...response.data,
-        lastLoginAt: response.data.lastLoginAt
-          ? new Date(response.data.lastLoginAt)
+        // Backend field names
+        activeCount: data.activeCount,
+        totalCount: data.totalCount,
+        suspiciousCount: data.suspiciousCount,
+        maxConcurrentSessions: data.maxConcurrentSessions,
+        inactivityTimeoutSeconds: data.inactivityTimeoutSeconds,
+        recentSessions: data.recentSessions?.map(parseSession),
+
+        // Legacy field names (for backwards compatibility)
+        totalSessions: data.totalCount,
+        activeSessions: data.activeCount,
+        suspiciousSessions: data.suspiciousCount,
+
+        lastLoginAt: data.lastLoginAt
+          ? new Date(data.lastLoginAt)
           : undefined,
-        loginHistory: response.data.loginHistory?.map((item) => ({
+        lastLoginLocation: data.lastLoginLocation,
+        loginHistory: data.loginHistory?.map((item) => ({
           ...item,
           timestamp: new Date(item.timestamp),
         })) || [],

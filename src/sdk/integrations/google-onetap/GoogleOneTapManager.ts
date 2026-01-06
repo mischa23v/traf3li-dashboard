@@ -213,7 +213,7 @@ export class GoogleOneTapManager {
    * Verify credential with backend
    */
   private async verifyWithBackend(credential: string): Promise<GoogleOneTapResult> {
-    const response = await fetch(`${this.config.apiUrl}/api/auth/google/onetap`, {
+    const response = await fetch(`${this.config.apiUrl}/api/auth/google/one-tap`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

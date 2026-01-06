@@ -123,11 +123,12 @@ const mfaService = {
       }
 
       // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
       const accessToken = (response.data as any).access_token || response.data.accessToken
       const refreshToken = (response.data as any).refresh_token || response.data.refreshToken
-      const expiresIn = (response.data as any).expires_in // seconds until access token expires
+      const expiresIn = (response.data as any).expires_in || (response.data as any).expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         storeTokens(accessToken, refreshToken, expiresIn)
       }
 
@@ -159,15 +160,26 @@ const mfaService = {
   },
 
   /**
-   * Regenerate backup codes
+   * Generate backup codes
    * Invalidates all previous backup codes
+   * POST /api/auth/mfa/backup-codes/generate
    */
-  regenerateBackupCodes: async (): Promise<{ backupCodes: string[] }> => {
+  regenerateBackupCodes: async (): Promise<{ backupCodes: string[]; remainingCodes: number }> => {
     try {
-      const response = await authApi.post<{ backupCodes: string[] }>(
-        '/auth/mfa/backup-codes/regenerate'
-      )
-      return { backupCodes: response.data.backupCodes }
+      const response = await authApi.post<{
+        error?: boolean
+        message?: string
+        codes?: string[]
+        backupCodes?: string[]
+        remainingCodes?: number
+      }>('/auth/mfa/backup-codes/generate')
+
+      // Backend may return 'codes' or 'backupCodes'
+      const codes = response.data.codes || response.data.backupCodes || []
+      return {
+        backupCodes: codes,
+        remainingCodes: response.data.remainingCodes || codes.length,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -175,13 +187,24 @@ const mfaService = {
 
   /**
    * Get remaining backup codes count
+   * GET /api/auth/mfa/backup-codes/count
    */
   getBackupCodesCount: async (): Promise<number> => {
     try {
-      const status = await mfaService.getStatus()
-      return status.backupCodesCount
+      // Try dedicated endpoint first
+      const response = await authApi.get<{
+        error?: boolean
+        remainingCodes: number
+      }>('/auth/mfa/backup-codes/count')
+      return response.data.remainingCodes
     } catch {
-      return 0
+      // Fallback to status endpoint
+      try {
+        const status = await mfaService.getStatus()
+        return status.backupCodesCount
+      } catch {
+        return 0
+      }
     }
   },
 
