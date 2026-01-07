@@ -41,7 +41,6 @@ import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authPrivacyRouteImport } from './routes/(auth)/privacy'
-import { Route as authOtpLoginRouteImport } from './routes/(auth)/otp-login'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authNoFirmRouteImport } from './routes/(auth)/no-firm'
 import { Route as authMfaChallengeRouteImport } from './routes/(auth)/mfa-challenge'
@@ -621,11 +620,6 @@ const authSignInRoute = authSignInRouteImport.update({
 const authPrivacyRoute = authPrivacyRouteImport.update({
   id: '/(auth)/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const authOtpLoginRoute = authOtpLoginRouteImport.update({
-  id: '/(auth)/otp-login',
-  path: '/otp-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authOtpRoute = authOtpRouteImport.update({
@@ -3170,7 +3164,6 @@ export interface FileRoutesByFullPath {
   '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
-  '/otp-login': typeof authOtpLoginRoute
   '/privacy': typeof authPrivacyRoute
   '/sign-in': typeof authSignInRoute
   '/sign-in-2': typeof authSignIn2Route
@@ -3622,7 +3615,6 @@ export interface FileRoutesByTo {
   '/mfa-challenge': typeof authMfaChallengeRoute
   '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
-  '/otp-login': typeof authOtpLoginRoute
   '/privacy': typeof authPrivacyRoute
   '/sign-in': typeof authSignInRoute
   '/sign-in-2': typeof authSignIn2Route
@@ -4067,7 +4059,6 @@ export interface FileRoutesById {
   '/(auth)/mfa-challenge': typeof authMfaChallengeRoute
   '/(auth)/no-firm': typeof authNoFirmRoute
   '/(auth)/otp': typeof authOtpRoute
-  '/(auth)/otp-login': typeof authOtpLoginRoute
   '/(auth)/privacy': typeof authPrivacyRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-in-2': typeof authSignIn2Route
@@ -4522,7 +4513,6 @@ export interface FileRouteTypes {
     | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
-    | '/otp-login'
     | '/privacy'
     | '/sign-in'
     | '/sign-in-2'
@@ -4974,7 +4964,6 @@ export interface FileRouteTypes {
     | '/mfa-challenge'
     | '/no-firm'
     | '/otp'
-    | '/otp-login'
     | '/privacy'
     | '/sign-in'
     | '/sign-in-2'
@@ -5418,7 +5407,6 @@ export interface FileRouteTypes {
     | '/(auth)/mfa-challenge'
     | '/(auth)/no-firm'
     | '/(auth)/otp'
-    | '/(auth)/otp-login'
     | '/(auth)/privacy'
     | '/(auth)/sign-in'
     | '/(auth)/sign-in-2'
@@ -5872,7 +5860,6 @@ export interface RootRouteChildren {
   authMfaChallengeRoute: typeof authMfaChallengeRoute
   authNoFirmRoute: typeof authNoFirmRoute
   authOtpRoute: typeof authOtpRoute
-  authOtpLoginRoute: typeof authOtpLoginRoute
   authPrivacyRoute: typeof authPrivacyRoute
   authSignInRoute: typeof authSignInRoute
   authSignIn2Route: typeof authSignIn2Route
@@ -6111,13 +6098,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof authPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(auth)/otp-login': {
-      id: '/(auth)/otp-login'
-      path: '/otp-login'
-      fullPath: '/otp-login'
-      preLoaderRoute: typeof authOtpLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/otp': {
@@ -10727,7 +10707,6 @@ const rootRouteChildren: RootRouteChildren = {
   authMfaChallengeRoute: authMfaChallengeRoute,
   authNoFirmRoute: authNoFirmRoute,
   authOtpRoute: authOtpRoute,
-  authOtpLoginRoute: authOtpLoginRoute,
   authPrivacyRoute: authPrivacyRoute,
   authSignInRoute: authSignInRoute,
   authSignIn2Route: authSignIn2Route,
