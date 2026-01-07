@@ -10,9 +10,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Content Security Policy (frame-ancestors moved to HTTP headers in vercel.json) -->
+  <!-- SECURITY: 'unsafe-eval' removed - modern React builds don't need it -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://js.hcaptcha.com https://challenges.cloudflare.com;
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://js.hcaptcha.com https://challenges.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' data: https://fonts.gstatic.com;
     img-src 'self' data: https: blob:;

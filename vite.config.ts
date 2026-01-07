@@ -40,6 +40,7 @@ export default defineConfig({
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
 
       // Content Security Policy (dev version with HMR support)
+      // Note: 'unsafe-eval' kept in dev only for Vite HMR, removed in production
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://js.hcaptcha.com",
@@ -55,9 +56,9 @@ export default defineConfig({
     },
   },
   build: {
-    // Full source maps exposed for debugging - traces minified code back to source
-    // Shows exact file:line:column for every API call in browser DevTools
-    sourcemap: true,
+    // SECURITY: Source maps disabled in production to prevent exposing source code
+    // Enable locally with: VITE_SOURCEMAP=true npm run build
+    sourcemap: process.env.VITE_SOURCEMAP === 'true',
     // Disable minification in debug mode for readable code (set to 'esbuild' for production)
     minify: process.env.DEBUG_BUILD === 'true' ? false : 'esbuild',
     rollupOptions: {
