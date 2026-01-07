@@ -2184,21 +2184,6 @@ export const invalidateCache = {
     },
   },
 
-  // PDFme Templates
-  pdfme: {
-    all: (options?: { refetchType?: 'all' }) =>
-      queryClient.invalidateQueries({ queryKey: ['pdfme'], refetchType: options?.refetchType }),
-    templates: () => queryClient.invalidateQueries({ queryKey: ['pdfme', 'templates'] }),
-    template: (id: string) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'template', id] }),
-    defaultTemplate: (category: string) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'default', category] }),
-    list: (filters?: any) => queryClient.invalidateQueries({ queryKey: ['pdfme', 'templates', filters] }),
-    related: async () => {
-      await Promise.all([
-        invalidateCache.pdfme.all(),
-      ])
-    },
-  },
-
   // Sessions
   sessions: {
     all: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }),

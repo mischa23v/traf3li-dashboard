@@ -1167,13 +1167,6 @@ export const ROUTES = {
     },
 
     /**
-     * PDF templates
-     */
-    pdfTemplates: {
-      list: '/dashboard/pdf-templates',
-    },
-
-    /**
      * Data export
      */
     dataExport: {
