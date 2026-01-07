@@ -91,7 +91,6 @@ import { Route as AuthenticatedDashboardSubcontractingIndexRouteImport } from '.
 import { Route as AuthenticatedDashboardStaffIndexRouteImport } from './routes/_authenticated/dashboard.staff.index'
 import { Route as AuthenticatedDashboardReportsIndexRouteImport } from './routes/_authenticated/dashboard.reports.index'
 import { Route as AuthenticatedDashboardQualityIndexRouteImport } from './routes/_authenticated/dashboard.quality.index'
-import { Route as AuthenticatedDashboardPdfTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.pdf-templates.index'
 import { Route as AuthenticatedDashboardOrganizationsIndexRouteImport } from './routes/_authenticated/dashboard.organizations.index'
 import { Route as AuthenticatedDashboardNotificationsIndexRouteImport } from './routes/_authenticated/dashboard.notifications.index'
 import { Route as AuthenticatedDashboardManufacturingIndexRouteImport } from './routes/_authenticated/dashboard.manufacturing.index'
@@ -906,12 +905,6 @@ const AuthenticatedDashboardQualityIndexRoute =
   AuthenticatedDashboardQualityIndexRouteImport.update({
     id: '/dashboard/quality/',
     path: '/dashboard/quality/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardPdfTemplatesIndexRoute =
-  AuthenticatedDashboardPdfTemplatesIndexRouteImport.update({
-    id: '/dashboard/pdf-templates/',
-    path: '/dashboard/pdf-templates/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardOrganizationsIndexRoute =
@@ -3326,7 +3319,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/manufacturing': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/dashboard/pdf-templates': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/dashboard/quality': typeof AuthenticatedDashboardQualityIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
@@ -3767,7 +3759,6 @@ export interface FileRoutesByTo {
   '/dashboard/manufacturing': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/dashboard/pdf-templates': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/dashboard/quality': typeof AuthenticatedDashboardQualityIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
@@ -4225,7 +4216,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/manufacturing/': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/_authenticated/dashboard/notifications/': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/_authenticated/dashboard/organizations/': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/_authenticated/dashboard/pdf-templates/': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/_authenticated/dashboard/quality/': typeof AuthenticatedDashboardQualityIndexRoute
   '/_authenticated/dashboard/reports/': typeof AuthenticatedDashboardReportsIndexRoute
   '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
@@ -4681,7 +4671,6 @@ export interface FileRouteTypes {
     | '/dashboard/manufacturing'
     | '/dashboard/notifications'
     | '/dashboard/organizations'
-    | '/dashboard/pdf-templates'
     | '/dashboard/quality'
     | '/dashboard/reports'
     | '/dashboard/staff'
@@ -5122,7 +5111,6 @@ export interface FileRouteTypes {
     | '/dashboard/manufacturing'
     | '/dashboard/notifications'
     | '/dashboard/organizations'
-    | '/dashboard/pdf-templates'
     | '/dashboard/quality'
     | '/dashboard/reports'
     | '/dashboard/staff'
@@ -5579,7 +5567,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/manufacturing/'
     | '/_authenticated/dashboard/notifications/'
     | '/_authenticated/dashboard/organizations/'
-    | '/_authenticated/dashboard/pdf-templates/'
     | '/_authenticated/dashboard/quality/'
     | '/_authenticated/dashboard/reports/'
     | '/_authenticated/dashboard/staff/'
@@ -6474,13 +6461,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/quality'
       fullPath: '/dashboard/quality'
       preLoaderRoute: typeof AuthenticatedDashboardQualityIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/pdf-templates/': {
-      id: '/_authenticated/dashboard/pdf-templates/'
-      path: '/dashboard/pdf-templates'
-      fullPath: '/dashboard/pdf-templates'
-      preLoaderRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/organizations/': {
@@ -10471,7 +10451,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardManufacturingIndexRoute: typeof AuthenticatedDashboardManufacturingIndexRoute
   AuthenticatedDashboardNotificationsIndexRoute: typeof AuthenticatedDashboardNotificationsIndexRoute
   AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
-  AuthenticatedDashboardPdfTemplatesIndexRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   AuthenticatedDashboardQualityIndexRoute: typeof AuthenticatedDashboardQualityIndexRoute
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
@@ -10627,8 +10606,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardNotificationsIndexRoute,
   AuthenticatedDashboardOrganizationsIndexRoute:
     AuthenticatedDashboardOrganizationsIndexRoute,
-  AuthenticatedDashboardPdfTemplatesIndexRoute:
-    AuthenticatedDashboardPdfTemplatesIndexRoute,
   AuthenticatedDashboardQualityIndexRoute:
     AuthenticatedDashboardQualityIndexRoute,
   AuthenticatedDashboardReportsIndexRoute:
