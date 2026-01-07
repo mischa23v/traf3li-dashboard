@@ -366,11 +366,6 @@ export function useSidebarData(): SidebarData {
               module: 'invoices',
             },
             {
-              title: 'sidebar.nav.pdfTemplates',
-              url: ROUTES.dashboard.pdfTemplates.list,
-              module: 'documents',
-            },
-            {
               title: 'sidebar.nav.payments',
               url: ROUTES.dashboard.finance.payments.list,
               module: 'payments',
