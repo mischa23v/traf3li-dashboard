@@ -73,8 +73,9 @@ describe('saudiNationalIdSchema', () => {
 })
 
 describe('saudiPhoneSchema', () => {
-  it('should validate phone numbers with +966 prefix', () => {
-    const validPhones = ['+966501234567', '+966512345678', '+966599999999']
+  it('should validate phone numbers in strict E.164 format (+9665XXXXXXXX)', () => {
+    // Backend requires strict E.164 format: +966 + 5 + 8 digits
+    const validPhones = ['+966501234567', '+966512345678', '+966599999999', '+966550000000']
 
     validPhones.forEach(phone => {
       const result = saudiPhoneSchema.safeParse(phone)
@@ -82,31 +83,25 @@ describe('saudiPhoneSchema', () => {
     })
   })
 
-  it('should validate phone numbers with 966 prefix', () => {
-    const validPhones = ['966501234567', '966512345678']
+  it('should reject phone numbers without + prefix (use toE164Phone to normalize)', () => {
+    // These formats should be normalized using toE164Phone() before validation
+    const invalidPhones = ['966501234567', '0501234567', '501234567']
 
-    validPhones.forEach(phone => {
+    invalidPhones.forEach(phone => {
       const result = saudiPhoneSchema.safeParse(phone)
-      expect(result.success).toBe(true)
-    })
-  })
-
-  it('should validate phone numbers with 05 prefix', () => {
-    const validPhones = ['0501234567', '0512345678', '0599999999']
-
-    validPhones.forEach(phone => {
-      const result = saudiPhoneSchema.safeParse(phone)
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(false)
     })
   })
 
   it('should reject invalid phone numbers', () => {
     const invalidPhones = [
       '1234567890',      // Wrong prefix
-      '+967501234567',   // Wrong country code
-      '05012345',        // Too short
-      '050123456789012', // Too long
+      '+967501234567',   // Wrong country code (Yemen)
+      '+96650123456',    // Too short (only 7 digits after 5)
+      '+9665012345678',  // Too long (9 digits after 5)
       '+966-50-1234567', // Contains dashes
+      '+966 501234567',  // Contains spaces
+      '00966501234567',  // International format (not E.164)
       '',                // Empty
     ]
 
@@ -121,13 +116,16 @@ describe('saudiPhoneSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('should handle 8-digit and 9-digit phone numbers', () => {
-    const validPhones = ['+96650123456', '+966501234567']
+  it('should only accept 9-digit Saudi mobile numbers (5 + 8 digits)', () => {
+    // Valid: +966 + 5XXXXXXXX (exactly 9 digits after country code)
+    const validPhone = '+966501234567'
+    expect(saudiPhoneSchema.safeParse(validPhone).success).toBe(true)
 
-    validPhones.forEach(phone => {
-      const result = saudiPhoneSchema.safeParse(phone)
-      expect(result.success).toBe(true)
-    })
+    // Invalid: wrong length
+    const tooShort = '+96650123456' // 8 digits after +966
+    const tooLong = '+9665012345678' // 10 digits after +966
+    expect(saudiPhoneSchema.safeParse(tooShort).success).toBe(false)
+    expect(saudiPhoneSchema.safeParse(tooLong).success).toBe(false)
   })
 })
 
