@@ -918,6 +918,51 @@ apiClientNoVersion.interceptors.response.use(
       }
     }
 
+    // Handle 403 Forbidden - Check for CSRF token errors and retry once with fresh token
+    if (error.response?.status === 403) {
+      const errorCode = error.response?.data?.code
+      const errorMessage = error.response?.data?.message?.toLowerCase() || ''
+
+      // Check for CSRF token errors - retry once with fresh token
+      // Handle various CSRF error codes and messages
+      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING' ||
+          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode === 'CSRF_TOKEN_REUSED' ||
+          errorCode === 'CSRF_TOKEN_EXPIRED' || errorCode?.startsWith('CSRF_') ||
+          errorMessage.includes('csrf') || errorMessage.includes('token already used')) {
+        // Only retry once
+        if (!originalRequest._csrfRetry) {
+          originalRequest._csrfRetry = true
+
+          try {
+            // Refresh CSRF token
+            await refreshCsrfToken()
+
+            // Get the new token and retry
+            const newToken = getCsrfToken()
+            if (newToken && originalRequest.headers) {
+              originalRequest.headers.set('X-CSRF-Token', newToken)
+            }
+
+            return apiClientNoVersion(originalRequest)
+          } catch (csrfError) {
+            if (import.meta.env.DEV) {
+              console.error('[CSRF] Token refresh failed (noVersion):', csrfError)
+            }
+            // Fall through to return the error
+          }
+        }
+
+        // If CSRF retry already attempted or failed, return a clear error
+        return Promise.reject({
+          status: 403,
+          message: 'CSRF token invalid - please try again',
+          code: errorCode || 'CSRF_ERROR',
+          error: true,
+          requestId: error.response?.data?.requestId,
+        })
+      }
+    }
+
     // DON'T auto-redirect on 401 for auth routes
     // Let the auth service decide what to do based on the specific endpoint
     // Support both nested error object (error.error.message) and root-level message
@@ -1449,10 +1494,14 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 403) {
       const message = error.response?.data?.message
       const errorCode = error.response?.data?.code
+      const messageLower = message?.toLowerCase() || ''
 
       // Check for CSRF token errors - retry once with fresh token
+      // Handle various CSRF error codes and messages
       if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING' ||
-          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode?.startsWith('CSRF_')) {
+          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode === 'CSRF_TOKEN_REUSED' ||
+          errorCode === 'CSRF_TOKEN_EXPIRED' || errorCode?.startsWith('CSRF_') ||
+          messageLower.includes('csrf') || messageLower.includes('token already used')) {
         // Only retry once
         if (!originalRequest._csrfRetry) {
           originalRequest._csrfRetry = true
