@@ -4342,4 +4342,1045 @@ interface RevaluationResponse {
 
 ---
 
-*Part 5 Complete. Continue to Part 6 (Tax & ZATCA)?*
+# PART 6: TAX & ZATCA E-INVOICING COMPLIANCE {#part-6-tax-zatca}
+
+## 6.1 ZATCA Regulatory Overview
+
+### Legal Framework
+- **VAT Law**: Implemented January 1, 2018 (5%), increased to **15%** on July 1, 2020
+- **E-Invoicing Regulation**: Issued September 2021
+- **Phase 1 (Generation)**: December 4, 2021 - Generate & store e-invoices
+- **Phase 2 (Integration)**: January 1, 2023+ - Integration with ZATCA Fatoora platform
+
+### Penalties for Non-Compliance
+| Violation | Penalty (SAR) |
+|-----------|---------------|
+| Non-compliant invoice format | 5,000 - 50,000 per violation |
+| Missing QR code | Up to 10,000 per invoice |
+| Failure to integrate with ZATCA | Suspension of VAT registration |
+| Late WHT payment | 1% per 30 days delay |
+| Tax evasion | 25% of unpaid tax |
+
+### Sources
+- [ZATCA E-Invoicing Portal](https://zatca.gov.sa/en/E-Invoicing/Introduction/Pages/Roll-out-phases.aspx)
+- [ZATCA VAT Implementing Regulations](https://zatca.gov.sa/en/RulesRegulations/Taxes/Documents/Implmenting%20Regulations%20of%20the%20VAT%20Law_EN.pdf)
+
+---
+
+## 6.2 Tax Configuration Schema
+
+```typescript
+// backend/src/models/tax.model.ts
+
+export interface ITaxCode extends Document {
+  code: string;                    // 'S', 'Z', 'E', 'O'
+  name: string;                    // 'Standard Rate'
+  nameAr: string;                  // 'المعدل القياسي'
+  description: string;
+
+  // Tax details
+  taxType: TaxType;                // vat, withholding, excise
+  rate: number;                    // 0.15 for 15%
+  ratePercent: number;             // 15
+
+  // ZATCA Classification
+  zatcaCategory: ZATCATaxCategory;
+  zatcaCategoryCode: string;       // 'S', 'Z', 'E', 'O'
+  zatcaReasonCode?: string;        // For exemptions
+  zatcaReasonText?: string;
+
+  // Behavior
+  behavior: TaxBehavior;           // inclusive, exclusive
+  isCompound: boolean;
+
+  // Accounts
+  outputAccountId: string;         // For sales (liability)
+  inputAccountId: string;          // For purchases (asset)
+
+  isActive: boolean;
+  effectiveFrom: Date;
+  effectiveTo?: Date;
+}
+
+// ZATCA Tax Categories per UBL 2.1
+export enum ZATCATaxCategory {
+  STANDARD = 'S',                  // Standard rate (15%)
+  ZERO_RATED = 'Z',                // Zero-rated (0%)
+  EXEMPT = 'E',                    // Exempt from VAT
+  OUT_OF_SCOPE = 'O',              // Outside VAT scope
+}
+
+// ZATCA Exemption Reason Codes
+export enum ZATCAExemptionReason {
+  // Zero-Rated
+  EXPORT = 'VATEX-SA-29',                    // Exports
+  INTL_TRANSPORT = 'VATEX-SA-29-7',          // International transport
+  QUALIFIED_MEDICINE = 'VATEX-SA-32',        // Medicines
+  INVESTMENT_METALS = 'VATEX-SA-33',         // Gold 99%+
+
+  // Exempt
+  FINANCIAL_SERVICES = 'VATEX-SA-35',
+  RESIDENTIAL_RENT = 'VATEX-SA-36',
+  EDUCATION = 'VATEX-SA-EDU',
+  HEALTHCARE = 'VATEX-SA-HEA',
+
+  // Out of Scope
+  NOT_SUBJECT = 'VATEX-SA-OOS',
+}
+
+// Withholding Tax (for non-residents)
+export enum WithholdingPaymentType {
+  DIVIDENDS = 'dividends',                   // 5%
+  INTEREST = 'interest',                     // 5%
+  ROYALTIES = 'royalties',                   // 15%
+  MANAGEMENT_FEES = 'management_fees',       // 20%
+  TECHNICAL_SERVICES = 'technical_services', // 5%
+  RENT = 'rent',                             // 5%
+}
+
+// Default tax codes for Saudi Arabia
+export const SAUDI_TAX_CODES = [
+  { code: 'S', name: 'Standard Rate', nameAr: 'المعدل القياسي', rate: 0.15 },
+  { code: 'Z', name: 'Zero Rated', nameAr: 'معفى بنسبة صفر', rate: 0 },
+  { code: 'E', name: 'Exempt', nameAr: 'معفى', rate: 0 },
+  { code: 'O', name: 'Out of Scope', nameAr: 'خارج النطاق', rate: 0 },
+];
+```
+
+---
+
+## 6.3 ZATCA Invoice Types
+
+```typescript
+// backend/src/types/zatca.types.ts
+
+/**
+ * ZATCA Invoice Type Codes per UBL 2.1
+ */
+export enum ZATCAInvoiceTypeCode {
+  STANDARD_TAX_INVOICE = '388',      // فاتورة ضريبية
+  DEBIT_NOTE = '383',                // إشعار مدين
+  CREDIT_NOTE = '381',               // إشعار دائن
+  PREPAYMENT_INVOICE = '386',        // فاتورة دفعة مقدمة
+}
+
+/**
+ * Invoice Subtype - Format: NNPNESB (7 characters)
+ */
+export const ZATCA_SUBTYPES = {
+  // Standard Tax Invoice (B2B)
+  STANDARD_INVOICE: '0100000',
+  STANDARD_THIRD_PARTY: '0110000',
+  STANDARD_EXPORT: '0100100',
+  STANDARD_SUMMARY: '0100010',
+
+  // Simplified Tax Invoice (B2C)
+  SIMPLIFIED_INVOICE: '0200000',
+  SIMPLIFIED_THIRD_PARTY: '0210000',
+};
+
+/**
+ * Standard vs Simplified Invoice Rules
+ */
+export const INVOICE_TYPE_RULES = {
+  standard: {
+    type: 'standard',
+    transactionType: 'B2B',
+    integrationMethod: 'clearance',   // Real-time clearance
+    buyerVATRequired: true,
+    buyerNameRequired: true,
+    buyerAddressRequired: true,
+    qrCodeRequired: true,
+    buyerCanClaimInputVAT: true,
+    minAmount: 100000,                // 1000 SAR
+  },
+  simplified: {
+    type: 'simplified',
+    transactionType: 'B2C',
+    integrationMethod: 'reporting',   // Report within 24h
+    reportingDeadline: '24 hours',
+    buyerVATRequired: false,
+    buyerNameRequired: false,
+    buyerAddressRequired: false,
+    qrCodeRequired: true,
+    buyerCanClaimInputVAT: false,
+  },
+};
+```
+
+---
+
+## 6.4 QR Code Generation (9 Tags TLV Format)
+
+```typescript
+// backend/src/services/zatca-qr.service.ts
+
+/**
+ * ZATCA QR Code TLV Tags
+ * Phase 1 (Dec 2021): Tags 1-5
+ * Phase 2 (Jan 2023): Tags 1-9
+ */
+export enum QRCodeTag {
+  SELLER_NAME = 1,              // اسم البائع
+  VAT_REGISTRATION = 2,         // رقم تسجيل ضريبة القيمة المضافة
+  TIMESTAMP = 3,                // الطابع الزمني
+  INVOICE_TOTAL = 4,            // إجمالي الفاتورة مع الضريبة
+  VAT_TOTAL = 5,                // إجمالي الضريبة
+  INVOICE_HASH = 6,             // تجزئة الفاتورة (Phase 2)
+  ECDSA_SIGNATURE = 7,          // التوقيع الرقمي (Phase 2)
+  ECDSA_PUBLIC_KEY = 8,         // المفتاح العام (Phase 2)
+  ECDSA_STAMP_SIGNATURE = 9,    // توقيع ختم التشفير (Phase 2)
+}
+
+export interface QRCodeData {
+  sellerName: string;               // Arabic required
+  vatRegistrationNumber: string;    // 15-digit, starts/ends with 3
+  invoiceTimestamp: Date;
+  invoiceTotal: number;
+  vatTotal: number;
+  invoiceHash?: string;             // Phase 2
+  ecdsaSignature?: string;          // Phase 2
+  ecdsaPublicKey?: string;          // Phase 2
+  csidSignature?: string;           // Phase 2
+}
+
+export class ZATCAQRCodeService {
+  /**
+   * Generate TLV-encoded QR code (Base64)
+   */
+  static generateQRCode(data: QRCodeData, phase: 1 | 2 = 2): string {
+    const tlvBuffer: Buffer[] = [];
+
+    // Tag 1: Seller Name (UTF-8)
+    tlvBuffer.push(this.encodeTLV(QRCodeTag.SELLER_NAME, data.sellerName));
+
+    // Tag 2: VAT Registration Number
+    tlvBuffer.push(this.encodeTLV(QRCodeTag.VAT_REGISTRATION, data.vatRegistrationNumber));
+
+    // Tag 3: Timestamp (ISO 8601)
+    tlvBuffer.push(this.encodeTLV(QRCodeTag.TIMESTAMP, data.invoiceTimestamp.toISOString()));
+
+    // Tag 4: Invoice Total
+    tlvBuffer.push(this.encodeTLV(QRCodeTag.INVOICE_TOTAL, data.invoiceTotal.toFixed(2)));
+
+    // Tag 5: VAT Total
+    tlvBuffer.push(this.encodeTLV(QRCodeTag.VAT_TOTAL, data.vatTotal.toFixed(2)));
+
+    // Phase 2 Tags
+    if (phase === 2) {
+      if (!data.invoiceHash || !data.ecdsaSignature || !data.ecdsaPublicKey) {
+        throw new Error('Phase 2 requires hash, signature, and public key');
+      }
+
+      tlvBuffer.push(this.encodeTLVBinary(QRCodeTag.INVOICE_HASH, Buffer.from(data.invoiceHash, 'hex')));
+      tlvBuffer.push(this.encodeTLVBinary(QRCodeTag.ECDSA_SIGNATURE, Buffer.from(data.ecdsaSignature, 'base64')));
+      tlvBuffer.push(this.encodeTLVBinary(QRCodeTag.ECDSA_PUBLIC_KEY, Buffer.from(data.ecdsaPublicKey, 'base64')));
+
+      if (data.csidSignature) {
+        tlvBuffer.push(this.encodeTLVBinary(QRCodeTag.ECDSA_STAMP_SIGNATURE, Buffer.from(data.csidSignature, 'base64')));
+      }
+    }
+
+    return Buffer.concat(tlvBuffer).toString('base64');
+  }
+
+  /**
+   * Decode QR code for validation
+   */
+  static decodeQRCode(base64String: string): QRCodeData {
+    const buffer = Buffer.from(base64String, 'base64');
+    const data: Partial<QRCodeData> = {};
+    let offset = 0;
+
+    while (offset < buffer.length) {
+      const tag = buffer.readUInt8(offset);
+      const length = buffer.readUInt8(offset + 1);
+      const value = buffer.slice(offset + 2, offset + 2 + length);
+
+      switch (tag) {
+        case QRCodeTag.SELLER_NAME:
+          data.sellerName = value.toString('utf8');
+          break;
+        case QRCodeTag.VAT_REGISTRATION:
+          data.vatRegistrationNumber = value.toString('utf8');
+          break;
+        case QRCodeTag.TIMESTAMP:
+          data.invoiceTimestamp = new Date(value.toString('utf8'));
+          break;
+        case QRCodeTag.INVOICE_TOTAL:
+          data.invoiceTotal = parseFloat(value.toString('utf8'));
+          break;
+        case QRCodeTag.VAT_TOTAL:
+          data.vatTotal = parseFloat(value.toString('utf8'));
+          break;
+        case QRCodeTag.INVOICE_HASH:
+          data.invoiceHash = value.toString('hex');
+          break;
+        case QRCodeTag.ECDSA_SIGNATURE:
+          data.ecdsaSignature = value.toString('base64');
+          break;
+        case QRCodeTag.ECDSA_PUBLIC_KEY:
+          data.ecdsaPublicKey = value.toString('base64');
+          break;
+        case QRCodeTag.ECDSA_STAMP_SIGNATURE:
+          data.csidSignature = value.toString('base64');
+          break;
+      }
+      offset += 2 + length;
+    }
+    return data as QRCodeData;
+  }
+
+  private static encodeTLV(tag: number, value: string): Buffer {
+    const valueBuffer = Buffer.from(value, 'utf8');
+    const tagBuffer = Buffer.alloc(1);
+    const lengthBuffer = Buffer.alloc(1);
+    tagBuffer.writeUInt8(tag);
+    lengthBuffer.writeUInt8(valueBuffer.length);
+    return Buffer.concat([tagBuffer, lengthBuffer, valueBuffer]);
+  }
+
+  private static encodeTLVBinary(tag: number, value: Buffer): Buffer {
+    const tagBuffer = Buffer.alloc(1);
+    const lengthBuffer = Buffer.alloc(1);
+    tagBuffer.writeUInt8(tag);
+    lengthBuffer.writeUInt8(value.length);
+    return Buffer.concat([tagBuffer, lengthBuffer, value]);
+  }
+
+  /**
+   * Validate VAT number format (15 digits, starts/ends with 3)
+   */
+  static validateVATNumber(vatNumber: string): boolean {
+    if (!/^\d{15}$/.test(vatNumber)) return false;
+    if (!vatNumber.startsWith('3')) return false;
+    if (!vatNumber.endsWith('3')) return false;
+    return true;
+  }
+}
+```
+
+---
+
+## 6.5 ZATCA XML Generation (UBL 2.1)
+
+```typescript
+// backend/src/services/zatca-xml.service.ts
+
+import { create } from 'xmlbuilder2';
+import crypto from 'crypto';
+
+export class ZATCAXMLService {
+  private static readonly UBL_NS = 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2';
+  private static readonly CAC_NS = 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2';
+  private static readonly CBC_NS = 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2';
+
+  /**
+   * Generate ZATCA-compliant UBL 2.1 XML invoice
+   */
+  static generateInvoiceXML(invoice: IInvoice, seller: ICompany): string {
+    const doc = create({ version: '1.0', encoding: 'UTF-8' })
+      .ele(this.UBL_NS, 'Invoice')
+      .att('xmlns:cac', this.CAC_NS)
+      .att('xmlns:cbc', this.CBC_NS);
+
+    // Profile ID
+    doc.ele('cbc:ProfileID').txt('reporting:1.0');
+
+    // UUID (unique per invoice)
+    doc.ele('cbc:UUID').txt(invoice.zatca.uuid);
+
+    // Invoice Number
+    doc.ele('cbc:ID').txt(invoice.invoiceNumber);
+
+    // Issue Date & Time
+    doc.ele('cbc:IssueDate').txt(this.formatDate(invoice.invoiceDate));
+    doc.ele('cbc:IssueTime').txt(this.formatTime(invoice.invoiceDate));
+
+    // Invoice Type Code
+    doc.ele('cbc:InvoiceTypeCode')
+      .att('name', invoice.zatca.invoiceSubType)
+      .txt(invoice.zatca.invoiceTypeCode);
+
+    // Currency
+    doc.ele('cbc:DocumentCurrencyCode').txt(invoice.currency);
+    doc.ele('cbc:TaxCurrencyCode').txt('SAR');
+
+    // Billing Reference (for credit/debit notes)
+    if (invoice.originalInvoiceId) {
+      doc.ele('cac:BillingReference')
+        .ele('cac:InvoiceDocumentReference')
+        .ele('cbc:ID').txt(invoice.originalInvoiceNumber!);
+    }
+
+    // QR Code
+    const qrRef = doc.ele('cac:AdditionalDocumentReference');
+    qrRef.ele('cbc:ID').txt('QR');
+    qrRef.ele('cac:Attachment')
+      .ele('cbc:EmbeddedDocumentBinaryObject')
+      .att('mimeCode', 'text/plain')
+      .txt(invoice.zatca.qrCode);
+
+    // Seller
+    this.addSellerParty(doc, seller);
+
+    // Buyer
+    this.addBuyerParty(doc, invoice);
+
+    // Tax Total
+    this.addTaxTotal(doc, invoice);
+
+    // Monetary Total
+    this.addMonetaryTotal(doc, invoice);
+
+    // Invoice Lines
+    invoice.lineItems.forEach((line, idx) => {
+      this.addInvoiceLine(doc, line, idx + 1, invoice.currency);
+    });
+
+    return doc.end({ prettyPrint: true });
+  }
+
+  static calculateInvoiceHash(xml: string): string {
+    const xmlForHashing = xml.replace(/<ds:Signature[\s\S]*?<\/ds:Signature>/g, '');
+    return crypto.createHash('sha256').update(xmlForHashing, 'utf8').digest('hex');
+  }
+
+  private static addSellerParty(doc: any, seller: ICompany): void {
+    const party = doc.ele('cac:AccountingSupplierParty').ele('cac:Party');
+    party.ele('cac:PartyIdentification')
+      .ele('cbc:ID').att('schemeID', 'VAT').txt(seller.vatNumber);
+
+    const address = party.ele('cac:PostalAddress');
+    address.ele('cbc:StreetName').txt(seller.address.street);
+    address.ele('cbc:CityName').txt(seller.address.city);
+    address.ele('cbc:PostalZone').txt(seller.address.postalCode);
+    address.ele('cac:Country').ele('cbc:IdentificationCode').txt('SA');
+
+    party.ele('cac:PartyTaxScheme').ele('cbc:CompanyID').txt(seller.vatNumber);
+    party.ele('cac:PartyLegalEntity').ele('cbc:RegistrationName').txt(seller.nameAr);
+  }
+
+  private static addBuyerParty(doc: any, invoice: IInvoice): void {
+    const isSimplified = invoice.zatca.invoiceSubType?.startsWith('02');
+    const party = doc.ele('cac:AccountingCustomerParty').ele('cac:Party');
+
+    if (!isSimplified && invoice.customerVatNumber) {
+      party.ele('cac:PartyIdentification')
+        .ele('cbc:ID').att('schemeID', 'VAT').txt(invoice.customerVatNumber);
+      party.ele('cac:PartyTaxScheme').ele('cbc:CompanyID').txt(invoice.customerVatNumber);
+    }
+
+    if (!isSimplified && invoice.customerAddress) {
+      const address = party.ele('cac:PostalAddress');
+      address.ele('cbc:StreetName').txt(invoice.customerAddress.street);
+      address.ele('cbc:CityName').txt(invoice.customerAddress.city);
+      address.ele('cac:Country').ele('cbc:IdentificationCode').txt('SA');
+    }
+
+    party.ele('cac:PartyLegalEntity')
+      .ele('cbc:RegistrationName').txt(invoice.customerNameAr || invoice.customerName);
+  }
+
+  private static addTaxTotal(doc: any, invoice: IInvoice): void {
+    const taxTotal = doc.ele('cac:TaxTotal');
+    taxTotal.ele('cbc:TaxAmount').att('currencyID', invoice.currency)
+      .txt((invoice.totalTax / 100).toFixed(2));
+
+    for (const breakdown of invoice.taxBreakdown) {
+      const subtotal = taxTotal.ele('cac:TaxSubtotal');
+      subtotal.ele('cbc:TaxableAmount').att('currencyID', invoice.currency)
+        .txt((breakdown.taxableBase / 100).toFixed(2));
+      subtotal.ele('cbc:TaxAmount').att('currencyID', invoice.currency)
+        .txt((breakdown.taxAmount / 100).toFixed(2));
+
+      const category = subtotal.ele('cac:TaxCategory');
+      category.ele('cbc:ID').txt(breakdown.taxCode.charAt(0));
+      category.ele('cbc:Percent').txt((breakdown.taxRate * 100).toString());
+      category.ele('cac:TaxScheme').ele('cbc:ID').txt('VAT');
+    }
+  }
+
+  private static addMonetaryTotal(doc: any, invoice: IInvoice): void {
+    const monetary = doc.ele('cac:LegalMonetaryTotal');
+    monetary.ele('cbc:LineExtensionAmount').att('currencyID', invoice.currency)
+      .txt((invoice.subtotal / 100).toFixed(2));
+    monetary.ele('cbc:TaxExclusiveAmount').att('currencyID', invoice.currency)
+      .txt((invoice.totalBeforeTax / 100).toFixed(2));
+    monetary.ele('cbc:TaxInclusiveAmount').att('currencyID', invoice.currency)
+      .txt((invoice.totalAmount / 100).toFixed(2));
+    monetary.ele('cbc:PayableAmount').att('currencyID', invoice.currency)
+      .txt((invoice.grandTotal / 100).toFixed(2));
+  }
+
+  private static addInvoiceLine(doc: any, line: IInvoiceLineItem, lineNum: number, currency: string): void {
+    const invLine = doc.ele('cac:InvoiceLine');
+    invLine.ele('cbc:ID').txt(lineNum.toString());
+    invLine.ele('cbc:InvoicedQuantity').att('unitCode', 'PCE').txt(line.quantity.toString());
+    invLine.ele('cbc:LineExtensionAmount').att('currencyID', currency)
+      .txt((line.netAmount / 100).toFixed(2));
+
+    const item = invLine.ele('cac:Item');
+    item.ele('cbc:Name').txt(line.descriptionAr || line.description);
+
+    const taxCat = item.ele('cac:ClassifiedTaxCategory');
+    taxCat.ele('cbc:ID').txt(line.taxRate === 0.15 ? 'S' : 'Z');
+    taxCat.ele('cbc:Percent').txt((line.taxRate * 100).toString());
+    taxCat.ele('cac:TaxScheme').ele('cbc:ID').txt('VAT');
+
+    invLine.ele('cac:Price').ele('cbc:PriceAmount').att('currencyID', currency)
+      .txt((line.unitPrice / 100).toFixed(2));
+  }
+
+  private static formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+  private static formatTime(date: Date): string {
+    return date.toISOString().split('T')[1].split('.')[0];
+  }
+}
+```
+
+---
+
+## 6.6 ZATCA Integration Service (Fatoora Platform)
+
+```typescript
+// backend/src/services/zatca-integration.service.ts
+
+import axios from 'axios';
+import crypto from 'crypto';
+import { ec as EC } from 'elliptic';
+
+/**
+ * ZATCA Fatoora Platform Integration
+ * Sandbox: https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal
+ * Production: https://gw-fatoora.zatca.gov.sa/e-invoicing/core
+ */
+export class ZATCAIntegrationService {
+  private baseUrl: string;
+  private csid: string;              // Cryptographic Stamp Identifier
+  private privateKey: string;        // ECDSA private key
+
+  constructor() {
+    this.baseUrl = process.env.ZATCA_ENV === 'production'
+      ? 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core'
+      : 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal';
+
+    this.csid = process.env.ZATCA_CSID!;
+    this.privateKey = process.env.ZATCA_PRIVATE_KEY!;
+  }
+
+  /**
+   * Onboarding Step 1: Generate CSR (Certificate Signing Request)
+   */
+  async generateCSR(companyInfo: {
+    commonName: string;           // Company name
+    organizationUnit: string;     // Branch name
+    organization: string;         // Company legal name
+    country: string;              // 'SA'
+    serialNumber: string;         // VAT number
+    invoiceType: string;          // '1100' for both types
+    location: string;             // City
+    industry: string;             // Industry code
+  }): Promise<{ csr: string; privateKey: string }> {
+    const ec = new EC('secp256k1');
+    const keyPair = ec.genKeyPair();
+
+    const privateKey = keyPair.getPrivate('hex');
+    const publicKey = keyPair.getPublic('hex');
+
+    // Generate CSR (simplified - production should use proper X.509)
+    const csrData = {
+      CN: companyInfo.commonName,
+      OU: companyInfo.organizationUnit,
+      O: companyInfo.organization,
+      C: companyInfo.country,
+      SN: companyInfo.serialNumber,
+      UID: companyInfo.invoiceType,
+      title: companyInfo.location,
+      registeredAddress: companyInfo.industry,
+      publicKey,
+    };
+
+    const csr = Buffer.from(JSON.stringify(csrData)).toString('base64');
+
+    return { csr, privateKey };
+  }
+
+  /**
+   * Onboarding Step 2: Get Compliance CSID (for testing)
+   */
+  async getComplianceCSID(csr: string, otp: string): Promise<{
+    csid: string;
+    secret: string;
+    expiryDate: string;
+  }> {
+    const response = await axios.post(
+      `${this.baseUrl}/compliance`,
+      { csr },
+      {
+        headers: {
+          'Accept-Version': 'V2',
+          'OTP': otp,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return {
+      csid: response.data.binarySecurityToken,
+      secret: response.data.secret,
+      expiryDate: response.data.tokenExpiryDate,
+    };
+  }
+
+  /**
+   * Onboarding Step 3: Get Production CSID
+   */
+  async getProductionCSID(
+    complianceRequestId: string,
+    complianceCSID: string,
+    secret: string
+  ): Promise<{
+    csid: string;
+    secret: string;
+    expiryDate: string;
+  }> {
+    const auth = Buffer.from(`${complianceCSID}:${secret}`).toString('base64');
+
+    const response = await axios.post(
+      `${this.baseUrl}/production/csids`,
+      { compliance_request_id: complianceRequestId },
+      {
+        headers: {
+          'Accept-Version': 'V2',
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return {
+      csid: response.data.binarySecurityToken,
+      secret: response.data.secret,
+      expiryDate: response.data.tokenExpiryDate,
+    };
+  }
+
+  /**
+   * Standard Invoice: Clearance API (B2B - Real-time)
+   * Invoice must be cleared before issuing to customer
+   */
+  async clearInvoice(invoice: IInvoice, seller: ICompany): Promise<ZATCAClearanceResult> {
+    // 1. Generate XML
+    const xml = ZATCAXMLService.generateInvoiceXML(invoice, seller);
+
+    // 2. Calculate hash
+    const hash = ZATCAXMLService.calculateInvoiceHash(xml);
+
+    // 3. Sign the invoice
+    const signature = this.signInvoice(hash);
+
+    // 4. Generate QR code with all 9 tags
+    const qrCode = ZATCAQRCodeService.generateQRCode({
+      sellerName: seller.nameAr,
+      vatRegistrationNumber: seller.vatNumber,
+      invoiceTimestamp: invoice.invoiceDate,
+      invoiceTotal: invoice.grandTotal / 100,
+      vatTotal: invoice.totalTax / 100,
+      invoiceHash: hash,
+      ecdsaSignature: signature,
+      ecdsaPublicKey: this.getPublicKey(),
+    }, 2);
+
+    // 5. Embed signature and QR in XML
+    const signedXml = this.embedSignatureInXML(xml, signature, qrCode);
+
+    // 6. Call ZATCA Clearance API
+    const auth = Buffer.from(`${this.csid}:${process.env.ZATCA_SECRET}`).toString('base64');
+
+    try {
+      const response = await axios.post(
+        `${this.baseUrl}/invoices/clearance/single`,
+        {
+          invoiceHash: hash,
+          uuid: invoice.zatca.uuid,
+          invoice: Buffer.from(signedXml).toString('base64'),
+        },
+        {
+          headers: {
+            'Accept-Version': 'V2',
+            'Accept-Language': 'en',
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+            'Clearance-Status': '1',  // Request clearance
+          },
+        }
+      );
+
+      return {
+        status: 'cleared',
+        clearanceStatus: response.data.clearanceStatus,
+        clearedInvoice: response.data.clearedInvoice,
+        validationResults: response.data.validationResults,
+        warnings: response.data.validationResults?.warningMessages || [],
+        qrCode,
+        invoiceHash: hash,
+      };
+    } catch (error: any) {
+      return {
+        status: 'rejected',
+        clearanceStatus: 'REJECTED',
+        errors: error.response?.data?.validationResults?.errorMessages || [error.message],
+        warnings: error.response?.data?.validationResults?.warningMessages || [],
+        invoiceHash: hash,
+      };
+    }
+  }
+
+  /**
+   * Simplified Invoice: Reporting API (B2C - Within 24 hours)
+   */
+  async reportInvoice(invoice: IInvoice, seller: ICompany): Promise<ZATCAReportingResult> {
+    // Similar to clearance but uses reporting endpoint
+    const xml = ZATCAXMLService.generateInvoiceXML(invoice, seller);
+    const hash = ZATCAXMLService.calculateInvoiceHash(xml);
+    const signature = this.signInvoice(hash);
+
+    const qrCode = ZATCAQRCodeService.generateQRCode({
+      sellerName: seller.nameAr,
+      vatRegistrationNumber: seller.vatNumber,
+      invoiceTimestamp: invoice.invoiceDate,
+      invoiceTotal: invoice.grandTotal / 100,
+      vatTotal: invoice.totalTax / 100,
+      invoiceHash: hash,
+      ecdsaSignature: signature,
+      ecdsaPublicKey: this.getPublicKey(),
+    }, 2);
+
+    const signedXml = this.embedSignatureInXML(xml, signature, qrCode);
+    const auth = Buffer.from(`${this.csid}:${process.env.ZATCA_SECRET}`).toString('base64');
+
+    try {
+      const response = await axios.post(
+        `${this.baseUrl}/invoices/reporting/single`,
+        {
+          invoiceHash: hash,
+          uuid: invoice.zatca.uuid,
+          invoice: Buffer.from(signedXml).toString('base64'),
+        },
+        {
+          headers: {
+            'Accept-Version': 'V2',
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return {
+        status: 'reported',
+        reportingStatus: response.data.reportingStatus,
+        validationResults: response.data.validationResults,
+        warnings: response.data.validationResults?.warningMessages || [],
+        qrCode,
+        invoiceHash: hash,
+      };
+    } catch (error: any) {
+      return {
+        status: 'failed',
+        errors: error.response?.data?.validationResults?.errorMessages || [error.message],
+      };
+    }
+  }
+
+  /**
+   * Sign invoice hash using ECDSA
+   */
+  private signInvoice(hash: string): string {
+    const ec = new EC('secp256k1');
+    const key = ec.keyFromPrivate(this.privateKey, 'hex');
+    const signature = key.sign(hash);
+    return Buffer.from(signature.toDER()).toString('base64');
+  }
+
+  private getPublicKey(): string {
+    const ec = new EC('secp256k1');
+    const key = ec.keyFromPrivate(this.privateKey, 'hex');
+    return key.getPublic('hex');
+  }
+
+  private embedSignatureInXML(xml: string, signature: string, qrCode: string): string {
+    // Add UBLExtensions with signature
+    // This is simplified - production needs proper XAdES signature
+    return xml.replace(
+      '</Invoice>',
+      `<ext:UBLExtensions>
+        <ext:UBLExtension>
+          <ext:ExtensionContent>
+            <sig:UBLDocumentSignatures>
+              <sac:SignatureInformation>
+                <ds:Signature>${signature}</ds:Signature>
+              </sac:SignatureInformation>
+            </sig:UBLDocumentSignatures>
+          </ext:ExtensionContent>
+        </ext:UBLExtension>
+      </ext:UBLExtensions>
+      </Invoice>`
+    );
+  }
+}
+
+export interface ZATCAClearanceResult {
+  status: 'cleared' | 'rejected';
+  clearanceStatus: string;
+  clearedInvoice?: string;
+  validationResults?: any;
+  errors?: string[];
+  warnings: string[];
+  qrCode?: string;
+  invoiceHash: string;
+}
+
+export interface ZATCAReportingResult {
+  status: 'reported' | 'failed';
+  reportingStatus?: string;
+  validationResults?: any;
+  errors?: string[];
+  warnings?: string[];
+  qrCode?: string;
+  invoiceHash?: string;
+}
+```
+
+---
+
+## 6.7 ZATCA Compliance Validation
+
+```typescript
+// backend/src/services/zatca-validation.service.ts
+
+export interface ZATCAValidationResult {
+  isValid: boolean;
+  errors: ZATCAValidationError[];
+  warnings: ZATCAValidationWarning[];
+}
+
+export interface ZATCAValidationError {
+  code: string;
+  message: string;
+  messageAr: string;
+  field?: string;
+}
+
+export class ZATCAValidationService {
+  /**
+   * Validate invoice before submission to ZATCA
+   */
+  static validateInvoice(invoice: IInvoice, seller: ICompany): ZATCAValidationResult {
+    const errors: ZATCAValidationError[] = [];
+    const warnings: ZATCAValidationWarning[] = [];
+
+    const isSimplified = invoice.zatca?.invoiceSubType?.startsWith('02');
+
+    // 1. Seller validations
+    if (!ZATCAQRCodeService.validateVATNumber(seller.vatNumber)) {
+      errors.push({
+        code: 'BR-KSA-02',
+        message: 'Invalid seller VAT number format',
+        messageAr: 'تنسيق رقم ضريبة القيمة المضافة للبائع غير صالح',
+        field: 'seller.vatNumber',
+      });
+    }
+
+    if (!seller.nameAr) {
+      errors.push({
+        code: 'BR-KSA-01',
+        message: 'Seller name in Arabic is required',
+        messageAr: 'اسم البائع بالعربية مطلوب',
+        field: 'seller.nameAr',
+      });
+    }
+
+    // 2. Buyer validations (for standard invoices)
+    if (!isSimplified) {
+      if (!invoice.customerVatNumber) {
+        errors.push({
+          code: 'BR-KSA-03',
+          message: 'Buyer VAT number required for standard invoice',
+          messageAr: 'رقم ضريبة القيمة المضافة للمشتري مطلوب للفاتورة الضريبية',
+          field: 'customerVatNumber',
+        });
+      } else if (!ZATCAQRCodeService.validateVATNumber(invoice.customerVatNumber)) {
+        errors.push({
+          code: 'BR-KSA-04',
+          message: 'Invalid buyer VAT number format',
+          messageAr: 'تنسيق رقم ضريبة القيمة المضافة للمشتري غير صالح',
+          field: 'customerVatNumber',
+        });
+      }
+
+      if (!invoice.customerAddress) {
+        errors.push({
+          code: 'BR-KSA-05',
+          message: 'Buyer address required for standard invoice',
+          messageAr: 'عنوان المشتري مطلوب للفاتورة الضريبية',
+          field: 'customerAddress',
+        });
+      }
+    }
+
+    // 3. Invoice date validations
+    const invoiceDate = new Date(invoice.invoiceDate);
+    const now = new Date();
+
+    if (invoiceDate > now) {
+      errors.push({
+        code: 'BR-KSA-06',
+        message: 'Invoice date cannot be in the future',
+        messageAr: 'تاريخ الفاتورة لا يمكن أن يكون في المستقبل',
+        field: 'invoiceDate',
+      });
+    }
+
+    // 4. Amount validations
+    if (invoice.grandTotal <= 0) {
+      errors.push({
+        code: 'BR-KSA-07',
+        message: 'Invoice total must be greater than zero',
+        messageAr: 'إجمالي الفاتورة يجب أن يكون أكبر من صفر',
+        field: 'grandTotal',
+      });
+    }
+
+    // 5. Tax validations
+    for (const line of invoice.lineItems) {
+      if (line.taxRate !== 0 && line.taxRate !== 0.15) {
+        warnings.push({
+          code: 'BR-KSA-W01',
+          message: `Line ${line.lineNumber}: Non-standard tax rate ${line.taxRate * 100}%`,
+          messageAr: `السطر ${line.lineNumber}: معدل ضريبة غير قياسي`,
+          field: `lineItems[${line.lineNumber}].taxRate`,
+        });
+      }
+    }
+
+    // 6. Credit note validations
+    if (invoice.invoiceType === InvoiceType.CREDIT_NOTE) {
+      if (!invoice.originalInvoiceId) {
+        errors.push({
+          code: 'BR-KSA-08',
+          message: 'Credit note must reference original invoice',
+          messageAr: 'إشعار دائن يجب أن يشير إلى الفاتورة الأصلية',
+          field: 'originalInvoiceId',
+        });
+      }
+
+      if (!invoice.creditNoteReason) {
+        errors.push({
+          code: 'BR-KSA-09',
+          message: 'Credit note reason is required',
+          messageAr: 'سبب إشعار دائن مطلوب',
+          field: 'creditNoteReason',
+        });
+      }
+    }
+
+    // 7. UUID validation
+    if (!invoice.zatca?.uuid) {
+      errors.push({
+        code: 'BR-KSA-10',
+        message: 'Invoice UUID is required',
+        messageAr: 'معرف الفاتورة الفريد مطلوب',
+        field: 'zatca.uuid',
+      });
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  }
+}
+```
+
+---
+
+## 6.8 Tax & ZATCA API Contracts
+
+```typescript
+// Tax Code APIs
+// GET /api/v1/tax-codes
+interface ListTaxCodesResponse {
+  success: true;
+  data: {
+    taxCodes: ITaxCode[];
+    withholdingTaxCodes: IWithholdingTaxCode[];
+  };
+}
+
+// ZATCA Integration APIs
+// POST /api/v1/zatca/onboard
+interface ZATCAOnboardRequest {
+  companyId: string;
+  otp: string;                     // From ZATCA portal
+  environment: 'sandbox' | 'production';
+}
+
+interface ZATCAOnboardResponse {
+  success: true;
+  data: {
+    csid: string;
+    expiryDate: string;
+    status: 'active';
+  };
+}
+
+// POST /api/v1/invoices/:id/zatca/submit
+interface ZATCASubmitRequest {
+  invoiceId: string;
+}
+
+interface ZATCASubmitResponse {
+  success: true;
+  data: {
+    status: 'cleared' | 'reported' | 'rejected' | 'failed';
+    zatcaResponse: ZATCAClearanceResult | ZATCAReportingResult;
+    invoice: IInvoice;              // Updated with ZATCA data
+  };
+}
+
+// GET /api/v1/invoices/:id/zatca/status
+interface ZATCAStatusResponse {
+  success: true;
+  data: {
+    submissionStatus: ZATCAStatus;
+    submissionDate?: string;
+    clearanceDate?: string;
+    qrCode?: string;
+    invoiceHash?: string;
+    warnings?: string[];
+    errors?: string[];
+  };
+}
+
+// POST /api/v1/zatca/validate
+interface ZATCAValidateRequest {
+  invoiceId: string;
+}
+
+interface ZATCAValidateResponse {
+  success: true;
+  data: {
+    isValid: boolean;
+    errors: ZATCAValidationError[];
+    warnings: ZATCAValidationWarning[];
+  };
+}
+```
+
+---
+
+*Part 6 Complete. Continue to Part 7 (Expenses)?*
