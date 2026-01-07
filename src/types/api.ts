@@ -148,7 +148,15 @@ export type SocketAuthErrorCode =
 /**
  * Server → Client: Token expired event payload
  * Emitted when token TTL exceeded during periodic check (every 60s)
- * Recoverable: Yes - refresh token and update socket
+ *
+ * IMPORTANT: Server disconnects IMMEDIATELY after emitting this event.
+ * There is NO grace period - client should reconnect with new token.
+ *
+ * Token expiry times:
+ * - Normal users: 15 minutes
+ * - Anonymous users: 24 hours
+ *
+ * Recoverable: Yes - refresh token via HTTP and reconnect socket
  */
 export interface SocketAuthTokenExpiredPayload {
   message: string         // "Your session has expired. Please refresh to continue."
@@ -158,6 +166,15 @@ export interface SocketAuthTokenExpiredPayload {
 /**
  * Server → Client: Token invalid event payload
  * Emitted when token was revoked or tampered with
+ *
+ * IMPORTANT: Server disconnects IMMEDIATELY after emitting this event.
+ *
+ * Causes:
+ * - User logged out from another device
+ * - Admin revoked user's sessions
+ * - Token was manually invalidated
+ * - JWT verification failed
+ *
  * Recoverable: No - must re-authenticate (login again)
  */
 export interface SocketAuthTokenInvalidPayload {
@@ -168,11 +185,14 @@ export interface SocketAuthTokenInvalidPayload {
 /**
  * Client → Server: Token refresh response
  * Returned from 'auth:refresh_token' emit callback
+ *
+ * IMPORTANT: Backend returns expiresAt as a Date object (socket.tokenExpiry).
+ * Frontend should handle both Date and string formats for resilience.
  */
 export interface SocketAuthRefreshTokenResponse {
   success: boolean
-  expiresAt?: string      // ISO 8601 date string (only if success: true)
-  error?: string          // Error message (only if success: false)
+  expiresAt?: Date | string  // Date object from backend (may serialize to string over socket)
+  error?: string             // Error message (only if success: false)
 }
 
 /**

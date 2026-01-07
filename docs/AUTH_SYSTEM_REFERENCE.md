@@ -630,8 +630,55 @@ GOOGLE_SSO_CLIENT_ID=<your-id>.apps.googleusercontent.com
 
 ---
 
+## 13. WEBSOCKET TOKEN AUTHENTICATION
+
+WebSocket connections require token authentication and perform periodic validity checks.
+
+### Quick Reference
+
+| Setting | Value |
+|---------|-------|
+| Token check interval | 60 seconds |
+| Access token TTL (normal) | 15 minutes |
+| Access token TTL (anonymous) | 24 hours |
+| Grace period after expiry | **None** (immediate disconnect) |
+
+### Token Source (Priority)
+
+1. `socket.handshake.auth?.token`
+2. `socket.handshake.query?.token`
+
+### Events
+
+| Event | Direction | Purpose |
+|-------|-----------|---------|
+| `auth:token_expired` | Server → Client | Token TTL exceeded |
+| `auth:token_invalid` | Server → Client | Token revoked/invalid |
+| `auth:refresh_token` | Client → Server | Update socket token |
+
+### Connection Error Codes
+
+| Code | Meaning |
+|------|---------|
+| `AUTHENTICATION_REQUIRED` | No token in handshake |
+| `INVALID_TOKEN` | JWT verification failed |
+| `USER_NOT_FOUND` | User not in database |
+| `USER_DISABLED` | Account disabled |
+| `AUTHENTICATION_FAILED` | Generic failure |
+
+### JWT User ID Field
+
+**IMPORTANT**: Use `decoded.id` for user ID. The backend does NOT use `decoded.userId` or `decoded.sub`.
+
+### Detailed Documentation
+
+See [WebSocket Token Expiry](./WEBSOCKET_TOKEN_EXPIRY.md) for complete implementation details.
+
+---
+
 ## Related Documentation
 
 - [Authentication API Endpoints](./api-endpoints/01-AUTHENTICATION.md)
 - [HTTPONLY Cookie Auth](./HTTPONLY_COOKIE_AUTH.md)
 - [CAPTCHA Integration](./CAPTCHA_INTEGRATION.md)
+- [WebSocket Token Expiry](./WEBSOCKET_TOKEN_EXPIRY.md)
