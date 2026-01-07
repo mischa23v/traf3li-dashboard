@@ -41,7 +41,8 @@ export function PasswordBreachWarning({
   }
 
   // Format breach count with locale
-  const formattedBreachCount = warning.breachCount.toLocaleString(
+  // Backend returns 'count' field from HaveIBeenPwned API
+  const formattedBreachCount = warning.count.toLocaleString(
     isRTL ? 'ar-SA' : 'en-US'
   )
 
@@ -66,7 +67,8 @@ export function PasswordBreachWarning({
           </DialogTitle>
 
           <DialogDescription className="text-center">
-            {isRTL ? warning.message : warning.messageEn}
+            {/* Backend provides localized message based on user's Accept-Language header */}
+            {warning.message}
           </DialogDescription>
         </DialogHeader>
 
