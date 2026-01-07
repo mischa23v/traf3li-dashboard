@@ -1,18 +1,6 @@
-import { z } from 'zod'
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { ROUTES } from '@/constants/routes'
-
-const searchSchema = z.object({
-  redirect: z.string().optional(),
-})
+import { createFileRoute } from '@tanstack/react-router'
+import SignIn from '@/features/auth/sign-in'
 
 export const Route = createFileRoute('/(auth)/sign-in')({
-  validateSearch: searchSchema,
-  beforeLoad: ({ search }) => {
-    // Redirect to OTP login, preserving any redirect parameter
-    throw redirect({
-      to: ROUTES.auth.otpLogin,
-      search: search.redirect ? { redirect: search.redirect } : undefined,
-    })
-  },
+  component: SignIn,
 })
