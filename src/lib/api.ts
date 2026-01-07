@@ -380,6 +380,42 @@ let failedQueue: Array<{
 }> = []
 
 /**
+ * CSRF refresh state management
+ * Prevents multiple concurrent CSRF refresh attempts
+ */
+let isRefreshingCsrf = false
+let csrfFailedQueue: Array<{
+  resolve: (value: any) => void
+  reject: (error: any) => void
+  config: InternalAxiosRequestConfig
+  client: 'versioned' | 'noVersion'
+}> = []
+
+/**
+ * Process queued requests after CSRF refresh
+ */
+const processCsrfQueue = (error: any = null): void => {
+  csrfFailedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      // Retry the request with new CSRF token
+      const newToken = getCsrfToken()
+      if (newToken && prom.config.headers) {
+        prom.config.headers.set('X-CSRF-Token', newToken)
+      }
+      // Use appropriate client
+      if (prom.client === 'noVersion') {
+        prom.resolve(apiClientNoVersion(prom.config))
+      } else {
+        prom.resolve(apiClient(prom.config))
+      }
+    }
+  })
+  csrfFailedQueue = []
+}
+
+/**
  * Process queued requests after token refresh
  */
 const processQueue = (error: any = null): void => {
@@ -920,43 +956,93 @@ apiClientNoVersion.interceptors.response.use(
 
     // Handle 403 Forbidden - Check for CSRF token errors and retry once with fresh token
     if (error.response?.status === 403) {
-      const errorCode = error.response?.data?.code
-      const errorMessage = error.response?.data?.message?.toLowerCase() || ''
+      const csrfErrorCode = error.response?.data?.code
+      const csrfErrorMessage = error.response?.data?.message?.toLowerCase() || ''
 
       // Check for CSRF token errors - retry once with fresh token
       // Handle various CSRF error codes and messages
-      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING' ||
-          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode === 'CSRF_TOKEN_REUSED' ||
-          errorCode === 'CSRF_TOKEN_EXPIRED' || errorCode?.startsWith('CSRF_') ||
-          errorMessage.includes('csrf') || errorMessage.includes('token already used')) {
-        // Only retry once
+      const isCsrfError = csrfErrorCode === 'CSRF_TOKEN_INVALID' ||
+          csrfErrorCode === 'CSRF_TOKEN_MISSING' ||
+          csrfErrorCode === 'CSRF_ORIGIN_INVALID' ||
+          csrfErrorCode === 'CSRF_TOKEN_REUSED' ||
+          csrfErrorCode === 'CSRF_TOKEN_EXPIRED' ||
+          csrfErrorCode?.startsWith('CSRF_') ||
+          csrfErrorMessage.includes('csrf') ||
+          csrfErrorMessage.includes('token already used')
+
+      if (isCsrfError) {
+        // Only retry once per request
         if (!originalRequest._csrfRetry) {
           originalRequest._csrfRetry = true
+
+          // If already refreshing CSRF, queue this request
+          if (isRefreshingCsrf) {
+            return new Promise((resolve, reject) => {
+              csrfFailedQueue.push({
+                resolve,
+                reject,
+                config: originalRequest,
+                client: 'noVersion'
+              })
+            })
+          }
+
+          // Start CSRF refresh
+          isRefreshingCsrf = true
 
           try {
             // Refresh CSRF token
             await refreshCsrfToken()
 
-            // Get the new token and retry
+            // Get the new token
             const newToken = getCsrfToken()
-            if (newToken && originalRequest.headers) {
+            if (!newToken) {
+              // CSRF refresh succeeded but no token available - fail cleanly
+              const csrfFailError = {
+                status: 403,
+                message: 'فشل تحديث رمز الأمان | Security token refresh failed',
+                code: 'CSRF_REFRESH_FAILED',
+                error: true,
+                requestId: error.response?.data?.requestId,
+              }
+              processCsrfQueue(csrfFailError)
+              return Promise.reject(csrfFailError)
+            }
+
+            // Update original request with new token
+            if (originalRequest.headers) {
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
+            // Process queued requests
+            processCsrfQueue()
+
+            // Retry original request
             return apiClientNoVersion(originalRequest)
           } catch (csrfError) {
             if (import.meta.env.DEV) {
               console.error('[CSRF] Token refresh failed (noVersion):', csrfError)
             }
-            // Fall through to return the error
+            // Reject all queued requests
+            const failError = {
+              status: 403,
+              message: 'فشل تحديث رمز الأمان | Security token refresh failed',
+              code: 'CSRF_REFRESH_FAILED',
+              error: true,
+              requestId: error.response?.data?.requestId,
+            }
+            processCsrfQueue(failError)
+            return Promise.reject(failError)
+          } finally {
+            isRefreshingCsrf = false
           }
         }
 
-        // If CSRF retry already attempted or failed, return a clear error
+        // If CSRF retry already attempted, return bilingual error
         return Promise.reject({
           status: 403,
-          message: 'CSRF token invalid - please try again',
-          code: errorCode || 'CSRF_ERROR',
+          message: 'رمز الأمان غير صالح. يرجى المحاولة مرة أخرى | Security token invalid. Please try again.',
+          code: csrfErrorCode || 'CSRF_ERROR',
           error: true,
           requestId: error.response?.data?.requestId,
         })
@@ -1493,64 +1579,127 @@ apiClient.interceptors.response.use(
     // Handle 403 Forbidden - Permission denied (including departed users) and CSRF errors
     if (error.response?.status === 403) {
       const message = error.response?.data?.message
-      const errorCode = error.response?.data?.code
+      const csrfErrCode = error.response?.data?.code
       const messageLower = message?.toLowerCase() || ''
 
       // Check for CSRF token errors - retry once with fresh token
       // Handle various CSRF error codes and messages
-      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING' ||
-          errorCode === 'CSRF_ORIGIN_INVALID' || errorCode === 'CSRF_TOKEN_REUSED' ||
-          errorCode === 'CSRF_TOKEN_EXPIRED' || errorCode?.startsWith('CSRF_') ||
-          messageLower.includes('csrf') || messageLower.includes('token already used')) {
-        // Only retry once
+      const isCsrfErr = csrfErrCode === 'CSRF_TOKEN_INVALID' ||
+          csrfErrCode === 'CSRF_TOKEN_MISSING' ||
+          csrfErrCode === 'CSRF_ORIGIN_INVALID' ||
+          csrfErrCode === 'CSRF_TOKEN_REUSED' ||
+          csrfErrCode === 'CSRF_TOKEN_EXPIRED' ||
+          csrfErrCode?.startsWith('CSRF_') ||
+          messageLower.includes('csrf') ||
+          messageLower.includes('token already used')
+
+      if (isCsrfErr) {
+        // Only retry once per request
         if (!originalRequest._csrfRetry) {
           originalRequest._csrfRetry = true
+
+          // If already refreshing CSRF, queue this request
+          if (isRefreshingCsrf) {
+            return new Promise((resolve, reject) => {
+              csrfFailedQueue.push({
+                resolve,
+                reject,
+                config: originalRequest,
+                client: 'versioned'
+              })
+            })
+          }
+
+          // Start CSRF refresh
+          isRefreshingCsrf = true
 
           try {
             // Refresh CSRF token
             await refreshCsrfToken()
 
-            // Get the new token and retry
+            // Get the new token
             const newToken = getCsrfToken()
-            if (newToken && originalRequest.headers) {
+            if (!newToken) {
+              // CSRF refresh succeeded but no token available
+              const csrfFailErr = {
+                status: 403,
+                message: 'فشل تحديث رمز الأمان | Security token refresh failed',
+                code: 'CSRF_REFRESH_FAILED',
+                error: true,
+                requestId: error.response?.data?.requestId,
+              }
+              processCsrfQueue(csrfFailErr)
+
+              // Redirect to login for versioned API (non-auth endpoints)
+              import('sonner').then(({ toast }) => {
+                toast.error('انتهت صلاحية الجلسة | Session expired', {
+                  description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+                  duration: 3000,
+                })
+              })
+              setTimeout(() => {
+                window.location.href = '/sign-in?reason=csrf_failed'
+              }, 2000)
+
+              return Promise.reject(csrfFailErr)
+            }
+
+            // Update original request with new token
+            if (originalRequest.headers) {
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
+            // Process queued requests
+            processCsrfQueue()
+
+            // Retry original request
             return apiClient(originalRequest)
           } catch (csrfError) {
             if (import.meta.env.DEV) {
               console.error('[CSRF] Token refresh failed:', csrfError)
             }
-            // If refresh fails, redirect to login
+            // Reject all queued requests
+            const failErr = {
+              status: 403,
+              message: 'فشل تحديث رمز الأمان | Security token refresh failed',
+              code: 'CSRF_REFRESH_FAILED',
+              error: true,
+              requestId: error.response?.data?.requestId,
+            }
+            processCsrfQueue(failErr)
+
+            // Redirect to login
             import('sonner').then(({ toast }) => {
               toast.error('انتهت صلاحية الجلسة | Session expired', {
                 description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
                 duration: 3000,
               })
             })
-
             setTimeout(() => {
               window.location.href = '/sign-in?reason=csrf_failed'
             }, 2000)
-          }
-        } else {
-          // Already retried once, show error and redirect
-          import('sonner').then(({ toast }) => {
-            toast.error('انتهت صلاحية الجلسة | Session expired', {
-              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-              duration: 3000,
-            })
-          })
 
-          setTimeout(() => {
-            window.location.href = '/sign-in?reason=csrf_failed'
-          }, 2000)
+            return Promise.reject(failErr)
+          } finally {
+            isRefreshingCsrf = false
+          }
         }
+
+        // If CSRF retry already attempted, redirect to login
+        import('sonner').then(({ toast }) => {
+          toast.error('انتهت صلاحية الجلسة | Session expired', {
+            description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
+            duration: 3000,
+          })
+        })
+        setTimeout(() => {
+          window.location.href = '/sign-in?reason=csrf_failed'
+        }, 2000)
 
         return Promise.reject({
           status: 403,
-          message: 'CSRF token invalid',
-          code: errorCode,
+          message: 'رمز الأمان غير صالح | Security token invalid',
+          code: csrfErrCode || 'CSRF_ERROR',
           error: true,
           requestId: error.response?.data?.requestId,
         })
