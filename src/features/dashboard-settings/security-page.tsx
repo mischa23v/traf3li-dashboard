@@ -433,7 +433,7 @@ export function SecurityPage() {
                     <Button
                       variant="outline"
                       onClick={handleLogoutAndRelogin}
-                      className="sm:me-auto"
+                      className="sm:me-auto text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
                     >
                       <LogOut className="h-4 w-4 me-2" />
                       {isRTL ? 'تسجيل الخروج' : 'Logout'}
@@ -451,9 +451,7 @@ export function SecurityPage() {
                         disabled={changePasswordMutation.isPending}
                       >
                         {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                        {mustChangePassword
-                          ? (isRTL ? 'تغيير كلمة المرور الآن' : 'Change Password Now')
-                          : t('common.save')}
+                        {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
                       </Button>
                     </div>
                   </DialogFooter>
