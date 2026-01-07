@@ -1,3 +1,9 @@
+# 🔴 REQUIREMENT: ENTERPRISE-LEVEL CODE QUALITY
+
+**Make sure all code is enterprise-level, production-level, and meets gold standard. Be honest - review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases.**
+
+---
+
 # 🛑 STOP. READ THIS FIRST.
 
 **MANDATORY: Before writing ANY code, you MUST complete these steps:**
