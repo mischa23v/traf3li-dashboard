@@ -1,14 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import authService, { type User, type LoginCredentials } from '../authService'
-import apiClient from '@/lib/api'
+import { apiClientNoVersion } from '@/lib/api'
 
-// Mock the API client
+// Mock the API client - authService uses apiClientNoVersion, not the default export
 vi.mock('@/lib/api', () => ({
   default: {
     post: vi.fn(),
     get: vi.fn(),
   },
+  apiClientNoVersion: {
+    post: vi.fn(),
+    get: vi.fn(),
+  },
   handleApiError: vi.fn((error) => error?.message || 'An error occurred'),
+  storeTokens: vi.fn(),
+  clearTokens: vi.fn(),
+  resetApiState: vi.fn(),
+  refreshCsrfToken: vi.fn().mockResolvedValue(undefined),
+  getAccessToken: vi.fn().mockReturnValue(null),
+  getRefreshToken: vi.fn().mockReturnValue(null),
 }))
 
 // Mock localStorage
@@ -34,13 +44,17 @@ Object.defineProperty(window, 'localStorage', {
 })
 
 describe('authService', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorageMock.clear()
     vi.clearAllMocks()
+    // Reset all auth state including memoryCachedUser by calling logout
+    await authService.logout()
+    localStorageMock.clear() // Clear again after logout
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     localStorageMock.clear()
+    await authService.logout()
   })
 
   describe('login', () => {
@@ -65,17 +79,18 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
       const credentials: LoginCredentials = {
         username: 'testuser',
         password: 'password123',
       }
 
-      const user = await authService.login(credentials)
+      const result = await authService.login(credentials)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/login', credentials)
-      expect(user).toEqual(mockUser)
+      expect(apiClientNoVersion.post).toHaveBeenCalledWith('/auth/login', credentials)
+      // login now returns LoginResponse which could be { user, warning } or OTPRequiredResponse
+      expect('user' in result && result.user).toEqual(mockUser)
       expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser))
     })
 
@@ -105,14 +120,15 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
-      const user = await authService.login({
+      const result = await authService.login({
         username: 'testuser',
         password: 'password123',
       })
 
-      expect(user.firmId).toBe('firm-456')
+      // login returns LoginResponse - extract user from { user, warning }
+      expect('user' in result && result.user.firmId).toBe('firm-456')
     })
 
     it('should normalize user data and extract firmId from tenant.id', async () => {
@@ -141,14 +157,15 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
-      const user = await authService.login({
+      const result = await authService.login({
         username: 'testuser',
         password: 'password123',
       })
 
-      expect(user.firmId).toBe('tenant-789')
+      // login returns LoginResponse - extract user from { user, warning }
+      expect('user' in result && result.user.firmId).toBe('tenant-789')
     })
 
     it('should throw error when login fails', async () => {
@@ -159,7 +176,7 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
       await expect(
         authService.login({
@@ -178,7 +195,7 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
       await expect(
         authService.login({
@@ -190,7 +207,7 @@ describe('authService', () => {
 
     it('should handle API errors', async () => {
       const mockError = new Error('Network error')
-      vi.mocked(apiClient.post).mockRejectedValue(mockError)
+      vi.mocked(apiClientNoVersion.post).mockRejectedValue(mockError)
 
       await expect(
         authService.login({
@@ -217,18 +234,18 @@ describe('authService', () => {
 
       localStorage.setItem('user', JSON.stringify(mockUser))
 
-      vi.mocked(apiClient.post).mockResolvedValue({ data: {} })
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue({ data: {} })
 
       await authService.logout()
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/logout')
+      expect(apiClientNoVersion.post).toHaveBeenCalledWith('/auth/logout')
       expect(localStorage.getItem('user')).toBeNull()
     })
 
     it('should clear localStorage even if API call fails', async () => {
       localStorage.setItem('user', JSON.stringify({ _id: '123' }))
 
-      vi.mocked(apiClient.post).mockRejectedValue(new Error('Network error'))
+      vi.mocked(apiClientNoVersion.post).mockRejectedValue(new Error('Network error'))
 
       await authService.logout()
 
@@ -258,11 +275,11 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.get).mockResolvedValue(mockResponse)
 
       const user = await authService.getCurrentUser()
 
-      expect(apiClient.get).toHaveBeenCalledWith('/auth/me')
+      expect(apiClientNoVersion.get).toHaveBeenCalledWith('/auth/me')
       expect(user).toEqual(mockUser)
       expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser))
     })
@@ -275,25 +292,31 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.get).mockResolvedValue(mockResponse)
 
       const user = await authService.getCurrentUser()
 
       expect(user).toBeNull()
     })
 
-    it('should clear localStorage on 401 unauthorized error', async () => {
+    it('should return null on 401 but NOT clear localStorage (only logout does that)', async () => {
+      // Note: authService intentionally does NOT clear localStorage on 401
+      // to prevent race conditions with parallel route preloads.
+      // Only authService.logout() should clear localStorage.
       localStorage.setItem('user', JSON.stringify({ _id: '123' }))
 
       const mockError: any = new Error('Unauthorized')
       mockError.status = 401
 
-      vi.mocked(apiClient.get).mockRejectedValue(mockError)
+      vi.mocked(apiClientNoVersion.get).mockRejectedValue(mockError)
 
       const user = await authService.getCurrentUser()
 
+      // getCurrentUser returns null to trigger redirect to sign-in
       expect(user).toBeNull()
-      expect(localStorage.getItem('user')).toBeNull()
+      // But localStorage is preserved - only logout() clears it
+      // This is intentional to prevent race conditions with parallel route preloads
+      expect(localStorage.getItem('user')).not.toBeNull()
     })
 
     it('should normalize user data from getCurrentUser', async () => {
@@ -322,7 +345,7 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.get).mockResolvedValue(mockResponse)
 
       const user = await authService.getCurrentUser()
 
@@ -485,14 +508,15 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
-      const user = await authService.login({
+      const result = await authService.login({
         username: 'testuser',
         password: 'password123',
       })
 
-      expect(user.firmId).toBe('existing-firm-id')
+      // login returns LoginResponse - extract user from { user, warning }
+      expect('user' in result && result.user.firmId).toBe('existing-firm-id')
     })
 
     it('should handle user without firm or tenant', async () => {
@@ -516,14 +540,15 @@ describe('authService', () => {
         },
       }
 
-      vi.mocked(apiClient.post).mockResolvedValue(mockResponse)
+      vi.mocked(apiClientNoVersion.post).mockResolvedValue(mockResponse)
 
-      const user = await authService.login({
+      const result = await authService.login({
         username: 'testuser',
         password: 'password123',
       })
 
-      expect(user.firmId).toBeUndefined()
+      // login returns LoginResponse - extract user from { user, warning }
+      expect('user' in result && result.user.firmId).toBeUndefined()
     })
 
     it('should handle malformed localStorage data gracefully', () => {
