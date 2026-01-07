@@ -239,6 +239,22 @@ export const ROUTES = {
         list: '/dashboard/finance/recurring',
       },
 
+      // Subscriptions
+      subscriptions: {
+        list: '/dashboard/finance/subscriptions',
+        new: '/dashboard/finance/subscriptions/new',
+        detail: (subscriptionId: string) => `/dashboard/finance/subscriptions/${subscriptionId}`,
+        edit: (subscriptionId: string) => `/dashboard/finance/subscriptions/${subscriptionId}/edit`,
+      },
+
+      // Subscription Plans
+      subscriptionPlans: {
+        list: '/dashboard/finance/subscription-plans',
+        new: '/dashboard/finance/subscription-plans/new',
+        detail: (planId: string) => `/dashboard/finance/subscription-plans/${planId}`,
+        edit: (planId: string) => `/dashboard/finance/subscription-plans/${planId}/edit`,
+      },
+
       // Quotes
       quotes: {
         list: '/dashboard/finance/quotes',
@@ -1320,6 +1336,8 @@ export type RouteParams = {
   feedId: string;
   cardId: string;
   reportId: string;
+  subscriptionId: string;
+  subscriptionPlanId: string;
 
   // HR
   employeeId: string;

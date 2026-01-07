@@ -28,6 +28,10 @@ import {
   CheckSquare,
   BookOpen,
   Scale,
+  Wallet,
+  CreditCard,
+  RefreshCw,
+  Receipt,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -82,6 +86,32 @@ export const sidebarData: SidebarData = {
             {
               title: 'sidebar.allCases',
               url: ROUTES.dashboard.cases.list,
+            },
+          ],
+        },
+        {
+          title: 'sidebar.finance',
+          icon: Wallet,
+          items: [
+            {
+              title: 'sidebar.invoices',
+              url: ROUTES.dashboard.finance.invoices.list,
+              icon: Receipt,
+            },
+            {
+              title: 'sidebar.subscriptions',
+              url: ROUTES.dashboard.finance.subscriptions.list,
+              icon: RefreshCw,
+            },
+            {
+              title: 'sidebar.subscriptionPlans',
+              url: ROUTES.dashboard.finance.subscriptionPlans.list,
+              icon: CreditCard,
+            },
+            {
+              title: 'sidebar.payments',
+              url: ROUTES.dashboard.finance.payments.list,
+              icon: Wallet,
             },
           ],
         },
