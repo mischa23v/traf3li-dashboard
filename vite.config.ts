@@ -56,9 +56,8 @@ export default defineConfig({
     },
   },
   build: {
-    // SECURITY: Source maps disabled in production to prevent exposing source code
-    // Enable locally with: VITE_SOURCEMAP=true npm run build
-    sourcemap: process.env.VITE_SOURCEMAP === 'true',
+    // SECURITY: Source maps disabled - never expose source code in production
+    sourcemap: false,
     // Disable minification in debug mode for readable code (set to 'esbuild' for production)
     minify: process.env.DEBUG_BUILD === 'true' ? false : 'esbuild',
     rollupOptions: {
