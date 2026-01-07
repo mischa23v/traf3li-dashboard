@@ -3877,4 +3877,469 @@ interface AccountLedgerResponse {
 
 ---
 
-*Part 4 Complete. Continue to Part 5 (Multi-Currency)?*
+# PART 5: MULTI-CURRENCY SUPPORT {#part-5-multi-currency}
+
+## 5.1 Currency Management Schema
+
+### Why This Matters
+**Problems from Audit:**
+- No exchange rate table
+- No realized vs unrealized gain/loss
+- Payment in different currency than invoice not handled
+- No currency revaluation for period-end
+
+```typescript
+// backend/src/models/currency.model.ts
+
+export interface ICurrency extends Document {
+  code: string;                    // ISO 4217: 'USD', 'EUR', 'GBP'
+  name: string;                    // 'US Dollar'
+  nameAr: string;                  // 'دولار أمريكي'
+  symbol: string;                  // '$'
+  symbolPosition: 'before' | 'after';
+  decimalPlaces: number;           // 2 for most, 0 for JPY, 3 for KWD
+  decimalSeparator: string;        // '.'
+  thousandsSeparator: string;      // ','
+
+  // Rounding
+  roundingMode: RoundingMode;
+  smallestUnit: number;            // 0.01 for SAR, 0.001 for KWD
+
+  // Status
+  isActive: boolean;
+  isBaseCurrency: boolean;         // Only one can be true (SAR)
+
+  // Exchange rate defaults
+  defaultRateType: ExchangeRateType;
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IExchangeRate extends Document {
+  // Currency pair
+  fromCurrency: string;            // 'USD'
+  toCurrency: string;              // 'SAR'
+
+  // Rate
+  rate: number;                    // e.g., 3.75 (1 USD = 3.75 SAR)
+  inverseRate: number;             // e.g., 0.2667 (1 SAR = 0.2667 USD)
+
+  // Type
+  rateType: ExchangeRateType;      // spot, buy, sell, average
+
+  // Validity
+  effectiveDate: Date;             // Start date
+  expiryDate?: Date;               // End date (null = current)
+
+  // Source
+  source: ExchangeRateSource;
+  sourceReference?: string;        // External reference
+
+  // Audit
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+}
+
+// Pre-seeded currencies for Saudi market
+export const DEFAULT_CURRENCIES = [
+  { code: 'SAR', name: 'Saudi Riyal', nameAr: 'ريال سعودي', symbol: '﷼', decimalPlaces: 2, isBaseCurrency: true },
+  { code: 'USD', name: 'US Dollar', nameAr: 'دولار أمريكي', symbol: '$', decimalPlaces: 2 },
+  { code: 'EUR', name: 'Euro', nameAr: 'يورو', symbol: '€', decimalPlaces: 2 },
+  { code: 'GBP', name: 'British Pound', nameAr: 'جنيه إسترليني', symbol: '£', decimalPlaces: 2 },
+  { code: 'AED', name: 'UAE Dirham', nameAr: 'درهم إماراتي', symbol: 'د.إ', decimalPlaces: 2 },
+  { code: 'KWD', name: 'Kuwaiti Dinar', nameAr: 'دينار كويتي', symbol: 'د.ك', decimalPlaces: 3 },
+  { code: 'BHD', name: 'Bahraini Dinar', nameAr: 'دينار بحريني', symbol: 'د.ب', decimalPlaces: 3 },
+  { code: 'QAR', name: 'Qatari Riyal', nameAr: 'ريال قطري', symbol: 'ر.ق', decimalPlaces: 2 },
+  { code: 'OMR', name: 'Omani Rial', nameAr: 'ريال عماني', symbol: 'ر.ع', decimalPlaces: 3 },
+  { code: 'EGP', name: 'Egyptian Pound', nameAr: 'جنيه مصري', symbol: 'ج.م', decimalPlaces: 2 },
+  { code: 'JOD', name: 'Jordanian Dinar', nameAr: 'دينار أردني', symbol: 'د.أ', decimalPlaces: 3 },
+];
+```
+
+---
+
+## 5.2 Exchange Rate Service
+
+```typescript
+// backend/src/services/exchange-rate.service.ts
+
+export class ExchangeRateService {
+  /**
+   * Get exchange rate for a specific date
+   * Falls back to most recent rate if exact date not found
+   */
+  static async getRate(
+    fromCurrency: string,
+    toCurrency: string,
+    date: Date = new Date(),
+    rateType: ExchangeRateType = ExchangeRateType.SPOT
+  ): Promise<IExchangeRate> {
+    // Same currency - rate is 1
+    if (fromCurrency === toCurrency) {
+      return {
+        fromCurrency,
+        toCurrency,
+        rate: 1,
+        inverseRate: 1,
+        rateType,
+        effectiveDate: date,
+      } as IExchangeRate;
+    }
+
+    // Try direct rate first
+    let rate = await ExchangeRate.findOne({
+      fromCurrency,
+      toCurrency,
+      rateType,
+      effectiveDate: { $lte: date },
+      $or: [
+        { expiryDate: null },
+        { expiryDate: { $gte: date } },
+      ],
+    }).sort({ effectiveDate: -1 });
+
+    if (rate) return rate;
+
+    // Try inverse rate
+    rate = await ExchangeRate.findOne({
+      fromCurrency: toCurrency,
+      toCurrency: fromCurrency,
+      rateType,
+      effectiveDate: { $lte: date },
+      $or: [
+        { expiryDate: null },
+        { expiryDate: { $gte: date } },
+      ],
+    }).sort({ effectiveDate: -1 });
+
+    if (rate) {
+      // Return inverted
+      return {
+        fromCurrency,
+        toCurrency,
+        rate: rate.inverseRate,
+        inverseRate: rate.rate,
+        rateType,
+        effectiveDate: rate.effectiveDate,
+      } as IExchangeRate;
+    }
+
+    // Try triangulation through base currency (SAR)
+    if (fromCurrency !== 'SAR' && toCurrency !== 'SAR') {
+      const fromToBase = await this.getRate(fromCurrency, 'SAR', date, rateType);
+      const baseToTarget = await this.getRate('SAR', toCurrency, date, rateType);
+
+      if (fromToBase && baseToTarget) {
+        const triangulatedRate = fromToBase.rate * baseToTarget.rate;
+        return {
+          fromCurrency,
+          toCurrency,
+          rate: triangulatedRate,
+          inverseRate: 1 / triangulatedRate,
+          rateType,
+          effectiveDate: date,
+          source: ExchangeRateSource.MANUAL,
+        } as IExchangeRate;
+      }
+    }
+
+    throw new FinanceError(
+      FinanceErrorCode.CUR_001,
+      `Exchange rate not found for ${fromCurrency}/${toCurrency} on ${date.toISOString().split('T')[0]}`
+    );
+  }
+
+  /**
+   * Convert amount between currencies
+   */
+  static async convert(
+    amount: number,
+    fromCurrency: string,
+    toCurrency: string,
+    date: Date = new Date(),
+    rateType: ExchangeRateType = ExchangeRateType.SPOT
+  ): Promise<{ amount: number; rate: number; rateDate: Date }> {
+    const exchangeRate = await this.getRate(fromCurrency, toCurrency, date, rateType);
+
+    const toCurrencyConfig = await Currency.findOne({ code: toCurrency });
+    const decimalPlaces = toCurrencyConfig?.decimalPlaces || 2;
+
+    const convertedAmount = new Decimal(amount)
+      .times(exchangeRate.rate)
+      .toDecimalPlaces(decimalPlaces, Decimal.ROUND_HALF_UP)
+      .toNumber();
+
+    return {
+      amount: convertedAmount,
+      rate: exchangeRate.rate,
+      rateDate: exchangeRate.effectiveDate,
+    };
+  }
+
+  /**
+   * Create or update exchange rate
+   */
+  static async setRate(
+    fromCurrency: string,
+    toCurrency: string,
+    rate: number,
+    rateType: ExchangeRateType,
+    effectiveDate: Date,
+    source: ExchangeRateSource = ExchangeRateSource.MANUAL,
+    userId: string
+  ): Promise<IExchangeRate> {
+    // Validate currencies exist
+    const [from, to] = await Promise.all([
+      Currency.findOne({ code: fromCurrency, isActive: true }),
+      Currency.findOne({ code: toCurrency, isActive: true }),
+    ]);
+
+    if (!from) throw new FinanceError(FinanceErrorCode.CUR_002, `Invalid currency: ${fromCurrency}`);
+    if (!to) throw new FinanceError(FinanceErrorCode.CUR_002, `Invalid currency: ${toCurrency}`);
+
+    // Expire previous rate
+    await ExchangeRate.updateMany(
+      {
+        fromCurrency,
+        toCurrency,
+        rateType,
+        expiryDate: null,
+      },
+      {
+        expiryDate: new Date(effectiveDate.getTime() - 1),
+      }
+    );
+
+    // Create new rate
+    const exchangeRate = new ExchangeRate({
+      fromCurrency,
+      toCurrency,
+      rate,
+      inverseRate: 1 / rate,
+      rateType,
+      effectiveDate,
+      source,
+      createdBy: userId,
+    });
+
+    await exchangeRate.save();
+    return exchangeRate;
+  }
+}
+```
+
+---
+
+## 5.3 Realized vs Unrealized Gain/Loss
+
+```typescript
+// backend/src/services/exchange-gain-loss.service.ts
+
+export interface ExchangeGainLossResult {
+  transactionId: string;
+  transactionType: 'payment' | 'revaluation';
+  originalCurrency: string;
+  originalAmount: number;
+  originalRate: number;
+  settlementRate: number;
+  gainLossAmount: number;          // In base currency (SAR)
+  isGain: boolean;
+  journalEntryId?: string;
+}
+
+export class ExchangeGainLossService {
+  /**
+   * Calculate realized gain/loss when payment settles invoice
+   */
+  static calculateRealizedGainLoss(
+    invoiceAmount: number,           // Amount in foreign currency
+    invoiceRate: number,             // Rate at invoice date
+    paymentRate: number              // Rate at payment date
+  ): number {
+    const invoiceBase = new Decimal(invoiceAmount).times(invoiceRate);
+    const paymentBase = new Decimal(invoiceAmount).times(paymentRate);
+    return paymentBase.minus(invoiceBase).toNumber();
+  }
+
+  /**
+   * Period-end revaluation of open foreign currency balances
+   */
+  static async revalueOpenBalances(
+    periodEndDate: Date,
+    userId: string
+  ): Promise<ExchangeGainLossResult[]> {
+    const results: ExchangeGainLossResult[] = [];
+    const foreignBalances = await this.getForeignCurrencyBalances(periodEndDate);
+
+    for (const balance of foreignBalances) {
+      if (balance.currency === 'SAR') continue;
+
+      const periodEndRate = await ExchangeRateService.getRate(
+        balance.currency,
+        'SAR',
+        periodEndDate,
+        ExchangeRateType.CLOSING
+      );
+
+      const currentBaseValue = new Decimal(balance.amount).times(periodEndRate.rate);
+      const bookedBaseValue = new Decimal(balance.amountBase);
+      const unrealizedGainLoss = currentBaseValue.minus(bookedBaseValue).toNumber();
+
+      if (Math.abs(unrealizedGainLoss) < 0.01) continue;
+
+      const entry = await this.createRevaluationEntry(
+        balance,
+        unrealizedGainLoss,
+        periodEndDate,
+        periodEndRate.rate,
+        userId
+      );
+
+      results.push({
+        transactionId: balance.accountId,
+        transactionType: 'revaluation',
+        originalCurrency: balance.currency,
+        originalAmount: balance.amount,
+        originalRate: balance.amountBase / balance.amount,
+        settlementRate: periodEndRate.rate,
+        gainLossAmount: unrealizedGainLoss,
+        isGain: unrealizedGainLoss > 0,
+        journalEntryId: entry._id.toString(),
+      });
+    }
+
+    return results;
+  }
+
+  private static async getForeignCurrencyBalances(asOfDate: Date) {
+    return JournalEntryLine.aggregate([
+      {
+        $lookup: {
+          from: 'journalentries',
+          localField: 'journalEntryId',
+          foreignField: '_id',
+          as: 'entry',
+        },
+      },
+      { $unwind: '$entry' },
+      {
+        $match: {
+          'entry.status': 'posted',
+          'entry.entryDate': { $lte: asOfDate },
+          'entry.currency': { $ne: 'SAR' },
+        },
+      },
+      {
+        $group: {
+          _id: { accountId: '$accountId', currency: '$entry.currency' },
+          amount: { $sum: { $subtract: ['$debit', '$credit'] } },
+          amountBase: { $sum: { $subtract: ['$debitBase', '$creditBase'] } },
+        },
+      },
+      { $match: { amount: { $ne: 0 } } },
+    ]);
+  }
+
+  private static async createRevaluationEntry(
+    balance: any,
+    gainLossAmount: number,
+    date: Date,
+    newRate: number,
+    userId: string
+  ): Promise<IJournalEntry> {
+    const fxAccount = await Account.findOne({
+      systemAccountType: SystemAccountType.EXCHANGE_GAIN_LOSS,
+    });
+
+    const lines: any[] = gainLossAmount > 0
+      ? [
+          { accountId: balance.accountId, debit: gainLossAmount, memo: 'FX Revaluation' },
+          { accountId: fxAccount!._id.toString(), credit: gainLossAmount, memo: 'Unrealized FX Gain' }
+        ]
+      : [
+          { accountId: balance.accountId, credit: Math.abs(gainLossAmount), memo: 'FX Revaluation' },
+          { accountId: fxAccount!._id.toString(), debit: Math.abs(gainLossAmount), memo: 'Unrealized FX Loss' }
+        ];
+
+    return JournalEntryService.create({
+      entryType: JournalEntryType.REVALUATION,
+      entryDate: date,
+      reference: `REVAL-${date.toISOString().split('T')[0]}`,
+      memo: `Currency revaluation for ${balance.currency} balance`,
+      lines,
+      autoReverse: true,
+      autoReverseDate: new Date(date.getTime() + 86400000),
+    });
+  }
+}
+```
+
+---
+
+## 5.4 Multi-Currency API Contracts
+
+```typescript
+// GET /api/v1/currencies
+interface ListCurrenciesResponse {
+  success: true;
+  data: {
+    currencies: ICurrency[];
+    baseCurrency: ICurrency;
+  };
+}
+
+// POST /api/v1/exchange-rates
+interface CreateExchangeRateRequest {
+  fromCurrency: string;
+  toCurrency: string;
+  rate: number;
+  rateType: ExchangeRateType;
+  effectiveDate: string;
+}
+
+// GET /api/v1/exchange-rates/convert
+interface ConvertCurrencyRequest {
+  amount: number;
+  fromCurrency: string;
+  toCurrency: string;
+  date?: string;
+  rateType?: ExchangeRateType;
+}
+
+interface ConvertCurrencyResponse {
+  success: true;
+  data: {
+    originalAmount: number;
+    originalCurrency: string;
+    convertedAmount: number;
+    targetCurrency: string;
+    rate: number;
+    rateDate: string;
+  };
+}
+
+// POST /api/v1/exchange-rates/revalue
+interface RevaluationRequest {
+  periodEndDate: string;
+  preview?: boolean;
+}
+
+interface RevaluationResponse {
+  success: true;
+  data: {
+    results: ExchangeGainLossResult[];
+    summary: {
+      totalGain: number;
+      totalLoss: number;
+      netGainLoss: number;
+      accountsRevalued: number;
+    };
+  };
+}
+```
+
+---
+
+*Part 5 Complete. Continue to Part 6 (Tax & ZATCA)?*
