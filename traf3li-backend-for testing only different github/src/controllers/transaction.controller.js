@@ -1,6 +1,7 @@
 const { Transaction, Invoice, Expense, Case } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const CustomException = require('../utils/CustomException');
+const { escapeRegex } = require('../utils/security');
 
 /**
  * Create transaction
@@ -117,12 +118,14 @@ const getTransactions = asyncHandler(async (req, res) => {
     }
 
     // Search
+    // SECURITY: Escape regex to prevent ReDoS attacks
     if (search) {
+        const safeSearch = escapeRegex(search);
         query.$or = [
-            { description: { $regex: search, $options: 'i' } },
-            { transactionId: { $regex: search, $options: 'i' } },
-            { referenceNumber: { $regex: search, $options: 'i' } },
-            { notes: { $regex: search, $options: 'i' } }
+            { description: { $regex: safeSearch, $options: 'i' } },
+            { transactionId: { $regex: safeSearch, $options: 'i' } },
+            { referenceNumber: { $regex: safeSearch, $options: 'i' } },
+            { notes: { $regex: safeSearch, $options: 'i' } }
         ];
     }
 

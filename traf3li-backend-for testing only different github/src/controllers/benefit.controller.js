@@ -1,6 +1,7 @@
 const { EmployeeBenefit, User } = require('../models');
 const { CustomException } = require('../utils');
 const asyncHandler = require('../utils/asyncHandler');
+const { escapeRegex } = require('../utils/security');
 
 // ==================== CREATE BENEFIT ====================
 const createBenefit = asyncHandler(async (req, res) => {
@@ -162,14 +163,16 @@ const getBenefits = asyncHandler(async (req, res) => {
     try {
         const filters = { createdBy: req.userID };
 
+        // SECURITY: Escape regex to prevent ReDoS attacks
         if (search) {
+            const safeSearch = escapeRegex(search);
             filters.$or = [
-                { benefitName: { $regex: search, $options: 'i' } },
-                { benefitNameAr: { $regex: search, $options: 'i' } },
-                { employeeName: { $regex: search, $options: 'i' } },
-                { employeeNameAr: { $regex: search, $options: 'i' } },
-                { enrollmentNumber: { $regex: search, $options: 'i' } },
-                { benefitEnrollmentId: { $regex: search, $options: 'i' } }
+                { benefitName: { $regex: safeSearch, $options: 'i' } },
+                { benefitNameAr: { $regex: safeSearch, $options: 'i' } },
+                { employeeName: { $regex: safeSearch, $options: 'i' } },
+                { employeeNameAr: { $regex: safeSearch, $options: 'i' } },
+                { enrollmentNumber: { $regex: safeSearch, $options: 'i' } },
+                { benefitEnrollmentId: { $regex: safeSearch, $options: 'i' } }
             ];
         }
 
@@ -178,7 +181,7 @@ const getBenefits = asyncHandler(async (req, res) => {
         if (benefitCategory) filters.benefitCategory = benefitCategory;
         if (status) filters.status = status;
         if (enrollmentType) filters.enrollmentType = enrollmentType;
-        if (providerName) filters.providerName = { $regex: providerName, $options: 'i' };
+        if (providerName) filters.providerName = { $regex: escapeRegex(providerName), $options: 'i' };
 
         if (fromDate || toDate) {
             filters.effectiveDate = {};

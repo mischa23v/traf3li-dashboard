@@ -42,6 +42,15 @@ const userSchema = new mongoose.Schema({
         default: 'client',
         required: false
     },
+    // SECURITY: Account lockout fields for brute force protection
+    failedLoginAttempts: {
+        type: Number,
+        default: 0
+    },
+    lockUntil: {
+        type: Date,
+        default: null
+    },
     lawyerProfile: {
         specialization: {
             type: [String],

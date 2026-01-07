@@ -1,5 +1,6 @@
 const { Firm, User } = require('../models');
 const { CustomException } = require('../utils');
+const { escapeRegex } = require('../utils/security');
 
 // Create firm
 const createFirm = async (request, response) => {
@@ -36,9 +37,12 @@ const createFirm = async (request, response) => {
 const getFirms = async (request, response) => {
     const { search, city, practiceArea } = request.query;
     try {
+        // SECURITY: Escape regex to prevent ReDoS attacks
+        const safeCity = city ? escapeRegex(city) : null;
+
         const filters = {
             ...(search && { $text: { $search: search } }),
-            ...(city && { city: { $regex: city, $options: 'i' } }),
+            ...(safeCity && { city: { $regex: safeCity, $options: 'i' } }),
             ...(practiceArea && { practiceAreas: practiceArea })
         };
 
