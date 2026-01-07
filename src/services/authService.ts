@@ -191,6 +191,18 @@ export interface PasswordBreachWarning {
 }
 
 /**
+ * Security Warning returned with OTP required response
+ * When password is compromised but login can proceed with OTP
+ */
+export interface SecurityWarning {
+  type: 'PASSWORD_COMPROMISED'
+  message: string
+  messageEn: string
+  breachCount?: number
+  requirePasswordChange: boolean
+}
+
+/**
  * Login Credentials Interface
  */
 export interface LoginCredentials {
@@ -201,12 +213,43 @@ export interface LoginCredentials {
 }
 
 /**
+ * Login OTP Required Response
+ * Returned when password login succeeds but email OTP verification is needed
+ * The loginSessionToken MUST be passed to /verify-otp to prove password was verified
+ */
+export interface LoginOTPRequiredResponse {
+  requiresOtp: true
+  code: 'OTP_REQUIRED'
+  message: string               // Arabic message
+  messageEn: string             // English message
+  email: string                 // Masked email: "u***r@example.com"
+  fullEmail: string             // Full email for OTP verification (stored securely)
+  expiresIn: number             // OTP expiry in seconds (300 = 5 min)
+  loginSessionToken: string     // CRITICAL: Must pass to /verify-otp
+  loginSessionExpiresIn: number // Session expiry in seconds (600 = 10 min)
+  securityWarning?: SecurityWarning
+}
+
+/**
  * Login Result Interface
  * Contains user and optional breach warning
+ * Used when login completes directly (SSO, One-Tap) without requiring OTP
  */
 export interface LoginResult {
   user: User
   warning?: PasswordBreachWarning
+}
+
+/**
+ * Union type for login response - either OTP required or direct login success
+ */
+export type LoginResponse = LoginOTPRequiredResponse | LoginResult
+
+/**
+ * Type guard to check if login response requires OTP
+ */
+export function isOTPRequired(response: LoginResponse): response is LoginOTPRequiredResponse {
+  return 'requiresOtp' in response && response.requiresOtp === true
 }
 
 /**
@@ -317,11 +360,16 @@ export interface OTPResponse {
 /**
  * Verify OTP Data Interface
  * Note: Backend expects 'otp' field, not 'code'
+ *
+ * SECURITY: For purpose='login', loginSessionToken is REQUIRED
+ * This token proves the password was actually verified before OTP
+ * and prevents OTP-only bypass attacks
  */
 export interface VerifyOTPData {
   email: string
   otp: string
   purpose?: OTPPurpose  // login | registration | verify_email
+  loginSessionToken?: string  // REQUIRED for purpose='login' - proves password was verified
 }
 
 /**
@@ -370,7 +418,15 @@ export interface EmailVerificationResponse {
 interface AuthResponse {
   error: boolean
   message: string
+  messageEn?: string
   user?: User
+
+  // OTP Required Response fields (password login flow)
+  requiresOtp?: boolean
+  code?: string  // 'OTP_REQUIRED' when OTP is needed
+  email?: string  // Masked email for display
+  loginSessionToken?: string  // Token to pass to verify-otp
+  loginSessionExpiresIn?: number  // Session expiry in seconds
 
   // OAuth 2.0 Standard (snake_case) - recommended for new code
   access_token?: string
@@ -386,6 +442,9 @@ interface AuthResponse {
   // Password breach warning (only present if password was found in breaches)
   // Backend returns this as 'passwordWarning' from HaveIBeenPwned check
   passwordWarning?: PasswordBreachWarning
+
+  // Security warning for OTP flow (breach detected but allowing OTP verification)
+  securityWarning?: SecurityWarning
 }
 
 /**
@@ -499,7 +558,7 @@ const authService = {
    * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
    * =========================================================================
    */
-  login: async (credentials: LoginCredentials): Promise<LoginResult> => {
+  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       // NOTE: TanStack Query automatically invalidates queries on auth state change
       // No manual cache clearing needed - query invalidation happens via queryClient
@@ -510,6 +569,39 @@ const authService = {
         credentials
       )
 
+      // Check if OTP verification is required (email-based 2FA for password login)
+      // This is the normal flow for password-based login: password verified, now needs OTP
+      if (response.data.requiresOtp === true && response.data.code === 'OTP_REQUIRED') {
+        authLog('Password verified, OTP required for login', {
+          email: response.data.email, // Masked email
+          expiresIn: response.data.expiresIn,
+          hasSecurityWarning: !!response.data.securityWarning,
+        })
+
+        // Return OTP required response - caller must redirect to OTP page
+        const otpResponse: LoginOTPRequiredResponse = {
+          requiresOtp: true,
+          code: 'OTP_REQUIRED',
+          message: response.data.message || 'يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني',
+          messageEn: response.data.messageEn || 'Please enter the verification code sent to your email',
+          email: response.data.email || '', // Masked email for display
+          fullEmail: credentials.username, // Use the email they logged in with
+          expiresIn: response.data.expiresIn || 300, // Default 5 min
+          loginSessionToken: response.data.loginSessionToken || '',
+          loginSessionExpiresIn: response.data.loginSessionExpiresIn || 600, // Default 10 min
+          securityWarning: response.data.securityWarning,
+        }
+
+        // Validate critical field
+        if (!otpResponse.loginSessionToken) {
+          authError('Backend did not return loginSessionToken for OTP flow!')
+          throw new Error('خطأ في نظام التحقق. يرجى المحاولة مرة أخرى. | Authentication system error. Please try again.')
+        }
+
+        return otpResponse
+      }
+
+      // Normal login flow (SSO, One-Tap, or if backend doesn't require OTP)
       if (response.data.error || !response.data.user) {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
@@ -1057,9 +1149,27 @@ const authService = {
    */
   verifyOTP: async (data: VerifyOTPData): Promise<User> => {
     try {
+      // SECURITY: For login purpose, loginSessionToken is REQUIRED
+      // This proves the password was verified before OTP
+      if (data.purpose === 'login' && !data.loginSessionToken) {
+        authError('verifyOTP called for login without loginSessionToken!')
+        throw new Error('جلسة تسجيل الدخول منتهية. يرجى إعادة تسجيل الدخول. | Login session expired. Please sign in again.')
+      }
+
+      authLog('Verifying OTP', {
+        email: data.email,
+        purpose: data.purpose,
+        hasLoginSessionToken: !!data.loginSessionToken,
+      })
+
       const response = await authApi.post<AuthResponse>(
         '/auth/verify-otp',
-        data
+        {
+          email: data.email,
+          otp: data.otp,
+          purpose: data.purpose || 'login',
+          ...(data.loginSessionToken && { loginSessionToken: data.loginSessionToken }),
+        }
       )
 
       if (response.data.error || !response.data.user) {

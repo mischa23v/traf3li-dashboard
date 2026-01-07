@@ -40,6 +40,8 @@ interface OtpFormProps extends React.HTMLAttributes<HTMLFormElement> {
   email?: string
   /** Purpose of the OTP verification (login, registration, password_reset, email_verification) */
   purpose?: OtpPurpose
+  /** Login session token - REQUIRED for purpose='login' to prove password was verified */
+  loginSessionToken?: string
   onResendOtp?: () => Promise<void>
   /** Callback when OTP is verified successfully */
   onSuccess?: () => void
@@ -48,7 +50,7 @@ interface OtpFormProps extends React.HTMLAttributes<HTMLFormElement> {
 // Cooldown duration in seconds (OTP endpoints are rate-limited to 3/hour)
 const RESEND_COOLDOWN = 60
 
-export function OtpForm({ className, email, purpose = 'login', onResendOtp, onSuccess, ...props }: OtpFormProps) {
+export function OtpForm({ className, email, purpose = 'login', loginSessionToken, onResendOtp, onSuccess, ...props }: OtpFormProps) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
@@ -128,8 +130,14 @@ export function OtpForm({ className, email, purpose = 'login', onResendOtp, onSu
     try {
       // In production, this would call the actual API
       if (email) {
-        // Include purpose in the verification request
-        await authApi.post('/auth/verify-otp', { email, otp: data.otp, purpose })
+        // Include purpose and loginSessionToken in the verification request
+        // loginSessionToken is REQUIRED for purpose='login' to prove password was verified
+        await authApi.post('/auth/verify-otp', {
+          email,
+          otp: data.otp,
+          purpose,
+          ...(loginSessionToken && { loginSessionToken }),
+        })
         toast.success(isRTL ? 'تم التحقق بنجاح' : 'Verification successful')
         if (onSuccess) {
           onSuccess()
