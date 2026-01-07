@@ -129,6 +129,70 @@ export interface SocketForceLogoutEvent {
   message?: string
 }
 
+// ═══════════════════════════════════════════════════════════════
+// WEBSOCKET TOKEN AUTHENTICATION EVENTS
+// Server checks token validity every 60 seconds
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Socket connection error codes
+ * Returned in connect_error event when authentication fails
+ */
+export type SocketAuthErrorCode =
+  | 'AUTHENTICATION_REQUIRED'  // No token provided in handshake
+  | 'INVALID_TOKEN'            // Token failed JWT verification
+  | 'USER_NOT_FOUND'           // User not found in database
+  | 'USER_DISABLED'            // User account is disabled
+  | 'AUTHENTICATION_FAILED'    // Generic auth failure
+
+/**
+ * Server → Client: Token expired event payload
+ * Emitted when token TTL exceeded during periodic check (every 60s)
+ * Recoverable: Yes - refresh token and update socket
+ */
+export interface SocketAuthTokenExpiredPayload {
+  message: string         // "Your session has expired. Please refresh to continue."
+  code: 'TOKEN_EXPIRED'
+}
+
+/**
+ * Server → Client: Token invalid event payload
+ * Emitted when token was revoked or tampered with
+ * Recoverable: No - must re-authenticate (login again)
+ */
+export interface SocketAuthTokenInvalidPayload {
+  message: string         // "Your session is no longer valid. Please log in again."
+  code: 'TOKEN_INVALID'
+}
+
+/**
+ * Client → Server: Token refresh response
+ * Returned from 'auth:refresh_token' emit callback
+ */
+export interface SocketAuthRefreshTokenResponse {
+  success: boolean
+  expiresAt?: string      // ISO 8601 date string (only if success: true)
+  error?: string          // Error message (only if success: false)
+}
+
+/**
+ * Socket auth error codes for token refresh failures
+ */
+export type SocketAuthRefreshErrorCode =
+  | 'Invalid token provided'  // Null, undefined, or non-string token sent
+  | 'Invalid token'           // Token failed JWT verification
+  | 'User mismatch'           // Token belongs to different user than socket
+  | 'Refresh failed'          // Unexpected server error
+
+/**
+ * Socket auth state for tracking
+ */
+export interface SocketAuthState {
+  isAuthenticated: boolean
+  tokenExpiry: Date | null
+  lastRefresh: Date | null
+}
+
 /**
  * Generic API response type that can be either success or error
  */

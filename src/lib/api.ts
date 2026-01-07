@@ -43,6 +43,7 @@ import {
   registerPendingRequest,
   clearPendingRequests,
 } from './request-deduplication'
+import { tokenRefreshEvents } from './token-refresh-events'
 import {
   shouldAllowRequest,
   recordSuccess,
@@ -308,6 +309,8 @@ export const isTokenExpiringSoon = (bufferSeconds: number = TOKEN_REFRESH_BUFFER
  * Note: With httpOnly cookie strategy, refreshToken is NOT in the response body.
  * The browser automatically sends the refresh_token cookie with requests to /api/auth/*.
  * This is more secure as JavaScript cannot access the refresh token.
+ *
+ * Also emits token refresh event so WebSocket layer can update its token
  */
 export const storeTokens = (accessToken: string, refreshToken?: string | null, expiresIn?: number): void => {
   tokenLog('Storing tokens in localStorage...', {
@@ -343,6 +346,10 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
     })
   } else {
     tokenLog('Tokens stored successfully')
+
+    // Emit token refresh event so WebSocket layer can update its token
+    // This ensures WebSocket stays authenticated after HTTP token refresh
+    tokenRefreshEvents.emit(accessToken, expiresIn)
   }
 }
 
@@ -1916,6 +1923,8 @@ export const resetApiState = () => {
   // Reset token refresh state
   isRefreshing = false
   failedQueue = []
+  // Clear token refresh event listeners (prevents stale callbacks)
+  tokenRefreshEvents.clear()
 }
 
 // Re-export circuit breaker utilities for monitoring
