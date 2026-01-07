@@ -8474,4 +8474,998 @@ interface ClosePeriodRequest { forceClose?: boolean }
 
 ---
 
-*Part 8 Complete. Continue to Part 9 (Audit Trail & Security)?*
+*Part 8 Complete.*
+
+---
+
+# Part 9: Audit Trail & Security (~800 lines)
+
+This part covers comprehensive audit logging, PDPL compliance (Saudi Personal Data Protection Law), security controls, document versioning, and financial controls.
+
+---
+
+## 9.1 Audit Log Schema
+
+```typescript
+// ============================================================
+// AUDIT LOG SCHEMA
+// Complete audit trail for all financial transactions
+// Based on enterprise ERP audit patterns
+// ============================================================
+
+export interface IAuditLog {
+  id: string;
+  companyId: string;
+
+  // Action Details
+  action: AuditAction;
+  resourceType: AuditResourceType;
+  resourceId: string;
+  resourceNumber?: string;             // e.g., INV-2024-00001
+
+  // Actor
+  userId: string;
+  userName: string;
+  userEmail: string;
+  userRole: string;
+  impersonatorId?: string;             // If acting on behalf of another user
+
+  // Request Context
+  ipAddress: string;
+  userAgent: string;
+  requestId: string;
+  sessionId?: string;
+
+  // Timestamps
+  timestamp: string;                   // ISO 8601
+  processingTimeMs: number;
+
+  // Change Details
+  changes?: IAuditChange[];
+  previousState?: Record<string, any>;
+  newState?: Record<string, any>;
+
+  // Financial Impact
+  financialImpact?: IFinancialImpact;
+
+  // Additional Context
+  reason?: string;                     // Reason for change (if required)
+  reasonAr?: string;
+  metadata?: Record<string, any>;
+
+  // Compliance
+  pdplRelevant: boolean;               // PDPL (Saudi Data Protection)
+  dataCategories?: PDPLDataCategory[];
+  retentionRequired: boolean;
+  retentionUntil?: string;
+}
+
+export enum AuditAction {
+  // CRUD Operations
+  CREATE = 'create',
+  READ = 'read',
+  UPDATE = 'update',
+  DELETE = 'delete',
+
+  // Document Lifecycle
+  SUBMIT = 'submit',
+  APPROVE = 'approve',
+  REJECT = 'reject',
+  POST = 'post',
+  UNPOST = 'unpost',
+  VOID = 'void',
+  CANCEL = 'cancel',
+  REVERSE = 'reverse',
+
+  // Financial Actions
+  ALLOCATE_PAYMENT = 'allocate_payment',
+  DEALLOCATE_PAYMENT = 'deallocate_payment',
+  WRITE_OFF = 'write_off',
+  APPLY_CREDIT = 'apply_credit',
+  RECORD_GAIN_LOSS = 'record_gain_loss',
+
+  // Security Actions
+  LOGIN = 'login',
+  LOGOUT = 'logout',
+  LOGIN_FAILED = 'login_failed',
+  PASSWORD_CHANGE = 'password_change',
+  PERMISSION_CHANGE = 'permission_change',
+  EXPORT_DATA = 'export_data',
+  BULK_UPDATE = 'bulk_update',
+
+  // Period Actions
+  LOCK_PERIOD = 'lock_period',
+  UNLOCK_PERIOD = 'unlock_period',
+  CLOSE_PERIOD = 'close_period',
+  REOPEN_PERIOD = 'reopen_period',
+
+  // ZATCA Actions
+  ZATCA_SUBMIT = 'zatca_submit',
+  ZATCA_CLEAR = 'zatca_clear',
+  ZATCA_REJECT = 'zatca_reject',
+}
+
+export const AuditActionAr: Record<AuditAction, string> = {
+  [AuditAction.CREATE]: 'إنشاء',
+  [AuditAction.READ]: 'قراءة',
+  [AuditAction.UPDATE]: 'تعديل',
+  [AuditAction.DELETE]: 'حذف',
+  [AuditAction.SUBMIT]: 'تقديم',
+  [AuditAction.APPROVE]: 'موافقة',
+  [AuditAction.REJECT]: 'رفض',
+  [AuditAction.POST]: 'ترحيل',
+  [AuditAction.UNPOST]: 'إلغاء الترحيل',
+  [AuditAction.VOID]: 'إلغاء',
+  [AuditAction.CANCEL]: 'إلغاء',
+  [AuditAction.REVERSE]: 'عكس',
+  [AuditAction.ALLOCATE_PAYMENT]: 'تخصيص دفعة',
+  [AuditAction.DEALLOCATE_PAYMENT]: 'إلغاء تخصيص دفعة',
+  [AuditAction.WRITE_OFF]: 'شطب',
+  [AuditAction.APPLY_CREDIT]: 'تطبيق رصيد دائن',
+  [AuditAction.RECORD_GAIN_LOSS]: 'تسجيل ربح/خسارة',
+  [AuditAction.LOGIN]: 'تسجيل دخول',
+  [AuditAction.LOGOUT]: 'تسجيل خروج',
+  [AuditAction.LOGIN_FAILED]: 'فشل تسجيل الدخول',
+  [AuditAction.PASSWORD_CHANGE]: 'تغيير كلمة المرور',
+  [AuditAction.PERMISSION_CHANGE]: 'تغيير الصلاحيات',
+  [AuditAction.EXPORT_DATA]: 'تصدير البيانات',
+  [AuditAction.BULK_UPDATE]: 'تحديث جماعي',
+  [AuditAction.LOCK_PERIOD]: 'قفل الفترة',
+  [AuditAction.UNLOCK_PERIOD]: 'فتح الفترة',
+  [AuditAction.CLOSE_PERIOD]: 'إغلاق الفترة',
+  [AuditAction.REOPEN_PERIOD]: 'إعادة فتح الفترة',
+  [AuditAction.ZATCA_SUBMIT]: 'إرسال للزكاة',
+  [AuditAction.ZATCA_CLEAR]: 'اعتماد الزكاة',
+  [AuditAction.ZATCA_REJECT]: 'رفض الزكاة',
+};
+
+export enum AuditResourceType {
+  INVOICE = 'invoice',
+  CREDIT_NOTE = 'credit_note',
+  PAYMENT = 'payment',
+  RECEIPT = 'receipt',
+  CHECK = 'check',
+  JOURNAL_ENTRY = 'journal_entry',
+  EXPENSE_CLAIM = 'expense_claim',
+  CASH_ADVANCE = 'cash_advance',
+  CLIENT = 'client',
+  VENDOR = 'vendor',
+  ACCOUNT = 'account',
+  TAX_CODE = 'tax_code',
+  CURRENCY = 'currency',
+  EXCHANGE_RATE = 'exchange_rate',
+  FISCAL_PERIOD = 'fiscal_period',
+  FISCAL_YEAR = 'fiscal_year',
+  USER = 'user',
+  ROLE = 'role',
+  COMPANY = 'company',
+  REPORT = 'report',
+}
+
+export interface IAuditChange {
+  field: string;
+  fieldLabel: string;
+  fieldLabelAr: string;
+  oldValue: any;
+  newValue: any;
+  displayOldValue: string;
+  displayNewValue: string;
+}
+
+export interface IFinancialImpact {
+  affectedAccounts: string[];
+  debitAmount: number;
+  creditAmount: number;
+  currencyCode: string;
+  exchangeRate: number;
+  baseDebitAmount: number;
+  baseCreditAmount: number;
+}
+```
+
+---
+
+## 9.2 PDPL Compliance (Saudi Data Protection)
+
+```typescript
+// ============================================================
+// PDPL (Personal Data Protection Law) COMPLIANCE
+// نظام حماية البيانات الشخصية
+// ============================================================
+
+export enum PDPLDataCategory {
+  // Personal Identification
+  NATIONAL_ID = 'national_id',           // رقم الهوية الوطنية
+  IQAMA_NUMBER = 'iqama_number',         // رقم الإقامة
+  PASSPORT = 'passport',                  // جواز السفر
+  COMMERCIAL_REGISTRATION = 'cr',        // السجل التجاري
+
+  // Contact Information
+  EMAIL = 'email',
+  PHONE = 'phone',
+  ADDRESS = 'address',
+
+  // Financial Data
+  BANK_ACCOUNT = 'bank_account',
+  IBAN = 'iban',
+  CREDIT_CARD = 'credit_card',
+  SALARY = 'salary',
+
+  // Health Data (Sensitive)
+  HEALTH = 'health',
+
+  // Employment Data
+  EMPLOYMENT = 'employment',
+}
+
+export interface IPDPLConfig {
+  // Retention Periods (in months)
+  retentionPeriods: Record<PDPLDataCategory, number>;
+
+  // Masking Rules
+  maskingRules: IPDPLMaskingRule[];
+
+  // Consent Requirements
+  consentRequired: PDPLDataCategory[];
+
+  // Cross-border Transfer Restrictions
+  crossBorderRestricted: PDPLDataCategory[];
+}
+
+export interface IPDPLMaskingRule {
+  dataCategory: PDPLDataCategory;
+  maskPattern: string;                   // e.g., "****{last4}"
+  showToRoles: string[];                 // Roles that can see unmasked
+}
+
+// Default PDPL Configuration for Saudi Arabia
+export const DEFAULT_PDPL_CONFIG: IPDPLConfig = {
+  retentionPeriods: {
+    [PDPLDataCategory.NATIONAL_ID]: 120,      // 10 years
+    [PDPLDataCategory.IQAMA_NUMBER]: 120,
+    [PDPLDataCategory.PASSPORT]: 120,
+    [PDPLDataCategory.COMMERCIAL_REGISTRATION]: 120,
+    [PDPLDataCategory.EMAIL]: 60,             // 5 years
+    [PDPLDataCategory.PHONE]: 60,
+    [PDPLDataCategory.ADDRESS]: 60,
+    [PDPLDataCategory.BANK_ACCOUNT]: 120,
+    [PDPLDataCategory.IBAN]: 120,
+    [PDPLDataCategory.CREDIT_CARD]: 60,
+    [PDPLDataCategory.SALARY]: 84,            // 7 years (labor law)
+    [PDPLDataCategory.HEALTH]: 120,
+    [PDPLDataCategory.EMPLOYMENT]: 84,
+  },
+  maskingRules: [
+    { dataCategory: PDPLDataCategory.NATIONAL_ID, maskPattern: '****{last4}', showToRoles: ['admin', 'hr'] },
+    { dataCategory: PDPLDataCategory.IBAN, maskPattern: 'SA**{last4}', showToRoles: ['admin', 'finance'] },
+    { dataCategory: PDPLDataCategory.BANK_ACCOUNT, maskPattern: '****{last4}', showToRoles: ['admin', 'finance'] },
+    { dataCategory: PDPLDataCategory.PHONE, maskPattern: '+966****{last4}', showToRoles: ['admin', 'sales'] },
+    { dataCategory: PDPLDataCategory.EMAIL, maskPattern: '{first2}***@***', showToRoles: ['admin'] },
+  ],
+  consentRequired: [PDPLDataCategory.HEALTH, PDPLDataCategory.SALARY],
+  crossBorderRestricted: [PDPLDataCategory.NATIONAL_ID, PDPLDataCategory.IQAMA_NUMBER, PDPLDataCategory.HEALTH],
+};
+
+export class PDPLComplianceEngine {
+
+  /**
+   * Mask sensitive data based on PDPL rules
+   */
+  static maskData(
+    value: string,
+    category: PDPLDataCategory,
+    userRole: string,
+    config: IPDPLConfig = DEFAULT_PDPL_CONFIG
+  ): string {
+    const rule = config.maskingRules.find(r => r.dataCategory === category);
+
+    if (!rule || rule.showToRoles.includes(userRole)) {
+      return value; // No masking needed
+    }
+
+    return this.applyMask(value, rule.maskPattern);
+  }
+
+  /**
+   * Apply mask pattern to value
+   */
+  private static applyMask(value: string, pattern: string): string {
+    if (!value) return value;
+
+    if (pattern.includes('{last4}')) {
+      const last4 = value.slice(-4);
+      return pattern.replace('{last4}', last4);
+    }
+
+    if (pattern.includes('{first2}')) {
+      const first2 = value.slice(0, 2);
+      return pattern.replace('{first2}', first2);
+    }
+
+    return pattern;
+  }
+
+  /**
+   * Check if data export is allowed
+   */
+  static canExportData(
+    categories: PDPLDataCategory[],
+    destination: 'local' | 'cross_border',
+    hasConsent: boolean,
+    config: IPDPLConfig = DEFAULT_PDPL_CONFIG
+  ): { allowed: boolean; blockedCategories: PDPLDataCategory[]; reason?: string } {
+    const blocked: PDPLDataCategory[] = [];
+
+    for (const category of categories) {
+      // Check consent
+      if (config.consentRequired.includes(category) && !hasConsent) {
+        blocked.push(category);
+        continue;
+      }
+
+      // Check cross-border
+      if (destination === 'cross_border' && config.crossBorderRestricted.includes(category)) {
+        blocked.push(category);
+      }
+    }
+
+    return {
+      allowed: blocked.length === 0,
+      blockedCategories: blocked,
+      reason: blocked.length > 0 ? 'PDPL restrictions apply to some data categories' : undefined,
+    };
+  }
+
+  /**
+   * Calculate data retention date
+   */
+  static getRetentionDate(
+    category: PDPLDataCategory,
+    createdAt: string,
+    config: IPDPLConfig = DEFAULT_PDPL_CONFIG
+  ): string {
+    const months = config.retentionPeriods[category] || 60;
+    const date = new Date(createdAt);
+    date.setMonth(date.getMonth() + months);
+    return date.toISOString();
+  }
+
+  /**
+   * Log PDPL-relevant access
+   */
+  static async logDataAccess(
+    userId: string,
+    resourceType: AuditResourceType,
+    resourceId: string,
+    dataCategories: PDPLDataCategory[],
+    purpose: string
+  ): Promise<void> {
+    // Create audit log entry for PDPL tracking
+    const auditLog: Partial<IAuditLog> = {
+      action: AuditAction.READ,
+      resourceType,
+      resourceId,
+      userId,
+      pdplRelevant: true,
+      dataCategories,
+      metadata: { purpose },
+      timestamp: new Date().toISOString(),
+    };
+
+    // Log to audit system
+    await this.saveAuditLog(auditLog);
+  }
+
+  private static async saveAuditLog(log: Partial<IAuditLog>): Promise<void> {
+    // Implementation to save audit log
+  }
+}
+```
+
+---
+
+## 9.3 Document Versioning
+
+```typescript
+// ============================================================
+// DOCUMENT VERSION CONTROL
+// Track all changes to financial documents
+// ============================================================
+
+export interface IDocumentVersion {
+  id: string;
+  documentType: AuditResourceType;
+  documentId: string;
+
+  // Version Info
+  versionNumber: number;
+  isCurrentVersion: boolean;
+
+  // Snapshot
+  snapshot: Record<string, any>;       // Full document state
+  snapshotHash: string;                // SHA-256 hash for integrity
+
+  // Change Summary
+  changeType: DocumentChangeType;
+  changedFields: string[];
+  changeReason?: string;
+  changeReasonAr?: string;
+
+  // Actor
+  createdBy: string;
+  createdByName: string;
+  createdAt: string;
+
+  // Previous Version
+  previousVersionId?: string;
+}
+
+export enum DocumentChangeType {
+  INITIAL = 'initial',                 // First version
+  UPDATE = 'update',                   // Field changes
+  STATUS_CHANGE = 'status_change',     // Status transition
+  APPROVAL = 'approval',               // Approval action
+  VOID = 'void',                       // Document voided
+  CORRECTION = 'correction',           // Error correction
+}
+
+export const DocumentChangeTypeAr: Record<DocumentChangeType, string> = {
+  [DocumentChangeType.INITIAL]: 'إنشاء أولي',
+  [DocumentChangeType.UPDATE]: 'تحديث',
+  [DocumentChangeType.STATUS_CHANGE]: 'تغيير الحالة',
+  [DocumentChangeType.APPROVAL]: 'موافقة',
+  [DocumentChangeType.VOID]: 'إلغاء',
+  [DocumentChangeType.CORRECTION]: 'تصحيح',
+};
+
+export class DocumentVersioningEngine {
+
+  /**
+   * Create new version when document changes
+   */
+  static async createVersion(
+    documentType: AuditResourceType,
+    documentId: string,
+    newState: Record<string, any>,
+    previousState: Record<string, any> | null,
+    changeType: DocumentChangeType,
+    userId: string,
+    reason?: string
+  ): Promise<IDocumentVersion> {
+    // Get current version number
+    const currentVersion = await this.getCurrentVersion(documentType, documentId);
+    const versionNumber = currentVersion ? currentVersion.versionNumber + 1 : 1;
+
+    // Calculate changed fields
+    const changedFields = previousState
+      ? this.getChangedFields(previousState, newState)
+      : Object.keys(newState);
+
+    // Create hash of snapshot
+    const snapshotHash = await this.hashSnapshot(newState);
+
+    // Mark previous version as not current
+    if (currentVersion) {
+      await this.markVersionNotCurrent(currentVersion.id);
+    }
+
+    const version: IDocumentVersion = {
+      id: `ver-${documentId}-${versionNumber}`,
+      documentType,
+      documentId,
+      versionNumber,
+      isCurrentVersion: true,
+      snapshot: newState,
+      snapshotHash,
+      changeType,
+      changedFields,
+      changeReason: reason,
+      createdBy: userId,
+      createdByName: '', // Populate from user lookup
+      createdAt: new Date().toISOString(),
+      previousVersionId: currentVersion?.id,
+    };
+
+    await this.saveVersion(version);
+    return version;
+  }
+
+  /**
+   * Get document history
+   */
+  static async getHistory(
+    documentType: AuditResourceType,
+    documentId: string
+  ): Promise<IDocumentVersion[]> {
+    // Query all versions ordered by version number desc
+    return [];
+  }
+
+  /**
+   * Compare two versions
+   */
+  static compareVersions(
+    version1: IDocumentVersion,
+    version2: IDocumentVersion
+  ): IAuditChange[] {
+    const changes: IAuditChange[] = [];
+    const allFields = new Set([
+      ...Object.keys(version1.snapshot),
+      ...Object.keys(version2.snapshot),
+    ]);
+
+    for (const field of allFields) {
+      const oldValue = version1.snapshot[field];
+      const newValue = version2.snapshot[field];
+
+      if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+        changes.push({
+          field,
+          fieldLabel: field,           // Would be localized
+          fieldLabelAr: field,
+          oldValue,
+          newValue,
+          displayOldValue: this.formatValue(oldValue),
+          displayNewValue: this.formatValue(newValue),
+        });
+      }
+    }
+
+    return changes;
+  }
+
+  /**
+   * Restore to previous version
+   */
+  static async restoreVersion(
+    documentType: AuditResourceType,
+    documentId: string,
+    targetVersionId: string,
+    userId: string,
+    reason: string
+  ): Promise<IDocumentVersion> {
+    const targetVersion = await this.getVersion(targetVersionId);
+    if (!targetVersion) {
+      throw new Error('Version not found');
+    }
+
+    // Create new version with restored state
+    return this.createVersion(
+      documentType,
+      documentId,
+      targetVersion.snapshot,
+      null,
+      DocumentChangeType.CORRECTION,
+      userId,
+      `Restored to version ${targetVersion.versionNumber}: ${reason}`
+    );
+  }
+
+  // Helper methods
+  private static getChangedFields(oldState: any, newState: any): string[] {
+    const changed: string[] = [];
+    const allKeys = new Set([...Object.keys(oldState), ...Object.keys(newState)]);
+    for (const key of allKeys) {
+      if (JSON.stringify(oldState[key]) !== JSON.stringify(newState[key])) {
+        changed.push(key);
+      }
+    }
+    return changed;
+  }
+
+  private static async hashSnapshot(snapshot: any): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(JSON.stringify(snapshot));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private static formatValue(value: any): string {
+    if (value === null || value === undefined) return '-';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  }
+
+  private static async getCurrentVersion(type: AuditResourceType, id: string): Promise<IDocumentVersion | null> {
+    return null;
+  }
+  private static async markVersionNotCurrent(id: string): Promise<void> {}
+  private static async saveVersion(version: IDocumentVersion): Promise<void> {}
+  private static async getVersion(id: string): Promise<IDocumentVersion | null> { return null; }
+}
+```
+
+---
+
+## 9.4 Financial Controls
+
+```typescript
+// ============================================================
+// FINANCIAL CONTROLS & SEGREGATION OF DUTIES
+// ============================================================
+
+export interface IFinancialControl {
+  id: string;
+  companyId: string;
+
+  name: string;
+  nameAr: string;
+  description: string;
+  descriptionAr: string;
+
+  controlType: FinancialControlType;
+  riskLevel: RiskLevel;
+
+  // Control Definition
+  resourceType: AuditResourceType;
+  actions: AuditAction[];
+  conditions: IControlCondition[];
+
+  // Enforcement
+  enforcement: ControlEnforcement;
+  approvalRequired: boolean;
+  approverRoles?: string[];
+  notifyRoles?: string[];
+
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum FinancialControlType {
+  AMOUNT_LIMIT = 'amount_limit',           // Max transaction amount
+  SEGREGATION_OF_DUTIES = 'segregation',   // Can't do both actions
+  PERIOD_RESTRICTION = 'period_restriction', // Closed period check
+  APPROVAL_THRESHOLD = 'approval_threshold', // Requires approval above amount
+  DUPLICATE_CHECK = 'duplicate_check',     // Prevent duplicates
+  CREDIT_LIMIT = 'credit_limit',           // Client credit check
+  SEQUENCE_GAP = 'sequence_gap',           // No gaps in sequences
+}
+
+export enum RiskLevel {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+export enum ControlEnforcement {
+  BLOCK = 'block',                         // Prevent action
+  WARN = 'warn',                           // Allow with warning
+  LOG = 'log',                             // Allow, log for review
+  APPROVE = 'approve',                     // Require approval
+}
+
+export interface IControlCondition {
+  field: string;
+  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin';
+  value: any;
+}
+
+export interface IControlViolation {
+  controlId: string;
+  controlName: string;
+  controlNameAr: string;
+  violationType: FinancialControlType;
+  riskLevel: RiskLevel;
+  message: string;
+  messageAr: string;
+  enforcement: ControlEnforcement;
+  canOverride: boolean;
+  overrideRequires?: string[];             // Roles that can override
+}
+
+export class FinancialControlEngine {
+
+  /**
+   * Check all controls before action
+   */
+  static async checkControls(
+    companyId: string,
+    userId: string,
+    userRole: string,
+    action: AuditAction,
+    resourceType: AuditResourceType,
+    data: Record<string, any>
+  ): Promise<{ allowed: boolean; violations: IControlViolation[] }> {
+    const controls = await this.getActiveControls(companyId, resourceType, action);
+    const violations: IControlViolation[] = [];
+
+    for (const control of controls) {
+      const violation = await this.evaluateControl(control, userId, userRole, data);
+      if (violation) {
+        violations.push(violation);
+      }
+    }
+
+    // Determine if action is allowed
+    const hasBlockingViolation = violations.some(v => v.enforcement === ControlEnforcement.BLOCK);
+
+    return {
+      allowed: !hasBlockingViolation,
+      violations,
+    };
+  }
+
+  /**
+   * Evaluate single control
+   */
+  private static async evaluateControl(
+    control: IFinancialControl,
+    userId: string,
+    userRole: string,
+    data: Record<string, any>
+  ): Promise<IControlViolation | null> {
+
+    switch (control.controlType) {
+      case FinancialControlType.AMOUNT_LIMIT:
+        return this.checkAmountLimit(control, data);
+
+      case FinancialControlType.SEGREGATION_OF_DUTIES:
+        return this.checkSegregationOfDuties(control, userId, data);
+
+      case FinancialControlType.PERIOD_RESTRICTION:
+        return this.checkPeriodRestriction(control, data);
+
+      case FinancialControlType.CREDIT_LIMIT:
+        return this.checkCreditLimit(control, data);
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Check amount limit control
+   */
+  private static checkAmountLimit(
+    control: IFinancialControl,
+    data: Record<string, any>
+  ): IControlViolation | null {
+    const amountCondition = control.conditions.find(c => c.field === 'amount');
+    if (!amountCondition) return null;
+
+    const amount = data.totalAmount || data.amount || 0;
+    const limit = amountCondition.value;
+
+    if (amount > limit) {
+      return {
+        controlId: control.id,
+        controlName: control.name,
+        controlNameAr: control.nameAr,
+        violationType: control.controlType,
+        riskLevel: control.riskLevel,
+        message: `Amount ${amount} exceeds limit ${limit}`,
+        messageAr: `المبلغ ${amount} يتجاوز الحد ${limit}`,
+        enforcement: control.enforcement,
+        canOverride: control.enforcement !== ControlEnforcement.BLOCK,
+        overrideRequires: control.approverRoles,
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check segregation of duties
+   */
+  private static async checkSegregationOfDuties(
+    control: IFinancialControl,
+    userId: string,
+    data: Record<string, any>
+  ): Promise<IControlViolation | null> {
+    // Example: Same user can't create and approve
+    const createdBy = data.createdBy;
+    if (createdBy === userId) {
+      return {
+        controlId: control.id,
+        controlName: control.name,
+        controlNameAr: control.nameAr,
+        violationType: control.controlType,
+        riskLevel: control.riskLevel,
+        message: 'Cannot approve your own document (Segregation of Duties)',
+        messageAr: 'لا يمكن الموافقة على مستند أنشأته بنفسك (فصل المهام)',
+        enforcement: control.enforcement,
+        canOverride: false,
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check period restriction
+   */
+  private static checkPeriodRestriction(
+    control: IFinancialControl,
+    data: Record<string, any>
+  ): IControlViolation | null {
+    const postingDate = data.postingDate || data.invoiceDate;
+    if (!postingDate) return null;
+
+    // Check if period is closed (would query periods table)
+    const periodClosed = false; // Placeholder
+
+    if (periodClosed) {
+      return {
+        controlId: control.id,
+        controlName: control.name,
+        controlNameAr: control.nameAr,
+        violationType: control.controlType,
+        riskLevel: control.riskLevel,
+        message: `Cannot post to closed period: ${postingDate}`,
+        messageAr: `لا يمكن الترحيل إلى فترة مغلقة: ${postingDate}`,
+        enforcement: ControlEnforcement.BLOCK,
+        canOverride: false,
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check credit limit
+   */
+  private static checkCreditLimit(
+    control: IFinancialControl,
+    data: Record<string, any>
+  ): IControlViolation | null {
+    const clientId = data.clientId;
+    const amount = data.totalAmount;
+
+    // Would query client's credit limit and current usage
+    const creditLimit = 0;
+    const creditUsed = 0;
+    const available = creditLimit - creditUsed;
+
+    if (amount > available) {
+      return {
+        controlId: control.id,
+        controlName: control.name,
+        controlNameAr: control.nameAr,
+        violationType: control.controlType,
+        riskLevel: control.riskLevel,
+        message: `Exceeds credit limit. Available: ${available}, Requested: ${amount}`,
+        messageAr: `يتجاوز حد الائتمان. المتاح: ${available}، المطلوب: ${amount}`,
+        enforcement: control.enforcement,
+        canOverride: control.enforcement !== ControlEnforcement.BLOCK,
+        overrideRequires: control.approverRoles,
+      };
+    }
+
+    return null;
+  }
+
+  private static async getActiveControls(
+    companyId: string,
+    resourceType: AuditResourceType,
+    action: AuditAction
+  ): Promise<IFinancialControl[]> {
+    return [];
+  }
+}
+```
+
+---
+
+## 9.5 Audit API Contracts
+
+```typescript
+// ============================================================
+// AUDIT & SECURITY API CONTRACTS
+// ============================================================
+
+// GET /api/v1/audit-logs
+interface ListAuditLogsRequest {
+  page?: number;
+  limit?: number;
+  resourceType?: AuditResourceType;
+  resourceId?: string;
+  action?: AuditAction;
+  userId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+interface ListAuditLogsResponse {
+  success: true;
+  data: { logs: IAuditLog[]; total: number; page: number; totalPages: number };
+}
+
+// GET /api/v1/audit-logs/:id
+interface GetAuditLogResponse { success: true; data: { log: IAuditLog } }
+
+// GET /api/v1/documents/:type/:id/versions
+interface ListDocumentVersionsResponse {
+  success: true;
+  data: { versions: IDocumentVersion[]; currentVersion: number };
+}
+
+// GET /api/v1/documents/:type/:id/versions/:versionId
+interface GetDocumentVersionResponse {
+  success: true;
+  data: { version: IDocumentVersion };
+}
+
+// POST /api/v1/documents/:type/:id/restore
+interface RestoreVersionRequest { versionId: string; reason: string }
+interface RestoreVersionResponse {
+  success: true;
+  data: { newVersion: IDocumentVersion };
+}
+
+// GET /api/v1/documents/:type/:id/versions/compare
+interface CompareVersionsRequest { version1Id: string; version2Id: string }
+interface CompareVersionsResponse {
+  success: true;
+  data: { changes: IAuditChange[] };
+}
+
+// GET /api/v1/financial-controls
+interface ListFinancialControlsResponse {
+  success: true;
+  data: { controls: IFinancialControl[] };
+}
+
+// POST /api/v1/financial-controls/check
+interface CheckControlsRequest {
+  action: AuditAction;
+  resourceType: AuditResourceType;
+  data: Record<string, any>;
+}
+interface CheckControlsResponse {
+  success: true;
+  data: { allowed: boolean; violations: IControlViolation[] };
+}
+
+// POST /api/v1/financial-controls/:id/override
+interface OverrideControlRequest {
+  reason: string;
+  reasonAr: string;
+}
+interface OverrideControlResponse {
+  success: true;
+  data: { overrideToken: string; expiresAt: string };
+}
+
+// GET /api/v1/pdpl/data-access-log
+interface DataAccessLogRequest {
+  userId?: string;
+  resourceType?: AuditResourceType;
+  dataCategory?: PDPLDataCategory;
+  dateFrom?: string;
+  dateTo?: string;
+}
+interface DataAccessLogResponse {
+  success: true;
+  data: { logs: IAuditLog[]; total: number };
+}
+
+// POST /api/v1/pdpl/export-consent
+interface ExportConsentRequest {
+  dataCategories: PDPLDataCategory[];
+  purpose: string;
+  destination: 'local' | 'cross_border';
+}
+interface ExportConsentResponse {
+  success: true;
+  data: { allowed: boolean; blockedCategories: PDPLDataCategory[]; reason?: string };
+}
+
+// GET /api/v1/security/activity-summary
+interface ActivitySummaryRequest { dateFrom: string; dateTo: string }
+interface ActivitySummaryResponse {
+  success: true;
+  data: {
+    totalActions: number;
+    byAction: Record<AuditAction, number>;
+    byResourceType: Record<AuditResourceType, number>;
+    byUser: Array<{ userId: string; userName: string; count: number }>;
+    failedLogins: number;
+    controlViolations: number;
+  };
+}
+```
+
+---
+
+*Part 9 Complete. Continue to Part 10 (Frontend Implementation Guide)?*
