@@ -7561,4 +7561,917 @@ interface GetPerDiemRateResponse {
 
 ---
 
-*Part 7 Complete. Continue to Part 8 (Financial Reporting)?*
+*Part 7 Complete.*
+
+---
+
+# Part 8: Financial Reporting (~800 lines)
+
+This part covers comprehensive financial reporting including trial balance, income statement, balance sheet, cash flow statement, and aging reports.
+
+---
+
+## 8.1 Fiscal Period Management
+
+```typescript
+// ============================================================
+// FISCAL PERIOD & YEAR MANAGEMENT
+// ============================================================
+
+export interface IFiscalYear {
+  id: string;
+  companyId: string;
+  name: string;                        // "FY 2024"
+  nameAr: string;                      // "السنة المالية 2024"
+  startDate: string;
+  endDate: string;
+  status: FiscalYearStatus;
+  closedAt?: string;
+  closedBy?: string;
+  periodType: FiscalPeriodType;
+  periods: IFiscalPeriod[];
+  retainedEarningsAccountId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum FiscalYearStatus {
+  DRAFT = 'draft',
+  OPEN = 'open',
+  CLOSING = 'closing',
+  CLOSED = 'closed',
+}
+
+export const FiscalYearStatusAr: Record<FiscalYearStatus, string> = {
+  [FiscalYearStatus.DRAFT]: 'مسودة',
+  [FiscalYearStatus.OPEN]: 'مفتوح',
+  [FiscalYearStatus.CLOSING]: 'قيد الإغلاق',
+  [FiscalYearStatus.CLOSED]: 'مغلق',
+};
+
+export enum FiscalPeriodType {
+  MONTHLY = 'monthly',
+  QUARTERLY = 'quarterly',
+}
+
+export interface IFiscalPeriod {
+  id: string;
+  fiscalYearId: string;
+  companyId: string;
+  name: string;
+  nameAr: string;
+  periodNumber: number;
+  startDate: string;
+  endDate: string;
+  status: FiscalPeriodStatus;
+  isLocked: boolean;
+  lockedAt?: string;
+  closedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum FiscalPeriodStatus {
+  FUTURE = 'future',
+  OPEN = 'open',
+  LOCKED = 'locked',
+  CLOSED = 'closed',
+}
+
+export const FiscalPeriodStatusAr: Record<FiscalPeriodStatus, string> = {
+  [FiscalPeriodStatus.FUTURE]: 'مستقبلي',
+  [FiscalPeriodStatus.OPEN]: 'مفتوح',
+  [FiscalPeriodStatus.LOCKED]: 'مقفل',
+  [FiscalPeriodStatus.CLOSED]: 'مغلق',
+};
+
+// Report Period Presets
+export enum ReportPeriodPreset {
+  CURRENT_MONTH = 'current_month',
+  PREVIOUS_MONTH = 'previous_month',
+  CURRENT_QUARTER = 'current_quarter',
+  CURRENT_YEAR = 'current_year',
+  YEAR_TO_DATE = 'year_to_date',
+  CUSTOM = 'custom',
+}
+
+export const ReportPeriodPresetAr: Record<ReportPeriodPreset, string> = {
+  [ReportPeriodPreset.CURRENT_MONTH]: 'الشهر الحالي',
+  [ReportPeriodPreset.PREVIOUS_MONTH]: 'الشهر السابق',
+  [ReportPeriodPreset.CURRENT_QUARTER]: 'الربع الحالي',
+  [ReportPeriodPreset.CURRENT_YEAR]: 'السنة الحالية',
+  [ReportPeriodPreset.YEAR_TO_DATE]: 'من بداية السنة',
+  [ReportPeriodPreset.CUSTOM]: 'فترة مخصصة',
+};
+```
+
+---
+
+## 8.2 Trial Balance Report
+
+```typescript
+// ============================================================
+// TRIAL BALANCE REPORT
+// ============================================================
+
+export interface ITrialBalanceReport {
+  companyId: string;
+  companyName: string;
+  companyNameAr: string;
+  asOfDate: string;
+  generatedAt: string;
+  currencyCode: string;
+  accounts: ITrialBalanceAccount[];
+  totalDebits: number;
+  totalCredits: number;
+  isBalanced: boolean;
+  comparisonDate?: string;
+}
+
+export interface ITrialBalanceAccount {
+  accountId: string;
+  accountCode: string;
+  accountName: string;
+  accountNameAr: string;
+  accountType: AccountType;
+  openingDebit: number;
+  openingCredit: number;
+  periodDebit: number;
+  periodCredit: number;
+  closingDebit: number;
+  closingCredit: number;
+  comparisonDebit?: number;
+  comparisonCredit?: number;
+  variance?: number;
+  level: number;
+  parentAccountId?: string;
+  isGroup: boolean;
+}
+
+export class TrialBalanceEngine {
+  static async generate(
+    companyId: string,
+    asOfDate: string,
+    options: { includeZeroBalances?: boolean; showHierarchy?: boolean; comparisonDate?: string } = {}
+  ): Promise<ITrialBalanceReport> {
+    const accounts = await this.getAccountsWithBalances(companyId, asOfDate);
+    let totalDebits = 0;
+    let totalCredits = 0;
+
+    const reportAccounts: ITrialBalanceAccount[] = [];
+
+    for (const account of accounts) {
+      if (!options.includeZeroBalances && account.balance === 0) continue;
+
+      const isDebitNormal = [AccountType.ASSET, AccountType.EXPENSE].includes(account.type);
+      const debit = account.balance > 0 && isDebitNormal ? account.balance :
+                   (account.balance < 0 && !isDebitNormal ? -account.balance : 0);
+      const credit = account.balance > 0 && !isDebitNormal ? account.balance :
+                    (account.balance < 0 && isDebitNormal ? -account.balance : 0);
+
+      totalDebits += debit;
+      totalCredits += credit;
+
+      reportAccounts.push({
+        accountId: account.id,
+        accountCode: account.code,
+        accountName: account.name,
+        accountNameAr: account.nameAr,
+        accountType: account.type,
+        openingDebit: 0,
+        openingCredit: 0,
+        periodDebit: 0,
+        periodCredit: 0,
+        closingDebit: debit,
+        closingCredit: credit,
+        level: account.level,
+        parentAccountId: account.parentId,
+        isGroup: account.isGroup,
+      });
+    }
+
+    return {
+      companyId,
+      companyName: '',
+      companyNameAr: '',
+      asOfDate,
+      generatedAt: new Date().toISOString(),
+      currencyCode: 'SAR',
+      accounts: options.showHierarchy ? this.buildHierarchy(reportAccounts) : reportAccounts,
+      totalDebits,
+      totalCredits,
+      isBalanced: Math.abs(totalDebits - totalCredits) < 1,
+      comparisonDate: options.comparisonDate,
+    };
+  }
+
+  private static buildHierarchy(accounts: ITrialBalanceAccount[]): ITrialBalanceAccount[] {
+    // Build parent-child tree structure
+    return accounts;
+  }
+
+  private static async getAccountsWithBalances(companyId: string, asOfDate: string): Promise<any[]> {
+    return [];
+  }
+}
+```
+
+---
+
+## 8.3 Income Statement (Profit & Loss)
+
+```typescript
+// ============================================================
+// INCOME STATEMENT REPORT
+// ============================================================
+
+export interface IIncomeStatementReport {
+  companyId: string;
+  companyName: string;
+  companyNameAr: string;
+  periodStart: string;
+  periodEnd: string;
+  generatedAt: string;
+  currencyCode: string;
+
+  // Revenue
+  revenue: IIncomeStatementSection;
+  totalRevenue: number;
+
+  // Cost of Goods Sold
+  costOfGoodsSold: IIncomeStatementSection;
+  totalCOGS: number;
+  grossProfit: number;
+  grossProfitMargin: number;           // Basis points
+
+  // Operating Expenses
+  operatingExpenses: IIncomeStatementSection;
+  totalOperatingExpenses: number;
+  operatingIncome: number;
+  operatingMargin: number;
+
+  // Other Income/Expenses
+  otherIncome: IIncomeStatementSection;
+  otherExpenses: IIncomeStatementSection;
+  totalOtherNet: number;
+
+  // Final
+  incomeBeforeTax: number;
+  taxExpense: number;
+  netIncome: number;
+  netProfitMargin: number;
+
+  // Comparison
+  comparison?: IIncomeStatementComparison;
+}
+
+export interface IIncomeStatementSection {
+  title: string;
+  titleAr: string;
+  accounts: IIncomeStatementLine[];
+  total: number;
+}
+
+export interface IIncomeStatementLine {
+  accountId: string;
+  accountCode: string;
+  accountName: string;
+  accountNameAr: string;
+  amount: number;
+  comparisonAmount?: number;
+  variance?: number;
+  variancePercent?: number;
+  level: number;
+  isSubtotal: boolean;
+}
+
+export interface IIncomeStatementComparison {
+  periodStart: string;
+  periodEnd: string;
+  totalRevenue: number;
+  grossProfit: number;
+  operatingIncome: number;
+  netIncome: number;
+  revenueVariance: number;
+  netIncomeVariance: number;
+}
+
+export class IncomeStatementEngine {
+  static async generate(
+    companyId: string,
+    periodStart: string,
+    periodEnd: string,
+    options: { comparisonPeriod?: { start: string; end: string } } = {}
+  ): Promise<IIncomeStatementReport> {
+    const revenue = await this.getSection(companyId, AccountType.REVENUE, periodStart, periodEnd);
+    const cogs = await this.getSection(companyId, AccountType.COST_OF_GOODS_SOLD, periodStart, periodEnd);
+    const opex = await this.getSection(companyId, AccountType.EXPENSE, periodStart, periodEnd);
+    const otherIncome = await this.getSection(companyId, AccountType.OTHER_INCOME, periodStart, periodEnd);
+    const otherExpenses = await this.getSection(companyId, AccountType.OTHER_EXPENSE, periodStart, periodEnd);
+
+    const totalRevenue = revenue.total;
+    const totalCOGS = cogs.total;
+    const grossProfit = totalRevenue - totalCOGS;
+    const grossProfitMargin = totalRevenue > 0 ? Math.round((grossProfit / totalRevenue) * 10000) : 0;
+
+    const totalOperatingExpenses = opex.total;
+    const operatingIncome = grossProfit - totalOperatingExpenses;
+    const operatingMargin = totalRevenue > 0 ? Math.round((operatingIncome / totalRevenue) * 10000) : 0;
+
+    const totalOtherNet = otherIncome.total - otherExpenses.total;
+    const incomeBeforeTax = operatingIncome + totalOtherNet;
+    const taxExpense = await this.getTaxExpense(companyId, periodStart, periodEnd);
+    const netIncome = incomeBeforeTax - taxExpense;
+    const netProfitMargin = totalRevenue > 0 ? Math.round((netIncome / totalRevenue) * 10000) : 0;
+
+    return {
+      companyId,
+      companyName: '',
+      companyNameAr: '',
+      periodStart,
+      periodEnd,
+      generatedAt: new Date().toISOString(),
+      currencyCode: 'SAR',
+      revenue,
+      totalRevenue,
+      costOfGoodsSold: cogs,
+      totalCOGS,
+      grossProfit,
+      grossProfitMargin,
+      operatingExpenses: opex,
+      totalOperatingExpenses,
+      operatingIncome,
+      operatingMargin,
+      otherIncome,
+      otherExpenses,
+      totalOtherNet,
+      incomeBeforeTax,
+      taxExpense,
+      netIncome,
+      netProfitMargin,
+    };
+  }
+
+  private static async getSection(
+    companyId: string,
+    accountType: AccountType,
+    periodStart: string,
+    periodEnd: string
+  ): Promise<IIncomeStatementSection> {
+    return { title: '', titleAr: '', accounts: [], total: 0 };
+  }
+
+  private static async getTaxExpense(companyId: string, periodStart: string, periodEnd: string): Promise<number> {
+    return 0;
+  }
+}
+```
+
+---
+
+## 8.4 Balance Sheet
+
+```typescript
+// ============================================================
+// BALANCE SHEET REPORT
+// Assets = Liabilities + Equity
+// ============================================================
+
+export interface IBalanceSheetReport {
+  companyId: string;
+  companyName: string;
+  companyNameAr: string;
+  asOfDate: string;
+  generatedAt: string;
+  currencyCode: string;
+
+  // Assets
+  currentAssets: IBalanceSheetSection;
+  totalCurrentAssets: number;
+  nonCurrentAssets: IBalanceSheetSection;
+  totalNonCurrentAssets: number;
+  totalAssets: number;
+
+  // Liabilities
+  currentLiabilities: IBalanceSheetSection;
+  totalCurrentLiabilities: number;
+  nonCurrentLiabilities: IBalanceSheetSection;
+  totalNonCurrentLiabilities: number;
+  totalLiabilities: number;
+
+  // Equity
+  equity: IBalanceSheetSection;
+  totalEquity: number;
+
+  // Balance Check
+  totalLiabilitiesAndEquity: number;
+  isBalanced: boolean;
+
+  // Key Ratios
+  currentRatio: number;
+  quickRatio: number;
+  debtToEquityRatio: number;
+  workingCapital: number;
+}
+
+export interface IBalanceSheetSection {
+  title: string;
+  titleAr: string;
+  accounts: IBalanceSheetLine[];
+  total: number;
+}
+
+export interface IBalanceSheetLine {
+  accountId: string;
+  accountCode: string;
+  accountName: string;
+  accountNameAr: string;
+  balance: number;
+  comparisonBalance?: number;
+  variance?: number;
+  level: number;
+  isSubtotal: boolean;
+}
+
+export class BalanceSheetEngine {
+  static async generate(
+    companyId: string,
+    asOfDate: string,
+    options: { comparisonDate?: string } = {}
+  ): Promise<IBalanceSheetReport> {
+    // Get sections
+    const currentAssets = await this.getSection(companyId, asOfDate, AccountType.ASSET, 'current');
+    const nonCurrentAssets = await this.getSection(companyId, asOfDate, AccountType.ASSET, 'non_current');
+    const currentLiabilities = await this.getSection(companyId, asOfDate, AccountType.LIABILITY, 'current');
+    const nonCurrentLiabilities = await this.getSection(companyId, asOfDate, AccountType.LIABILITY, 'non_current');
+    const equity = await this.getEquitySection(companyId, asOfDate);
+
+    const totalCurrentAssets = currentAssets.total;
+    const totalNonCurrentAssets = nonCurrentAssets.total;
+    const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+
+    const totalCurrentLiabilities = currentLiabilities.total;
+    const totalNonCurrentLiabilities = nonCurrentLiabilities.total;
+    const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
+
+    const totalEquity = equity.total;
+    const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
+
+    // Calculate ratios
+    const currentRatio = totalCurrentLiabilities > 0 ? totalCurrentAssets / totalCurrentLiabilities : 0;
+    const inventory = await this.getInventoryBalance(companyId, asOfDate);
+    const quickRatio = totalCurrentLiabilities > 0 ? (totalCurrentAssets - inventory) / totalCurrentLiabilities : 0;
+    const debtToEquityRatio = totalEquity > 0 ? totalLiabilities / totalEquity : 0;
+    const workingCapital = totalCurrentAssets - totalCurrentLiabilities;
+
+    return {
+      companyId,
+      companyName: '',
+      companyNameAr: '',
+      asOfDate,
+      generatedAt: new Date().toISOString(),
+      currencyCode: 'SAR',
+      currentAssets,
+      totalCurrentAssets,
+      nonCurrentAssets,
+      totalNonCurrentAssets,
+      totalAssets,
+      currentLiabilities,
+      totalCurrentLiabilities,
+      nonCurrentLiabilities,
+      totalNonCurrentLiabilities,
+      totalLiabilities,
+      equity,
+      totalEquity,
+      totalLiabilitiesAndEquity,
+      isBalanced: Math.abs(totalAssets - totalLiabilitiesAndEquity) < 1,
+      currentRatio: Math.round(currentRatio * 100) / 100,
+      quickRatio: Math.round(quickRatio * 100) / 100,
+      debtToEquityRatio: Math.round(debtToEquityRatio * 100) / 100,
+      workingCapital,
+    };
+  }
+
+  private static async getSection(
+    companyId: string,
+    asOfDate: string,
+    accountType: AccountType,
+    subType: string
+  ): Promise<IBalanceSheetSection> {
+    return { title: '', titleAr: '', accounts: [], total: 0 };
+  }
+
+  private static async getEquitySection(companyId: string, asOfDate: string): Promise<IBalanceSheetSection> {
+    return { title: 'Equity', titleAr: 'حقوق الملكية', accounts: [], total: 0 };
+  }
+
+  private static async getInventoryBalance(companyId: string, asOfDate: string): Promise<number> {
+    return 0;
+  }
+}
+```
+
+---
+
+## 8.5 Aging Reports (AR & AP)
+
+```typescript
+// ============================================================
+// ACCOUNTS RECEIVABLE AGING REPORT
+// ============================================================
+
+export interface IARAgingReport {
+  companyId: string;
+  asOfDate: string;
+  generatedAt: string;
+  currencyCode: string;
+  totalOutstanding: number;
+  totalOverdue: number;
+  overduePercent: number;
+  buckets: IAgingBucket[];
+  clients: IAgingClientSummary[];
+  topDebtors: IAgingClientSummary[];
+}
+
+export interface IAgingBucket {
+  name: string;
+  nameAr: string;
+  minDays: number;
+  maxDays: number | null;
+  amount: number;
+  count: number;
+  percent: number;
+}
+
+export interface IAgingClientSummary {
+  clientId: string;
+  clientCode: string;
+  clientName: string;
+  clientNameAr: string;
+  creditLimit: number;
+  creditUsed: number;
+  creditAvailable: number;
+  current: number;
+  days1To30: number;
+  days31To60: number;
+  days61To90: number;
+  over90Days: number;
+  totalOutstanding: number;
+  totalOverdue: number;
+  oldestInvoiceDate?: string;
+  invoices: IAgingInvoice[];
+}
+
+export interface IAgingInvoice {
+  invoiceId: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  daysOverdue: number;
+  originalAmount: number;
+  paidAmount: number;
+  balanceDue: number;
+  bucket: string;
+}
+
+export class ARAgingEngine {
+  static readonly BUCKETS = [
+    { name: 'Current', nameAr: 'الحالي', minDays: -Infinity, maxDays: 0 },
+    { name: '1-30 Days', nameAr: '1-30 يوم', minDays: 1, maxDays: 30 },
+    { name: '31-60 Days', nameAr: '31-60 يوم', minDays: 31, maxDays: 60 },
+    { name: '61-90 Days', nameAr: '61-90 يوم', minDays: 61, maxDays: 90 },
+    { name: 'Over 90 Days', nameAr: 'أكثر من 90 يوم', minDays: 91, maxDays: null },
+  ];
+
+  static async generate(
+    companyId: string,
+    asOfDate: string,
+    options: { clientId?: string; includeDetail?: boolean; topCount?: number } = {}
+  ): Promise<IARAgingReport> {
+    const asOfDateTime = new Date(asOfDate);
+    const invoices = await this.getOutstandingInvoices(companyId, asOfDate, options.clientId);
+
+    const buckets: IAgingBucket[] = this.BUCKETS.map(b => ({ ...b, amount: 0, count: 0, percent: 0 }));
+    const clientMap = new Map<string, IAgingClientSummary>();
+    let totalOutstanding = 0;
+    let totalOverdue = 0;
+
+    for (const invoice of invoices) {
+      const dueDate = new Date(invoice.dueDate);
+      const daysOverdue = Math.floor((asOfDateTime.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+      const bucket = this.getBucket(daysOverdue);
+      const bucketIndex = buckets.findIndex(b => b.name === bucket);
+
+      if (bucketIndex >= 0) {
+        buckets[bucketIndex].amount += invoice.balanceDue;
+        buckets[bucketIndex].count++;
+      }
+
+      totalOutstanding += invoice.balanceDue;
+      if (daysOverdue > 0) totalOverdue += invoice.balanceDue;
+
+      // Group by client
+      if (!clientMap.has(invoice.clientId)) {
+        clientMap.set(invoice.clientId, {
+          clientId: invoice.clientId,
+          clientCode: invoice.clientCode,
+          clientName: invoice.clientName,
+          clientNameAr: invoice.clientNameAr,
+          creditLimit: invoice.creditLimit || 0,
+          creditUsed: 0,
+          creditAvailable: 0,
+          current: 0,
+          days1To30: 0,
+          days31To60: 0,
+          days61To90: 0,
+          over90Days: 0,
+          totalOutstanding: 0,
+          totalOverdue: 0,
+          invoices: [],
+        });
+      }
+
+      const client = clientMap.get(invoice.clientId)!;
+      client.totalOutstanding += invoice.balanceDue;
+      if (daysOverdue > 0) client.totalOverdue += invoice.balanceDue;
+
+      if (daysOverdue <= 0) client.current += invoice.balanceDue;
+      else if (daysOverdue <= 30) client.days1To30 += invoice.balanceDue;
+      else if (daysOverdue <= 60) client.days31To60 += invoice.balanceDue;
+      else if (daysOverdue <= 90) client.days61To90 += invoice.balanceDue;
+      else client.over90Days += invoice.balanceDue;
+
+      if (options.includeDetail) {
+        client.invoices.push({
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoiceNumber,
+          invoiceDate: invoice.invoiceDate,
+          dueDate: invoice.dueDate,
+          daysOverdue,
+          originalAmount: invoice.totalAmount,
+          paidAmount: invoice.paidAmount,
+          balanceDue: invoice.balanceDue,
+          bucket,
+        });
+      }
+    }
+
+    // Calculate percentages
+    for (const bucket of buckets) {
+      bucket.percent = totalOutstanding > 0 ? Math.round((bucket.amount / totalOutstanding) * 10000) / 100 : 0;
+    }
+
+    const clients = Array.from(clientMap.values());
+    for (const client of clients) {
+      client.creditUsed = client.totalOutstanding;
+      client.creditAvailable = Math.max(0, client.creditLimit - client.creditUsed);
+    }
+
+    const topDebtors = [...clients].sort((a, b) => b.totalOutstanding - a.totalOutstanding).slice(0, options.topCount || 10);
+
+    return {
+      companyId,
+      asOfDate,
+      generatedAt: new Date().toISOString(),
+      currencyCode: 'SAR',
+      totalOutstanding,
+      totalOverdue,
+      overduePercent: totalOutstanding > 0 ? Math.round((totalOverdue / totalOutstanding) * 10000) / 100 : 0,
+      buckets,
+      clients,
+      topDebtors,
+    };
+  }
+
+  private static getBucket(daysOverdue: number): string {
+    for (const bucket of this.BUCKETS) {
+      if (daysOverdue >= bucket.minDays && (bucket.maxDays === null || daysOverdue <= bucket.maxDays)) {
+        return bucket.name;
+      }
+    }
+    return 'Over 90 Days';
+  }
+
+  private static async getOutstandingInvoices(companyId: string, asOfDate: string, clientId?: string): Promise<any[]> {
+    return [];
+  }
+}
+
+// AP Aging follows same pattern - just uses vendors/bills instead of clients/invoices
+```
+
+---
+
+## 8.6 Cash Flow Statement
+
+```typescript
+// ============================================================
+// CASH FLOW STATEMENT
+// ============================================================
+
+export interface ICashFlowStatement {
+  companyId: string;
+  periodStart: string;
+  periodEnd: string;
+  generatedAt: string;
+  currencyCode: string;
+
+  openingCashBalance: number;
+  operatingActivities: ICashFlowSection;
+  netCashFromOperating: number;
+  investingActivities: ICashFlowSection;
+  netCashFromInvesting: number;
+  financingActivities: ICashFlowSection;
+  netCashFromFinancing: number;
+  netChangeInCash: number;
+  closingCashBalance: number;
+  isReconciled: boolean;
+}
+
+export interface ICashFlowSection {
+  title: string;
+  titleAr: string;
+  items: ICashFlowItem[];
+  total: number;
+}
+
+export interface ICashFlowItem {
+  description: string;
+  descriptionAr: string;
+  amount: number;
+  itemType: CashFlowItemType;
+}
+
+export enum CashFlowItemType {
+  NET_INCOME = 'net_income',
+  DEPRECIATION = 'depreciation',
+  CHANGE_IN_RECEIVABLES = 'change_in_receivables',
+  CHANGE_IN_INVENTORY = 'change_in_inventory',
+  CHANGE_IN_PAYABLES = 'change_in_payables',
+  PURCHASE_OF_ASSETS = 'purchase_of_assets',
+  SALE_OF_ASSETS = 'sale_of_assets',
+  LOANS_RECEIVED = 'loans_received',
+  LOAN_REPAYMENTS = 'loan_repayments',
+  DIVIDENDS_PAID = 'dividends_paid',
+}
+
+export class CashFlowStatementEngine {
+  static async generate(companyId: string, periodStart: string, periodEnd: string): Promise<ICashFlowStatement> {
+    const openingCash = await this.getCashBalance(companyId, this.getPreviousDay(periodStart));
+    const closingCash = await this.getCashBalance(companyId, periodEnd);
+
+    const operating = await this.getOperatingActivities(companyId, periodStart, periodEnd);
+    const investing = await this.getInvestingActivities(companyId, periodStart, periodEnd);
+    const financing = await this.getFinancingActivities(companyId, periodStart, periodEnd);
+
+    const netChange = operating.total + investing.total + financing.total;
+
+    return {
+      companyId,
+      periodStart,
+      periodEnd,
+      generatedAt: new Date().toISOString(),
+      currencyCode: 'SAR',
+      openingCashBalance: openingCash,
+      operatingActivities: operating,
+      netCashFromOperating: operating.total,
+      investingActivities: investing,
+      netCashFromInvesting: investing.total,
+      financingActivities: financing,
+      netCashFromFinancing: financing.total,
+      netChangeInCash: netChange,
+      closingCashBalance: closingCash,
+      isReconciled: Math.abs((openingCash + netChange) - closingCash) < 1,
+    };
+  }
+
+  private static getPreviousDay(date: string): string {
+    const d = new Date(date);
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  private static async getCashBalance(companyId: string, asOfDate: string): Promise<number> { return 0; }
+  private static async getOperatingActivities(companyId: string, start: string, end: string): Promise<ICashFlowSection> {
+    return { title: 'Operating Activities', titleAr: 'الأنشطة التشغيلية', items: [], total: 0 };
+  }
+  private static async getInvestingActivities(companyId: string, start: string, end: string): Promise<ICashFlowSection> {
+    return { title: 'Investing Activities', titleAr: 'الأنشطة الاستثمارية', items: [], total: 0 };
+  }
+  private static async getFinancingActivities(companyId: string, start: string, end: string): Promise<ICashFlowSection> {
+    return { title: 'Financing Activities', titleAr: 'الأنشطة التمويلية', items: [], total: 0 };
+  }
+}
+```
+
+---
+
+## 8.7 Report API Contracts
+
+```typescript
+// ============================================================
+// FINANCIAL REPORTING API CONTRACTS
+// ============================================================
+
+// GET /api/v1/reports/trial-balance
+interface TrialBalanceRequest {
+  asOfDate: string;
+  includeZeroBalances?: boolean;
+  showHierarchy?: boolean;
+  comparisonDate?: string;
+}
+interface TrialBalanceResponse { success: true; data: ITrialBalanceReport; }
+
+// GET /api/v1/reports/income-statement
+interface IncomeStatementRequest {
+  periodStart: string;
+  periodEnd: string;
+  comparisonPeriodStart?: string;
+  comparisonPeriodEnd?: string;
+}
+interface IncomeStatementResponse { success: true; data: IIncomeStatementReport; }
+
+// GET /api/v1/reports/balance-sheet
+interface BalanceSheetRequest {
+  asOfDate: string;
+  comparisonDate?: string;
+}
+interface BalanceSheetResponse { success: true; data: IBalanceSheetReport; }
+
+// GET /api/v1/reports/ar-aging
+interface ARAgingRequest {
+  asOfDate: string;
+  clientId?: string;
+  includeInvoiceDetail?: boolean;
+  topDebtorsCount?: number;
+}
+interface ARAgingResponse { success: true; data: IARAgingReport; }
+
+// GET /api/v1/reports/ap-aging
+interface APAgingRequest {
+  asOfDate: string;
+  vendorId?: string;
+  includeBillDetail?: boolean;
+}
+interface APAgingResponse { success: true; data: IAPAgingReport; }
+
+// GET /api/v1/reports/cash-flow
+interface CashFlowRequest { periodStart: string; periodEnd: string; }
+interface CashFlowResponse { success: true; data: ICashFlowStatement; }
+
+// GET /api/v1/reports/general-ledger
+interface GeneralLedgerRequest {
+  accountId?: string;
+  periodStart: string;
+  periodEnd: string;
+  page?: number;
+  limit?: number;
+}
+interface GeneralLedgerResponse {
+  success: true;
+  data: {
+    account: { id: string; code: string; name: string; nameAr: string };
+    openingBalance: number;
+    entries: IJournalEntryLine[];
+    closingBalance: number;
+    totalDebits: number;
+    totalCredits: number;
+  };
+}
+
+// POST /api/v1/reports/export
+interface ReportExportRequest {
+  reportType: 'trial_balance' | 'income_statement' | 'balance_sheet' | 'ar_aging' | 'ap_aging' | 'cash_flow';
+  format: 'pdf' | 'xlsx' | 'csv';
+  parameters: Record<string, any>;
+  language: 'en' | 'ar';
+}
+interface ReportExportResponse {
+  success: true;
+  data: { fileUrl: string; fileName: string; expiresAt: string };
+}
+
+// --- Fiscal Period APIs ---
+// GET /api/v1/fiscal-years
+interface ListFiscalYearsResponse { success: true; data: { fiscalYears: IFiscalYear[] } }
+
+// POST /api/v1/fiscal-years
+interface CreateFiscalYearRequest {
+  name: string;
+  nameAr: string;
+  startDate: string;
+  endDate: string;
+  periodType: FiscalPeriodType;
+  retainedEarningsAccountId: string;
+}
+
+// POST /api/v1/fiscal-periods/:id/lock
+interface LockPeriodResponse { success: true; data: { period: IFiscalPeriod } }
+
+// POST /api/v1/fiscal-periods/:id/close
+interface ClosePeriodRequest { forceClose?: boolean }
+```
+
+---
+
+*Part 8 Complete. Continue to Part 9 (Audit Trail & Security)?*
