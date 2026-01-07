@@ -9468,4 +9468,1209 @@ interface ActivitySummaryResponse {
 
 ---
 
-*Part 9 Complete. Continue to Part 10 (Frontend Implementation Guide)?*
+*Part 9 Complete.*
+
+---
+
+# Part 10: Frontend Implementation Guide (~800 lines)
+
+This part provides React/TypeScript implementation patterns for the frontend, including hooks, components, form handling, and RTL support.
+
+---
+
+## 10.1 Money Formatting Utilities
+
+```typescript
+// src/lib/money.ts
+// ============================================================
+// MONEY FORMATTING UTILITIES
+// Safe handling of monetary values
+// ============================================================
+
+import Decimal from 'decimal.js';
+
+// Configure Decimal for financial calculations
+Decimal.set({
+  precision: 20,
+  rounding: Decimal.ROUND_HALF_UP,
+});
+
+/**
+ * Currency configuration
+ */
+export const CURRENCIES: Record<string, { code: string; symbol: string; symbolAr: string; decimals: number }> = {
+  SAR: { code: 'SAR', symbol: 'SAR', symbolAr: 'ر.س', decimals: 2 },
+  USD: { code: 'USD', symbol: '$', symbolAr: '$', decimals: 2 },
+  EUR: { code: 'EUR', symbol: '€', symbolAr: '€', decimals: 2 },
+  AED: { code: 'AED', symbol: 'AED', symbolAr: 'د.إ', decimals: 2 },
+  KWD: { code: 'KWD', symbol: 'KWD', symbolAr: 'د.ك', decimals: 3 },
+};
+
+/**
+ * Convert halalas to SAR for display
+ */
+export function halalasToSar(halalas: number): number {
+  return new Decimal(halalas).dividedBy(100).toNumber();
+}
+
+/**
+ * Convert SAR to halalas for storage
+ */
+export function sarToHalalas(sar: number): number {
+  return new Decimal(sar).times(100).round().toNumber();
+}
+
+/**
+ * Format money for display
+ */
+export function formatMoney(
+  amount: number,
+  currencyCode: string = 'SAR',
+  locale: 'en' | 'ar' = 'en',
+  options: { showSymbol?: boolean; convertFromSmallest?: boolean } = {}
+): string {
+  const { showSymbol = true, convertFromSmallest = true } = options;
+  const currency = CURRENCIES[currencyCode] || CURRENCIES.SAR;
+
+  // Convert from smallest unit if needed
+  const displayAmount = convertFromSmallest
+    ? new Decimal(amount).dividedBy(Math.pow(10, currency.decimals))
+    : new Decimal(amount);
+
+  // Format number based on locale
+  const formatted = displayAmount.toNumber().toLocaleString(
+    locale === 'ar' ? 'ar-SA' : 'en-SA',
+    {
+      minimumFractionDigits: currency.decimals,
+      maximumFractionDigits: currency.decimals,
+    }
+  );
+
+  if (!showSymbol) return formatted;
+
+  const symbol = locale === 'ar' ? currency.symbolAr : currency.symbol;
+  return locale === 'ar' ? `${formatted} ${symbol}` : `${symbol} ${formatted}`;
+}
+
+/**
+ * Parse money input string
+ */
+export function parseMoney(
+  input: string,
+  currencyCode: string = 'SAR',
+  options: { toSmallestUnit?: boolean } = {}
+): number | null {
+  const { toSmallestUnit = true } = options;
+  const currency = CURRENCIES[currencyCode] || CURRENCIES.SAR;
+
+  // Remove currency symbols and formatting
+  const cleaned = input
+    .replace(/[^\d.,-]/g, '')
+    .replace(/,/g, '')
+    .trim();
+
+  if (!cleaned || isNaN(Number(cleaned))) return null;
+
+  const decimal = new Decimal(cleaned);
+
+  if (toSmallestUnit) {
+    return decimal.times(Math.pow(10, currency.decimals)).round().toNumber();
+  }
+
+  return decimal.toNumber();
+}
+
+/**
+ * Calculate VAT
+ */
+export function calculateVat(
+  amount: number,
+  vatRate: number,           // Basis points (1500 = 15%)
+  inclusive: boolean = false
+): { net: number; vat: number; gross: number } {
+  const rate = new Decimal(vatRate).dividedBy(10000);
+
+  if (inclusive) {
+    const gross = new Decimal(amount);
+    const net = gross.dividedBy(rate.plus(1));
+    const vat = gross.minus(net);
+    return {
+      net: net.round().toNumber(),
+      vat: vat.round().toNumber(),
+      gross: amount,
+    };
+  }
+
+  const net = new Decimal(amount);
+  const vat = net.times(rate);
+  const gross = net.plus(vat);
+  return {
+    net: amount,
+    vat: vat.round().toNumber(),
+    gross: gross.round().toNumber(),
+  };
+}
+```
+
+---
+
+## 10.2 Invoice Form Hook
+
+```typescript
+// src/hooks/useInvoiceForm.ts
+// ============================================================
+// INVOICE FORM HOOK
+// Manages invoice creation/editing state
+// ============================================================
+
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '@/lib/query-keys';
+import { calculateVat, sarToHalalas, formatMoney } from '@/lib/money';
+import type { IInvoice, IInvoiceLine, DiscountType, TaxBehavior } from '@/types/finance';
+
+interface UseInvoiceFormOptions {
+  invoiceId?: string;
+  defaultClientId?: string;
+}
+
+export function useInvoiceForm(options: UseInvoiceFormOptions = {}) {
+  const { invoiceId, defaultClientId } = options;
+  const queryClient = useQueryClient();
+
+  // Form State
+  const [lines, setLines] = useState<Partial<IInvoiceLine>[]>([]);
+  const [clientId, setClientId] = useState(defaultClientId || '');
+  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dueDate, setDueDate] = useState('');
+  const [notes, setNotes] = useState('');
+  const [notesAr, setNotesAr] = useState('');
+  const [documentDiscount, setDocumentDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState<DiscountType>('none');
+  const [taxBehavior, setTaxBehavior] = useState<TaxBehavior>('exclusive');
+
+  // Fetch existing invoice for editing
+  const { data: existingInvoice, isLoading: loadingInvoice } = useQuery({
+    queryKey: QueryKeys.invoices.detail(invoiceId!),
+    enabled: !!invoiceId,
+    select: (data) => data.data.invoice,
+  });
+
+  // Load existing invoice data
+  useMemo(() => {
+    if (existingInvoice) {
+      setClientId(existingInvoice.clientId);
+      setInvoiceDate(existingInvoice.invoiceDate);
+      setDueDate(existingInvoice.dueDate);
+      setNotes(existingInvoice.notes || '');
+      setNotesAr(existingInvoice.notesAr || '');
+      setLines(existingInvoice.lines);
+      setTaxBehavior(existingInvoice.taxBehavior);
+    }
+  }, [existingInvoice]);
+
+  // Add line
+  const addLine = useCallback(() => {
+    setLines(prev => [
+      ...prev,
+      {
+        lineNumber: prev.length + 1,
+        description: '',
+        quantity: 1,
+        unitPrice: 0,
+        taxRate: 1500, // 15% default
+        discountType: 'none' as DiscountType,
+        discountValue: 0,
+      },
+    ]);
+  }, []);
+
+  // Update line
+  const updateLine = useCallback((index: number, updates: Partial<IInvoiceLine>) => {
+    setLines(prev => {
+      const newLines = [...prev];
+      newLines[index] = { ...newLines[index], ...updates };
+      return newLines;
+    });
+  }, []);
+
+  // Remove line
+  const removeLine = useCallback((index: number) => {
+    setLines(prev => {
+      const newLines = prev.filter((_, i) => i !== index);
+      return newLines.map((line, i) => ({ ...line, lineNumber: i + 1 }));
+    });
+  }, []);
+
+  // Calculate line totals
+  const calculateLineTotal = useCallback((line: Partial<IInvoiceLine>) => {
+    const quantity = line.quantity || 0;
+    const unitPrice = line.unitPrice || 0;
+    const subtotal = quantity * unitPrice;
+
+    // Apply line discount
+    let discountAmount = 0;
+    if (line.discountType === 'percentage' && line.discountValue) {
+      discountAmount = Math.round((subtotal * line.discountValue) / 10000);
+    } else if (line.discountType === 'fixed' && line.discountValue) {
+      discountAmount = line.discountValue;
+    }
+
+    const netAmount = subtotal - discountAmount;
+    const vatResult = calculateVat(netAmount, line.taxRate || 1500, taxBehavior === 'inclusive');
+
+    return {
+      subtotal,
+      discountAmount,
+      netAmount: vatResult.net,
+      taxAmount: vatResult.vat,
+      total: vatResult.gross,
+    };
+  }, [taxBehavior]);
+
+  // Calculate invoice totals
+  const totals = useMemo(() => {
+    let subtotal = 0;
+    let totalDiscount = 0;
+    let totalTax = 0;
+
+    for (const line of lines) {
+      const lineCalc = calculateLineTotal(line);
+      subtotal += lineCalc.subtotal;
+      totalDiscount += lineCalc.discountAmount;
+      totalTax += lineCalc.taxAmount;
+    }
+
+    // Apply document discount
+    let docDiscountAmount = 0;
+    const netSubtotal = subtotal - totalDiscount;
+    if (discountType === 'percentage' && documentDiscount) {
+      docDiscountAmount = Math.round((netSubtotal * documentDiscount) / 10000);
+    } else if (discountType === 'fixed' && documentDiscount) {
+      docDiscountAmount = documentDiscount;
+    }
+
+    const total = netSubtotal - docDiscountAmount + totalTax;
+
+    return {
+      subtotal,
+      lineDiscount: totalDiscount,
+      documentDiscount: docDiscountAmount,
+      totalDiscount: totalDiscount + docDiscountAmount,
+      taxTotal: totalTax,
+      total,
+    };
+  }, [lines, documentDiscount, discountType, calculateLineTotal]);
+
+  // Create/Update mutation
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const endpoint = invoiceId ? `/api/v1/invoices/${invoiceId}` : '/api/v1/invoices';
+      const method = invoiceId ? 'PUT' : 'POST';
+      const response = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.invoices.all });
+      if (invoiceId) {
+        queryClient.invalidateQueries({ queryKey: QueryKeys.invoices.detail(invoiceId) });
+      }
+    },
+  });
+
+  // Submit form
+  const submit = useCallback(async () => {
+    const payload = {
+      clientId,
+      invoiceDate,
+      dueDate,
+      notes,
+      notesAr,
+      taxBehavior,
+      documentDiscountType: discountType,
+      documentDiscountValue: documentDiscount,
+      lines: lines.map(line => ({
+        ...line,
+        unitPrice: sarToHalalas(line.unitPrice || 0),
+      })),
+    };
+
+    return saveMutation.mutateAsync(payload);
+  }, [clientId, invoiceDate, dueDate, notes, notesAr, taxBehavior, discountType, documentDiscount, lines, saveMutation]);
+
+  return {
+    // State
+    clientId,
+    invoiceDate,
+    dueDate,
+    notes,
+    notesAr,
+    lines,
+    documentDiscount,
+    discountType,
+    taxBehavior,
+    totals,
+    existingInvoice,
+    loadingInvoice,
+    isSaving: saveMutation.isPending,
+    error: saveMutation.error,
+
+    // Setters
+    setClientId,
+    setInvoiceDate,
+    setDueDate,
+    setNotes,
+    setNotesAr,
+    setDocumentDiscount,
+    setDiscountType,
+    setTaxBehavior,
+
+    // Line operations
+    addLine,
+    updateLine,
+    removeLine,
+    calculateLineTotal,
+
+    // Actions
+    submit,
+  };
+}
+```
+
+---
+
+## 10.3 Money Input Component
+
+```tsx
+// src/components/finance/MoneyInput.tsx
+// ============================================================
+// MONEY INPUT COMPONENT
+// Handles currency input with proper formatting
+// ============================================================
+
+import { useState, useCallback, useEffect, forwardRef } from 'react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { formatMoney, parseMoney, halalasToSar } from '@/lib/money';
+import { useTranslation } from 'react-i18next';
+
+interface MoneyInputProps {
+  value: number;                       // Value in smallest unit (halalas)
+  onChange: (value: number) => void;
+  currency?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  className?: string;
+  error?: boolean;
+  'aria-label'?: string;
+}
+
+export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(
+  ({ value, onChange, currency = 'SAR', disabled, placeholder, className, error, ...props }, ref) => {
+    const { i18n } = useTranslation();
+    const locale = i18n.language === 'ar' ? 'ar' : 'en';
+
+    // Display value (formatted string)
+    const [displayValue, setDisplayValue] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
+
+    // Update display when value changes externally
+    useEffect(() => {
+      if (!isFocused) {
+        const formatted = value > 0
+          ? formatMoney(value, currency, locale, { showSymbol: false })
+          : '';
+        setDisplayValue(formatted);
+      }
+    }, [value, currency, locale, isFocused]);
+
+    // Handle focus - show raw number for editing
+    const handleFocus = useCallback(() => {
+      setIsFocused(true);
+      if (value > 0) {
+        setDisplayValue(halalasToSar(value).toString());
+      }
+    }, [value]);
+
+    // Handle blur - format and save
+    const handleBlur = useCallback(() => {
+      setIsFocused(false);
+      const parsed = parseMoney(displayValue, currency, { toSmallestUnit: true });
+      if (parsed !== null) {
+        onChange(parsed);
+        setDisplayValue(formatMoney(parsed, currency, locale, { showSymbol: false }));
+      } else {
+        setDisplayValue(value > 0 ? formatMoney(value, currency, locale, { showSymbol: false }) : '');
+      }
+    }, [displayValue, currency, locale, value, onChange]);
+
+    // Handle input change
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
+      // Allow only numbers, decimals, and minus
+      if (/^-?\d*\.?\d*$/.test(input) || input === '') {
+        setDisplayValue(input);
+      }
+    }, []);
+
+    return (
+      <div className={cn('relative', className)}>
+        <Input
+          ref={ref}
+          type="text"
+          inputMode="decimal"
+          value={displayValue}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          disabled={disabled}
+          placeholder={placeholder || '0.00'}
+          className={cn(
+            'text-end',
+            locale === 'ar' && 'text-start',
+            error && 'border-red-500'
+          )}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          {...props}
+        />
+        <span className={cn(
+          'absolute top-1/2 -translate-y-1/2 text-muted-foreground text-sm',
+          locale === 'ar' ? 'left-3' : 'right-3'
+        )}>
+          {currency}
+        </span>
+      </div>
+    );
+  }
+);
+
+MoneyInput.displayName = 'MoneyInput';
+```
+
+---
+
+## 10.4 Invoice Line Item Component
+
+```tsx
+// src/components/finance/InvoiceLineItem.tsx
+// ============================================================
+// INVOICE LINE ITEM COMPONENT
+// Single line in invoice form
+// ============================================================
+
+import { memo } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Trash2 } from 'lucide-react';
+import { MoneyInput } from './MoneyInput';
+import { formatMoney } from '@/lib/money';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import type { IInvoiceLine, DiscountType } from '@/types/finance';
+
+interface InvoiceLineItemProps {
+  line: Partial<IInvoiceLine>;
+  index: number;
+  onUpdate: (index: number, updates: Partial<IInvoiceLine>) => void;
+  onRemove: (index: number) => void;
+  lineTotal: {
+    subtotal: number;
+    discountAmount: number;
+    netAmount: number;
+    taxAmount: number;
+    total: number;
+  };
+  disabled?: boolean;
+}
+
+export const InvoiceLineItem = memo<InvoiceLineItemProps>(({
+  line,
+  index,
+  onUpdate,
+  onRemove,
+  lineTotal,
+  disabled,
+}) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'ar' ? 'ar' : 'en';
+  const isRtl = locale === 'ar';
+
+  return (
+    <div className={cn(
+      'grid gap-4 p-4 border rounded-lg',
+      'grid-cols-12',
+      isRtl && 'text-right'
+    )}>
+      {/* Line Number */}
+      <div className="col-span-1 flex items-center justify-center">
+        <span className="text-muted-foreground font-medium">{line.lineNumber}</span>
+      </div>
+
+      {/* Description */}
+      <div className="col-span-3">
+        <Input
+          value={line.description || ''}
+          onChange={(e) => onUpdate(index, { description: e.target.value })}
+          placeholder={t('finance.description')}
+          disabled={disabled}
+          dir={isRtl ? 'rtl' : 'ltr'}
+        />
+      </div>
+
+      {/* Quantity */}
+      <div className="col-span-1">
+        <Input
+          type="number"
+          min="0"
+          step="1"
+          value={line.quantity || ''}
+          onChange={(e) => onUpdate(index, { quantity: parseInt(e.target.value) || 0 })}
+          placeholder={t('finance.qty')}
+          disabled={disabled}
+          className="text-center"
+        />
+      </div>
+
+      {/* Unit Price */}
+      <div className="col-span-2">
+        <MoneyInput
+          value={line.unitPrice || 0}
+          onChange={(value) => onUpdate(index, { unitPrice: value })}
+          disabled={disabled}
+          aria-label={t('finance.unitPrice')}
+        />
+      </div>
+
+      {/* Discount */}
+      <div className="col-span-2 flex gap-2">
+        <Select
+          value={line.discountType || 'none'}
+          onValueChange={(value: DiscountType) => onUpdate(index, { discountType: value })}
+          disabled={disabled}
+        >
+          <SelectTrigger className="w-20">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">-</SelectItem>
+            <SelectItem value="percentage">%</SelectItem>
+            <SelectItem value="fixed">SAR</SelectItem>
+          </SelectContent>
+        </Select>
+        {line.discountType !== 'none' && (
+          <Input
+            type="number"
+            min="0"
+            value={line.discountValue || ''}
+            onChange={(e) => onUpdate(index, { discountValue: parseInt(e.target.value) || 0 })}
+            className="flex-1"
+            disabled={disabled}
+          />
+        )}
+      </div>
+
+      {/* Tax Rate */}
+      <div className="col-span-1">
+        <Select
+          value={String(line.taxRate || 1500)}
+          onValueChange={(value) => onUpdate(index, { taxRate: parseInt(value) })}
+          disabled={disabled}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1500">15%</SelectItem>
+            <SelectItem value="0">0%</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Line Total */}
+      <div className="col-span-1 flex items-center justify-end">
+        <span className="font-medium">
+          {formatMoney(lineTotal.total, 'SAR', locale)}
+        </span>
+      </div>
+
+      {/* Remove Button */}
+      <div className="col-span-1 flex items-center justify-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onRemove(index)}
+          disabled={disabled}
+          className="text-destructive hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+});
+
+InvoiceLineItem.displayName = 'InvoiceLineItem';
+```
+
+---
+
+## 10.5 Payment Allocation Component
+
+```tsx
+// src/components/finance/PaymentAllocation.tsx
+// ============================================================
+// PAYMENT ALLOCATION COMPONENT
+// Allocate payment to multiple invoices
+// ============================================================
+
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { QueryKeys } from '@/lib/query-keys';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { formatMoney, halalasToSar, sarToHalalas } from '@/lib/money';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import type { IInvoice } from '@/types/finance';
+
+interface PaymentAllocationProps {
+  clientId: string;
+  paymentAmount: number;              // In halalas
+  onAllocationsChange: (allocations: Array<{ invoiceId: string; amount: number }>) => void;
+}
+
+export function PaymentAllocation({ clientId, paymentAmount, onAllocationsChange }: PaymentAllocationProps) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'ar' ? 'ar' : 'en';
+  const isRtl = locale === 'ar';
+
+  // Fetch outstanding invoices
+  const { data: invoices, isLoading } = useQuery({
+    queryKey: QueryKeys.invoices.outstanding(clientId),
+    enabled: !!clientId,
+    select: (data) => data.data.invoices as IInvoice[],
+  });
+
+  // Track allocations
+  const [allocations, setAllocations] = useState<Record<string, number>>({});
+
+  // Calculate totals
+  const { totalAllocated, remaining } = useMemo(() => {
+    const totalAllocated = Object.values(allocations).reduce((sum, amt) => sum + amt, 0);
+    return {
+      totalAllocated,
+      remaining: paymentAmount - totalAllocated,
+    };
+  }, [allocations, paymentAmount]);
+
+  // Update allocation for invoice
+  const updateAllocation = (invoiceId: string, amount: number, maxAmount: number) => {
+    const validAmount = Math.min(Math.max(0, amount), maxAmount);
+    setAllocations(prev => {
+      const newAllocations = { ...prev };
+      if (validAmount > 0) {
+        newAllocations[invoiceId] = validAmount;
+      } else {
+        delete newAllocations[invoiceId];
+      }
+      onAllocationsChange(
+        Object.entries(newAllocations).map(([invoiceId, amount]) => ({ invoiceId, amount }))
+      );
+      return newAllocations;
+    });
+  };
+
+  // Auto-allocate using FIFO
+  const autoAllocateFIFO = () => {
+    if (!invoices) return;
+
+    const newAllocations: Record<string, number> = {};
+    let remainingToAllocate = paymentAmount;
+
+    // Sort by due date (oldest first)
+    const sorted = [...invoices].sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+
+    for (const invoice of sorted) {
+      if (remainingToAllocate <= 0) break;
+
+      const allocateAmount = Math.min(remainingToAllocate, invoice.balanceDue);
+      if (allocateAmount > 0) {
+        newAllocations[invoice.id] = allocateAmount;
+        remainingToAllocate -= allocateAmount;
+      }
+    }
+
+    setAllocations(newAllocations);
+    onAllocationsChange(
+      Object.entries(newAllocations).map(([invoiceId, amount]) => ({ invoiceId, amount }))
+    );
+  };
+
+  if (isLoading) {
+    return <div className="p-4 text-center">{t('common.loading')}</div>;
+  }
+
+  if (!invoices?.length) {
+    return (
+      <div className="p-4 text-center text-muted-foreground">
+        {t('finance.noOutstandingInvoices')}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Summary Bar */}
+      <div className={cn(
+        'flex items-center justify-between p-4 bg-muted rounded-lg',
+        isRtl && 'flex-row-reverse'
+      )}>
+        <div>
+          <p className="text-sm text-muted-foreground">{t('finance.paymentAmount')}</p>
+          <p className="text-lg font-semibold">{formatMoney(paymentAmount, 'SAR', locale)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">{t('finance.allocated')}</p>
+          <p className="text-lg font-semibold">{formatMoney(totalAllocated, 'SAR', locale)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">{t('finance.remaining')}</p>
+          <p className={cn('text-lg font-semibold', remaining < 0 && 'text-destructive')}>
+            {formatMoney(remaining, 'SAR', locale)}
+          </p>
+        </div>
+        <Button onClick={autoAllocateFIFO} variant="outline">
+          {t('finance.autoAllocate')}
+        </Button>
+      </div>
+
+      {/* Invoices Table */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-12"></TableHead>
+            <TableHead>{t('finance.invoiceNumber')}</TableHead>
+            <TableHead>{t('finance.invoiceDate')}</TableHead>
+            <TableHead>{t('finance.dueDate')}</TableHead>
+            <TableHead className={isRtl ? 'text-left' : 'text-right'}>{t('finance.total')}</TableHead>
+            <TableHead className={isRtl ? 'text-left' : 'text-right'}>{t('finance.balance')}</TableHead>
+            <TableHead className={isRtl ? 'text-left' : 'text-right'}>{t('finance.allocate')}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invoices.map((invoice) => {
+            const isSelected = allocations[invoice.id] > 0;
+            const allocated = allocations[invoice.id] || 0;
+
+            return (
+              <TableRow key={invoice.id} className={isSelected ? 'bg-muted/50' : ''}>
+                <TableCell>
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={(checked) => {
+                      updateAllocation(
+                        invoice.id,
+                        checked ? Math.min(remaining + allocated, invoice.balanceDue) : 0,
+                        invoice.balanceDue
+                      );
+                    }}
+                  />
+                </TableCell>
+                <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+                <TableCell>{invoice.invoiceDate}</TableCell>
+                <TableCell>
+                  <span className={cn(
+                    new Date(invoice.dueDate) < new Date() && 'text-destructive'
+                  )}>
+                    {invoice.dueDate}
+                  </span>
+                </TableCell>
+                <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+                  {formatMoney(invoice.totalAmount, 'SAR', locale)}
+                </TableCell>
+                <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+                  <Badge variant={invoice.balanceDue > 0 ? 'destructive' : 'default'}>
+                    {formatMoney(invoice.balanceDue, 'SAR', locale)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    min="0"
+                    max={halalasToSar(invoice.balanceDue)}
+                    step="0.01"
+                    value={allocated > 0 ? halalasToSar(allocated) : ''}
+                    onChange={(e) => {
+                      const value = sarToHalalas(parseFloat(e.target.value) || 0);
+                      updateAllocation(invoice.id, value, invoice.balanceDue);
+                    }}
+                    className={cn('w-32', isRtl ? 'text-left' : 'text-right')}
+                    placeholder="0.00"
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+```
+
+---
+
+## 10.6 Financial Report Display Component
+
+```tsx
+// src/components/finance/reports/TrialBalanceReport.tsx
+// ============================================================
+// TRIAL BALANCE REPORT COMPONENT
+// ============================================================
+
+import { useQuery } from '@tanstack/react-query';
+import { QueryKeys } from '@/lib/query-keys';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { formatMoney } from '@/lib/money';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import type { ITrialBalanceReport, ITrialBalanceAccount } from '@/types/finance';
+
+interface TrialBalanceReportProps {
+  asOfDate: string;
+  showHierarchy?: boolean;
+  includeZeroBalances?: boolean;
+}
+
+export function TrialBalanceReport({ asOfDate, showHierarchy, includeZeroBalances }: TrialBalanceReportProps) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'ar' ? 'ar' : 'en';
+  const isRtl = locale === 'ar';
+
+  const { data: report, isLoading } = useQuery({
+    queryKey: QueryKeys.reports.trialBalance(asOfDate, { showHierarchy, includeZeroBalances }),
+    select: (data) => data.data as ITrialBalanceReport,
+  });
+
+  if (isLoading || !report) {
+    return <div className="p-8 text-center">{t('common.loading')}</div>;
+  }
+
+  // Render account row with indentation for hierarchy
+  const renderAccountRow = (account: ITrialBalanceAccount) => {
+    const indent = account.level * 20;
+    const name = locale === 'ar' ? account.accountNameAr : account.accountName;
+
+    return (
+      <TableRow key={account.accountId} className={account.isGroup ? 'font-semibold bg-muted/30' : ''}>
+        <TableCell>
+          <span style={{ paddingInlineStart: `${indent}px` }}>
+            {account.accountCode}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span style={{ paddingInlineStart: `${indent}px` }}>
+            {name}
+          </span>
+        </TableCell>
+        <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+          {account.closingDebit > 0 ? formatMoney(account.closingDebit, 'SAR', locale) : '-'}
+        </TableCell>
+        <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+          {account.closingCredit > 0 ? formatMoney(account.closingCredit, 'SAR', locale) : '-'}
+        </TableCell>
+      </TableRow>
+    );
+  };
+
+  // Recursively render accounts with children
+  const renderAccounts = (accounts: ITrialBalanceAccount[]): JSX.Element[] => {
+    return accounts.flatMap(account => {
+      const rows = [renderAccountRow(account)];
+      if ('children' in account && account.children?.length) {
+        rows.push(...renderAccounts(account.children as ITrialBalanceAccount[]));
+      }
+      return rows;
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className={cn('flex items-center justify-between', isRtl && 'flex-row-reverse')}>
+          <CardTitle>{t('finance.reports.trialBalance')}</CardTitle>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              {t('finance.asOf')}: {asOfDate}
+            </span>
+            <Badge variant={report.isBalanced ? 'default' : 'destructive'}>
+              {report.isBalanced ? t('finance.balanced') : t('finance.unbalanced')}
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('finance.accountCode')}</TableHead>
+              <TableHead>{t('finance.accountName')}</TableHead>
+              <TableHead className={isRtl ? 'text-left' : 'text-right'}>{t('finance.debit')}</TableHead>
+              <TableHead className={isRtl ? 'text-left' : 'text-right'}>{t('finance.credit')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {renderAccounts(report.accounts)}
+          </TableBody>
+          <TableFooter>
+            <TableRow className="font-bold text-lg">
+              <TableCell colSpan={2}>{t('finance.total')}</TableCell>
+              <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+                {formatMoney(report.totalDebits, 'SAR', locale)}
+              </TableCell>
+              <TableCell className={isRtl ? 'text-left' : 'text-right'}>
+                {formatMoney(report.totalCredits, 'SAR', locale)}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 10.7 Query Keys Configuration
+
+```typescript
+// src/lib/query-keys.ts
+// ============================================================
+// QUERY KEYS FOR REACT QUERY
+// Centralized cache key management
+// ============================================================
+
+export const QueryKeys = {
+  // Invoices
+  invoices: {
+    all: ['invoices'] as const,
+    list: (filters?: Record<string, any>) => ['invoices', 'list', filters] as const,
+    detail: (id: string) => ['invoices', 'detail', id] as const,
+    outstanding: (clientId: string) => ['invoices', 'outstanding', clientId] as const,
+  },
+
+  // Payments
+  payments: {
+    all: ['payments'] as const,
+    list: (filters?: Record<string, any>) => ['payments', 'list', filters] as const,
+    detail: (id: string) => ['payments', 'detail', id] as const,
+    unallocated: (clientId: string) => ['payments', 'unallocated', clientId] as const,
+  },
+
+  // Clients
+  clients: {
+    all: ['clients'] as const,
+    list: (filters?: Record<string, any>) => ['clients', 'list', filters] as const,
+    detail: (id: string) => ['clients', 'detail', id] as const,
+    statement: (id: string, period?: string) => ['clients', 'statement', id, period] as const,
+  },
+
+  // Expenses
+  expenses: {
+    all: ['expenses'] as const,
+    claims: (filters?: Record<string, any>) => ['expenses', 'claims', filters] as const,
+    claim: (id: string) => ['expenses', 'claim', id] as const,
+    categories: ['expenses', 'categories'] as const,
+    billable: (clientId?: string) => ['expenses', 'billable', clientId] as const,
+  },
+
+  // Accounts
+  accounts: {
+    all: ['accounts'] as const,
+    list: (filters?: Record<string, any>) => ['accounts', 'list', filters] as const,
+    detail: (id: string) => ['accounts', 'detail', id] as const,
+    chartOfAccounts: ['accounts', 'chart'] as const,
+  },
+
+  // Journal Entries
+  journals: {
+    all: ['journals'] as const,
+    list: (filters?: Record<string, any>) => ['journals', 'list', filters] as const,
+    detail: (id: string) => ['journals', 'detail', id] as const,
+  },
+
+  // Reports
+  reports: {
+    trialBalance: (asOfDate: string, options?: Record<string, any>) =>
+      ['reports', 'trial-balance', asOfDate, options] as const,
+    incomeStatement: (periodStart: string, periodEnd: string) =>
+      ['reports', 'income-statement', periodStart, periodEnd] as const,
+    balanceSheet: (asOfDate: string) =>
+      ['reports', 'balance-sheet', asOfDate] as const,
+    arAging: (asOfDate: string, clientId?: string) =>
+      ['reports', 'ar-aging', asOfDate, clientId] as const,
+    apAging: (asOfDate: string, vendorId?: string) =>
+      ['reports', 'ap-aging', asOfDate, vendorId] as const,
+    cashFlow: (periodStart: string, periodEnd: string) =>
+      ['reports', 'cash-flow', periodStart, periodEnd] as const,
+    generalLedger: (accountId: string, period: string) =>
+      ['reports', 'general-ledger', accountId, period] as const,
+  },
+
+  // Currency
+  currencies: {
+    all: ['currencies'] as const,
+    rates: (baseCurrency: string, date?: string) =>
+      ['currencies', 'rates', baseCurrency, date] as const,
+  },
+
+  // Tax
+  tax: {
+    codes: ['tax', 'codes'] as const,
+    zatcaStatus: (invoiceId: string) => ['tax', 'zatca', invoiceId] as const,
+  },
+
+  // Fiscal
+  fiscal: {
+    years: ['fiscal', 'years'] as const,
+    periods: (yearId: string) => ['fiscal', 'periods', yearId] as const,
+    currentPeriod: ['fiscal', 'current-period'] as const,
+  },
+
+  // Audit
+  audit: {
+    logs: (filters?: Record<string, any>) => ['audit', 'logs', filters] as const,
+    documentHistory: (type: string, id: string) => ['audit', 'history', type, id] as const,
+  },
+};
+```
+
+---
+
+## 10.8 Routes Configuration
+
+```typescript
+// src/constants/routes.ts (finance section)
+// ============================================================
+// FINANCE ROUTES
+// ============================================================
+
+export const ROUTES = {
+  // ... existing routes
+
+  finance: {
+    // Invoices
+    invoices: {
+      list: '/finance/invoices',
+      create: '/finance/invoices/new',
+      detail: (id: string) => `/finance/invoices/${id}`,
+      edit: (id: string) => `/finance/invoices/${id}/edit`,
+    },
+
+    // Credit Notes
+    creditNotes: {
+      list: '/finance/credit-notes',
+      create: '/finance/credit-notes/new',
+      createFromInvoice: (invoiceId: string) => `/finance/credit-notes/new?invoiceId=${invoiceId}`,
+      detail: (id: string) => `/finance/credit-notes/${id}`,
+    },
+
+    // Payments
+    payments: {
+      list: '/finance/payments',
+      receive: '/finance/payments/receive',
+      detail: (id: string) => `/finance/payments/${id}`,
+      allocate: (id: string) => `/finance/payments/${id}/allocate`,
+    },
+
+    // Expenses
+    expenses: {
+      list: '/finance/expenses',
+      create: '/finance/expenses/new',
+      detail: (id: string) => `/finance/expenses/${id}`,
+      approve: (id: string) => `/finance/expenses/${id}/approve`,
+    },
+
+    // Reports
+    reports: {
+      dashboard: '/finance/reports',
+      trialBalance: '/finance/reports/trial-balance',
+      incomeStatement: '/finance/reports/income-statement',
+      balanceSheet: '/finance/reports/balance-sheet',
+      arAging: '/finance/reports/ar-aging',
+      apAging: '/finance/reports/ap-aging',
+      cashFlow: '/finance/reports/cash-flow',
+      generalLedger: '/finance/reports/general-ledger',
+    },
+
+    // Settings
+    settings: {
+      chartOfAccounts: '/finance/settings/chart-of-accounts',
+      taxCodes: '/finance/settings/tax-codes',
+      currencies: '/finance/settings/currencies',
+      fiscalPeriods: '/finance/settings/fiscal-periods',
+    },
+  },
+};
+```
+
+---
+
+*Part 10 Complete.*
+
+---
+
+# Summary
+
+This implementation plan provides enterprise-grade specifications for a complete finance/accounting module based on patterns from:
+- **Odoo** (Python, PostgreSQL)
+- **ERPNext** (Python, MariaDB)
+- **Apache OFBiz** (Java)
+- **iDempiere** (Java, PostgreSQL)
+
+## Key Features Covered
+
+| Part | Content | Lines |
+|------|---------|-------|
+| 1 | Core Foundation (Money, Sequences, Enums) | ~800 |
+| 2 | Invoice System (Schema, Calculation Engine) | ~800 |
+| 3 | Payment System (Allocation, Checks) | ~800 |
+| 4 | General Ledger (Chart of Accounts, Journal Entries) | ~800 |
+| 5 | Multi-Currency Support (Exchange Rates, Revaluation) | ~800 |
+| 6 | Tax & ZATCA E-Invoicing Compliance | ~800 |
+| 7 | Expense Management (Claims, Approval, Reimbursement) | ~800 |
+| 8 | Financial Reporting (Trial Balance, P&L, Balance Sheet) | ~800 |
+| 9 | Audit Trail & Security (PDPL, Versioning, Controls) | ~800 |
+| 10 | Frontend Implementation (React Hooks, Components) | ~800 |
+
+## Saudi Arabia Compliance
+
+- **ZATCA Phase 2**: QR codes, XML generation, clearance APIs
+- **VAT**: 15% standard rate with proper handling
+- **PDPL**: Data protection and masking
+- **Bilingual**: Arabic/English throughout
+
+## Implementation Priority
+
+1. **Phase 1**: Parts 1-4 (Core, Invoices, Payments, GL)
+2. **Phase 2**: Parts 5-6 (Multi-Currency, ZATCA)
+3. **Phase 3**: Parts 7-8 (Expenses, Reporting)
+4. **Phase 4**: Part 9 (Audit & Security)
+5. **Continuous**: Part 10 (Frontend as features are built)
+
+---
+
+*End of Finance Implementation Plan*
