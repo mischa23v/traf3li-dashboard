@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearch, useNavigate } from '@tanstack/react-router'
 import {
   Shield, Lock, Key, Smartphone, Eye, EyeOff,
   AlertTriangle, CheckCircle, Clock, MapPin, Monitor,
@@ -38,14 +39,25 @@ import { MFASetupWizard, BackupCodesModal } from '@/components/mfa'
 import { useMFAStatus, useMFARoleRequirement, useDisableMFA } from '@/hooks/useMFA'
 import { useActiveSessions, useRevokeSession, useRevokeAllSessions } from '@/hooks/useSessions'
 import { formatLastActive, formatDevice, formatLocation } from '@/services/sessions.service'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore, selectMustChangePassword } from '@/stores/auth-store'
+import { useChangePassword } from '@/hooks/usePassword'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
 
 export function SecurityPage() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
+  const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
+  const mustChangePassword = useAuthStore(selectMustChangePassword)
+  const clearPasswordBreachWarning = useAuthStore((state) => state.clearPasswordBreachWarning)
+
+  // Get URL search params
+  const searchParams = useSearch({ strict: false }) as { action?: string; reason?: string }
+  const actionParam = searchParams?.action
+  const reasonParam = searchParams?.reason
+  const isBreachReason = reasonParam === 'breach'
+  const isPasswordChangeRequired = actionParam === 'change-password'
 
   // Password dialog state
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
@@ -54,7 +66,9 @@ export function SecurityPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [isChangingPassword, setIsChangingPassword] = useState(false)
+
+  // Password change mutation
+  const changePasswordMutation = useChangePassword()
 
   // MFA state
   const [showMFASetup, setShowMFASetup] = useState(false)
@@ -66,6 +80,13 @@ export function SecurityPage() {
 
   // Login alerts state
   const [loginAlerts, setLoginAlerts] = useState(true)
+
+  // Auto-open password change dialog when action=change-password
+  useEffect(() => {
+    if (isPasswordChangeRequired) {
+      setChangePasswordOpen(true)
+    }
+  }, [isPasswordChangeRequired])
 
   // Fetch MFA status
   const { data: mfaStatus, isLoading: isMFALoading, refetch: refetchMFA } = useMFAStatus()
@@ -107,19 +128,24 @@ export function SecurityPage() {
       return
     }
 
-    setIsChangingPassword(true)
     try {
-      // TODO: Call change password API
-      // await authService.changePassword(currentPassword, newPassword)
-      toast.success(t('security.password.changed'))
+      await changePasswordMutation.mutateAsync({ currentPassword, newPassword })
+
+      // Clear breach warning flags after successful password change
+      clearPasswordBreachWarning()
+
+      // Close dialog and clear form
       setChangePasswordOpen(false)
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
+
+      // Clear URL params and navigate to clean security page
+      if (isPasswordChangeRequired) {
+        navigate({ to: ROUTES.dashboard.settings.security, replace: true })
+      }
     } catch (error: any) {
-      toast.error(error.message || t('common.error'))
-    } finally {
-      setIsChangingPassword(false)
+      // Error is already handled by the mutation hook (shows toast)
     }
   }
 
@@ -224,23 +250,59 @@ export function SecurityPage() {
             </Card>
           )}
 
+          {/* Password Breach Warning Banner */}
+          {(isBreachReason || mustChangePassword) && (
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="flex-1">
+                    <p className="font-medium text-red-800">
+                      {isRTL
+                        ? 'تحذير أمني: يجب تغيير كلمة المرور'
+                        : 'Security Warning: Password Change Required'}
+                    </p>
+                    <p className="text-sm text-red-600">
+                      {isBreachReason
+                        ? (isRTL
+                            ? 'تم العثور على كلمة المرور الخاصة بك في تسريبات بيانات. يرجى تغييرها فوراً لحماية حسابك.'
+                            : 'Your password was found in data breaches. Please change it immediately to protect your account.')
+                        : (isRTL
+                            ? 'يجب عليك تغيير كلمة المرور للمتابعة.'
+                            : 'You must change your password to continue.')}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Password Section */}
-          <Card>
+          <Card className={mustChangePassword ? 'border-red-200' : ''}>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Lock className="h-5 w-5 text-blue-600" />
+                <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${mustChangePassword ? 'bg-red-100' : 'bg-blue-100'}`}>
+                  <Lock className={`h-5 w-5 ${mustChangePassword ? 'text-red-600' : 'text-blue-600'}`} />
                 </div>
                 <div>
                   <CardTitle>{t('security.password.title')}</CardTitle>
                   <CardDescription>
-                    {t('security.password.lastChanged', { date: '30 days' })}
+                    {mustChangePassword
+                      ? (isRTL ? 'يجب تغيير كلمة المرور الآن' : 'Password change required')
+                      : t('security.password.lastChanged', { date: '30 days' })}
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+              <Dialog open={changePasswordOpen} onOpenChange={(open) => {
+                // Don't allow closing if password change is required
+                if (!open && mustChangePassword) {
+                  toast.error(isRTL ? 'يجب تغيير كلمة المرور أولاً' : 'You must change your password first')
+                  return
+                }
+                setChangePasswordOpen(open)
+              }}>
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <Key className="h-4 w-4 me-2" />
@@ -303,16 +365,20 @@ export function SecurityPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
-                      {t('common.cancel')}
-                    </Button>
+                    {!mustChangePassword && (
+                      <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
+                        {t('common.cancel')}
+                      </Button>
+                    )}
                     <Button
-                      className="bg-emerald-500 hover:bg-emerald-600"
+                      className={mustChangePassword ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 hover:bg-emerald-600'}
                       onClick={handlePasswordChange}
-                      disabled={isChangingPassword}
+                      disabled={changePasswordMutation.isPending}
                     >
-                      {isChangingPassword && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                      {t('common.save')}
+                      {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                      {mustChangePassword
+                        ? (isRTL ? 'تغيير كلمة المرور الآن' : 'Change Password Now')
+                        : t('common.save')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

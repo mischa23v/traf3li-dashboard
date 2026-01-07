@@ -173,8 +173,22 @@ export interface User {
   // Email verification fields
   isEmailVerified?: boolean
   emailVerifiedAt?: string | null
+  // Password breach fields (from backend breach check)
+  mustChangePassword?: boolean
+  passwordBreached?: boolean
   createdAt: string
   updatedAt: string
+}
+
+/**
+ * Password Breach Warning returned from login when password is compromised
+ */
+export interface PasswordBreachWarning {
+  type: 'PASSWORD_COMPROMISED'
+  message: string      // Arabic message
+  messageEn: string    // English message
+  breachCount: number  // Number of breaches found
+  requirePasswordChange: true
 }
 
 /**
@@ -185,6 +199,15 @@ export interface LoginCredentials {
   password: string
   captchaToken?: string
   rememberMe?: boolean // Extended session (30 days vs 24 hours)
+}
+
+/**
+ * Login Result Interface
+ * Contains user and optional breach warning
+ */
+export interface LoginResult {
+  user: User
+  warning?: PasswordBreachWarning
 }
 
 /**
@@ -359,6 +382,10 @@ interface AuthResponse {
   // Backwards compatibility (camelCase) - existing code continues to work
   accessToken?: string
   refreshToken?: string
+  expiresIn?: number
+
+  // Password breach warning (only present if password was found in breaches)
+  warning?: PasswordBreachWarning
 }
 
 /**
@@ -472,7 +499,7 @@ const authService = {
    * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
    * =========================================================================
    */
-  login: async (credentials: LoginCredentials): Promise<User> => {
+  login: async (credentials: LoginCredentials): Promise<LoginResult> => {
     try {
       // NOTE: TanStack Query automatically invalidates queries on auth state change
       // No manual cache clearing needed - query invalidation happens via queryClient
@@ -507,7 +534,18 @@ const authService = {
       }
 
       // Normalize user data to ensure firmId is set
-      const user = normalizeUser(response.data.user)
+      let user = normalizeUser(response.data.user)
+
+      // Check for password breach warning and set user flags accordingly
+      const warning = response.data.warning
+      if (warning?.type === 'PASSWORD_COMPROMISED') {
+        authWarn('Password breach detected!', { breachCount: warning.breachCount })
+        user = {
+          ...user,
+          mustChangePassword: true,
+          passwordBreached: true,
+        }
+      }
 
       // Store minimal user data in localStorage for persistence
       // SECURITY NOTE: Role stored here is for UI display only
@@ -524,6 +562,7 @@ const authService = {
         username: user.username,
         userId: user._id,
         firmId: user.firmId,
+        hasBreachWarning: !!warning,
       })
 
       // Initialize CSRF token after successful login
@@ -532,7 +571,7 @@ const authService = {
         console.warn('[AUTH] CSRF token initialization after login failed:', err)
       })
 
-      return user
+      return { user, warning }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

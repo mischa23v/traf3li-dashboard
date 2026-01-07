@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { setUser as setSentryUser } from '@/lib/sentry'
 import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/analytics'
-import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature } from '@/services/authService'
+import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
 interface AuthState {
@@ -16,12 +16,14 @@ interface AuthState {
   isLoading: boolean
   isAuthenticated: boolean
   error: string | null
+  passwordBreachWarning: PasswordBreachWarning | null
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>
   logout: () => Promise<void>
   setUser: (user: User | null) => void
   clearError: () => void
+  clearPasswordBreachWarning: () => void
   checkAuth: () => Promise<void>
 }
 
@@ -34,14 +36,15 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       isAuthenticated: false,
       error: null,
+      passwordBreachWarning: null,
 
       /**
        * Login Action
        */
       login: async (credentials: LoginCredentials) => {
-        set({ isLoading: true, error: null })
+        set({ isLoading: true, error: null, passwordBreachWarning: null })
         try {
-          const user = await authService.login(credentials)
+          const { user, warning } = await authService.login(credentials)
 
           // Check if MFA verification is required
           // SECURITY FIX: Trust backend's mfaPending flag - don't override it
@@ -54,6 +57,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: !mfaPending, // Not fully authenticated until MFA verified
             isLoading: false,
             error: null,
+            passwordBreachWarning: warning || null,
           })
 
           // Set Sentry user context
@@ -142,6 +146,25 @@ export const useAuthStore = create<AuthState>()(
        */
       clearError: () => {
         set({ error: null })
+      },
+
+      /**
+       * Clear Password Breach Warning
+       * Call this after user has changed their password
+       */
+      clearPasswordBreachWarning: () => {
+        set({ passwordBreachWarning: null })
+        // Also clear the breach flags from the user object
+        const currentUser = useAuthStore.getState().user
+        if (currentUser && (currentUser.mustChangePassword || currentUser.passwordBreached)) {
+          set({
+            user: {
+              ...currentUser,
+              mustChangePassword: false,
+              passwordBreached: false,
+            },
+          })
+        }
       },
 
       /**
@@ -293,3 +316,13 @@ export const selectIsEmailVerified = (state: AuthState) =>
   state.user?.isEmailVerified === true
 export const selectEmailVerifiedAt = (state: AuthState) =>
   state.user?.emailVerifiedAt
+
+/**
+ * Password breach selectors
+ */
+export const selectPasswordBreachWarning = (state: AuthState) =>
+  state.passwordBreachWarning
+export const selectMustChangePassword = (state: AuthState) =>
+  state.user?.mustChangePassword === true || state.user?.passwordBreached === true
+export const selectIsPasswordBreached = (state: AuthState) =>
+  state.user?.passwordBreached === true
