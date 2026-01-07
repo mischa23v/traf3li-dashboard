@@ -13,20 +13,33 @@ const jwt = require('jsonwebtoken');
 
 /**
  * Get JWT secrets from environment
- * Falls back to default for development (NEVER use in production)
+ * SECURITY: Fail-fast if secrets not configured - prevents token forgery
  */
 const getSecrets = () => {
   const jwtSecret = process.env.JWT_SECRET;
   const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
-  
-  if (!jwtSecret || !jwtRefreshSecret) {
-    console.warn('⚠️  WARNING: JWT secrets not set in environment variables!');
-    console.warn('⚠️  Using default secrets - DO NOT use in production!');
+
+  // SECURITY: Fail-fast - never use default secrets that could be guessed
+  if (!jwtSecret) {
+    throw new Error('CRITICAL: JWT_SECRET environment variable is not set. Server cannot start without proper JWT configuration.');
   }
-  
+
+  if (!jwtRefreshSecret) {
+    throw new Error('CRITICAL: JWT_REFRESH_SECRET environment variable is not set. Server cannot start without proper JWT configuration.');
+  }
+
+  // Validate secret strength (minimum 32 characters recommended)
+  if (jwtSecret.length < 32) {
+    console.warn('⚠️  WARNING: JWT_SECRET should be at least 32 characters for security');
+  }
+
+  if (jwtRefreshSecret.length < 32) {
+    console.warn('⚠️  WARNING: JWT_REFRESH_SECRET should be at least 32 characters for security');
+  }
+
   return {
-    accessSecret: jwtSecret || 'default-jwt-secret-do-not-use-in-production-change-this-immediately',
-    refreshSecret: jwtRefreshSecret || 'default-refresh-secret-do-not-use-in-production-change-this-now',
+    accessSecret: jwtSecret,
+    refreshSecret: jwtRefreshSecret,
   };
 };
 

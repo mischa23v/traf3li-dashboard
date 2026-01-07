@@ -11,11 +11,15 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
 
 const authRegister = async (request, response) => {
-    const { username, email, phone, password, image, isSeller, description, role, country } = request.body;
-    
+    // SECURITY: Do NOT destructure 'role' from request.body - prevents privilege escalation
+    const { username, email, phone, password, image, isSeller, description, country } = request.body;
+
     try {
         const hash = bcrypt.hashSync(password, saltRounds);
-        
+
+        // SECURITY: Role is determined server-side only, never from user input
+        const assignedRole = isSeller ? 'lawyer' : 'client';
+
         const user = new User({
             username,
             email,
@@ -25,7 +29,7 @@ const authRegister = async (request, response) => {
             description,
             isSeller,
             phone,
-            role: role || (isSeller ? 'lawyer' : 'client')
+            role: assignedRole  // Server-controlled, not user-controlled
         });
         
         await user.save();
