@@ -182,13 +182,12 @@ export interface User {
 
 /**
  * Password Breach Warning returned from login when password is compromised
+ * Matches backend API response format from HaveIBeenPwned integration
  */
 export interface PasswordBreachWarning {
-  type: 'PASSWORD_COMPROMISED'
-  message: string      // Arabic message
-  messageEn: string    // English message
-  breachCount: number  // Number of breaches found
-  requirePasswordChange: true
+  breached: boolean    // Whether password was found in breaches
+  count: number        // Number of times password was found in breaches
+  message: string      // Localized warning message from backend
 }
 
 /**
@@ -385,7 +384,8 @@ interface AuthResponse {
   expiresIn?: number
 
   // Password breach warning (only present if password was found in breaches)
-  warning?: PasswordBreachWarning
+  // Backend returns this as 'passwordWarning' from HaveIBeenPwned check
+  passwordWarning?: PasswordBreachWarning
 }
 
 /**
@@ -537,9 +537,10 @@ const authService = {
       let user = normalizeUser(response.data.user)
 
       // Check for password breach warning and set user flags accordingly
-      const warning = response.data.warning
-      if (warning?.type === 'PASSWORD_COMPROMISED') {
-        authWarn('Password breach detected!', { breachCount: warning.breachCount })
+      // Backend returns passwordWarning: { breached, count, message } from HaveIBeenPwned check
+      const warning = response.data.passwordWarning
+      if (warning?.breached) {
+        authWarn('Password breach detected!', { count: warning.count })
         user = {
           ...user,
           mustChangePassword: true,
