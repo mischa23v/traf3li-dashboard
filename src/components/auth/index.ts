@@ -19,6 +19,8 @@ export { GuestBanner } from './guest-banner'
 
 // Password
 export { PasswordStrengthIndicator } from './password-strength-indicator'
+export { PasswordBreachWarning } from './password-breach-warning'
+export { PasswordChangeGuard } from './password-change-guard'
 
 // CAPTCHA
 export {

@@ -9,6 +9,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SkipToMain } from '@/components/skip-to-main'
 import { OfflineIndicator } from '@/components/offline-indicator'
 import { SessionWarningModal } from '@/components/session-warning-modal'
+import { PasswordChangeGuard } from '@/components/auth/password-change-guard'
 import { useOnboardingWizardStatus, useSkipWizard } from '@/hooks/useOnboardingWizard'
 import WelcomeScreen from '@/features/onboarding/components/welcome-screen'
 import InitialSetupWizard from '@/features/onboarding/components/initial-setup-wizard'
@@ -76,37 +77,39 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <SearchProvider>
       <LayoutProvider>
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <OfflineIndicator />
-          <SessionWarningModal />
-          <SkipToMain />
-          <AppSidebar />
-          <SidebarInset
-            className={cn(
-              // Set content container, so we can use container queries
-              '@container/content',
+        <PasswordChangeGuard>
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <OfflineIndicator />
+            <SessionWarningModal />
+            <SkipToMain />
+            <AppSidebar />
+            <SidebarInset
+              className={cn(
+                // Set content container, so we can use container queries
+                '@container/content',
 
-              // If layout is fixed, set the height
-              // to 100svh to prevent overflow
-              'has-data-[layout=fixed]:h-svh',
+                // If layout is fixed, set the height
+                // to 100svh to prevent overflow
+                'has-data-[layout=fixed]:h-svh',
 
-              // If layout is fixed and sidebar is inset,
-              // set the height to 100svh - spacing (total margins) to prevent overflow
-              'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]',
-              'bg-white text-[#0f172a]'
-            )}
-          >
-            {/* Setup Reminder Banner */}
-            {onboardingStatus?.completed && <SetupReminderBanner />}
+                // If layout is fixed and sidebar is inset,
+                // set the height to 100svh - spacing (total margins) to prevent overflow
+                'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]',
+                'bg-white text-[#0f172a]'
+              )}
+            >
+              {/* Setup Reminder Banner */}
+              {onboardingStatus?.completed && <SetupReminderBanner />}
 
-            {children ?? <Outlet />}
-          </SidebarInset>
+              {children ?? <Outlet />}
+            </SidebarInset>
 
-          {/* New Onboarding Components */}
-          <WelcomeModal open={showWelcomeModal} onOpenChange={setShowWelcomeModal} />
-          <FeatureTour />
-          {hasSeenWelcome && !dontShowWelcomeAgain && <QuickStartChecklist />}
-        </SidebarProvider>
+            {/* New Onboarding Components */}
+            <WelcomeModal open={showWelcomeModal} onOpenChange={setShowWelcomeModal} />
+            <FeatureTour />
+            {hasSeenWelcome && !dontShowWelcomeAgain && <QuickStartChecklist />}
+          </SidebarProvider>
+        </PasswordChangeGuard>
       </LayoutProvider>
     </SearchProvider>
   )

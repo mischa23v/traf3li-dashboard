@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
 import { useAuthStore } from '@/stores/auth-store'
+import { ROUTES } from '@/constants/routes'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
@@ -25,6 +26,23 @@ export const Route = createFileRoute('/_authenticated')({
         to: '/mfa-challenge',
         search: {
           redirect: location.href,
+        },
+      })
+    }
+
+    // Check if user must change password (due to breach or admin requirement)
+    // Redirect to security settings if password change is required
+    // Allow access to security settings page to actually change the password
+    const mustChangePassword = user?.mustChangePassword || user?.passwordBreached
+    const isSecurityPage = location.pathname.startsWith(ROUTES.dashboard.settings.security)
+    const isLogoutPage = location.pathname.includes('logout')
+
+    if (mustChangePassword && !isSecurityPage && !isLogoutPage) {
+      throw redirect({
+        to: ROUTES.dashboard.settings.security,
+        search: {
+          action: 'change-password',
+          reason: user?.passwordBreached ? 'breach' : 'required',
         },
       })
     }
