@@ -63,7 +63,6 @@ export const ROUTES = {
     magicLink: '/magic-link',
     mfaChallenge: '/mfa-challenge',
     otp: '/otp',
-    otpLogin: '/otp-login',
     callback: (provider: string) => `/auth/callback/${provider}`,
     noFirm: '/no-firm',
     terms: '/terms',
