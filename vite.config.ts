@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import sri from 'vite-plugin-sri3'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,6 +14,16 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
+    // SECURITY: Subresource Integrity (SRI) - adds integrity hashes to scripts/stylesheets
+    // This protects against CDN compromise and supply chain attacks
+    // Prevents tampered scripts from executing (CDN compromise, supply chain attacks)
+    // Uses SHA-384 by default (W3C recommended)
+    // Must be placed at the end of plugins array per plugin documentation
+    sri({
+      // Don't ignore missing assets - fail the build if assets are missing
+      // This ensures all scripts have valid integrity hashes
+      ignoreMissingAsset: false,
+    }),
   ],
   resolve: {
     alias: {

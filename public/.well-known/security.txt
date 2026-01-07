@@ -1,0 +1,59 @@
+# Traf3li Security Policy
+# RFC 9116 - https://www.rfc-editor.org/rfc/rfc9116
+# Validate at: https://securitytxt.org/
+
+# Primary security contact
+Contact: mailto:security@traf3li.com
+
+# Security policy page
+Policy: https://traf3li.com/security-policy
+
+# File expiration (1 year from creation - must be updated annually)
+Expires: 2027-01-07T00:00:00.000Z
+
+# Preferred communication languages
+Preferred-Languages: en, ar
+
+# Canonical location of this file
+Canonical: https://dashboard.traf3li.com/.well-known/security.txt
+
+# Acknowledgments page for security researchers (optional - uncomment when available)
+# Acknowledgments: https://traf3li.com/security/hall-of-fame
+
+# Hiring security professionals (optional - uncomment when available)
+# Hiring: https://traf3li.com/careers/security
+
+# PGP key for encrypted reports (optional - uncomment when available)
+# Encryption: https://traf3li.com/.well-known/pgp-key.txt
+
+# ============================================================================
+# RESPONSIBLE DISCLOSURE GUIDELINES
+# ============================================================================
+#
+# We take security seriously. If you discover a vulnerability:
+#
+# 1. Report it to security@traf3li.com with:
+#    - Detailed description of the vulnerability
+#    - Steps to reproduce
+#    - Potential impact assessment
+#    - Any proof-of-concept code (if applicable)
+#
+# 2. Our commitment:
+#    - Acknowledge receipt within 24 business hours
+#    - Provide initial assessment within 72 hours
+#    - Keep you informed of remediation progress
+#    - Credit you in our acknowledgments (if desired)
+#
+# 3. Please:
+#    - Allow reasonable time for remediation before disclosure
+#    - Do not access or modify user data
+#    - Do not perform denial-of-service attacks
+#    - Do not social engineer our employees
+#
+# We will not pursue legal action against researchers who:
+#    - Follow responsible disclosure practices
+#    - Act in good faith
+#    - Do not cause harm to our users or systems
+#
+# Thank you for helping keep Traf3li and our users secure.
+# ============================================================================
