@@ -4,7 +4,7 @@ import { useSearch, useNavigate } from '@tanstack/react-router'
 import {
   Shield, Lock, Key, Smartphone, Eye, EyeOff,
   AlertTriangle, CheckCircle, Clock, MapPin, Monitor,
-  Loader2, KeyRound
+  Loader2, KeyRound, LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +40,7 @@ import { useMFAStatus, useMFARoleRequirement, useDisableMFA } from '@/hooks/useM
 import { useActiveSessions, useRevokeSession, useRevokeAllSessions } from '@/hooks/useSessions'
 import { formatLastActive, formatDevice, formatLocation } from '@/services/sessions.service'
 import { useAuthStore, selectMustChangePassword } from '@/stores/auth-store'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useChangePassword } from '@/hooks/usePassword'
 import { toast } from 'sonner'
 import { ROUTES } from '@/constants/routes'
@@ -49,6 +50,7 @@ export function SecurityPage() {
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
+  const logout = useAuthStore((state) => state.logout)
   const mustChangePassword = useAuthStore(selectMustChangePassword)
   const clearPasswordBreachWarning = useAuthStore((state) => state.clearPasswordBreachWarning)
 
@@ -67,6 +69,7 @@ export function SecurityPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [recentAuthError, setRecentAuthError] = useState(false)
 
   // Password change mutation
   const changePasswordMutation = useChangePassword()
@@ -114,6 +117,9 @@ export function SecurityPage() {
   ]
 
   const handlePasswordChange = async () => {
+    // Clear any previous recent auth error
+    setRecentAuthError(false)
+
     if (!currentPassword || !newPassword || !confirmPassword) {
       toast.error(t('common.fillAllFields'))
       return
@@ -140,13 +146,29 @@ export function SecurityPage() {
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
+      setRecentAuthError(false)
 
       // Clear URL params and navigate to clean security page
       if (isPasswordChangeRequired) {
         navigate({ to: ROUTES.dashboard.settings.security, replace: true })
       }
     } catch (error: any) {
-      // Error is already handled by the mutation hook (shows toast)
+      // Check if this is a "Recent authentication required" error
+      const errorMessage = error?.message || ''
+      if (errorMessage.includes('Recent authentication required') ||
+          errorMessage.includes('التحقق الأخير مطلوب')) {
+        setRecentAuthError(true)
+      }
+    }
+  }
+
+  const handleLogoutAndRelogin = async () => {
+    try {
+      await logout()
+      // Navigate to login page - user will be redirected back after login
+      navigate({ to: ROUTES.auth.signIn, replace: true })
+    } catch (error) {
+      toast.error(isRTL ? 'فشل تسجيل الخروج' : 'Logout failed')
     }
   }
 
@@ -318,6 +340,36 @@ export function SecurityPage() {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
+                    {/* Recent Authentication Required Alert */}
+                    {recentAuthError && (
+                      <Alert className="border-amber-200 bg-amber-50">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        <AlertDescription className="text-amber-800">
+                          <div className="space-y-2">
+                            <p className="font-medium">
+                              {isRTL
+                                ? 'مطلوب تسجيل دخول حديث'
+                                : 'Recent login required'}
+                            </p>
+                            <p className="text-sm">
+                              {isRTL
+                                ? 'لتغيير كلمة المرور، يجب عليك تسجيل الخروج وتسجيل الدخول مرة أخرى، ثم المحاولة فوراً.'
+                                : 'To change your password, you need to log out and log back in, then try immediately.'}
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="mt-2 border-amber-300 text-amber-700 hover:bg-amber-100"
+                              onClick={handleLogoutAndRelogin}
+                            >
+                              <LogOut className="h-4 w-4 me-2" />
+                              {isRTL ? 'تسجيل الخروج وإعادة الدخول' : 'Logout & Re-login'}
+                            </Button>
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     <div className="space-y-2">
                       <Label>{t('security.password.current')}</Label>
                       <div className="relative">
@@ -376,22 +428,34 @@ export function SecurityPage() {
                       </div>
                     </div>
                   </div>
-                  <DialogFooter>
-                    {!mustChangePassword && (
-                      <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
-                        {t('common.cancel')}
-                      </Button>
-                    )}
+                  <DialogFooter className="flex-col sm:flex-row gap-2">
+                    {/* Logout button - always visible for convenience */}
                     <Button
-                      className={mustChangePassword ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 hover:bg-emerald-600'}
-                      onClick={handlePasswordChange}
-                      disabled={changePasswordMutation.isPending}
+                      variant="outline"
+                      onClick={handleLogoutAndRelogin}
+                      className="sm:me-auto"
                     >
-                      {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                      {mustChangePassword
-                        ? (isRTL ? 'تغيير كلمة المرور الآن' : 'Change Password Now')
-                        : t('common.save')}
+                      <LogOut className="h-4 w-4 me-2" />
+                      {isRTL ? 'تسجيل الخروج' : 'Logout'}
                     </Button>
+
+                    <div className="flex gap-2">
+                      {!mustChangePassword && (
+                        <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
+                          {t('common.cancel')}
+                        </Button>
+                      )}
+                      <Button
+                        className={mustChangePassword ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 hover:bg-emerald-600'}
+                        onClick={handlePasswordChange}
+                        disabled={changePasswordMutation.isPending}
+                      >
+                        {changePasswordMutation.isPending && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                        {mustChangePassword
+                          ? (isRTL ? 'تغيير كلمة المرور الآن' : 'Change Password Now')
+                          : t('common.save')}
+                      </Button>
+                    </div>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
