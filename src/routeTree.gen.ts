@@ -239,6 +239,8 @@ import { Route as AuthenticatedDashboardFinanceVendorsIndexRouteImport } from '.
 import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions.index'
 import { Route as AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions-history.index'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
+import { Route as AuthenticatedDashboardFinanceSubscriptionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.subscriptions.index'
+import { Route as AuthenticatedDashboardFinanceSubscriptionPlansIndexRouteImport } from './routes/_authenticated/dashboard.finance.subscription-plans.index'
 import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.index'
 import { Route as AuthenticatedDashboardFinanceRetainersIndexRouteImport } from './routes/_authenticated/dashboard.finance.retainers.index'
@@ -361,6 +363,10 @@ import { Route as AuthenticatedDashboardFinanceTimeTrackingNewRouteImport } from
 import { Route as AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.monthly'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingApprovalsRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.approvals'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId'
+import { Route as AuthenticatedDashboardFinanceSubscriptionsNewRouteImport } from './routes/_authenticated/dashboard.finance.subscriptions.new'
+import { Route as AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteImport } from './routes/_authenticated/dashboard.finance.subscriptions.$subscriptionId'
+import { Route as AuthenticatedDashboardFinanceSubscriptionPlansNewRouteImport } from './routes/_authenticated/dashboard.finance.subscription-plans.new'
+import { Route as AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteImport } from './routes/_authenticated/dashboard.finance.subscription-plans.$planId'
 import { Route as AuthenticatedDashboardFinanceStatementsNewRouteImport } from './routes/_authenticated/dashboard.finance.statements.new'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.mudad'
@@ -452,6 +458,8 @@ import { Route as AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteI
 import { Route as AuthenticatedDashboardHrPromotionsPromotionIdEditRouteImport } from './routes/_authenticated/dashboard.hr.promotions.$promotionId.edit'
 import { Route as AuthenticatedDashboardFinanceVendorsVendorIdEditRouteImport } from './routes/_authenticated/dashboard.finance.vendors.$vendorId.edit'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId.edit'
+import { Route as AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRouteImport } from './routes/_authenticated/dashboard.finance.subscriptions.$subscriptionId.edit'
+import { Route as AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRouteImport } from './routes/_authenticated/dashboard.finance.subscription-plans.$planId.edit'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId.edit'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.new'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.sadad.pay'
@@ -1795,6 +1803,18 @@ const AuthenticatedDashboardFinanceTimeTrackingIndexRoute =
     path: '/time-tracking/',
     getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
+const AuthenticatedDashboardFinanceSubscriptionsIndexRoute =
+  AuthenticatedDashboardFinanceSubscriptionsIndexRouteImport.update({
+    id: '/subscriptions/',
+    path: '/subscriptions/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute =
+  AuthenticatedDashboardFinanceSubscriptionPlansIndexRouteImport.update({
+    id: '/subscription-plans/',
+    path: '/subscription-plans/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
 const AuthenticatedDashboardFinanceStatementsIndexRoute =
   AuthenticatedDashboardFinanceStatementsIndexRouteImport.update({
     id: '/statements/',
@@ -2527,6 +2547,30 @@ const AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute =
     path: '/time-tracking/$entryId',
     getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
+const AuthenticatedDashboardFinanceSubscriptionsNewRoute =
+  AuthenticatedDashboardFinanceSubscriptionsNewRouteImport.update({
+    id: '/subscriptions/new',
+    path: '/subscriptions/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute =
+  AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteImport.update({
+    id: '/subscriptions/$subscriptionId',
+    path: '/subscriptions/$subscriptionId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSubscriptionPlansNewRoute =
+  AuthenticatedDashboardFinanceSubscriptionPlansNewRouteImport.update({
+    id: '/subscription-plans/new',
+    path: '/subscription-plans/new',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute =
+  AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteImport.update({
+    id: '/subscription-plans/$planId',
+    path: '/subscription-plans/$planId',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
 const AuthenticatedDashboardFinanceStatementsNewRoute =
   AuthenticatedDashboardFinanceStatementsNewRouteImport.update({
     id: '/statements/new',
@@ -3075,6 +3119,22 @@ const AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute,
   } as any)
+const AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute =
+  AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRouteImport.update(
+    {
+      id: '/edit',
+      path: '/edit',
+      getParentRoute: () =>
+        AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute,
+    } as any,
+  )
+const AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute =
+  AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () =>
+      AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute,
+  } as any)
 const AuthenticatedDashboardFinanceStatementsStatementIdEditRoute =
   AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport.update({
     id: '/edit',
@@ -3397,6 +3457,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/dashboard/finance/subscription-plans/$planId': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren
+  '/dashboard/finance/subscription-plans/new': typeof AuthenticatedDashboardFinanceSubscriptionPlansNewRoute
+  '/dashboard/finance/subscriptions/$subscriptionId': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren
+  '/dashboard/finance/subscriptions/new': typeof AuthenticatedDashboardFinanceSubscriptionsNewRoute
   '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
   '/dashboard/finance/time-tracking/approvals': typeof AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute
   '/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
@@ -3519,6 +3583,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/dashboard/finance/saudi-banking': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/dashboard/finance/subscription-plans': typeof AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute
+  '/dashboard/finance/subscriptions': typeof AuthenticatedDashboardFinanceSubscriptionsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
@@ -3576,6 +3642,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
   '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
+  '/dashboard/finance/subscriptions/$subscriptionId/edit': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
   '/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
@@ -3836,6 +3904,10 @@ export interface FileRoutesByTo {
   '/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/dashboard/finance/subscription-plans/$planId': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren
+  '/dashboard/finance/subscription-plans/new': typeof AuthenticatedDashboardFinanceSubscriptionPlansNewRoute
+  '/dashboard/finance/subscriptions/$subscriptionId': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren
+  '/dashboard/finance/subscriptions/new': typeof AuthenticatedDashboardFinanceSubscriptionsNewRoute
   '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
   '/dashboard/finance/time-tracking/approvals': typeof AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute
   '/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
@@ -3958,6 +4030,8 @@ export interface FileRoutesByTo {
   '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/dashboard/finance/saudi-banking': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/dashboard/finance/subscription-plans': typeof AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute
+  '/dashboard/finance/subscriptions': typeof AuthenticatedDashboardFinanceSubscriptionsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
@@ -4015,6 +4089,8 @@ export interface FileRoutesByTo {
   '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
   '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
+  '/dashboard/finance/subscriptions/$subscriptionId/edit': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
   '/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
@@ -4292,6 +4368,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/_authenticated/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/_authenticated/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/_authenticated/dashboard/finance/subscription-plans/$planId': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren
+  '/_authenticated/dashboard/finance/subscription-plans/new': typeof AuthenticatedDashboardFinanceSubscriptionPlansNewRoute
+  '/_authenticated/dashboard/finance/subscriptions/$subscriptionId': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren
+  '/_authenticated/dashboard/finance/subscriptions/new': typeof AuthenticatedDashboardFinanceSubscriptionsNewRoute
   '/_authenticated/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
   '/_authenticated/dashboard/finance/time-tracking/approvals': typeof AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute
   '/_authenticated/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
@@ -4414,6 +4494,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/retainers/': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/_authenticated/dashboard/finance/saudi-banking/': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/_authenticated/dashboard/finance/subscription-plans/': typeof AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute
+  '/_authenticated/dashboard/finance/subscriptions/': typeof AuthenticatedDashboardFinanceSubscriptionsIndexRoute
   '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/_authenticated/dashboard/finance/transactions-history/': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/_authenticated/dashboard/finance/transactions/': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
@@ -4471,6 +4553,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
   '/_authenticated/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/_authenticated/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/_authenticated/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
+  '/_authenticated/dashboard/finance/subscriptions/$subscriptionId/edit': typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute
   '/_authenticated/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/_authenticated/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
   '/_authenticated/dashboard/hr/promotions/$promotionId/edit': typeof AuthenticatedDashboardHrPromotionsPromotionIdEditRoute
@@ -4746,6 +4830,10 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/mudad'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
+    | '/dashboard/finance/subscription-plans/$planId'
+    | '/dashboard/finance/subscription-plans/new'
+    | '/dashboard/finance/subscriptions/$subscriptionId'
+    | '/dashboard/finance/subscriptions/new'
     | '/dashboard/finance/time-tracking/$entryId'
     | '/dashboard/finance/time-tracking/approvals'
     | '/dashboard/finance/time-tracking/monthly'
@@ -4868,6 +4956,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/retainers'
     | '/dashboard/finance/saudi-banking'
     | '/dashboard/finance/statements'
+    | '/dashboard/finance/subscription-plans'
+    | '/dashboard/finance/subscriptions'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions-history'
     | '/dashboard/finance/transactions'
@@ -4925,6 +5015,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/sadad/pay'
     | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
+    | '/dashboard/finance/subscription-plans/$planId/edit'
+    | '/dashboard/finance/subscriptions/$subscriptionId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
     | '/dashboard/hr/promotions/$promotionId/edit'
@@ -5185,6 +5277,10 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/mudad'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
+    | '/dashboard/finance/subscription-plans/$planId'
+    | '/dashboard/finance/subscription-plans/new'
+    | '/dashboard/finance/subscriptions/$subscriptionId'
+    | '/dashboard/finance/subscriptions/new'
     | '/dashboard/finance/time-tracking/$entryId'
     | '/dashboard/finance/time-tracking/approvals'
     | '/dashboard/finance/time-tracking/monthly'
@@ -5307,6 +5403,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/retainers'
     | '/dashboard/finance/saudi-banking'
     | '/dashboard/finance/statements'
+    | '/dashboard/finance/subscription-plans'
+    | '/dashboard/finance/subscriptions'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions-history'
     | '/dashboard/finance/transactions'
@@ -5364,6 +5462,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/saudi-banking/sadad/pay'
     | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
+    | '/dashboard/finance/subscription-plans/$planId/edit'
+    | '/dashboard/finance/subscriptions/$subscriptionId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
     | '/dashboard/hr/promotions/$promotionId/edit'
@@ -5640,6 +5740,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/saudi-banking/mudad'
     | '/_authenticated/dashboard/finance/statements/$statementId'
     | '/_authenticated/dashboard/finance/statements/new'
+    | '/_authenticated/dashboard/finance/subscription-plans/$planId'
+    | '/_authenticated/dashboard/finance/subscription-plans/new'
+    | '/_authenticated/dashboard/finance/subscriptions/$subscriptionId'
+    | '/_authenticated/dashboard/finance/subscriptions/new'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId'
     | '/_authenticated/dashboard/finance/time-tracking/approvals'
     | '/_authenticated/dashboard/finance/time-tracking/monthly'
@@ -5762,6 +5866,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/retainers/'
     | '/_authenticated/dashboard/finance/saudi-banking/'
     | '/_authenticated/dashboard/finance/statements/'
+    | '/_authenticated/dashboard/finance/subscription-plans/'
+    | '/_authenticated/dashboard/finance/subscriptions/'
     | '/_authenticated/dashboard/finance/time-tracking/'
     | '/_authenticated/dashboard/finance/transactions-history/'
     | '/_authenticated/dashboard/finance/transactions/'
@@ -5819,6 +5925,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
     | '/_authenticated/dashboard/finance/saudi-banking/wps/new'
     | '/_authenticated/dashboard/finance/statements/$statementId/edit'
+    | '/_authenticated/dashboard/finance/subscription-plans/$planId/edit'
+    | '/_authenticated/dashboard/finance/subscriptions/$subscriptionId/edit'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId/edit'
     | '/_authenticated/dashboard/finance/vendors/$vendorId/edit'
     | '/_authenticated/dashboard/hr/promotions/$promotionId/edit'
@@ -7486,6 +7594,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
+    '/_authenticated/dashboard/finance/subscriptions/': {
+      id: '/_authenticated/dashboard/finance/subscriptions/'
+      path: '/subscriptions'
+      fullPath: '/dashboard/finance/subscriptions'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/subscription-plans/': {
+      id: '/_authenticated/dashboard/finance/subscription-plans/'
+      path: '/subscription-plans'
+      fullPath: '/dashboard/finance/subscription-plans'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
     '/_authenticated/dashboard/finance/statements/': {
       id: '/_authenticated/dashboard/finance/statements/'
       path: '/statements'
@@ -8340,6 +8462,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
+    '/_authenticated/dashboard/finance/subscriptions/new': {
+      id: '/_authenticated/dashboard/finance/subscriptions/new'
+      path: '/subscriptions/new'
+      fullPath: '/dashboard/finance/subscriptions/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/subscriptions/$subscriptionId': {
+      id: '/_authenticated/dashboard/finance/subscriptions/$subscriptionId'
+      path: '/subscriptions/$subscriptionId'
+      fullPath: '/dashboard/finance/subscriptions/$subscriptionId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/subscription-plans/new': {
+      id: '/_authenticated/dashboard/finance/subscription-plans/new'
+      path: '/subscription-plans/new'
+      fullPath: '/dashboard/finance/subscription-plans/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/subscription-plans/$planId': {
+      id: '/_authenticated/dashboard/finance/subscription-plans/$planId'
+      path: '/subscription-plans/$planId'
+      fullPath: '/dashboard/finance/subscription-plans/$planId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
     '/_authenticated/dashboard/finance/statements/new': {
       id: '/_authenticated/dashboard/finance/statements/new'
       path: '/statements/new'
@@ -8977,6 +9127,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
     }
+    '/_authenticated/dashboard/finance/subscriptions/$subscriptionId/edit': {
+      id: '/_authenticated/dashboard/finance/subscriptions/$subscriptionId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/subscriptions/$subscriptionId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute
+    }
+    '/_authenticated/dashboard/finance/subscription-plans/$planId/edit': {
+      id: '/_authenticated/dashboard/finance/subscription-plans/$planId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/subscription-plans/$planId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute
+    }
     '/_authenticated/dashboard/finance/statements/$statementId/edit': {
       id: '/_authenticated/dashboard/finance/statements/$statementId/edit'
       path: '/edit'
@@ -9501,6 +9665,36 @@ const AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren =
     AuthenticatedDashboardFinanceStatementsStatementIdRouteChildren,
   )
 
+interface AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteChildren {
+  AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteChildren: AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute:
+      AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren =
+  AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteChildren {
+  AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute: typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteChildren: AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute:
+      AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren =
+  AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteChildren,
+  )
+
 interface AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteChildren {
   AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
 }
@@ -9575,6 +9769,10 @@ interface AuthenticatedDashboardFinanceRouteChildren {
   AuthenticatedDashboardFinanceSaudiBankingMudadRoute: typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   AuthenticatedDashboardFinanceStatementsStatementIdRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   AuthenticatedDashboardFinanceStatementsNewRoute: typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren
+  AuthenticatedDashboardFinanceSubscriptionPlansNewRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansNewRoute
+  AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute: typeof AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren
+  AuthenticatedDashboardFinanceSubscriptionsNewRoute: typeof AuthenticatedDashboardFinanceSubscriptionsNewRoute
   AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
   AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute: typeof AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute
   AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute: typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
@@ -9600,6 +9798,8 @@ interface AuthenticatedDashboardFinanceRouteChildren {
   AuthenticatedDashboardFinanceRetainersIndexRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   AuthenticatedDashboardFinanceSaudiBankingIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute: typeof AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute
+  AuthenticatedDashboardFinanceSubscriptionsIndexRoute: typeof AuthenticatedDashboardFinanceSubscriptionsIndexRoute
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
@@ -9698,6 +9898,14 @@ const AuthenticatedDashboardFinanceRouteChildren: AuthenticatedDashboardFinanceR
       AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren,
     AuthenticatedDashboardFinanceStatementsNewRoute:
       AuthenticatedDashboardFinanceStatementsNewRoute,
+    AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRoute:
+      AuthenticatedDashboardFinanceSubscriptionPlansPlanIdRouteWithChildren,
+    AuthenticatedDashboardFinanceSubscriptionPlansNewRoute:
+      AuthenticatedDashboardFinanceSubscriptionPlansNewRoute,
+    AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRoute:
+      AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdRouteWithChildren,
+    AuthenticatedDashboardFinanceSubscriptionsNewRoute:
+      AuthenticatedDashboardFinanceSubscriptionsNewRoute,
     AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute:
       AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren,
     AuthenticatedDashboardFinanceTimeTrackingApprovalsRoute:
@@ -9748,6 +9956,10 @@ const AuthenticatedDashboardFinanceRouteChildren: AuthenticatedDashboardFinanceR
       AuthenticatedDashboardFinanceSaudiBankingIndexRoute,
     AuthenticatedDashboardFinanceStatementsIndexRoute:
       AuthenticatedDashboardFinanceStatementsIndexRoute,
+    AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute:
+      AuthenticatedDashboardFinanceSubscriptionPlansIndexRoute,
+    AuthenticatedDashboardFinanceSubscriptionsIndexRoute:
+      AuthenticatedDashboardFinanceSubscriptionsIndexRoute,
     AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
       AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
     AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute:

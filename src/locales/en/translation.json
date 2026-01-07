@@ -71,6 +71,9 @@
       "financeOverview": "Accounts Dashboard",
       "invoices": "Invoices",
       "payments": "Payments",
+      "subscriptions": "Subscriptions",
+      "subscriptionPlans": "Subscription Plans",
+      "recurringInvoices": "Recurring Invoices",
       "expenses": "Expenses",
       "transactions": "Transactions",
       "timeTracking": "Time Tracking",
@@ -7672,5 +7675,222 @@
     "search": "Search users...",
     "loading": "Loading...",
     "noResults": "No users found"
+  },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "management": "Subscription Management",
+    "list": {
+      "search": "Search subscriptions...",
+      "searchPlaceholder": "Search by client or subscription number...",
+      "noSubscriptions": "No subscriptions found",
+      "noSubscriptionsDescription": "Create a new subscription to get started",
+      "newSubscription": "New Subscription",
+      "showMore": "Show More",
+      "filters": "Filters",
+      "status": "Status",
+      "planType": "Plan Type",
+      "billingPeriod": "Billing Period",
+      "nextBilling": "Next Billing",
+      "amount": "Amount",
+      "hoursUsed": "Hours Used",
+      "hoursIncluded": "hours included"
+    },
+    "create": {
+      "title": "New Subscription",
+      "description": "Create a new subscription for a client",
+      "selectPlan": "Select Subscription Plan",
+      "selectPlanDescription": "Choose the appropriate plan for the client",
+      "selectClient": "Select Client",
+      "selectClientDescription": "The client for this subscription",
+      "billingDates": "Billing Dates",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "endDateOptional": "Optional - for fixed-term subscriptions",
+      "settings": "Settings",
+      "autoRenew": "Auto Renew",
+      "autoRenewHelp": "Automatically renew when the period ends",
+      "autoInvoice": "Auto Invoice",
+      "autoInvoiceHelp": "Automatically generate invoices",
+      "skipTrial": "Skip Trial Period",
+      "skipTrialHelp": "Start with paid period immediately",
+      "notes": "Notes",
+      "notesEn": "Notes (English)",
+      "notesAr": "Notes (Arabic)",
+      "internalNotes": "Internal Notes",
+      "internalNotesHelp": "Notes for internal team only"
+    },
+    "detail": {
+      "title": "Subscription Details",
+      "backToList": "Back to Subscriptions",
+      "overview": "Overview",
+      "invoices": "Invoices",
+      "history": "History",
+      "summary": "Subscription Summary",
+      "currentPeriod": "Current Period",
+      "monthlyRevenue": "Monthly Revenue",
+      "nextBilling": "Next Billing",
+      "hoursUsage": "Hours Usage",
+      "planInfo": "Plan Information",
+      "clientInfo": "Client Information",
+      "actions": {
+        "edit": "Edit",
+        "pause": "Pause",
+        "resume": "Resume",
+        "cancel": "Cancel",
+        "renew": "Renew",
+        "changePlan": "Change Plan",
+        "generateInvoice": "Generate Invoice"
+      }
+    },
+    "status": {
+      "draft": "Draft",
+      "trial": "Trial",
+      "active": "Active",
+      "paused": "Paused",
+      "past_due": "Past Due",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "completed": "Completed"
+    },
+    "dialogs": {
+      "cancel": {
+        "title": "Cancel Subscription",
+        "description": "Are you sure you want to cancel this subscription?",
+        "reason": "Cancellation Reason",
+        "reasonPlaceholder": "Enter cancellation reason...",
+        "atPeriodEnd": "Cancel at end of current period",
+        "atPeriodEndHelp": "Subscription will remain active until end of paid period",
+        "immediate": "Cancel immediately",
+        "confirm": "Confirm Cancellation"
+      },
+      "pause": {
+        "title": "Pause Subscription",
+        "description": "The subscription will be paused and can be resumed later",
+        "reason": "Pause Reason",
+        "confirm": "Pause Subscription"
+      }
+    },
+    "sidebar": {
+      "quickActions": "Quick Actions",
+      "stats": "Statistics",
+      "totalMRR": "Total Monthly Revenue",
+      "activeSubscriptions": "Active Subscriptions",
+      "trialSubscriptions": "Trial Subscriptions",
+      "upcomingRenewals": "Upcoming Renewals"
+    }
+  },
+  "subscriptionPlans": {
+    "title": "Subscription Plans",
+    "management": "Plan Management",
+    "list": {
+      "search": "Search plans...",
+      "searchPlaceholder": "Search by name or code...",
+      "noPlans": "No plans found",
+      "noPlansDescription": "Create a new subscription plan to get started",
+      "newPlan": "New Plan",
+      "planType": "Plan Type",
+      "billingPeriod": "Billing Period",
+      "amount": "Amount",
+      "hoursIncluded": "hours",
+      "trialDays": "trial days"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "public": "Public"
+    },
+    "actions": {
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "dialogs": {
+      "duplicate": {
+        "title": "Duplicate Plan",
+        "description": "Enter a new name for the copy"
+      }
+    },
+    "form": {
+      "newTitle": "New Subscription Plan",
+      "editTitle": "Edit Plan",
+      "newDescription": "Create a new subscription plan for your clients",
+      "editDescription": "Edit subscription plan details",
+      "sections": {
+        "basicInfo": "Basic Information",
+        "basicInfoDesc": "Name, description, and plan type",
+        "pricing": "Pricing",
+        "pricingDesc": "Amount, billing period, and currency",
+        "hours": "Hours & Services",
+        "hoursDesc": "Included hours and overage rate",
+        "trial": "Trial Period",
+        "trialDesc": "Trial settings for new clients",
+        "automation": "Automation",
+        "limits": "Limits",
+        "status": "Status"
+      },
+      "name": "Name",
+      "namePlaceholder": "e.g., Monthly Retainer Package",
+      "nameAr": "Name (Arabic)",
+      "nameArPlaceholder": "e.g., باقة التوكيل الشهري",
+      "planType": "Plan Type",
+      "code": "Plan Code",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of the plan...",
+      "descriptionAr": "Description (Arabic)",
+      "descriptionArPlaceholder": "Brief description in Arabic...",
+      "amount": "Amount",
+      "currency": "Currency",
+      "billingPeriod": "Billing Period",
+      "setupFee": "Setup Fee",
+      "includedHours": "Included Hours",
+      "includedHoursHelp": "Number of hours included per billing period",
+      "hourlyRateAfter": "Hourly Rate After Exhaustion",
+      "hourlyRateAfterHelp": "Rate per hour after included hours are used",
+      "trialDays": "Trial Days",
+      "trialAmount": "Trial Amount",
+      "trialAmountHelp": "Leave as 0 for free trial",
+      "autoRenew": "Auto Renew",
+      "autoRenewHelp": "Automatically renew subscription",
+      "autoInvoice": "Auto Invoice",
+      "autoInvoiceHelp": "Automatically generate invoices",
+      "invoiceDaysBefore": "Generate Invoice Before",
+      "days": "days",
+      "prorationBehavior": "Proration Behavior",
+      "alignToPeriodStart": "Align to Period Start",
+      "alignToPeriodStartHelp": "Bill on first of month",
+      "autoCloseDays": "Auto Close After",
+      "daysIfUnpaid": "days if unpaid",
+      "maxClients": "Maximum Clients",
+      "maxCases": "Maximum Cases",
+      "unlimited": "Unlimited",
+      "isActive": "Active",
+      "isActiveHelp": "Allow creating new subscriptions",
+      "isPublic": "Public",
+      "isPublicHelp": "Show in client portal",
+      "sortOrder": "Display Order"
+    },
+    "sidebar": {
+      "quickActions": "Quick Actions",
+      "stats": "Plan Statistics",
+      "totalPlans": "Total Plans",
+      "activePlans": "Active Plans",
+      "publicPlans": "Public Plans"
+    },
+    "planTypes": {
+      "retainer": "Monthly Retainer",
+      "hourly_package": "Hourly Package",
+      "flat_fee": "Flat Fee",
+      "hybrid": "Hybrid",
+      "compliance": "Compliance",
+      "document_review": "Document Review",
+      "advisory": "Advisory"
+    },
+    "billingPeriods": {
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "semi_annually": "Semi-Annually",
+      "annually": "Annually"
+    }
   }
 }

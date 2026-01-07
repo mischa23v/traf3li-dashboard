@@ -71,6 +71,9 @@
       "financeOverview": "لوحة الحسابات",
       "invoices": "الفواتير",
       "payments": "المدفوعات",
+      "subscriptions": "الاشتراكات",
+      "subscriptionPlans": "خطط الاشتراك",
+      "recurringInvoices": "الفواتير المتكررة",
       "expenses": "المصروفات",
       "transactions": "المعاملات",
       "timeTracking": "تتبع الوقت",
@@ -7750,5 +7753,222 @@
     "search": "ابحث عن مستخدمين...",
     "loading": "جاري التحميل...",
     "noResults": "لم يتم العثور على مستخدمين"
+  },
+  "subscriptions": {
+    "title": "الاشتراكات",
+    "management": "إدارة الاشتراكات",
+    "list": {
+      "search": "بحث في الاشتراكات...",
+      "searchPlaceholder": "بحث بالعميل أو رقم الاشتراك...",
+      "noSubscriptions": "لا توجد اشتراكات",
+      "noSubscriptionsDescription": "أنشئ اشتراكاً جديداً للبدء",
+      "newSubscription": "اشتراك جديد",
+      "showMore": "عرض المزيد",
+      "filters": "تصفية",
+      "status": "الحالة",
+      "planType": "نوع الخطة",
+      "billingPeriod": "فترة الفوترة",
+      "nextBilling": "الفاتورة القادمة",
+      "amount": "المبلغ",
+      "hoursUsed": "الساعات المستخدمة",
+      "hoursIncluded": "ساعة مشمولة"
+    },
+    "create": {
+      "title": "اشتراك جديد",
+      "description": "إنشاء اشتراك جديد لعميل",
+      "selectPlan": "اختر خطة الاشتراك",
+      "selectPlanDescription": "اختر الخطة المناسبة للعميل",
+      "selectClient": "اختر العميل",
+      "selectClientDescription": "العميل الذي سيتم إنشاء الاشتراك له",
+      "billingDates": "تواريخ الفوترة",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "endDateOptional": "اختياري - للاشتراكات محددة المدة",
+      "settings": "الإعدادات",
+      "autoRenew": "تجديد تلقائي",
+      "autoRenewHelp": "تجديد الاشتراك تلقائياً عند انتهاء الفترة",
+      "autoInvoice": "فوترة تلقائية",
+      "autoInvoiceHelp": "إنشاء الفواتير تلقائياً",
+      "skipTrial": "تخطي الفترة التجريبية",
+      "skipTrialHelp": "البدء بالفترة المدفوعة مباشرة",
+      "notes": "الملاحظات",
+      "notesEn": "ملاحظات (إنجليزي)",
+      "notesAr": "ملاحظات (عربي)",
+      "internalNotes": "ملاحظات داخلية",
+      "internalNotesHelp": "ملاحظات للفريق الداخلي فقط"
+    },
+    "detail": {
+      "title": "تفاصيل الاشتراك",
+      "backToList": "العودة للاشتراكات",
+      "overview": "نظرة عامة",
+      "invoices": "الفواتير",
+      "history": "السجل",
+      "summary": "ملخص الاشتراك",
+      "currentPeriod": "الفترة الحالية",
+      "monthlyRevenue": "الإيرادات الشهرية",
+      "nextBilling": "الفاتورة القادمة",
+      "hoursUsage": "استخدام الساعات",
+      "planInfo": "معلومات الخطة",
+      "clientInfo": "معلومات العميل",
+      "actions": {
+        "edit": "تعديل",
+        "pause": "إيقاف مؤقت",
+        "resume": "استئناف",
+        "cancel": "إلغاء",
+        "renew": "تجديد",
+        "changePlan": "تغيير الخطة",
+        "generateInvoice": "إنشاء فاتورة"
+      }
+    },
+    "status": {
+      "draft": "مسودة",
+      "trial": "فترة تجريبية",
+      "active": "نشط",
+      "paused": "متوقف مؤقتاً",
+      "past_due": "متأخر السداد",
+      "cancelled": "ملغي",
+      "expired": "منتهي",
+      "completed": "مكتمل"
+    },
+    "dialogs": {
+      "cancel": {
+        "title": "إلغاء الاشتراك",
+        "description": "هل أنت متأكد من إلغاء هذا الاشتراك؟",
+        "reason": "سبب الإلغاء",
+        "reasonPlaceholder": "أدخل سبب الإلغاء...",
+        "atPeriodEnd": "الإلغاء في نهاية الفترة الحالية",
+        "atPeriodEndHelp": "سيبقى الاشتراك نشطاً حتى نهاية الفترة المدفوعة",
+        "immediate": "الإلغاء فوراً",
+        "confirm": "تأكيد الإلغاء"
+      },
+      "pause": {
+        "title": "إيقاف الاشتراك مؤقتاً",
+        "description": "سيتم إيقاف الاشتراك مؤقتاً ويمكن استئنافه لاحقاً",
+        "reason": "سبب الإيقاف",
+        "confirm": "إيقاف الاشتراك"
+      }
+    },
+    "sidebar": {
+      "quickActions": "إجراءات سريعة",
+      "stats": "الإحصائيات",
+      "totalMRR": "إجمالي الإيرادات الشهرية",
+      "activeSubscriptions": "الاشتراكات النشطة",
+      "trialSubscriptions": "الاشتراكات التجريبية",
+      "upcomingRenewals": "التجديدات القادمة"
+    }
+  },
+  "subscriptionPlans": {
+    "title": "خطط الاشتراك",
+    "management": "إدارة الخطط",
+    "list": {
+      "search": "بحث في الخطط...",
+      "searchPlaceholder": "بحث بالاسم أو الكود...",
+      "noPlans": "لا توجد خطط",
+      "noPlansDescription": "أنشئ خطة اشتراك جديدة للبدء",
+      "newPlan": "خطة جديدة",
+      "planType": "نوع الخطة",
+      "billingPeriod": "فترة الفوترة",
+      "amount": "المبلغ",
+      "hoursIncluded": "ساعة",
+      "trialDays": "يوم تجريبي"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "public": "عام"
+    },
+    "actions": {
+      "activate": "تفعيل",
+      "deactivate": "إلغاء التفعيل"
+    },
+    "dialogs": {
+      "duplicate": {
+        "title": "نسخ الخطة",
+        "description": "أدخل اسماً جديداً للنسخة"
+      }
+    },
+    "form": {
+      "newTitle": "خطة اشتراك جديدة",
+      "editTitle": "تعديل الخطة",
+      "newDescription": "أنشئ خطة اشتراك جديدة لعملائك",
+      "editDescription": "قم بتعديل تفاصيل خطة الاشتراك",
+      "sections": {
+        "basicInfo": "المعلومات الأساسية",
+        "basicInfoDesc": "الاسم والوصف ونوع الخطة",
+        "pricing": "التسعير",
+        "pricingDesc": "المبلغ وفترة الفوترة والعملة",
+        "hours": "الساعات والخدمات",
+        "hoursDesc": "الساعات المشمولة والسعر بعد الاستنفاد",
+        "trial": "الفترة التجريبية",
+        "trialDesc": "إعدادات الفترة التجريبية للعملاء الجدد",
+        "automation": "الأتمتة",
+        "limits": "الحدود",
+        "status": "الحالة"
+      },
+      "name": "الاسم",
+      "namePlaceholder": "مثال: باقة التوكيل الشهري",
+      "nameAr": "الاسم بالعربية",
+      "nameArPlaceholder": "مثال: باقة التوكيل الشهري",
+      "planType": "نوع الخطة",
+      "code": "كود الخطة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف مختصر للخطة...",
+      "descriptionAr": "الوصف بالعربية",
+      "descriptionArPlaceholder": "وصف مختصر للخطة بالعربية...",
+      "amount": "المبلغ",
+      "currency": "العملة",
+      "billingPeriod": "فترة الفوترة",
+      "setupFee": "رسوم الإعداد",
+      "includedHours": "الساعات المشمولة",
+      "includedHoursHelp": "عدد الساعات المشمولة في كل فترة فوترة",
+      "hourlyRateAfter": "سعر الساعة بعد الاستنفاد",
+      "hourlyRateAfterHelp": "السعر لكل ساعة بعد استنفاد الساعات المشمولة",
+      "trialDays": "أيام التجربة",
+      "trialAmount": "مبلغ التجربة",
+      "trialAmountHelp": "اتركه 0 للتجربة المجانية",
+      "autoRenew": "تجديد تلقائي",
+      "autoRenewHelp": "تجديد الاشتراك تلقائياً",
+      "autoInvoice": "فوترة تلقائية",
+      "autoInvoiceHelp": "إنشاء الفواتير تلقائياً",
+      "invoiceDaysBefore": "إنشاء الفاتورة قبل",
+      "days": "أيام",
+      "prorationBehavior": "سلوك التناسب",
+      "alignToPeriodStart": "محاذاة لبداية الفترة",
+      "alignToPeriodStartHelp": "الفوترة في أول الشهر",
+      "autoCloseDays": "إغلاق تلقائي بعد",
+      "daysIfUnpaid": "يوم بدون سداد",
+      "maxClients": "الحد الأقصى للعملاء",
+      "maxCases": "الحد الأقصى للقضايا",
+      "unlimited": "غير محدود",
+      "isActive": "نشط",
+      "isActiveHelp": "السماح بإنشاء اشتراكات جديدة",
+      "isPublic": "عام",
+      "isPublicHelp": "إظهار في بوابة العملاء",
+      "sortOrder": "ترتيب العرض"
+    },
+    "sidebar": {
+      "quickActions": "إجراءات سريعة",
+      "stats": "إحصائيات الخطط",
+      "totalPlans": "إجمالي الخطط",
+      "activePlans": "خطط نشطة",
+      "publicPlans": "خطط عامة"
+    },
+    "planTypes": {
+      "retainer": "توكيل شهري",
+      "hourly_package": "باقة ساعات",
+      "flat_fee": "رسوم ثابتة",
+      "hybrid": "مختلط",
+      "compliance": "امتثال",
+      "document_review": "مراجعة مستندات",
+      "advisory": "استشاري"
+    },
+    "billingPeriods": {
+      "weekly": "أسبوعياً",
+      "biweekly": "كل أسبوعين",
+      "monthly": "شهرياً",
+      "quarterly": "ربع سنوي",
+      "semi_annually": "نصف سنوي",
+      "annually": "سنوياً"
+    }
   }
 }
