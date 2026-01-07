@@ -5383,4 +5383,2182 @@ interface ZATCAValidateResponse {
 
 ---
 
-*Part 6 Complete. Continue to Part 7 (Expenses)?*
+*Part 6 Complete.*
+
+---
+
+# Part 7: Expense Management (~800 lines)
+
+This part covers the complete expense management system including expense claims, approval workflows, billable expense tracking, reimbursements, and GL integration.
+
+---
+
+## 7.1 Expense Types & Categories Schema
+
+```typescript
+// ============================================================
+// EXPENSE CATEGORY HIERARCHY
+// Based on Odoo hr_expense + ERPNext expense_claim_type
+// ============================================================
+
+export enum ExpenseCategoryType {
+  TRAVEL = 'travel',
+  MEALS = 'meals',
+  ACCOMMODATION = 'accommodation',
+  TRANSPORTATION = 'transportation',
+  OFFICE_SUPPLIES = 'office_supplies',
+  COMMUNICATION = 'communication',
+  PROFESSIONAL_SERVICES = 'professional_services',
+  TRAINING = 'training',
+  ENTERTAINMENT = 'entertainment',
+  SUBSCRIPTIONS = 'subscriptions',
+  EQUIPMENT = 'equipment',
+  MISCELLANEOUS = 'miscellaneous',
+}
+
+// Arabic translations for expense categories
+export const ExpenseCategoryTypeAr: Record<ExpenseCategoryType, string> = {
+  [ExpenseCategoryType.TRAVEL]: 'السفر',
+  [ExpenseCategoryType.MEALS]: 'الوجبات',
+  [ExpenseCategoryType.ACCOMMODATION]: 'الإقامة',
+  [ExpenseCategoryType.TRANSPORTATION]: 'المواصلات',
+  [ExpenseCategoryType.OFFICE_SUPPLIES]: 'مستلزمات مكتبية',
+  [ExpenseCategoryType.COMMUNICATION]: 'الاتصالات',
+  [ExpenseCategoryType.PROFESSIONAL_SERVICES]: 'الخدمات المهنية',
+  [ExpenseCategoryType.TRAINING]: 'التدريب',
+  [ExpenseCategoryType.ENTERTAINMENT]: 'الترفيه والضيافة',
+  [ExpenseCategoryType.SUBSCRIPTIONS]: 'الاشتراكات',
+  [ExpenseCategoryType.EQUIPMENT]: 'المعدات',
+  [ExpenseCategoryType.MISCELLANEOUS]: 'متنوعة',
+};
+
+export interface IExpenseCategory {
+  id: string;
+  companyId: string;
+
+  // Identity
+  code: string;                        // e.g., "EXP-TRAVEL-001"
+  name: string;                        // English name
+  nameAr: string;                      // Arabic name
+  type: ExpenseCategoryType;
+
+  // Accounting
+  expenseAccountId: string;            // Default GL account
+  taxCodeId?: string;                  // Default tax code
+
+  // Limits & Policies
+  requiresReceipt: boolean;            // Receipt mandatory?
+  receiptThreshold?: number;           // Receipt required above this amount (halalas)
+  maxAmount?: number;                  // Maximum per expense (halalas)
+  maxPerDiem?: number;                 // Maximum per day (halalas)
+  dailyLimit?: number;                 // Daily spending limit (halalas)
+
+  // Approval
+  requiresPreApproval: boolean;        // Needs approval before spending?
+  approvalThreshold?: number;          // Pre-approval above this amount
+
+  // Billable Tracking
+  defaultBillable: boolean;            // Default billable to client?
+  markupPercent?: number;              // Default markup for client billing (basis points)
+
+  // Status
+  isActive: boolean;
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
+// Per diem rates (based on Saudi travel allowance regulations)
+export interface IPerDiemRate {
+  id: string;
+  companyId: string;
+
+  // Location
+  countryCode: string;                 // ISO 3166-1 alpha-2
+  cityCode?: string;                   // For city-specific rates
+  locationName: string;
+  locationNameAr: string;
+
+  // Rates (in halalas)
+  accommodationRate: number;           // Daily hotel allowance
+  mealRate: number;                    // Daily meal allowance
+  transportRate: number;               // Daily transport allowance
+  incidentalRate: number;              // Daily incidentals
+  totalRate: number;                   // Total daily allowance
+
+  // Currency
+  currencyCode: string;                // Rate currency
+
+  // Validity
+  effectiveFrom: string;
+  effectiveTo?: string;
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Saudi domestic travel rates example
+export const SAUDI_DOMESTIC_PER_DIEM: Partial<IPerDiemRate> = {
+  countryCode: 'SA',
+  currencyCode: 'SAR',
+  accommodationRate: 50000,            // 500 SAR
+  mealRate: 15000,                     // 150 SAR
+  transportRate: 10000,                // 100 SAR
+  incidentalRate: 5000,                // 50 SAR
+  totalRate: 80000,                    // 800 SAR total
+};
+```
+
+---
+
+## 7.2 Expense Claim Schema
+
+```typescript
+// ============================================================
+// EXPENSE CLAIM (HEADER)
+// ============================================================
+
+export enum ExpenseClaimStatus {
+  DRAFT = 'draft',                     // Being created
+  SUBMITTED = 'submitted',             // Awaiting approval
+  PENDING_INFO = 'pending_info',       // Needs additional info
+  APPROVED = 'approved',               // Approved, pending reimbursement
+  PARTIALLY_PAID = 'partially_paid',   // Partial reimbursement made
+  PAID = 'paid',                       // Fully reimbursed
+  REJECTED = 'rejected',               // Rejected by approver
+  CANCELLED = 'cancelled',             // Cancelled by employee
+}
+
+export const ExpenseClaimStatusAr: Record<ExpenseClaimStatus, string> = {
+  [ExpenseClaimStatus.DRAFT]: 'مسودة',
+  [ExpenseClaimStatus.SUBMITTED]: 'مقدم',
+  [ExpenseClaimStatus.PENDING_INFO]: 'بانتظار معلومات',
+  [ExpenseClaimStatus.APPROVED]: 'معتمد',
+  [ExpenseClaimStatus.PARTIALLY_PAID]: 'مسدد جزئياً',
+  [ExpenseClaimStatus.PAID]: 'مسدد',
+  [ExpenseClaimStatus.REJECTED]: 'مرفوض',
+  [ExpenseClaimStatus.CANCELLED]: 'ملغي',
+};
+
+export interface IExpenseClaim {
+  id: string;
+  companyId: string;
+
+  // Identity
+  claimNumber: string;                 // Sequence: "EXP-2024-00001"
+
+  // Employee (claimant)
+  employeeId: string;
+  employeeName: string;
+  employeeNameAr: string;
+  department?: string;
+
+  // Claim Details
+  title: string;                       // "Business Trip to Riyadh"
+  titleAr: string;
+  description?: string;
+  descriptionAr?: string;
+
+  // Period
+  expensePeriodStart: string;          // ISO date
+  expensePeriodEnd: string;
+
+  // Business Purpose
+  projectId?: string;                  // For project tracking
+  clientId?: string;                   // For billable expenses
+  costCenterId?: string;               // Cost center allocation
+
+  // Trip Details (for travel claims)
+  isTravel: boolean;
+  travelFrom?: string;
+  travelTo?: string;
+  travelPurpose?: string;
+
+  // Currency
+  currencyCode: string;
+  exchangeRate: number;                // To company base currency (6 decimals)
+
+  // Amounts (in claim currency, stored as integers - smallest unit)
+  subtotal: number;                    // Sum of expense amounts
+  taxTotal: number;                    // Sum of VAT on expenses
+  totalAmount: number;                 // Total claimed
+
+  // Amounts in base currency
+  subtotalBase: number;
+  taxTotalBase: number;
+  totalAmountBase: number;
+
+  // Advances
+  advanceReceived: number;             // Cash advance received
+  advanceReceivedBase: number;
+  netReimbursable: number;             // total - advance
+  netReimbursableBase: number;
+
+  // Reimbursement
+  amountPaid: number;                  // Amount reimbursed
+  amountPaidBase: number;
+  amountDue: number;                   // Remaining to pay
+  amountDueBase: number;
+
+  // Status
+  status: ExpenseClaimStatus;
+
+  // Workflow
+  submittedAt?: string;
+  submittedBy?: string;
+
+  // Approval
+  approvalStatus: ApprovalStatus;
+  currentApproverId?: string;
+  approvalChain: IApprovalStep[];
+
+  // Rejection
+  rejectedAt?: string;
+  rejectedBy?: string;
+  rejectionReason?: string;
+  rejectionReasonAr?: string;
+
+  // Payment
+  paymentMethod?: PaymentMethod;
+  paymentReference?: string;
+  paidAt?: string;
+  paidBy?: string;
+
+  // Journal Entry (posted when approved/paid)
+  journalEntryId?: string;
+  reimbursementJournalId?: string;
+
+  // Lines
+  lines: IExpenseClaimLine[];
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
+// ============================================================
+// EXPENSE CLAIM LINE (INDIVIDUAL EXPENSES)
+// ============================================================
+
+export interface IExpenseClaimLine {
+  id: string;
+  claimId: string;
+  lineNumber: number;                  // Sequential line number
+
+  // Expense Details
+  expenseDate: string;                 // Date expense incurred
+  categoryId: string;                  // Expense category
+  categoryCode: string;                // Denormalized for display
+  categoryName: string;
+  categoryNameAr: string;
+
+  // Description
+  description: string;
+  descriptionAr?: string;
+
+  // Vendor/Merchant
+  merchantName?: string;
+  merchantVatNumber?: string;          // For VAT recovery
+
+  // Receipt
+  hasReceipt: boolean;
+  receiptNumber?: string;              // Vendor invoice/receipt number
+  receiptDate?: string;
+
+  // Amounts (in claim currency, smallest unit)
+  quantity: number;                    // Usually 1, but can be multiple
+  unitPrice: number;                   // Price per unit
+  amount: number;                      // quantity × unitPrice
+
+  // Tax
+  taxCodeId?: string;
+  taxRate: number;                     // Basis points
+  taxAmount: number;                   // VAT amount
+  taxInclusive: boolean;               // Is amount tax-inclusive?
+
+  // Total
+  totalAmount: number;                 // amount + tax (or amount if inclusive)
+
+  // Base Currency Amounts
+  amountBase: number;
+  taxAmountBase: number;
+  totalAmountBase: number;
+
+  // Accounting
+  accountId: string;                   // GL expense account
+  costCenterId?: string;               // Override claim cost center
+
+  // Billable to Client
+  isBillable: boolean;
+  clientId?: string;
+  projectId?: string;
+  markupPercent?: number;              // Markup for client billing (basis points)
+  billableAmount?: number;             // Amount to bill client (with markup)
+  billingStatus: BillingStatus;
+  invoiceId?: string;                  // Invoice where billed
+  invoiceLineId?: string;
+
+  // Per Diem
+  isPerDiem: boolean;
+  perDiemRateId?: string;
+  perDiemDays?: number;
+
+  // Mileage/Distance
+  isMileage: boolean;
+  distanceKm?: number;
+  mileageRate?: number;                // Per km rate
+  vehicleType?: 'personal' | 'company' | 'rental';
+
+  // Attachments
+  attachments: IExpenseAttachment[];
+
+  // Validation
+  isValid: boolean;
+  validationErrors: string[];
+  policyViolations: IPolicyViolation[];
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum BillingStatus {
+  NOT_BILLABLE = 'not_billable',
+  PENDING = 'pending',                 // Ready to be billed
+  BILLED = 'billed',                   // Included in invoice
+  WRITTEN_OFF = 'written_off',         // Not billed, absorbed
+}
+
+export const BillingStatusAr: Record<BillingStatus, string> = {
+  [BillingStatus.NOT_BILLABLE]: 'غير قابل للفوترة',
+  [BillingStatus.PENDING]: 'بانتظار الفوترة',
+  [BillingStatus.BILLED]: 'تم الفوترة',
+  [BillingStatus.WRITTEN_OFF]: 'مشطوب',
+};
+
+// Attachment for receipts/documents
+export interface IExpenseAttachment {
+  id: string;
+  lineId: string;
+
+  fileName: string;
+  fileType: string;                    // MIME type
+  fileSize: number;                    // bytes
+  filePath: string;                    // Storage path
+
+  // OCR extracted data (if available)
+  ocrProcessed: boolean;
+  ocrData?: {
+    merchantName?: string;
+    amount?: number;
+    vatAmount?: number;
+    vatNumber?: string;
+    date?: string;
+    items?: string[];
+  };
+
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
+// Policy violation tracking
+export interface IPolicyViolation {
+  code: string;
+  severity: 'warning' | 'error';
+  message: string;
+  messageAr: string;
+  field?: string;
+  limit?: number;
+  actual?: number;
+}
+```
+
+---
+
+## 7.3 Expense Approval Workflow
+
+```typescript
+// ============================================================
+// APPROVAL WORKFLOW SCHEMA
+// Based on Odoo approval.request + ERPNext workflow
+// ============================================================
+
+export enum ApprovalStatus {
+  NOT_REQUIRED = 'not_required',
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
+export const ApprovalStatusAr: Record<ApprovalStatus, string> = {
+  [ApprovalStatus.NOT_REQUIRED]: 'لا يتطلب موافقة',
+  [ApprovalStatus.PENDING]: 'بانتظار الموافقة',
+  [ApprovalStatus.IN_PROGRESS]: 'قيد المراجعة',
+  [ApprovalStatus.APPROVED]: 'معتمد',
+  [ApprovalStatus.REJECTED]: 'مرفوض',
+};
+
+export interface IApprovalStep {
+  id: string;
+  stepNumber: number;
+
+  // Approver
+  approverId: string;
+  approverName: string;
+  approverNameAr: string;
+  approverRole: string;
+
+  // Status
+  status: ApprovalStepStatus;
+
+  // Action timestamps
+  assignedAt: string;
+  actionAt?: string;
+
+  // Decision
+  decision?: 'approved' | 'rejected' | 'forwarded';
+  comments?: string;
+  commentsAr?: string;
+
+  // Forward to
+  forwardedTo?: string;
+  forwardReason?: string;
+}
+
+export enum ApprovalStepStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  SKIPPED = 'skipped',
+  FORWARDED = 'forwarded',
+}
+
+// ============================================================
+// APPROVAL RULE CONFIGURATION
+// ============================================================
+
+export interface IApprovalRule {
+  id: string;
+  companyId: string;
+
+  name: string;
+  nameAr: string;
+
+  // Document Type
+  documentType: 'expense_claim' | 'purchase_order' | 'payment';
+
+  // Conditions
+  conditions: IApprovalCondition[];
+
+  // Approval Chain
+  approvalChain: IApprovalChainStep[];
+
+  // Settings
+  priority: number;                    // Lower = higher priority
+  isActive: boolean;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IApprovalCondition {
+  field: string;                       // e.g., "totalAmount", "categoryId"
+  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin';
+  value: any;
+}
+
+export interface IApprovalChainStep {
+  stepNumber: number;
+
+  // Approver Selection
+  approverType: 'user' | 'role' | 'manager' | 'department_head' | 'custom';
+  approverId?: string;                 // User ID if type is 'user'
+  roleId?: string;                     // Role ID if type is 'role'
+
+  // Escalation
+  escalateAfterHours?: number;         // Auto-escalate if no response
+  escalateTo?: string;                 // User to escalate to
+
+  // Skip Conditions
+  skipIfAmount?: number;               // Skip if amount below this
+}
+
+// ============================================================
+// APPROVAL ENGINE
+// ============================================================
+
+export class ExpenseApprovalEngine {
+
+  /**
+   * Determine approval chain for an expense claim
+   */
+  static getApprovalChain(
+    claim: IExpenseClaim,
+    rules: IApprovalRule[],
+    orgStructure: IOrgStructure
+  ): IApprovalStep[] {
+    // Sort rules by priority
+    const sortedRules = [...rules].sort((a, b) => a.priority - b.priority);
+
+    // Find matching rule
+    const matchingRule = sortedRules.find(rule =>
+      this.evaluateConditions(claim, rule.conditions)
+    );
+
+    if (!matchingRule) {
+      // No rule matches - use default (direct manager)
+      return this.getDefaultApprovalChain(claim, orgStructure);
+    }
+
+    // Build approval chain from rule
+    return matchingRule.approvalChain.map((step, index) =>
+      this.resolveApprover(step, claim, orgStructure, index)
+    );
+  }
+
+  /**
+   * Evaluate if claim matches rule conditions
+   */
+  static evaluateConditions(
+    claim: IExpenseClaim,
+    conditions: IApprovalCondition[]
+  ): boolean {
+    return conditions.every(condition => {
+      const value = this.getFieldValue(claim, condition.field);
+
+      switch (condition.operator) {
+        case 'eq': return value === condition.value;
+        case 'ne': return value !== condition.value;
+        case 'gt': return value > condition.value;
+        case 'gte': return value >= condition.value;
+        case 'lt': return value < condition.value;
+        case 'lte': return value <= condition.value;
+        case 'in': return condition.value.includes(value);
+        case 'nin': return !condition.value.includes(value);
+        default: return false;
+      }
+    });
+  }
+
+  /**
+   * Get default approval chain (manager hierarchy)
+   */
+  static getDefaultApprovalChain(
+    claim: IExpenseClaim,
+    orgStructure: IOrgStructure
+  ): IApprovalStep[] {
+    const chain: IApprovalStep[] = [];
+    let currentManagerId = orgStructure.getManager(claim.employeeId);
+    let stepNumber = 1;
+
+    // Add managers up to CEO for high amounts
+    while (currentManagerId && stepNumber <= 5) {
+      const manager = orgStructure.getEmployee(currentManagerId);
+
+      if (!manager) break;
+
+      chain.push({
+        id: `step-${stepNumber}`,
+        stepNumber,
+        approverId: manager.id,
+        approverName: manager.name,
+        approverNameAr: manager.nameAr,
+        approverRole: manager.role,
+        status: ApprovalStepStatus.PENDING,
+        assignedAt: new Date().toISOString(),
+      });
+
+      // Check if this level can approve the amount
+      if (this.canApproveAmount(manager.role, claim.totalAmountBase)) {
+        break;
+      }
+
+      currentManagerId = orgStructure.getManager(currentManagerId);
+      stepNumber++;
+    }
+
+    return chain;
+  }
+
+  /**
+   * Check if role can approve amount (based on authority matrix)
+   */
+  static canApproveAmount(role: string, amountBase: number): boolean {
+    // Example authority limits (in halalas)
+    const limits: Record<string, number> = {
+      'team_lead': 100000,         // 1,000 SAR
+      'manager': 500000,           // 5,000 SAR
+      'director': 2500000,         // 25,000 SAR
+      'vp': 10000000,              // 100,000 SAR
+      'cfo': 50000000,             // 500,000 SAR
+      'ceo': Infinity,
+    };
+
+    return amountBase <= (limits[role] || 0);
+  }
+
+  /**
+   * Process approval decision
+   */
+  static async processDecision(
+    claim: IExpenseClaim,
+    stepId: string,
+    decision: 'approved' | 'rejected' | 'forwarded',
+    comments: string,
+    forwardTo?: string
+  ): Promise<IExpenseClaim> {
+    const step = claim.approvalChain.find(s => s.id === stepId);
+
+    if (!step) {
+      throw new Error('Approval step not found');
+    }
+
+    // Update step
+    step.status = decision === 'approved'
+      ? ApprovalStepStatus.APPROVED
+      : decision === 'rejected'
+        ? ApprovalStepStatus.REJECTED
+        : ApprovalStepStatus.FORWARDED;
+    step.decision = decision;
+    step.comments = comments;
+    step.actionAt = new Date().toISOString();
+
+    if (decision === 'forwarded' && forwardTo) {
+      step.forwardedTo = forwardTo;
+    }
+
+    // Determine claim approval status
+    if (decision === 'rejected') {
+      claim.approvalStatus = ApprovalStatus.REJECTED;
+      claim.status = ExpenseClaimStatus.REJECTED;
+      claim.rejectedAt = new Date().toISOString();
+      claim.rejectedBy = step.approverId;
+      claim.rejectionReason = comments;
+    } else if (decision === 'approved') {
+      // Check if all steps approved
+      const pendingSteps = claim.approvalChain.filter(
+        s => s.status === ApprovalStepStatus.PENDING
+      );
+
+      if (pendingSteps.length === 0) {
+        claim.approvalStatus = ApprovalStatus.APPROVED;
+        claim.status = ExpenseClaimStatus.APPROVED;
+      } else {
+        // Move to next approver
+        claim.approvalStatus = ApprovalStatus.IN_PROGRESS;
+        claim.currentApproverId = pendingSteps[0].approverId;
+      }
+    }
+
+    return claim;
+  }
+
+  /**
+   * Get utility method for field value
+   */
+  private static getFieldValue(claim: IExpenseClaim, field: string): any {
+    const parts = field.split('.');
+    let value: any = claim;
+
+    for (const part of parts) {
+      value = value?.[part];
+    }
+
+    return value;
+  }
+
+  /**
+   * Resolve approver from chain step definition
+   */
+  private static resolveApprover(
+    stepDef: IApprovalChainStep,
+    claim: IExpenseClaim,
+    orgStructure: IOrgStructure,
+    index: number
+  ): IApprovalStep {
+    let approver: any;
+
+    switch (stepDef.approverType) {
+      case 'user':
+        approver = orgStructure.getEmployee(stepDef.approverId!);
+        break;
+      case 'manager':
+        const managerId = orgStructure.getManager(claim.employeeId);
+        approver = managerId ? orgStructure.getEmployee(managerId) : null;
+        break;
+      case 'department_head':
+        const headId = orgStructure.getDepartmentHead(claim.department!);
+        approver = headId ? orgStructure.getEmployee(headId) : null;
+        break;
+      default:
+        throw new Error(`Unknown approver type: ${stepDef.approverType}`);
+    }
+
+    if (!approver) {
+      throw new Error(`Could not resolve approver for step ${index + 1}`);
+    }
+
+    return {
+      id: `step-${index + 1}`,
+      stepNumber: index + 1,
+      approverId: approver.id,
+      approverName: approver.name,
+      approverNameAr: approver.nameAr,
+      approverRole: approver.role,
+      status: ApprovalStepStatus.PENDING,
+      assignedAt: new Date().toISOString(),
+    };
+  }
+}
+```
+
+---
+
+## 7.4 Expense Policy Validation
+
+```typescript
+// ============================================================
+// EXPENSE POLICY ENGINE
+// Validates expenses against company policies
+// ============================================================
+
+export interface IExpensePolicy {
+  id: string;
+  companyId: string;
+
+  name: string;
+  nameAr: string;
+  description: string;
+  descriptionAr: string;
+
+  // Scope
+  appliesToAll: boolean;
+  departmentIds?: string[];
+  roleIds?: string[];
+  employeeIds?: string[];
+
+  // Rules
+  rules: IExpensePolicyRule[];
+
+  // Effective Period
+  effectiveFrom: string;
+  effectiveTo?: string;
+
+  isActive: boolean;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IExpensePolicyRule {
+  id: string;
+  ruleType: ExpensePolicyRuleType;
+
+  // Category Scope
+  categoryIds?: string[];              // Apply to specific categories
+  allCategories: boolean;
+
+  // Rule Parameters
+  parameters: Record<string, any>;
+
+  // Violation Handling
+  severity: 'warning' | 'error';
+  blockSubmission: boolean;
+
+  // Messages
+  violationMessage: string;
+  violationMessageAr: string;
+}
+
+export enum ExpensePolicyRuleType {
+  MAX_AMOUNT = 'max_amount',           // Maximum amount per expense
+  MAX_DAILY = 'max_daily',             // Maximum per day
+  MAX_PER_CLAIM = 'max_per_claim',     // Maximum per claim
+  RECEIPT_REQUIRED = 'receipt_required', // Receipt mandatory
+  RECEIPT_THRESHOLD = 'receipt_threshold', // Receipt above amount
+  ADVANCE_BOOKING = 'advance_booking', // Minimum days in advance
+  MAX_DAYS = 'max_days',               // Maximum claim period
+  WEEKEND_RESTRICTION = 'weekend_restriction', // No weekend expenses
+  DUPLICATE_CHECK = 'duplicate_check', // Check for duplicates
+  MERCHANT_BLACKLIST = 'merchant_blacklist', // Blocked merchants
+  PROJECT_REQUIRED = 'project_required', // Project must be specified
+}
+
+export class ExpensePolicyValidator {
+
+  /**
+   * Validate expense claim against all applicable policies
+   */
+  static validateClaim(
+    claim: IExpenseClaim,
+    policies: IExpensePolicy[],
+    employee: { id: string; departmentId: string; roleId: string }
+  ): { isValid: boolean; violations: IPolicyViolation[] } {
+    const violations: IPolicyViolation[] = [];
+
+    // Get applicable policies
+    const applicablePolicies = policies.filter(policy =>
+      this.isPolicyApplicable(policy, employee)
+    );
+
+    // Validate each line
+    for (const line of claim.lines) {
+      for (const policy of applicablePolicies) {
+        for (const rule of policy.rules) {
+          if (this.isRuleApplicable(rule, line.categoryId)) {
+            const ruleViolations = this.validateRule(rule, line, claim);
+            violations.push(...ruleViolations);
+          }
+        }
+      }
+    }
+
+    // Validate claim-level rules
+    for (const policy of applicablePolicies) {
+      for (const rule of policy.rules) {
+        if (rule.ruleType === ExpensePolicyRuleType.MAX_PER_CLAIM ||
+            rule.ruleType === ExpensePolicyRuleType.MAX_DAYS) {
+          const ruleViolations = this.validateClaimLevelRule(rule, claim);
+          violations.push(...ruleViolations);
+        }
+      }
+    }
+
+    const hasErrors = violations.some(v => v.severity === 'error');
+
+    return {
+      isValid: !hasErrors,
+      violations,
+    };
+  }
+
+  /**
+   * Check if policy applies to employee
+   */
+  static isPolicyApplicable(
+    policy: IExpensePolicy,
+    employee: { id: string; departmentId: string; roleId: string }
+  ): boolean {
+    if (policy.appliesToAll) return true;
+
+    if (policy.employeeIds?.includes(employee.id)) return true;
+    if (policy.departmentIds?.includes(employee.departmentId)) return true;
+    if (policy.roleIds?.includes(employee.roleId)) return true;
+
+    return false;
+  }
+
+  /**
+   * Check if rule applies to expense category
+   */
+  static isRuleApplicable(rule: IExpensePolicyRule, categoryId: string): boolean {
+    if (rule.allCategories) return true;
+    return rule.categoryIds?.includes(categoryId) || false;
+  }
+
+  /**
+   * Validate individual rule against expense line
+   */
+  static validateRule(
+    rule: IExpensePolicyRule,
+    line: IExpenseClaimLine,
+    claim: IExpenseClaim
+  ): IPolicyViolation[] {
+    const violations: IPolicyViolation[] = [];
+
+    switch (rule.ruleType) {
+      case ExpensePolicyRuleType.MAX_AMOUNT:
+        if (line.totalAmount > rule.parameters.maxAmount) {
+          violations.push({
+            code: 'MAX_AMOUNT_EXCEEDED',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'totalAmount',
+            limit: rule.parameters.maxAmount,
+            actual: line.totalAmount,
+          });
+        }
+        break;
+
+      case ExpensePolicyRuleType.RECEIPT_REQUIRED:
+        if (!line.hasReceipt) {
+          violations.push({
+            code: 'RECEIPT_REQUIRED',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'hasReceipt',
+          });
+        }
+        break;
+
+      case ExpensePolicyRuleType.RECEIPT_THRESHOLD:
+        if (line.totalAmount > rule.parameters.threshold && !line.hasReceipt) {
+          violations.push({
+            code: 'RECEIPT_REQUIRED_THRESHOLD',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'hasReceipt',
+            limit: rule.parameters.threshold,
+            actual: line.totalAmount,
+          });
+        }
+        break;
+
+      case ExpensePolicyRuleType.WEEKEND_RESTRICTION:
+        const expenseDate = new Date(line.expenseDate);
+        const day = expenseDate.getDay();
+        if (day === 5 || day === 6) { // Friday/Saturday (Saudi weekend)
+          violations.push({
+            code: 'WEEKEND_EXPENSE',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'expenseDate',
+          });
+        }
+        break;
+
+      case ExpensePolicyRuleType.PROJECT_REQUIRED:
+        if (line.isBillable && !line.projectId) {
+          violations.push({
+            code: 'PROJECT_REQUIRED',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'projectId',
+          });
+        }
+        break;
+    }
+
+    return violations;
+  }
+
+  /**
+   * Validate claim-level rules
+   */
+  static validateClaimLevelRule(
+    rule: IExpensePolicyRule,
+    claim: IExpenseClaim
+  ): IPolicyViolation[] {
+    const violations: IPolicyViolation[] = [];
+
+    switch (rule.ruleType) {
+      case ExpensePolicyRuleType.MAX_PER_CLAIM:
+        if (claim.totalAmount > rule.parameters.maxAmount) {
+          violations.push({
+            code: 'MAX_CLAIM_EXCEEDED',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'totalAmount',
+            limit: rule.parameters.maxAmount,
+            actual: claim.totalAmount,
+          });
+        }
+        break;
+
+      case ExpensePolicyRuleType.MAX_DAYS:
+        const startDate = new Date(claim.expensePeriodStart);
+        const endDate = new Date(claim.expensePeriodEnd);
+        const days = Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (days > rule.parameters.maxDays) {
+          violations.push({
+            code: 'MAX_DAYS_EXCEEDED',
+            severity: rule.severity,
+            message: rule.violationMessage,
+            messageAr: rule.violationMessageAr,
+            field: 'expensePeriodEnd',
+            limit: rule.parameters.maxDays,
+            actual: days,
+          });
+        }
+        break;
+    }
+
+    return violations;
+  }
+
+  /**
+   * Check for duplicate expenses
+   */
+  static async checkDuplicates(
+    line: IExpenseClaimLine,
+    existingExpenses: IExpenseClaimLine[]
+  ): Promise<IPolicyViolation[]> {
+    const violations: IPolicyViolation[] = [];
+
+    const duplicates = existingExpenses.filter(existing =>
+      existing.expenseDate === line.expenseDate &&
+      existing.totalAmount === line.totalAmount &&
+      existing.categoryId === line.categoryId &&
+      existing.merchantName === line.merchantName
+    );
+
+    if (duplicates.length > 0) {
+      violations.push({
+        code: 'DUPLICATE_EXPENSE',
+        severity: 'warning',
+        message: `Potential duplicate: similar expense found on ${line.expenseDate}`,
+        messageAr: `احتمال تكرار: تم العثور على مصروف مشابه بتاريخ ${line.expenseDate}`,
+        field: 'duplicate',
+      });
+    }
+
+    return violations;
+  }
+}
+```
+
+---
+
+*Part 7a Complete.*
+
+---
+
+## 7.5 Expense GL Posting
+
+```typescript
+// ============================================================
+// EXPENSE GL POSTING ENGINE
+// Creates journal entries for approved expense claims
+// ============================================================
+
+export class ExpenseGLPostingEngine {
+
+  /**
+   * Create journal entry when expense claim is approved
+   * This recognizes the expense and creates employee payable
+   */
+  static createApprovalJournalEntry(
+    claim: IExpenseClaim,
+    accounts: IExpenseAccountConfig
+  ): IJournalEntry {
+    const lines: IJournalEntryLine[] = [];
+    let lineNumber = 1;
+
+    // Group expenses by account and cost center
+    const expenseGroups = this.groupExpensesByAccount(claim.lines);
+
+    // Debit: Expense accounts
+    for (const group of expenseGroups) {
+      // Net expense amount (before VAT)
+      lines.push({
+        id: `line-${lineNumber++}`,
+        lineNumber: lineNumber - 1,
+        accountId: group.accountId,
+        accountCode: group.accountCode,
+        description: `Expense claim ${claim.claimNumber} - ${group.categoryName}`,
+        descriptionAr: `مطالبة مصروفات ${claim.claimNumber} - ${group.categoryNameAr}`,
+        debit: group.amountBase,
+        credit: 0,
+        currencyCode: claim.currencyCode,
+        exchangeRate: claim.exchangeRate,
+        foreignDebit: group.amount,
+        foreignCredit: 0,
+        costCenterId: group.costCenterId,
+        projectId: group.projectId,
+      });
+
+      // Input VAT (recoverable)
+      if (group.taxAmountBase > 0) {
+        lines.push({
+          id: `line-${lineNumber++}`,
+          lineNumber: lineNumber - 1,
+          accountId: accounts.inputVatAccountId,
+          accountCode: accounts.inputVatAccountCode,
+          description: `VAT on expenses - ${claim.claimNumber}`,
+          descriptionAr: `ضريبة القيمة المضافة على المصروفات - ${claim.claimNumber}`,
+          debit: group.taxAmountBase,
+          credit: 0,
+          currencyCode: claim.currencyCode,
+          exchangeRate: claim.exchangeRate,
+          foreignDebit: group.taxAmount,
+          foreignCredit: 0,
+          taxCodeId: group.taxCodeId,
+        });
+      }
+    }
+
+    // Credit: Employee payable (or advance settlement)
+    if (claim.advanceReceivedBase > 0) {
+      // First, settle against advance
+      lines.push({
+        id: `line-${lineNumber++}`,
+        lineNumber: lineNumber - 1,
+        accountId: accounts.employeeAdvanceAccountId,
+        accountCode: accounts.employeeAdvanceAccountCode,
+        description: `Advance settlement - ${claim.claimNumber}`,
+        descriptionAr: `تسوية سلفة - ${claim.claimNumber}`,
+        debit: 0,
+        credit: Math.min(claim.advanceReceivedBase, claim.totalAmountBase),
+        employeeId: claim.employeeId,
+      });
+
+      // If expenses exceed advance, create payable for difference
+      if (claim.totalAmountBase > claim.advanceReceivedBase) {
+        const payableAmount = claim.totalAmountBase - claim.advanceReceivedBase;
+        lines.push({
+          id: `line-${lineNumber++}`,
+          lineNumber: lineNumber - 1,
+          accountId: accounts.employeePayableAccountId,
+          accountCode: accounts.employeePayableAccountCode,
+          description: `Employee reimbursement payable - ${claim.claimNumber}`,
+          descriptionAr: `مستحقات تعويض الموظف - ${claim.claimNumber}`,
+          debit: 0,
+          credit: payableAmount,
+          employeeId: claim.employeeId,
+        });
+      }
+    } else {
+      // No advance - full amount to employee payable
+      lines.push({
+        id: `line-${lineNumber++}`,
+        lineNumber: lineNumber - 1,
+        accountId: accounts.employeePayableAccountId,
+        accountCode: accounts.employeePayableAccountCode,
+        description: `Employee reimbursement payable - ${claim.claimNumber}`,
+        descriptionAr: `مستحقات تعويض الموظف - ${claim.claimNumber}`,
+        debit: 0,
+        credit: claim.totalAmountBase,
+        employeeId: claim.employeeId,
+      });
+    }
+
+    // If advance exceeds expenses, employee owes company
+    if (claim.advanceReceivedBase > claim.totalAmountBase) {
+      const refundDue = claim.advanceReceivedBase - claim.totalAmountBase;
+      lines.push({
+        id: `line-${lineNumber++}`,
+        lineNumber: lineNumber - 1,
+        accountId: accounts.employeeReceivableAccountId,
+        accountCode: accounts.employeeReceivableAccountCode,
+        description: `Advance refund due - ${claim.claimNumber}`,
+        descriptionAr: `استرداد سلفة مستحق - ${claim.claimNumber}`,
+        debit: refundDue,
+        credit: 0,
+        employeeId: claim.employeeId,
+      });
+    }
+
+    return {
+      id: `je-exp-${claim.id}`,
+      companyId: claim.companyId,
+      journalNumber: '', // Will be assigned by sequence
+      journalType: JournalType.EXPENSE,
+      entryDate: new Date().toISOString().split('T')[0],
+      postingDate: new Date().toISOString().split('T')[0],
+      periodId: '', // Current period
+      description: `Expense claim approval - ${claim.claimNumber}`,
+      descriptionAr: `اعتماد مطالبة مصروفات - ${claim.claimNumber}`,
+      reference: claim.claimNumber,
+      referenceType: 'expense_claim',
+      referenceId: claim.id,
+      currencyCode: claim.currencyCode,
+      exchangeRate: claim.exchangeRate,
+      totalDebit: claim.totalAmountBase,
+      totalCredit: claim.totalAmountBase,
+      lines,
+      status: JournalEntryStatus.DRAFT,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'system',
+      updatedBy: 'system',
+    };
+  }
+
+  /**
+   * Create journal entry when expense is reimbursed
+   */
+  static createReimbursementJournalEntry(
+    claim: IExpenseClaim,
+    payment: IExpensePayment,
+    accounts: IExpenseAccountConfig
+  ): IJournalEntry {
+    const lines: IJournalEntryLine[] = [];
+
+    // Debit: Employee payable (reduce liability)
+    lines.push({
+      id: 'line-1',
+      lineNumber: 1,
+      accountId: accounts.employeePayableAccountId,
+      accountCode: accounts.employeePayableAccountCode,
+      description: `Reimbursement - ${claim.claimNumber}`,
+      descriptionAr: `تعويض - ${claim.claimNumber}`,
+      debit: payment.amountBase,
+      credit: 0,
+      employeeId: claim.employeeId,
+    });
+
+    // Credit: Bank/Cash (payment)
+    lines.push({
+      id: 'line-2',
+      lineNumber: 2,
+      accountId: payment.paymentAccountId,
+      accountCode: payment.paymentAccountCode,
+      description: `Payment to ${claim.employeeName} - ${claim.claimNumber}`,
+      descriptionAr: `دفعة إلى ${claim.employeeNameAr} - ${claim.claimNumber}`,
+      debit: 0,
+      credit: payment.amountBase,
+    });
+
+    return {
+      id: `je-reimb-${payment.id}`,
+      companyId: claim.companyId,
+      journalNumber: '',
+      journalType: JournalType.PAYMENT,
+      entryDate: payment.paymentDate,
+      postingDate: payment.paymentDate,
+      periodId: '',
+      description: `Expense reimbursement - ${claim.claimNumber}`,
+      descriptionAr: `تعويض مصروفات - ${claim.claimNumber}`,
+      reference: payment.paymentReference,
+      referenceType: 'expense_reimbursement',
+      referenceId: payment.id,
+      currencyCode: payment.currencyCode,
+      exchangeRate: payment.exchangeRate,
+      totalDebit: payment.amountBase,
+      totalCredit: payment.amountBase,
+      lines,
+      status: JournalEntryStatus.DRAFT,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'system',
+      updatedBy: 'system',
+    };
+  }
+
+  /**
+   * Group expense lines by GL account
+   */
+  private static groupExpensesByAccount(
+    lines: IExpenseClaimLine[]
+  ): IExpenseAccountGroup[] {
+    const groups = new Map<string, IExpenseAccountGroup>();
+
+    for (const line of lines) {
+      const key = `${line.accountId}-${line.costCenterId || 'none'}`;
+
+      if (groups.has(key)) {
+        const group = groups.get(key)!;
+        group.amount += line.amount;
+        group.amountBase += line.amountBase;
+        group.taxAmount += line.taxAmount;
+        group.taxAmountBase += line.taxAmountBase;
+      } else {
+        groups.set(key, {
+          accountId: line.accountId,
+          accountCode: '', // Will be populated
+          categoryName: line.categoryName,
+          categoryNameAr: line.categoryNameAr,
+          costCenterId: line.costCenterId,
+          projectId: line.projectId,
+          taxCodeId: line.taxCodeId,
+          amount: line.amount,
+          amountBase: line.amountBase,
+          taxAmount: line.taxAmount,
+          taxAmountBase: line.taxAmountBase,
+        });
+      }
+    }
+
+    return Array.from(groups.values());
+  }
+}
+
+interface IExpenseAccountGroup {
+  accountId: string;
+  accountCode: string;
+  categoryName: string;
+  categoryNameAr: string;
+  costCenterId?: string;
+  projectId?: string;
+  taxCodeId?: string;
+  amount: number;
+  amountBase: number;
+  taxAmount: number;
+  taxAmountBase: number;
+}
+
+interface IExpenseAccountConfig {
+  inputVatAccountId: string;
+  inputVatAccountCode: string;
+  employeeAdvanceAccountId: string;
+  employeeAdvanceAccountCode: string;
+  employeePayableAccountId: string;
+  employeePayableAccountCode: string;
+  employeeReceivableAccountId: string;
+  employeeReceivableAccountCode: string;
+}
+```
+
+---
+
+## 7.6 Expense Reimbursement Processing
+
+```typescript
+// ============================================================
+// EXPENSE REIMBURSEMENT PROCESSING
+// ============================================================
+
+export interface IExpensePayment {
+  id: string;
+  claimId: string;
+  claimNumber: string;
+
+  // Employee
+  employeeId: string;
+  employeeName: string;
+  employeeNameAr: string;
+
+  // Payment Details
+  paymentDate: string;
+  paymentMethod: ExpensePaymentMethod;
+  paymentReference: string;
+  paymentAccountId: string;
+  paymentAccountCode: string;
+
+  // Amount
+  amount: number;
+  currencyCode: string;
+  exchangeRate: number;
+  amountBase: number;
+
+  // Bank Details (for wire transfer)
+  bankName?: string;
+  bankAccountNumber?: string;
+  iban?: string;
+
+  // Status
+  status: ExpensePaymentStatus;
+
+  // Journal Entry
+  journalEntryId?: string;
+
+  // Audit
+  processedAt: string;
+  processedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum ExpensePaymentMethod {
+  BANK_TRANSFER = 'bank_transfer',
+  CASH = 'cash',
+  CHECK = 'check',
+  SALARY_DEDUCTION = 'salary_deduction',  // For advance refunds
+  PETTY_CASH = 'petty_cash',
+}
+
+export const ExpensePaymentMethodAr: Record<ExpensePaymentMethod, string> = {
+  [ExpensePaymentMethod.BANK_TRANSFER]: 'تحويل بنكي',
+  [ExpensePaymentMethod.CASH]: 'نقدي',
+  [ExpensePaymentMethod.CHECK]: 'شيك',
+  [ExpensePaymentMethod.SALARY_DEDUCTION]: 'خصم من الراتب',
+  [ExpensePaymentMethod.PETTY_CASH]: 'صندوق المصروفات النثرية',
+};
+
+export enum ExpensePaymentStatus {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled',
+}
+
+export class ExpenseReimbursementProcessor {
+
+  /**
+   * Process reimbursement for approved expense claim
+   */
+  static async processReimbursement(
+    claim: IExpenseClaim,
+    paymentDetails: {
+      paymentMethod: ExpensePaymentMethod;
+      paymentAccountId: string;
+      paymentDate?: string;
+    },
+    accounts: IExpenseAccountConfig
+  ): Promise<{ payment: IExpensePayment; journalEntry: IJournalEntry }> {
+
+    // Validate claim is approved
+    if (claim.status !== ExpenseClaimStatus.APPROVED &&
+        claim.status !== ExpenseClaimStatus.PARTIALLY_PAID) {
+      throw new Error('Claim must be approved before reimbursement');
+    }
+
+    // Calculate reimbursable amount
+    const reimbursableAmount = claim.netReimbursableBase - claim.amountPaidBase;
+
+    if (reimbursableAmount <= 0) {
+      throw new Error('No amount due for reimbursement');
+    }
+
+    // Create payment record
+    const payment: IExpensePayment = {
+      id: `exp-pmt-${Date.now()}`,
+      claimId: claim.id,
+      claimNumber: claim.claimNumber,
+      employeeId: claim.employeeId,
+      employeeName: claim.employeeName,
+      employeeNameAr: claim.employeeNameAr,
+      paymentDate: paymentDetails.paymentDate || new Date().toISOString().split('T')[0],
+      paymentMethod: paymentDetails.paymentMethod,
+      paymentReference: `REIMB-${claim.claimNumber}`,
+      paymentAccountId: paymentDetails.paymentAccountId,
+      paymentAccountCode: '', // Will be populated
+      amount: claim.netReimbursable - claim.amountPaid,
+      currencyCode: claim.currencyCode,
+      exchangeRate: claim.exchangeRate,
+      amountBase: reimbursableAmount,
+      status: ExpensePaymentStatus.PENDING,
+      processedAt: new Date().toISOString(),
+      processedBy: '', // Current user
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Create journal entry
+    const journalEntry = ExpenseGLPostingEngine.createReimbursementJournalEntry(
+      claim,
+      payment,
+      accounts
+    );
+
+    payment.journalEntryId = journalEntry.id;
+
+    return { payment, journalEntry };
+  }
+
+  /**
+   * Process bulk reimbursements
+   */
+  static async processBulkReimbursements(
+    claims: IExpenseClaim[],
+    paymentDetails: {
+      paymentMethod: ExpensePaymentMethod;
+      paymentAccountId: string;
+      paymentDate?: string;
+    },
+    accounts: IExpenseAccountConfig
+  ): Promise<{
+    successful: Array<{ claimId: string; payment: IExpensePayment }>;
+    failed: Array<{ claimId: string; error: string }>;
+  }> {
+    const successful: Array<{ claimId: string; payment: IExpensePayment }> = [];
+    const failed: Array<{ claimId: string; error: string }> = [];
+
+    for (const claim of claims) {
+      try {
+        const result = await this.processReimbursement(claim, paymentDetails, accounts);
+        successful.push({ claimId: claim.id, payment: result.payment });
+      } catch (error) {
+        failed.push({
+          claimId: claim.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
+    return { successful, failed };
+  }
+}
+```
+
+---
+
+## 7.7 Billable Expense Invoicing
+
+```typescript
+// ============================================================
+// BILLABLE EXPENSE TO INVOICE CONVERSION
+// Re-bills client expenses with optional markup
+// ============================================================
+
+export interface IBillableExpenseSummary {
+  clientId: string;
+  clientName: string;
+  clientNameAr: string;
+  projectId?: string;
+  projectName?: string;
+  expenses: IExpenseClaimLine[];
+  totalAmount: number;
+  totalAmountBase: number;
+  totalMarkup: number;
+  billableTotal: number;
+}
+
+export class BillableExpenseEngine {
+
+  /**
+   * Get unbilled expenses by client
+   */
+  static getUnbilledExpensesByClient(
+    expenses: IExpenseClaimLine[]
+  ): IBillableExpenseSummary[] {
+    const clientMap = new Map<string, IBillableExpenseSummary>();
+
+    const unbilled = expenses.filter(
+      e => e.isBillable && e.billingStatus === BillingStatus.PENDING
+    );
+
+    for (const expense of unbilled) {
+      if (!expense.clientId) continue;
+
+      if (clientMap.has(expense.clientId)) {
+        const summary = clientMap.get(expense.clientId)!;
+        summary.expenses.push(expense);
+        summary.totalAmount += expense.totalAmountBase;
+        summary.totalMarkup += this.calculateMarkup(expense);
+        summary.billableTotal = summary.totalAmount + summary.totalMarkup;
+      } else {
+        const markup = this.calculateMarkup(expense);
+        clientMap.set(expense.clientId, {
+          clientId: expense.clientId,
+          clientName: '', // Populate from lookup
+          clientNameAr: '',
+          projectId: expense.projectId,
+          expenses: [expense],
+          totalAmount: expense.totalAmountBase,
+          totalAmountBase: expense.totalAmountBase,
+          totalMarkup: markup,
+          billableTotal: expense.totalAmountBase + markup,
+        });
+      }
+    }
+
+    return Array.from(clientMap.values());
+  }
+
+  /**
+   * Calculate markup amount for expense
+   */
+  static calculateMarkup(expense: IExpenseClaimLine): number {
+    if (!expense.markupPercent || expense.markupPercent === 0) {
+      return 0;
+    }
+
+    // markupPercent is in basis points (e.g., 1000 = 10%)
+    return Math.round((expense.totalAmountBase * expense.markupPercent) / 10000);
+  }
+
+  /**
+   * Create invoice lines from billable expenses
+   */
+  static createInvoiceLinesFromExpenses(
+    expenses: IExpenseClaimLine[],
+    groupByCategory: boolean = true
+  ): IInvoiceLine[] {
+    if (groupByCategory) {
+      return this.createGroupedInvoiceLines(expenses);
+    }
+    return this.createDetailedInvoiceLines(expenses);
+  }
+
+  /**
+   * Create detailed invoice lines (one per expense)
+   */
+  private static createDetailedInvoiceLines(
+    expenses: IExpenseClaimLine[]
+  ): IInvoiceLine[] {
+    return expenses.map((expense, index) => {
+      const markup = this.calculateMarkup(expense);
+      const unitPrice = expense.totalAmountBase + markup;
+
+      return {
+        id: `inv-line-${index + 1}`,
+        lineNumber: index + 1,
+        itemType: InvoiceLineType.EXPENSE,
+        itemId: expense.id,
+        itemCode: expense.categoryCode,
+        description: `${expense.description} (${expense.expenseDate})`,
+        descriptionAr: expense.descriptionAr || expense.description,
+        quantity: 1,
+        quantityDecimals: 0,
+        unitPrice,
+        unitPriceBase: unitPrice,
+        discountType: DiscountType.NONE,
+        discountValue: 0,
+        discountAmount: 0,
+        subtotal: unitPrice,
+        subtotalBase: unitPrice,
+        taxCodeId: expense.taxCodeId,
+        taxRate: 1500, // 15% VAT
+        taxAmount: Math.round(unitPrice * 0.15),
+        taxAmountBase: Math.round(unitPrice * 0.15),
+        total: unitPrice + Math.round(unitPrice * 0.15),
+        totalBase: unitPrice + Math.round(unitPrice * 0.15),
+        accountId: '', // Revenue account
+        costCenterId: expense.costCenterId,
+        projectId: expense.projectId,
+        expenseClaimLineId: expense.id,
+      } as IInvoiceLine;
+    });
+  }
+
+  /**
+   * Create grouped invoice lines (by category)
+   */
+  private static createGroupedInvoiceLines(
+    expenses: IExpenseClaimLine[]
+  ): IInvoiceLine[] {
+    const groups = new Map<string, {
+      category: string;
+      categoryAr: string;
+      amount: number;
+      markup: number;
+      expenses: IExpenseClaimLine[];
+    }>();
+
+    for (const expense of expenses) {
+      const key = expense.categoryId;
+      const markup = this.calculateMarkup(expense);
+
+      if (groups.has(key)) {
+        const group = groups.get(key)!;
+        group.amount += expense.totalAmountBase;
+        group.markup += markup;
+        group.expenses.push(expense);
+      } else {
+        groups.set(key, {
+          category: expense.categoryName,
+          categoryAr: expense.categoryNameAr,
+          amount: expense.totalAmountBase,
+          markup: markup,
+          expenses: [expense],
+        });
+      }
+    }
+
+    return Array.from(groups.entries()).map(([categoryId, group], index) => {
+      const unitPrice = group.amount + group.markup;
+      return {
+        id: `inv-line-${index + 1}`,
+        lineNumber: index + 1,
+        itemType: InvoiceLineType.EXPENSE,
+        itemCode: categoryId,
+        description: `${group.category} (${group.expenses.length} expenses)`,
+        descriptionAr: `${group.categoryAr} (${group.expenses.length} مصروفات)`,
+        quantity: 1,
+        quantityDecimals: 0,
+        unitPrice,
+        unitPriceBase: unitPrice,
+        discountType: DiscountType.NONE,
+        discountValue: 0,
+        discountAmount: 0,
+        subtotal: unitPrice,
+        subtotalBase: unitPrice,
+        taxCodeId: '',
+        taxRate: 1500,
+        taxAmount: Math.round(unitPrice * 0.15),
+        taxAmountBase: Math.round(unitPrice * 0.15),
+        total: unitPrice + Math.round(unitPrice * 0.15),
+        totalBase: unitPrice + Math.round(unitPrice * 0.15),
+        accountId: '',
+        costCenterId: group.expenses[0].costCenterId,
+        projectId: group.expenses[0].projectId,
+        expenseClaimLineIds: group.expenses.map(e => e.id),
+      } as IInvoiceLine;
+    });
+  }
+
+  /**
+   * Mark expenses as billed after invoice is created
+   */
+  static markExpensesAsBilled(
+    expenses: IExpenseClaimLine[],
+    invoiceId: string,
+    invoiceLineIds: string[]
+  ): void {
+    for (let i = 0; i < expenses.length; i++) {
+      expenses[i].billingStatus = BillingStatus.BILLED;
+      expenses[i].invoiceId = invoiceId;
+      expenses[i].invoiceLineId = invoiceLineIds[i];
+    }
+  }
+}
+```
+
+---
+
+## 7.8 Cash Advance Management
+
+```typescript
+// ============================================================
+// CASH ADVANCE SCHEMA
+// Employee advances before travel/expenses
+// ============================================================
+
+export interface ICashAdvance {
+  id: string;
+  companyId: string;
+
+  // Identity
+  advanceNumber: string;              // Sequence: "ADV-2024-00001"
+
+  // Employee
+  employeeId: string;
+  employeeName: string;
+  employeeNameAr: string;
+  department: string;
+
+  // Purpose
+  purpose: string;
+  purposeAr: string;
+  expectedExpenseDate?: string;
+  expectedReturnDate?: string;
+
+  // Amount
+  requestedAmount: number;
+  approvedAmount: number;
+  currencyCode: string;
+  exchangeRate: number;
+  requestedAmountBase: number;
+  approvedAmountBase: number;
+
+  // Status
+  status: CashAdvanceStatus;
+
+  // Approval
+  approvalStatus: ApprovalStatus;
+  approvedAt?: string;
+  approvedBy?: string;
+
+  // Payment
+  paidAmount: number;
+  paidAmountBase: number;
+  paidAt?: string;
+  paidBy?: string;
+  paymentMethod?: ExpensePaymentMethod;
+  paymentReference?: string;
+
+  // Settlement
+  settledAmount: number;              // Amount settled against expense claims
+  settledAmountBase: number;
+  settledAt?: string;
+  settledBy?: string;
+
+  // Refund (if advance > expenses)
+  refundDue: number;
+  refundDueBase: number;
+  refundedAmount: number;
+  refundedAmountBase: number;
+  refundedAt?: string;
+
+  // Linked Claims
+  expenseClaimIds: string[];
+
+  // Journal Entries
+  advanceJournalId?: string;          // When advance is paid
+  settlementJournalId?: string;       // When settled
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export enum CashAdvanceStatus {
+  DRAFT = 'draft',
+  REQUESTED = 'requested',
+  APPROVED = 'approved',
+  PAID = 'paid',
+  PARTIALLY_SETTLED = 'partially_settled',
+  SETTLED = 'settled',
+  REFUND_PENDING = 'refund_pending',
+  CLOSED = 'closed',
+  REJECTED = 'rejected',
+  CANCELLED = 'cancelled',
+}
+
+export const CashAdvanceStatusAr: Record<CashAdvanceStatus, string> = {
+  [CashAdvanceStatus.DRAFT]: 'مسودة',
+  [CashAdvanceStatus.REQUESTED]: 'مطلوب',
+  [CashAdvanceStatus.APPROVED]: 'معتمد',
+  [CashAdvanceStatus.PAID]: 'مدفوع',
+  [CashAdvanceStatus.PARTIALLY_SETTLED]: 'مسوى جزئياً',
+  [CashAdvanceStatus.SETTLED]: 'مسوى',
+  [CashAdvanceStatus.REFUND_PENDING]: 'بانتظار الاسترداد',
+  [CashAdvanceStatus.CLOSED]: 'مغلق',
+  [CashAdvanceStatus.REJECTED]: 'مرفوض',
+  [CashAdvanceStatus.CANCELLED]: 'ملغي',
+};
+
+export class CashAdvanceEngine {
+
+  /**
+   * Create journal entry when advance is paid to employee
+   */
+  static createAdvancePaymentJournal(
+    advance: ICashAdvance,
+    paymentAccountId: string
+  ): IJournalEntry {
+    return {
+      id: `je-adv-${advance.id}`,
+      companyId: advance.companyId,
+      journalNumber: '',
+      journalType: JournalType.PAYMENT,
+      entryDate: advance.paidAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+      postingDate: advance.paidAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+      periodId: '',
+      description: `Cash advance payment - ${advance.advanceNumber}`,
+      descriptionAr: `دفع سلفة نقدية - ${advance.advanceNumber}`,
+      reference: advance.advanceNumber,
+      referenceType: 'cash_advance',
+      referenceId: advance.id,
+      currencyCode: advance.currencyCode,
+      exchangeRate: advance.exchangeRate,
+      totalDebit: advance.paidAmountBase,
+      totalCredit: advance.paidAmountBase,
+      lines: [
+        {
+          id: 'line-1',
+          lineNumber: 1,
+          accountId: '', // Employee advance account
+          accountCode: '1310',
+          description: `Advance to ${advance.employeeName}`,
+          descriptionAr: `سلفة إلى ${advance.employeeNameAr}`,
+          debit: advance.paidAmountBase,
+          credit: 0,
+          employeeId: advance.employeeId,
+        },
+        {
+          id: 'line-2',
+          lineNumber: 2,
+          accountId: paymentAccountId,
+          accountCode: '',
+          description: `Cash advance payment - ${advance.advanceNumber}`,
+          descriptionAr: `دفع سلفة - ${advance.advanceNumber}`,
+          debit: 0,
+          credit: advance.paidAmountBase,
+        },
+      ],
+      status: JournalEntryStatus.DRAFT,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'system',
+      updatedBy: 'system',
+    };
+  }
+
+  /**
+   * Link expense claim to cash advance
+   */
+  static linkExpenseClaimToAdvance(
+    advance: ICashAdvance,
+    claim: IExpenseClaim
+  ): void {
+    // Update advance
+    advance.expenseClaimIds.push(claim.id);
+    advance.settledAmount += Math.min(
+      claim.totalAmount,
+      advance.paidAmount - advance.settledAmount
+    );
+    advance.settledAmountBase += Math.min(
+      claim.totalAmountBase,
+      advance.paidAmountBase - advance.settledAmountBase
+    );
+
+    // Check if fully settled
+    if (advance.settledAmountBase >= advance.paidAmountBase) {
+      advance.status = CashAdvanceStatus.SETTLED;
+      advance.settledAt = new Date().toISOString();
+    } else {
+      advance.status = CashAdvanceStatus.PARTIALLY_SETTLED;
+    }
+
+    // Calculate refund if advance exceeds expenses
+    if (advance.paidAmountBase > advance.settledAmountBase) {
+      advance.refundDueBase = advance.paidAmountBase - advance.settledAmountBase;
+      advance.refundDue = advance.paidAmount - advance.settledAmount;
+
+      if (advance.status === CashAdvanceStatus.SETTLED) {
+        advance.status = CashAdvanceStatus.REFUND_PENDING;
+      }
+    }
+
+    // Update expense claim
+    claim.advanceReceived = Math.min(claim.totalAmount, advance.paidAmount);
+    claim.advanceReceivedBase = Math.min(claim.totalAmountBase, advance.paidAmountBase);
+    claim.netReimbursable = claim.totalAmount - claim.advanceReceived;
+    claim.netReimbursableBase = claim.totalAmountBase - claim.advanceReceivedBase;
+  }
+}
+```
+
+---
+
+## 7.9 Expense API Contracts
+
+```typescript
+// ============================================================
+// EXPENSE MANAGEMENT API CONTRACTS
+// ============================================================
+
+// --- Expense Categories ---
+
+// GET /api/v1/expense-categories
+interface ListExpenseCategoriesResponse {
+  success: true;
+  data: {
+    categories: IExpenseCategory[];
+    total: number;
+  };
+}
+
+// POST /api/v1/expense-categories
+interface CreateExpenseCategoryRequest {
+  code: string;
+  name: string;
+  nameAr: string;
+  type: ExpenseCategoryType;
+  expenseAccountId: string;
+  taxCodeId?: string;
+  requiresReceipt: boolean;
+  receiptThreshold?: number;
+  maxAmount?: number;
+  defaultBillable: boolean;
+  markupPercent?: number;
+}
+
+// --- Expense Claims ---
+
+// GET /api/v1/expense-claims
+interface ListExpenseClaimsRequest {
+  page?: number;
+  limit?: number;
+  employeeId?: string;
+  status?: ExpenseClaimStatus;
+  dateFrom?: string;
+  dateTo?: string;
+  approverId?: string;            // For approver's queue
+}
+
+interface ListExpenseClaimsResponse {
+  success: true;
+  data: {
+    claims: IExpenseClaim[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+// POST /api/v1/expense-claims
+interface CreateExpenseClaimRequest {
+  title: string;
+  titleAr: string;
+  description?: string;
+  expensePeriodStart: string;
+  expensePeriodEnd: string;
+  projectId?: string;
+  clientId?: string;
+  costCenterId?: string;
+  isTravel: boolean;
+  travelFrom?: string;
+  travelTo?: string;
+  currencyCode: string;
+  lines: CreateExpenseLineRequest[];
+}
+
+interface CreateExpenseLineRequest {
+  expenseDate: string;
+  categoryId: string;
+  description: string;
+  descriptionAr?: string;
+  merchantName?: string;
+  merchantVatNumber?: string;
+  quantity: number;
+  unitPrice: number;
+  taxCodeId?: string;
+  taxInclusive: boolean;
+  isBillable: boolean;
+  clientId?: string;
+  projectId?: string;
+  markupPercent?: number;
+  isPerDiem: boolean;
+  perDiemDays?: number;
+  isMileage: boolean;
+  distanceKm?: number;
+  costCenterId?: string;
+}
+
+interface CreateExpenseClaimResponse {
+  success: true;
+  data: {
+    claim: IExpenseClaim;
+  };
+}
+
+// PUT /api/v1/expense-claims/:id
+interface UpdateExpenseClaimRequest {
+  title?: string;
+  titleAr?: string;
+  description?: string;
+  lines?: CreateExpenseLineRequest[];
+}
+
+// POST /api/v1/expense-claims/:id/submit
+interface SubmitExpenseClaimResponse {
+  success: true;
+  data: {
+    claim: IExpenseClaim;
+    approvalChain: IApprovalStep[];
+  };
+}
+
+// POST /api/v1/expense-claims/:id/approve
+interface ApproveExpenseClaimRequest {
+  comments?: string;
+  commentsAr?: string;
+}
+
+interface ApproveExpenseClaimResponse {
+  success: true;
+  data: {
+    claim: IExpenseClaim;
+    journalEntry?: IJournalEntry;   // If final approval
+  };
+}
+
+// POST /api/v1/expense-claims/:id/reject
+interface RejectExpenseClaimRequest {
+  reason: string;
+  reasonAr: string;
+}
+
+// POST /api/v1/expense-claims/:id/reimburse
+interface ReimburseExpenseClaimRequest {
+  paymentMethod: ExpensePaymentMethod;
+  paymentAccountId: string;
+  paymentDate?: string;
+}
+
+interface ReimburseExpenseClaimResponse {
+  success: true;
+  data: {
+    claim: IExpenseClaim;
+    payment: IExpensePayment;
+    journalEntry: IJournalEntry;
+  };
+}
+
+// --- Attachments ---
+
+// POST /api/v1/expense-claims/:claimId/lines/:lineId/attachments
+interface UploadAttachmentResponse {
+  success: true;
+  data: {
+    attachment: IExpenseAttachment;
+    ocrData?: {
+      merchantName?: string;
+      amount?: number;
+      vatAmount?: number;
+      vatNumber?: string;
+      date?: string;
+    };
+  };
+}
+
+// --- Cash Advances ---
+
+// GET /api/v1/cash-advances
+interface ListCashAdvancesRequest {
+  employeeId?: string;
+  status?: CashAdvanceStatus;
+  hasUnsettledBalance?: boolean;
+}
+
+// POST /api/v1/cash-advances
+interface CreateCashAdvanceRequest {
+  purpose: string;
+  purposeAr: string;
+  requestedAmount: number;
+  currencyCode: string;
+  expectedExpenseDate?: string;
+  expectedReturnDate?: string;
+}
+
+// POST /api/v1/cash-advances/:id/pay
+interface PayCashAdvanceRequest {
+  paymentMethod: ExpensePaymentMethod;
+  paymentAccountId: string;
+  paymentDate?: string;
+}
+
+// POST /api/v1/cash-advances/:id/link-claim
+interface LinkClaimToAdvanceRequest {
+  claimId: string;
+}
+
+// --- Billable Expenses ---
+
+// GET /api/v1/expenses/billable
+interface GetBillableExpensesRequest {
+  clientId?: string;
+  projectId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+interface GetBillableExpensesResponse {
+  success: true;
+  data: {
+    byClient: IBillableExpenseSummary[];
+    totalBillable: number;
+  };
+}
+
+// POST /api/v1/expenses/create-invoice
+interface CreateInvoiceFromExpensesRequest {
+  clientId: string;
+  expenseLineIds: string[];
+  groupByCategory: boolean;
+  includeMarkup: boolean;
+}
+
+interface CreateInvoiceFromExpensesResponse {
+  success: true;
+  data: {
+    invoice: IInvoice;
+    billedExpenseCount: number;
+  };
+}
+
+// --- Per Diem Rates ---
+
+// GET /api/v1/per-diem-rates
+interface ListPerDiemRatesResponse {
+  success: true;
+  data: {
+    rates: IPerDiemRate[];
+  };
+}
+
+// GET /api/v1/per-diem-rates/:countryCode
+interface GetPerDiemRateResponse {
+  success: true;
+  data: {
+    rate: IPerDiemRate;
+  };
+}
+```
+
+---
+
+*Part 7 Complete. Continue to Part 8 (Financial Reporting)?*
