@@ -1547,13 +1547,6 @@ export const QueryKeys = {
     status: (id: string) => [...QueryKeys.dataExport.all(), 'status', id] as const,
   },
 
-  // ==================== PDFME ====================
-  pdfme: {
-    all: () => ['pdfme'] as const,
-    templates: () => [...QueryKeys.pdfme.all(), 'templates'] as const,
-    template: (id: string) => [...QueryKeys.pdfme.all(), 'template', id] as const,
-  },
-
   // ==================== SUPPORT ====================
   support: {
     all: () => ['support'] as const,
