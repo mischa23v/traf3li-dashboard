@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { setUser as setSentryUser } from '@/lib/sentry'
 import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/analytics'
-import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning } from '@/services/authService'
+import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning, isOTPRequired, LoginOTPRequiredResponse } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
 interface AuthState {
@@ -18,12 +18,17 @@ interface AuthState {
   error: string | null
   passwordBreachWarning: PasswordBreachWarning | null
 
+  // OTP Login State (for email-based 2FA after password verification)
+  otpRequired: boolean
+  otpData: LoginOTPRequiredResponse | null
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>
   logout: () => Promise<void>
   setUser: (user: User | null) => void
   clearError: () => void
   clearPasswordBreachWarning: () => void
+  clearOtpData: () => void
   checkAuth: () => Promise<void>
 }
 
@@ -38,13 +43,34 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       passwordBreachWarning: null,
 
+      // OTP Login State
+      otpRequired: false,
+      otpData: null,
+
       /**
        * Login Action
+       * Handles both direct login (SSO, One-Tap) and OTP-required flow (password login)
        */
       login: async (credentials: LoginCredentials) => {
-        set({ isLoading: true, error: null, passwordBreachWarning: null })
+        set({ isLoading: true, error: null, passwordBreachWarning: null, otpRequired: false, otpData: null })
         try {
-          const { user, warning } = await authService.login(credentials)
+          const response = await authService.login(credentials)
+
+          // Check if OTP verification is required (email-based 2FA for password login)
+          if (isOTPRequired(response)) {
+            // Password verified, but email OTP needed - store OTP data and let form handle redirect
+            set({
+              isLoading: false,
+              otpRequired: true,
+              otpData: response,
+              // Don't set error - this is an expected flow, not an error
+            })
+            // Return early - form will redirect to OTP page
+            return
+          }
+
+          // Direct login success (SSO, One-Tap, or backend doesn't require OTP)
+          const { user, warning } = response
 
           // Check if MFA verification is required
           // SECURITY FIX: Trust backend's mfaPending flag - don't override it
@@ -58,6 +84,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
             passwordBreachWarning: warning || null,
+            otpRequired: false,
+            otpData: null,
           })
 
           // Set Sentry user context
@@ -121,6 +149,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           error: null,
+          otpRequired: false,
+          otpData: null,
         })
         setSentryUser(null)
         usePermissionsStore.getState().clearPermissions()
@@ -165,6 +195,14 @@ export const useAuthStore = create<AuthState>()(
             },
           })
         }
+      },
+
+      /**
+       * Clear OTP Data
+       * Call this after successful OTP verification or when user navigates away
+       */
+      clearOtpData: () => {
+        set({ otpRequired: false, otpData: null })
       },
 
       /**
@@ -326,3 +364,10 @@ export const selectMustChangePassword = (state: AuthState) =>
   state.user?.mustChangePassword === true || state.user?.passwordBreached === true
 export const selectIsPasswordBreached = (state: AuthState) =>
   state.user?.passwordBreached === true
+
+/**
+ * OTP Login selectors
+ * Used for email-based 2FA after password verification
+ */
+export const selectOtpRequired = (state: AuthState) => state.otpRequired
+export const selectOtpData = (state: AuthState) => state.otpData

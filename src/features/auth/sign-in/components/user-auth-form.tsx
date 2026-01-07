@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
 import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore, selectOtpRequired, selectOtpData } from '@/stores/auth-store'
 import { useRateLimit } from '@/hooks/useRateLimit'
 import { AccountLockoutWarning } from '@/components/auth/account-lockout-warning'
 import { ProgressiveDelay } from '@/components/auth/progressive-delay'
@@ -68,6 +68,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const authError = useAuthStore((state) => state.error)
   const clearError = useAuthStore((state) => state.clearError)
   const setUser = useAuthStore((state) => state.setUser)
+  const clearOtpData = useAuthStore((state) => state.clearOtpData)
+  const otpRequired = useAuthStore(selectOtpRequired)
+  const otpData = useAuthStore(selectOtpData)
   const [isLoading, setIsLoading] = useState(false)
   const [isLDAPLoading, setIsLDAPLoading] = useState(false)
 
@@ -236,6 +239,28 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         : data
 
       await login(loginData)
+
+      // Check if OTP verification is required (email-based 2FA for password login)
+      const currentOtpRequired = useAuthStore.getState().otpRequired
+      const currentOtpData = useAuthStore.getState().otpData
+
+      if (currentOtpRequired && currentOtpData) {
+        // Password verified, OTP needed - redirect to OTP page
+        // Store the loginSessionToken in URL search params (NOT in localStorage for security)
+        rateLimit.recordSuccess()
+        markDeviceAsRecognized()
+
+        // Navigate to OTP page with necessary data
+        navigate({
+          to: ROUTES.auth.otp,
+          search: {
+            email: currentOtpData.fullEmail,
+            purpose: 'login',
+            token: currentOtpData.loginSessionToken,
+          },
+        })
+        return
+      }
 
       // Record successful login - clears rate limit data
       rateLimit.recordSuccess()
