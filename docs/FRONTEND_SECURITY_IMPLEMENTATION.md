@@ -135,21 +135,68 @@ Current expiry: **January 7, 2027**
 
 ## 4. Subresource Integrity (SRI)
 
+### Current Status: DISABLED BY DEFAULT
+
+SRI is currently **disabled by default** because Cloudflare Auto Minify modifies JavaScript files at the edge, which breaks the integrity hash verification.
+
+### Cloudflare Auto Minify Issue
+
+When Cloudflare Auto Minify is enabled:
+1. The build process computes SHA-384 hashes and embeds them in the HTML
+2. Cloudflare's edge servers modify/minify the JS files
+3. The browser computes a different hash from the modified files
+4. The browser blocks the scripts due to hash mismatch
+
+**Error message in browser console:**
+```
+Failed to find a valid digest in the 'integrity' attribute for resource
+'https://dashboard.traf3li.com/assets/vendor-react-xxx.js' with computed
+SHA-384 integrity '...'. The resource has been blocked.
+```
+
+### Enabling SRI
+
+To enable SRI, follow these steps:
+
+1. **Disable Cloudflare Auto Minify:**
+   - Go to Cloudflare Dashboard → Speed → Optimization → Auto Minify
+   - Uncheck "JavaScript" (CSS and HTML can remain checked)
+   - Save changes
+
+2. **Enable SRI in build:**
+   ```bash
+   # Set environment variable before building
+   VITE_ENABLE_SRI=true npm run build
+   ```
+
+3. **Verify SRI is working:**
+   ```bash
+   # Check that integrity attributes are present in built HTML
+   cat dist/index.html | grep -o 'integrity="sha[^"]*"' | head -5
+   ```
+
 ### Implementation
 
 SRI is implemented using [`vite-plugin-sri3`](https://github.com/yoyo930021/vite-plugin-sri3) in `vite.config.ts`:
 
 ```typescript
-import sri from 'vite-plugin-sri3'
+import { sri } from 'vite-plugin-sri3'
+
+// SRI is disabled by default because Cloudflare Auto Minify breaks it
+const enableSRI = process.env.VITE_ENABLE_SRI === 'true'
 
 export default defineConfig({
   plugins: [
     // ... other plugins
     // SRI plugin must be placed at end of plugins array
-    sri({
-      // Don't ignore missing assets - fail build if assets missing
-      ignoreMissingAsset: false,
-    }),
+    ...(enableSRI
+      ? [
+          sri({
+            // Don't ignore missing assets - fail build if assets missing
+            ignoreMissingAsset: false,
+          }),
+        ]
+      : []),
   ],
 })
 ```
@@ -165,10 +212,10 @@ export default defineConfig({
 ### Build Output Example
 
 ```html
-<!-- Before SRI -->
+<!-- Without SRI (default) -->
 <script src="/assets/main-abc123.js"></script>
 
-<!-- After SRI -->
+<!-- With SRI enabled (VITE_ENABLE_SRI=true) -->
 <script
   src="/assets/main-abc123.js"
   integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/ux..."
@@ -182,11 +229,20 @@ export default defineConfig({
 - **Supply Chain Security**: Prevents malicious script injection
 - **PCI DSS Compliance**: Meets v4.0.1 requirement for payment page scripts
 
+### Alternative Security Measures (When SRI is Disabled)
+
+When SRI is disabled, these measures still provide protection:
+- **Content Security Policy**: Restricts which domains can serve scripts
+- **HTTPS/HSTS**: Prevents man-in-the-middle attacks
+- **Cloudflare WAF**: Provides edge-level security
+- **Regular security audits**: Ensure no compromised dependencies
+
 ### Verification After Build
 
 ```bash
-# Check SRI in built HTML
+# Check if SRI is enabled in built HTML
 cat dist/index.html | grep -o 'integrity="sha[^"]*"' | head -5
+# If no output, SRI is disabled (default)
 ```
 
 ---

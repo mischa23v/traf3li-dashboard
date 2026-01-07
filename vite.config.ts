@@ -5,6 +5,13 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { sri } from 'vite-plugin-sri3'
 
+// SRI is disabled by default because Cloudflare Auto Minify modifies JS files at the edge,
+// which breaks SRI integrity hashes. To enable SRI:
+// 1. Disable Cloudflare Auto Minify (Speed → Optimization → Auto Minify → uncheck JS)
+// 2. Set VITE_ENABLE_SRI=true in your build environment
+// See docs/FRONTEND_SECURITY_IMPLEMENTATION.md for details
+const enableSRI = process.env.VITE_ENABLE_SRI === 'true'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -19,11 +26,18 @@ export default defineConfig({
     // Prevents tampered scripts from executing (CDN compromise, supply chain attacks)
     // Uses SHA-384 by default (W3C recommended)
     // Must be placed at the end of plugins array per plugin documentation
-    sri({
-      // Don't ignore missing assets - fail the build if assets are missing
-      // This ensures all scripts have valid integrity hashes
-      ignoreMissingAsset: false,
-    }),
+    //
+    // IMPORTANT: SRI is disabled by default because Cloudflare Auto Minify breaks it.
+    // Enable with VITE_ENABLE_SRI=true after disabling Cloudflare Auto Minify.
+    ...(enableSRI
+      ? [
+          sri({
+            // Don't ignore missing assets - fail the build if assets are missing
+            // This ensures all scripts have valid integrity hashes
+            ignoreMissingAsset: false,
+          }),
+        ]
+      : []),
   ],
   resolve: {
     alias: {
