@@ -499,27 +499,6 @@ export function SignIn() {
 
               {/* SSO Login Buttons */}
               <SSOLoginButtons disabled={isLoading || waitTime > 0} />
-
-              {/* Divider */}
-              <div className="relative my-2">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-slate-500">{isRTL ? 'أو' : 'or'}</span>
-                </div>
-              </div>
-
-              {/* OTP Login Link */}
-              <Link
-                to={ROUTES.auth.otpLogin}
-                className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                {isRTL ? 'تسجيل الدخول برمز التحقق' : 'Sign in with email code'}
-              </Link>
             </form>
           </div>
 
