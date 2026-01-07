@@ -1,5 +1,6 @@
 const { Gig } = require('../models');
 const { CustomException } = require('../utils');
+const { escapeRegex } = require('../utils/security');
 
 const createGig = async (request, response) => {
     try {
@@ -67,10 +68,14 @@ const getGig = async (request, response) => {
 const getGigs = async (request, response) => {
     const { category, search, max, min, userID, sort } = request.query;
     try {
+        // SECURITY: Escape regex to prevent ReDoS attacks
+        const safeCategory = category ? escapeRegex(category) : null;
+        const safeSearch = search ? escapeRegex(search) : null;
+
         const filters = {
             ...(userID && { userID }),
-            ...(category && { category: { $regex: category, $options: 'i' } }),
-            ...(search && { title: { $regex: search, $options: 'i' } }),
+            ...(safeCategory && { category: { $regex: safeCategory, $options: 'i' } }),
+            ...(safeSearch && { title: { $regex: safeSearch, $options: 'i' } }),
             ...((min || max) && {
                 price: {
                     ...(max && { $lte: max }),

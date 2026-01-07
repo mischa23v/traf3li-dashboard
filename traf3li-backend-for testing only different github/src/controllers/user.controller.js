@@ -1,5 +1,6 @@
 const { User } = require('../models');
 const { CustomException } = require('../utils');
+const { escapeRegex } = require('../utils/security');
 
 // Get user profile by ID (public)
 const getUserProfile = async (request, response) => {
@@ -130,10 +131,12 @@ const getLawyers = async (request, response) => {
         const filter = { isSeller: true };
         
         // Search by name or description
+        // SECURITY: Escape regex to prevent ReDoS attacks
         if (search) {
+            const safeSearch = escapeRegex(search);
             filter.$or = [
-                { username: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } }
+                { username: { $regex: safeSearch, $options: 'i' } },
+                { description: { $regex: safeSearch, $options: 'i' } }
             ];
         }
         

@@ -1,6 +1,7 @@
 const { Client, Case, Invoice, Payment } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const CustomException = require('../utils/CustomException');
+const { escapeRegex } = require('../utils/security');
 
 /**
  * Create client
@@ -140,13 +141,15 @@ const getClients = asyncHandler(async (req, res) => {
     if (country) query.country = country;
 
     // Search by name, email, phone, or client ID
+    // SECURITY: Escape regex to prevent ReDoS attacks
     if (search) {
+        const safeSearch = escapeRegex(search);
         query.$or = [
-            { fullName: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } },
-            { phone: { $regex: search, $options: 'i' } },
-            { clientId: { $regex: search, $options: 'i' } },
-            { companyName: { $regex: search, $options: 'i' } }
+            { fullName: { $regex: safeSearch, $options: 'i' } },
+            { email: { $regex: safeSearch, $options: 'i' } },
+            { phone: { $regex: safeSearch, $options: 'i' } },
+            { clientId: { $regex: safeSearch, $options: 'i' } },
+            { companyName: { $regex: safeSearch, $options: 'i' } }
         ];
     }
 

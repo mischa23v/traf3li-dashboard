@@ -6,12 +6,20 @@ const bcrypt = require('bcrypt');
 const { JWT_SECRET } = process.env;
 const saltRounds = 10;
 
+// SECURITY: Account lockout settings
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+
 const authRegister = async (request, response) => {
-    const { username, email, phone, password, image, isSeller, description, role, country } = request.body;
-    
+    // SECURITY: Do NOT destructure 'role' from request.body - prevents privilege escalation
+    const { username, email, phone, password, image, isSeller, description, country } = request.body;
+
     try {
         const hash = bcrypt.hashSync(password, saltRounds);
-        
+
+        // SECURITY: Role is determined server-side only, never from user input
+        const assignedRole = isSeller ? 'lawyer' : 'client';
+
         const user = new User({
             username,
             email,
@@ -21,7 +29,7 @@ const authRegister = async (request, response) => {
             description,
             isSeller,
             phone,
-            role: role || (isSeller ? 'lawyer' : 'client')
+            role: assignedRole  // Server-controlled, not user-controlled
         });
         
         await user.save();
@@ -48,7 +56,7 @@ const authRegister = async (request, response) => {
 
 const authLogin = async (request, response) => {
     const { username, password } = request.body;
-    
+
     try {
         // ✅ NEW: Accept both username AND email for login
         const user = await User.findOne({
@@ -57,21 +65,41 @@ const authLogin = async (request, response) => {
                 { email: username }  // Allow email in username field
             ]
         });
-        
+
         if(!user) {
             throw CustomException('Check username or password!', 404);
         }
-        
+
+        // SECURITY: Check if account is locked
+        if (user.lockUntil && user.lockUntil > Date.now()) {
+            const remainingTime = Math.ceil((user.lockUntil - Date.now()) / 1000 / 60);
+            throw CustomException(`Account locked. Try again in ${remainingTime} minutes.`, 423);
+        }
+
+        // Reset lockout if lock period has expired
+        if (user.lockUntil && user.lockUntil < Date.now()) {
+            user.failedLoginAttempts = 0;
+            user.lockUntil = null;
+            await user.save();
+        }
+
         const match = bcrypt.compareSync(password, user.password);
-        
+
         if(match) {
-            const { password, ...data } = user._doc;
-            
+            // SECURITY: Reset failed attempts on successful login
+            if (user.failedLoginAttempts > 0) {
+                user.failedLoginAttempts = 0;
+                user.lockUntil = null;
+                await user.save();
+            }
+
+            const { password: pwd, failedLoginAttempts, lockUntil, ...data } = user._doc;
+
             const token = jwt.sign({
                 _id: user._id,
                 isSeller: user.isSeller
             }, JWT_SECRET, { expiresIn: '7 days' });
-            
+
             // Auto-detect localhost from request origin
             const origin = request.get('origin') || '';
             const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
@@ -83,7 +111,7 @@ const authLogin = async (request, response) => {
                 maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
                 path: '/'
             }
-            
+
             return response.cookie('accessToken', token, cookieConfig)
                 .status(202).send({
                     error: false,
@@ -91,8 +119,21 @@ const authLogin = async (request, response) => {
                     user: data
                 });
         }
-        
-        throw CustomException('Check username or password!', 404);
+
+        // SECURITY: Increment failed login attempts
+        user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+
+        // Lock account if max attempts exceeded
+        if (user.failedLoginAttempts >= MAX_LOGIN_ATTEMPTS) {
+            user.lockUntil = new Date(Date.now() + LOCK_TIME);
+            await user.save();
+            throw CustomException('Too many failed attempts. Account locked for 15 minutes.', 423);
+        }
+
+        await user.save();
+
+        const attemptsRemaining = MAX_LOGIN_ATTEMPTS - user.failedLoginAttempts;
+        throw CustomException(`Check username or password! ${attemptsRemaining} attempts remaining.`, 404);
     }
     catch({ message, status = 500 }) {
         return response.status(status).send({
