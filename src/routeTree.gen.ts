@@ -139,7 +139,6 @@ import { Route as AuthenticatedDashboardKnowledgeJudgmentsRouteImport } from './
 import { Route as AuthenticatedDashboardKnowledgeFormsRouteImport } from './routes/_authenticated/dashboard.knowledge.forms'
 import { Route as AuthenticatedDashboardJobsMyServicesRouteImport } from './routes/_authenticated/dashboard.jobs.my-services'
 import { Route as AuthenticatedDashboardJobsBrowseRouteImport } from './routes/_authenticated/dashboard.jobs.browse'
-import { Route as AuthenticatedDashboardInventoryStockLedgerRouteImport } from './routes/_authenticated/dashboard.inventory.stock-ledger'
 import { Route as AuthenticatedDashboardInventorySettingsRouteImport } from './routes/_authenticated/dashboard.inventory.settings'
 import { Route as AuthenticatedDashboardInventoryCreateRouteImport } from './routes/_authenticated/dashboard.inventory.create'
 import { Route as AuthenticatedDashboardInventoryItemIdRouteImport } from './routes/_authenticated/dashboard.inventory.$itemId'
@@ -182,7 +181,6 @@ import { Route as AuthenticatedDashboardSupportSlaIndexRouteImport } from './rou
 import { Route as AuthenticatedDashboardSalesReportsIndexRouteImport } from './routes/_authenticated/dashboard.sales.reports.index'
 import { Route as AuthenticatedDashboardSalesLeadsIndexRouteImport } from './routes/_authenticated/dashboard.sales.leads.index'
 import { Route as AuthenticatedDashboardInventoryWarehousesIndexRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.index'
-import { Route as AuthenticatedDashboardInventoryStockEntriesIndexRouteImport } from './routes/_authenticated/dashboard.inventory.stock-entries.index'
 import { Route as AuthenticatedDashboardHrVehiclesIndexRouteImport } from './routes/_authenticated/dashboard.hr.vehicles.index'
 import { Route as AuthenticatedDashboardHrTrainingIndexRouteImport } from './routes/_authenticated/dashboard.hr.training.index'
 import { Route as AuthenticatedDashboardHrSuccessionPlanningIndexRouteImport } from './routes/_authenticated/dashboard.hr.succession-planning.index'
@@ -249,8 +247,6 @@ import { Route as AuthenticatedDashboardCrmContactsIndexRouteImport } from './ro
 import { Route as AuthenticatedDashboardCrmClientsIndexRouteImport } from './routes/_authenticated/dashboard.crm.clients.index'
 import { Route as AuthenticatedDashboardCrmCampaignsIndexRouteImport } from './routes/_authenticated/dashboard.crm.campaigns.index'
 import { Route as AuthenticatedDashboardCrmActivitiesIndexRouteImport } from './routes/_authenticated/dashboard.crm.activities.index'
-import { Route as AuthenticatedDashboardBuyingRfqIndexRouteImport } from './routes/_authenticated/dashboard.buying.rfq.index'
-import { Route as AuthenticatedDashboardBuyingMaterialRequestsIndexRouteImport } from './routes/_authenticated/dashboard.buying.material-requests.index'
 import { Route as AuthenticatedDashboardAssetsMaintenanceIndexRouteImport } from './routes/_authenticated/dashboard.assets.maintenance.index'
 import { Route as AuthenticatedDashboardAssetsCategoriesIndexRouteImport } from './routes/_authenticated/dashboard.assets.categories.index'
 import { Route as AuthenticatedDashboardTasksReportsNewRouteImport } from './routes/_authenticated/dashboard.tasks.reports.new'
@@ -264,8 +260,6 @@ import { Route as AuthenticatedDashboardSalesReportsNewRouteImport } from './rou
 import { Route as AuthenticatedDashboardSalesReportsReportIdRouteImport } from './routes/_authenticated/dashboard.sales.reports.$reportId'
 import { Route as AuthenticatedDashboardInventoryWarehousesCreateRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.create'
 import { Route as AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.$warehouseId'
-import { Route as AuthenticatedDashboardInventoryStockEntriesCreateRouteImport } from './routes/_authenticated/dashboard.inventory.stock-entries.create'
-import { Route as AuthenticatedDashboardInventoryStockEntriesStockEntryIdRouteImport } from './routes/_authenticated/dashboard.inventory.stock-entries.$stockEntryId'
 import { Route as AuthenticatedDashboardHrTrainingNewRouteImport } from './routes/_authenticated/dashboard.hr.training.new'
 import { Route as AuthenticatedDashboardHrTrainingTrainingIdRouteImport } from './routes/_authenticated/dashboard.hr.training.$trainingId'
 import { Route as AuthenticatedDashboardHrSuccessionPlanningNewRouteImport } from './routes/_authenticated/dashboard.hr.succession-planning.new'
@@ -408,11 +402,6 @@ import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } fro
 import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
 import { Route as AuthenticatedDashboardCasesCaseIdPipelineRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.pipeline'
 import { Route as AuthenticatedDashboardCasesCaseIdNotionRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.notion'
-import { Route as AuthenticatedDashboardBuyingRfqCreateRouteImport } from './routes/_authenticated/dashboard.buying.rfq.create'
-import { Route as AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport } from './routes/_authenticated/dashboard.buying.purchase-orders.create'
-import { Route as AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport } from './routes/_authenticated/dashboard.buying.purchase-orders.$purchaseOrderId'
-import { Route as AuthenticatedDashboardBuyingMaterialRequestsCreateRouteImport } from './routes/_authenticated/dashboard.buying.material-requests.create'
-import { Route as AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRouteImport } from './routes/_authenticated/dashboard.buying.material-requests.$materialRequestId'
 import { Route as AuthenticatedDashboardAssetsMaintenanceCreateRouteImport } from './routes/_authenticated/dashboard.assets.maintenance.create'
 import { Route as AuthenticatedDashboardAssetsCategoriesCreateRouteImport } from './routes/_authenticated/dashboard.assets.categories.create'
 import { Route as AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport } from './routes/_authenticated/dashboard.hr.settings.shift-types.index'
@@ -1177,12 +1166,6 @@ const AuthenticatedDashboardJobsBrowseRoute =
     path: '/dashboard/jobs/browse',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardInventoryStockLedgerRoute =
-  AuthenticatedDashboardInventoryStockLedgerRouteImport.update({
-    id: '/stock-ledger',
-    path: '/stock-ledger',
-    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
-  } as any)
 const AuthenticatedDashboardInventorySettingsRoute =
   AuthenticatedDashboardInventorySettingsRouteImport.update({
     id: '/settings',
@@ -1433,12 +1416,6 @@ const AuthenticatedDashboardInventoryWarehousesIndexRoute =
   AuthenticatedDashboardInventoryWarehousesIndexRouteImport.update({
     id: '/warehouses/',
     path: '/warehouses/',
-    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
-  } as any)
-const AuthenticatedDashboardInventoryStockEntriesIndexRoute =
-  AuthenticatedDashboardInventoryStockEntriesIndexRouteImport.update({
-    id: '/stock-entries/',
-    path: '/stock-entries/',
     getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardHrVehiclesIndexRoute =
@@ -1837,18 +1814,6 @@ const AuthenticatedDashboardCrmActivitiesIndexRoute =
     path: '/activities/',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
-const AuthenticatedDashboardBuyingRfqIndexRoute =
-  AuthenticatedDashboardBuyingRfqIndexRouteImport.update({
-    id: '/dashboard/buying/rfq/',
-    path: '/dashboard/buying/rfq/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardBuyingMaterialRequestsIndexRoute =
-  AuthenticatedDashboardBuyingMaterialRequestsIndexRouteImport.update({
-    id: '/dashboard/buying/material-requests/',
-    path: '/dashboard/buying/material-requests/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardAssetsMaintenanceIndexRoute =
   AuthenticatedDashboardAssetsMaintenanceIndexRouteImport.update({
     id: '/',
@@ -1925,18 +1890,6 @@ const AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute =
   AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport.update({
     id: '/warehouses/$warehouseId',
     path: '/warehouses/$warehouseId',
-    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
-  } as any)
-const AuthenticatedDashboardInventoryStockEntriesCreateRoute =
-  AuthenticatedDashboardInventoryStockEntriesCreateRouteImport.update({
-    id: '/stock-entries/create',
-    path: '/stock-entries/create',
-    getParentRoute: () => AuthenticatedDashboardInventoryRoute,
-  } as any)
-const AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute =
-  AuthenticatedDashboardInventoryStockEntriesStockEntryIdRouteImport.update({
-    id: '/stock-entries/$stockEntryId',
-    path: '/stock-entries/$stockEntryId',
     getParentRoute: () => AuthenticatedDashboardInventoryRoute,
   } as any)
 const AuthenticatedDashboardHrTrainingNewRoute =
@@ -2791,38 +2744,6 @@ const AuthenticatedDashboardCasesCaseIdNotionRoute =
     path: '/notion',
     getParentRoute: () => AuthenticatedDashboardCasesCaseIdRoute,
   } as any)
-const AuthenticatedDashboardBuyingRfqCreateRoute =
-  AuthenticatedDashboardBuyingRfqCreateRouteImport.update({
-    id: '/dashboard/buying/rfq/create',
-    path: '/dashboard/buying/rfq/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute =
-  AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardBuyingPurchaseOrdersRoute,
-  } as any)
-const AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute =
-  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport.update({
-    id: '/$purchaseOrderId',
-    path: '/$purchaseOrderId',
-    getParentRoute: () => AuthenticatedDashboardBuyingPurchaseOrdersRoute,
-  } as any)
-const AuthenticatedDashboardBuyingMaterialRequestsCreateRoute =
-  AuthenticatedDashboardBuyingMaterialRequestsCreateRouteImport.update({
-    id: '/dashboard/buying/material-requests/create',
-    path: '/dashboard/buying/material-requests/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute =
-  AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRouteImport.update(
-    {
-      id: '/dashboard/buying/material-requests/$materialRequestId',
-      path: '/dashboard/buying/material-requests/$materialRequestId',
-      getParentRoute: () => AuthenticatedRouteRoute,
-    } as any,
-  )
 const AuthenticatedDashboardAssetsMaintenanceCreateRoute =
   AuthenticatedDashboardAssetsMaintenanceCreateRouteImport.update({
     id: '/create',
@@ -3098,7 +3019,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
+  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
   '/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3125,7 +3046,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/inventory/$itemId': typeof AuthenticatedDashboardInventoryItemIdRoute
   '/dashboard/inventory/create': typeof AuthenticatedDashboardInventoryCreateRoute
   '/dashboard/inventory/settings': typeof AuthenticatedDashboardInventorySettingsRoute
-  '/dashboard/inventory/stock-ledger': typeof AuthenticatedDashboardInventoryStockLedgerRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -3183,11 +3103,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
-  '/dashboard/buying/material-requests/$materialRequestId': typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
-  '/dashboard/buying/material-requests/create': typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
-  '/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
-  '/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
-  '/dashboard/buying/rfq/create': typeof AuthenticatedDashboardBuyingRfqCreateRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -3330,8 +3245,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
   '/dashboard/hr/training/new': typeof AuthenticatedDashboardHrTrainingNewRoute
-  '/dashboard/inventory/stock-entries/$stockEntryId': typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
-  '/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
   '/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
@@ -3345,8 +3258,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
   '/dashboard/assets/categories/': typeof AuthenticatedDashboardAssetsCategoriesIndexRoute
   '/dashboard/assets/maintenance/': typeof AuthenticatedDashboardAssetsMaintenanceIndexRoute
-  '/dashboard/buying/material-requests': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
-  '/dashboard/buying/rfq': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/dashboard/crm/campaigns': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
   '/dashboard/crm/clients': typeof AuthenticatedDashboardCrmClientsIndexRoute
@@ -3413,7 +3324,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/succession-planning': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/dashboard/hr/training': typeof AuthenticatedDashboardHrTrainingIndexRoute
   '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
-  '/dashboard/inventory/stock-entries': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/dashboard/inventory/warehouses': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
@@ -3525,7 +3435,7 @@ export interface FileRoutesByTo {
   '/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
+  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
   '/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3552,7 +3462,6 @@ export interface FileRoutesByTo {
   '/dashboard/inventory/$itemId': typeof AuthenticatedDashboardInventoryItemIdRoute
   '/dashboard/inventory/create': typeof AuthenticatedDashboardInventoryCreateRoute
   '/dashboard/inventory/settings': typeof AuthenticatedDashboardInventorySettingsRoute
-  '/dashboard/inventory/stock-ledger': typeof AuthenticatedDashboardInventoryStockLedgerRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -3609,11 +3518,6 @@ export interface FileRoutesByTo {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
-  '/dashboard/buying/material-requests/$materialRequestId': typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
-  '/dashboard/buying/material-requests/create': typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
-  '/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
-  '/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
-  '/dashboard/buying/rfq/create': typeof AuthenticatedDashboardBuyingRfqCreateRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -3756,8 +3660,6 @@ export interface FileRoutesByTo {
   '/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
   '/dashboard/hr/training/new': typeof AuthenticatedDashboardHrTrainingNewRoute
-  '/dashboard/inventory/stock-entries/$stockEntryId': typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
-  '/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
   '/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
@@ -3771,8 +3673,6 @@ export interface FileRoutesByTo {
   '/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
   '/dashboard/assets/categories': typeof AuthenticatedDashboardAssetsCategoriesIndexRoute
   '/dashboard/assets/maintenance': typeof AuthenticatedDashboardAssetsMaintenanceIndexRoute
-  '/dashboard/buying/material-requests': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
-  '/dashboard/buying/rfq': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/dashboard/crm/campaigns': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
   '/dashboard/crm/clients': typeof AuthenticatedDashboardCrmClientsIndexRoute
@@ -3839,7 +3739,6 @@ export interface FileRoutesByTo {
   '/dashboard/hr/succession-planning': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/dashboard/hr/training': typeof AuthenticatedDashboardHrTrainingIndexRoute
   '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
-  '/dashboard/inventory/stock-entries': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/dashboard/inventory/warehouses': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
@@ -3962,7 +3861,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/_authenticated/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/_authenticated/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/_authenticated/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
+  '/_authenticated/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
   '/_authenticated/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/_authenticated/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3989,7 +3888,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/inventory/$itemId': typeof AuthenticatedDashboardInventoryItemIdRoute
   '/_authenticated/dashboard/inventory/create': typeof AuthenticatedDashboardInventoryCreateRoute
   '/_authenticated/dashboard/inventory/settings': typeof AuthenticatedDashboardInventorySettingsRoute
-  '/_authenticated/dashboard/inventory/stock-ledger': typeof AuthenticatedDashboardInventoryStockLedgerRoute
   '/_authenticated/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/_authenticated/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
   '/_authenticated/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
@@ -4047,11 +3945,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/_authenticated/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
-  '/_authenticated/dashboard/buying/material-requests/$materialRequestId': typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
-  '/_authenticated/dashboard/buying/material-requests/create': typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
-  '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
-  '/_authenticated/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
-  '/_authenticated/dashboard/buying/rfq/create': typeof AuthenticatedDashboardBuyingRfqCreateRoute
   '/_authenticated/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/_authenticated/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/_authenticated/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -4194,8 +4087,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/succession-planning/new': typeof AuthenticatedDashboardHrSuccessionPlanningNewRoute
   '/_authenticated/dashboard/hr/training/$trainingId': typeof AuthenticatedDashboardHrTrainingTrainingIdRoute
   '/_authenticated/dashboard/hr/training/new': typeof AuthenticatedDashboardHrTrainingNewRoute
-  '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId': typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
-  '/_authenticated/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/_authenticated/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/_authenticated/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
   '/_authenticated/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
@@ -4209,8 +4100,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
   '/_authenticated/dashboard/assets/categories/': typeof AuthenticatedDashboardAssetsCategoriesIndexRoute
   '/_authenticated/dashboard/assets/maintenance/': typeof AuthenticatedDashboardAssetsMaintenanceIndexRoute
-  '/_authenticated/dashboard/buying/material-requests/': typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
-  '/_authenticated/dashboard/buying/rfq/': typeof AuthenticatedDashboardBuyingRfqIndexRoute
   '/_authenticated/dashboard/crm/activities/': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/_authenticated/dashboard/crm/campaigns/': typeof AuthenticatedDashboardCrmCampaignsIndexRoute
   '/_authenticated/dashboard/crm/clients/': typeof AuthenticatedDashboardCrmClientsIndexRoute
@@ -4277,7 +4166,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/succession-planning/': typeof AuthenticatedDashboardHrSuccessionPlanningIndexRoute
   '/_authenticated/dashboard/hr/training/': typeof AuthenticatedDashboardHrTrainingIndexRoute
   '/_authenticated/dashboard/hr/vehicles/': typeof AuthenticatedDashboardHrVehiclesIndexRoute
-  '/_authenticated/dashboard/inventory/stock-entries/': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/_authenticated/dashboard/inventory/warehouses/': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
   '/_authenticated/dashboard/sales/leads/': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/_authenticated/dashboard/sales/reports/': typeof AuthenticatedDashboardSalesReportsIndexRoute
@@ -4425,7 +4313,6 @@ export interface FileRouteTypes {
     | '/dashboard/inventory/$itemId'
     | '/dashboard/inventory/create'
     | '/dashboard/inventory/settings'
-    | '/dashboard/inventory/stock-ledger'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
     | '/dashboard/knowledge/forms'
@@ -4483,11 +4370,6 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
     | '/dashboard/assets/maintenance/create'
-    | '/dashboard/buying/material-requests/$materialRequestId'
-    | '/dashboard/buying/material-requests/create'
-    | '/dashboard/buying/purchase-orders/$purchaseOrderId'
-    | '/dashboard/buying/purchase-orders/create'
-    | '/dashboard/buying/rfq/create'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
@@ -4630,8 +4512,6 @@ export interface FileRouteTypes {
     | '/dashboard/hr/succession-planning/new'
     | '/dashboard/hr/training/$trainingId'
     | '/dashboard/hr/training/new'
-    | '/dashboard/inventory/stock-entries/$stockEntryId'
-    | '/dashboard/inventory/stock-entries/create'
     | '/dashboard/inventory/warehouses/$warehouseId'
     | '/dashboard/inventory/warehouses/create'
     | '/dashboard/sales/reports/$reportId'
@@ -4645,8 +4525,6 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/reports/new'
     | '/dashboard/assets/categories/'
     | '/dashboard/assets/maintenance/'
-    | '/dashboard/buying/material-requests'
-    | '/dashboard/buying/rfq'
     | '/dashboard/crm/activities'
     | '/dashboard/crm/campaigns'
     | '/dashboard/crm/clients'
@@ -4713,7 +4591,6 @@ export interface FileRouteTypes {
     | '/dashboard/hr/succession-planning'
     | '/dashboard/hr/training'
     | '/dashboard/hr/vehicles'
-    | '/dashboard/inventory/stock-entries'
     | '/dashboard/inventory/warehouses'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
@@ -4852,7 +4729,6 @@ export interface FileRouteTypes {
     | '/dashboard/inventory/$itemId'
     | '/dashboard/inventory/create'
     | '/dashboard/inventory/settings'
-    | '/dashboard/inventory/stock-ledger'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
     | '/dashboard/knowledge/forms'
@@ -4909,11 +4785,6 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
     | '/dashboard/assets/maintenance/create'
-    | '/dashboard/buying/material-requests/$materialRequestId'
-    | '/dashboard/buying/material-requests/create'
-    | '/dashboard/buying/purchase-orders/$purchaseOrderId'
-    | '/dashboard/buying/purchase-orders/create'
-    | '/dashboard/buying/rfq/create'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
@@ -5056,8 +4927,6 @@ export interface FileRouteTypes {
     | '/dashboard/hr/succession-planning/new'
     | '/dashboard/hr/training/$trainingId'
     | '/dashboard/hr/training/new'
-    | '/dashboard/inventory/stock-entries/$stockEntryId'
-    | '/dashboard/inventory/stock-entries/create'
     | '/dashboard/inventory/warehouses/$warehouseId'
     | '/dashboard/inventory/warehouses/create'
     | '/dashboard/sales/reports/$reportId'
@@ -5071,8 +4940,6 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/reports/new'
     | '/dashboard/assets/categories'
     | '/dashboard/assets/maintenance'
-    | '/dashboard/buying/material-requests'
-    | '/dashboard/buying/rfq'
     | '/dashboard/crm/activities'
     | '/dashboard/crm/campaigns'
     | '/dashboard/crm/clients'
@@ -5139,7 +5006,6 @@ export interface FileRouteTypes {
     | '/dashboard/hr/succession-planning'
     | '/dashboard/hr/training'
     | '/dashboard/hr/vehicles'
-    | '/dashboard/inventory/stock-entries'
     | '/dashboard/inventory/warehouses'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
@@ -5288,7 +5154,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/inventory/$itemId'
     | '/_authenticated/dashboard/inventory/create'
     | '/_authenticated/dashboard/inventory/settings'
-    | '/_authenticated/dashboard/inventory/stock-ledger'
     | '/_authenticated/dashboard/jobs/browse'
     | '/_authenticated/dashboard/jobs/my-services'
     | '/_authenticated/dashboard/knowledge/forms'
@@ -5346,11 +5211,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/assets/categories/create'
     | '/_authenticated/dashboard/assets/maintenance/create'
-    | '/_authenticated/dashboard/buying/material-requests/$materialRequestId'
-    | '/_authenticated/dashboard/buying/material-requests/create'
-    | '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId'
-    | '/_authenticated/dashboard/buying/purchase-orders/create'
-    | '/_authenticated/dashboard/buying/rfq/create'
     | '/_authenticated/dashboard/cases/$caseId/notion'
     | '/_authenticated/dashboard/cases/$caseId/pipeline'
     | '/_authenticated/dashboard/cases/pipeline/board'
@@ -5493,8 +5353,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/succession-planning/new'
     | '/_authenticated/dashboard/hr/training/$trainingId'
     | '/_authenticated/dashboard/hr/training/new'
-    | '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId'
-    | '/_authenticated/dashboard/inventory/stock-entries/create'
     | '/_authenticated/dashboard/inventory/warehouses/$warehouseId'
     | '/_authenticated/dashboard/inventory/warehouses/create'
     | '/_authenticated/dashboard/sales/reports/$reportId'
@@ -5508,8 +5366,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tasks/reports/new'
     | '/_authenticated/dashboard/assets/categories/'
     | '/_authenticated/dashboard/assets/maintenance/'
-    | '/_authenticated/dashboard/buying/material-requests/'
-    | '/_authenticated/dashboard/buying/rfq/'
     | '/_authenticated/dashboard/crm/activities/'
     | '/_authenticated/dashboard/crm/campaigns/'
     | '/_authenticated/dashboard/crm/clients/'
@@ -5576,7 +5432,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/succession-planning/'
     | '/_authenticated/dashboard/hr/training/'
     | '/_authenticated/dashboard/hr/vehicles/'
-    | '/_authenticated/dashboard/inventory/stock-entries/'
     | '/_authenticated/dashboard/inventory/warehouses/'
     | '/_authenticated/dashboard/sales/leads/'
     | '/_authenticated/dashboard/sales/reports/'
@@ -6568,13 +6423,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardJobsBrowseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/inventory/stock-ledger': {
-      id: '/_authenticated/dashboard/inventory/stock-ledger'
-      path: '/stock-ledger'
-      fullPath: '/dashboard/inventory/stock-ledger'
-      preLoaderRoute: typeof AuthenticatedDashboardInventoryStockLedgerRouteImport
-      parentRoute: typeof AuthenticatedDashboardInventoryRoute
-    }
     '/_authenticated/dashboard/inventory/settings': {
       id: '/_authenticated/dashboard/inventory/settings'
       path: '/settings'
@@ -6867,13 +6715,6 @@ declare module '@tanstack/react-router' {
       path: '/warehouses'
       fullPath: '/dashboard/inventory/warehouses'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryWarehousesIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardInventoryRoute
-    }
-    '/_authenticated/dashboard/inventory/stock-entries/': {
-      id: '/_authenticated/dashboard/inventory/stock-entries/'
-      path: '/stock-entries'
-      fullPath: '/dashboard/inventory/stock-entries'
-      preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/hr/vehicles/': {
@@ -7338,20 +7179,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
-    '/_authenticated/dashboard/buying/rfq/': {
-      id: '/_authenticated/dashboard/buying/rfq/'
-      path: '/dashboard/buying/rfq'
-      fullPath: '/dashboard/buying/rfq'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingRfqIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/buying/material-requests/': {
-      id: '/_authenticated/dashboard/buying/material-requests/'
-      path: '/dashboard/buying/material-requests'
-      fullPath: '/dashboard/buying/material-requests'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/assets/maintenance/': {
       id: '/_authenticated/dashboard/assets/maintenance/'
       path: '/'
@@ -7441,20 +7268,6 @@ declare module '@tanstack/react-router' {
       path: '/warehouses/$warehouseId'
       fullPath: '/dashboard/inventory/warehouses/$warehouseId'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardInventoryRoute
-    }
-    '/_authenticated/dashboard/inventory/stock-entries/create': {
-      id: '/_authenticated/dashboard/inventory/stock-entries/create'
-      path: '/stock-entries/create'
-      fullPath: '/dashboard/inventory/stock-entries/create'
-      preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardInventoryRoute
-    }
-    '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId': {
-      id: '/_authenticated/dashboard/inventory/stock-entries/$stockEntryId'
-      path: '/stock-entries/$stockEntryId'
-      fullPath: '/dashboard/inventory/stock-entries/$stockEntryId'
-      preLoaderRoute: typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRouteImport
       parentRoute: typeof AuthenticatedDashboardInventoryRoute
     }
     '/_authenticated/dashboard/hr/training/new': {
@@ -8450,41 +8263,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/cases/$caseId/notion'
       preLoaderRoute: typeof AuthenticatedDashboardCasesCaseIdNotionRouteImport
       parentRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
-    }
-    '/_authenticated/dashboard/buying/rfq/create': {
-      id: '/_authenticated/dashboard/buying/rfq/create'
-      path: '/dashboard/buying/rfq/create'
-      fullPath: '/dashboard/buying/rfq/create'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingRfqCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/buying/purchase-orders/create': {
-      id: '/_authenticated/dashboard/buying/purchase-orders/create'
-      path: '/create'
-      fullPath: '/dashboard/buying/purchase-orders/create'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
-    }
-    '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId': {
-      id: '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId'
-      path: '/$purchaseOrderId'
-      fullPath: '/dashboard/buying/purchase-orders/$purchaseOrderId'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
-    }
-    '/_authenticated/dashboard/buying/material-requests/create': {
-      id: '/_authenticated/dashboard/buying/material-requests/create'
-      path: '/dashboard/buying/material-requests/create'
-      fullPath: '/dashboard/buying/material-requests/create'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/buying/material-requests/$materialRequestId': {
-      id: '/_authenticated/dashboard/buying/material-requests/$materialRequestId'
-      path: '/dashboard/buying/material-requests/$materialRequestId'
-      fullPath: '/dashboard/buying/material-requests/$materialRequestId'
-      preLoaderRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/assets/maintenance/create': {
       id: '/_authenticated/dashboard/assets/maintenance/create'
@@ -9809,13 +9587,9 @@ interface AuthenticatedDashboardInventoryRouteChildren {
   AuthenticatedDashboardInventoryItemIdRoute: typeof AuthenticatedDashboardInventoryItemIdRoute
   AuthenticatedDashboardInventoryCreateRoute: typeof AuthenticatedDashboardInventoryCreateRoute
   AuthenticatedDashboardInventorySettingsRoute: typeof AuthenticatedDashboardInventorySettingsRoute
-  AuthenticatedDashboardInventoryStockLedgerRoute: typeof AuthenticatedDashboardInventoryStockLedgerRoute
   AuthenticatedDashboardInventoryIndexRoute: typeof AuthenticatedDashboardInventoryIndexRoute
-  AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute: typeof AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute
-  AuthenticatedDashboardInventoryStockEntriesCreateRoute: typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute: typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   AuthenticatedDashboardInventoryWarehousesCreateRoute: typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
-  AuthenticatedDashboardInventoryStockEntriesIndexRoute: typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   AuthenticatedDashboardInventoryWarehousesIndexRoute: typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
 }
 
@@ -9827,20 +9601,12 @@ const AuthenticatedDashboardInventoryRouteChildren: AuthenticatedDashboardInvent
       AuthenticatedDashboardInventoryCreateRoute,
     AuthenticatedDashboardInventorySettingsRoute:
       AuthenticatedDashboardInventorySettingsRoute,
-    AuthenticatedDashboardInventoryStockLedgerRoute:
-      AuthenticatedDashboardInventoryStockLedgerRoute,
     AuthenticatedDashboardInventoryIndexRoute:
       AuthenticatedDashboardInventoryIndexRoute,
-    AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute:
-      AuthenticatedDashboardInventoryStockEntriesStockEntryIdRoute,
-    AuthenticatedDashboardInventoryStockEntriesCreateRoute:
-      AuthenticatedDashboardInventoryStockEntriesCreateRoute,
     AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute:
       AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute,
     AuthenticatedDashboardInventoryWarehousesCreateRoute:
       AuthenticatedDashboardInventoryWarehousesCreateRoute,
-    AuthenticatedDashboardInventoryStockEntriesIndexRoute:
-      AuthenticatedDashboardInventoryStockEntriesIndexRoute,
     AuthenticatedDashboardInventoryWarehousesIndexRoute:
       AuthenticatedDashboardInventoryWarehousesIndexRoute,
   }
@@ -9944,24 +9710,6 @@ const AuthenticatedDashboardTasksRouteWithChildren =
     AuthenticatedDashboardTasksRouteChildren,
   )
 
-interface AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren {
-  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
-  AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
-}
-
-const AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren: AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren =
-  {
-    AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute:
-      AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute,
-    AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute:
-      AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute,
-  }
-
-const AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren =
-  AuthenticatedDashboardBuyingPurchaseOrdersRoute._addFileChildren(
-    AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren,
-  )
-
 interface AuthenticatedDashboardSupportSlaRouteChildren {
   AuthenticatedDashboardSupportSlaCreateRoute: typeof AuthenticatedDashboardSupportSlaCreateRoute
   AuthenticatedDashboardSupportSlaIndexRoute: typeof AuthenticatedDashboardSupportSlaIndexRoute
@@ -10004,7 +9752,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardBuyingSupplierIdRoute: typeof AuthenticatedDashboardBuyingSupplierIdRoute
   AuthenticatedDashboardBuyingCreateRoute: typeof AuthenticatedDashboardBuyingCreateRoute
-  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
+  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
   AuthenticatedDashboardBuyingSettingsRoute: typeof AuthenticatedDashboardBuyingSettingsRoute
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
@@ -10046,13 +9794,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
   AuthenticatedDashboardSupportIndexRoute: typeof AuthenticatedDashboardSupportIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
-  AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
-  AuthenticatedDashboardBuyingMaterialRequestsCreateRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
-  AuthenticatedDashboardBuyingRfqCreateRoute: typeof AuthenticatedDashboardBuyingRfqCreateRoute
   AuthenticatedDashboardSalesReportsReportIdRoute: typeof AuthenticatedDashboardSalesReportsReportIdRoute
   AuthenticatedDashboardSalesReportsNewRoute: typeof AuthenticatedDashboardSalesReportsNewRoute
-  AuthenticatedDashboardBuyingMaterialRequestsIndexRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
-  AuthenticatedDashboardBuyingRfqIndexRoute: typeof AuthenticatedDashboardBuyingRfqIndexRoute
   AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
   AuthenticatedDashboardSalesReportsIndexRoute: typeof AuthenticatedDashboardSalesReportsIndexRoute
 }
@@ -10093,7 +9836,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardBuyingCreateRoute:
     AuthenticatedDashboardBuyingCreateRoute,
   AuthenticatedDashboardBuyingPurchaseOrdersRoute:
-    AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren,
+    AuthenticatedDashboardBuyingPurchaseOrdersRoute,
   AuthenticatedDashboardBuyingSettingsRoute:
     AuthenticatedDashboardBuyingSettingsRoute,
   AuthenticatedDashboardClientsClientIdRoute:
@@ -10168,20 +9911,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardSupportIndexRoute:
     AuthenticatedDashboardSupportIndexRoute,
   AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
-  AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute:
-    AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute,
-  AuthenticatedDashboardBuyingMaterialRequestsCreateRoute:
-    AuthenticatedDashboardBuyingMaterialRequestsCreateRoute,
-  AuthenticatedDashboardBuyingRfqCreateRoute:
-    AuthenticatedDashboardBuyingRfqCreateRoute,
   AuthenticatedDashboardSalesReportsReportIdRoute:
     AuthenticatedDashboardSalesReportsReportIdRoute,
   AuthenticatedDashboardSalesReportsNewRoute:
     AuthenticatedDashboardSalesReportsNewRoute,
-  AuthenticatedDashboardBuyingMaterialRequestsIndexRoute:
-    AuthenticatedDashboardBuyingMaterialRequestsIndexRoute,
-  AuthenticatedDashboardBuyingRfqIndexRoute:
-    AuthenticatedDashboardBuyingRfqIndexRoute,
   AuthenticatedDashboardSalesLeadsIndexRoute:
     AuthenticatedDashboardSalesLeadsIndexRoute,
   AuthenticatedDashboardSalesReportsIndexRoute:

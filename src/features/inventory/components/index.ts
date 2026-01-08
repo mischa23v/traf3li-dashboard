@@ -1,6 +1,6 @@
 /**
  * Inventory Components
- * Export all inventory-related components
+ * Simplified for office inventory management
  */
 
 export { InventoryListView } from './inventory-list-view'
@@ -11,7 +11,3 @@ export { InventorySettingsView } from './inventory-settings-view'
 export { WarehouseListView } from './warehouse-list-view'
 export { CreateWarehouseView } from './create-warehouse-view'
 export { WarehouseDetailsView } from './warehouse-details-view'
-export { StockEntryListView } from './stock-entry-list-view'
-export { CreateStockEntryView } from './create-stock-entry-view'
-export { StockEntryDetailsView } from './stock-entry-details-view'
-export { StockLedgerView } from './stock-ledger-view'
