@@ -71,6 +71,49 @@ export const SANED_RATES = {
   employer: 0.0075,
   /** Combined total: 1.5% */
   total: 0.015,
+  /** Percentage values for display */
+  EMPLOYER: 0.75,
+  EMPLOYEE: 0.75,
+} as const
+
+/**
+ * Combined GOSI rates object for easy access in components
+ * Rates are in percentage format (not decimal) for display
+ */
+export const GOSI_RATES = {
+  SAUDI: {
+    EMPLOYER: {
+      /** Legacy rate: 11.75% (9.75% pension + 2% OHI) */
+      LEGACY: 11.75,
+      /** Reform rate (July 2024+): 23.5% (21.5% pension + 2% OHI) */
+      REFORM: 23.5,
+    },
+    EMPLOYEE: {
+      /** Legacy rate: 9.75% */
+      LEGACY: 9.75,
+      /** Reform rate (July 2024+): 0% */
+      REFORM: 0,
+    },
+  },
+  NON_SAUDI: {
+    /** Employer rate: 2% (OHI only) */
+    EMPLOYER: 2,
+    /** Employee rate: 0% */
+    EMPLOYEE: 0,
+  },
+} as const
+
+/**
+ * Nitaqat band definitions
+ * Used for Saudization compliance tracking
+ */
+export const NITAQAT_BANDS = {
+  platinum: { name: 'Platinum', nameAr: 'بلاتيني', minRate: 40, color: '#E5E4E2' },
+  green_high: { name: 'High Green', nameAr: 'أخضر مرتفع', minRate: 35, color: '#006400' },
+  green_medium: { name: 'Medium Green', nameAr: 'أخضر متوسط', minRate: 27, color: '#228B22' },
+  green_low: { name: 'Low Green', nameAr: 'أخضر منخفض', minRate: 23, color: '#90EE90' },
+  yellow: { name: 'Yellow', nameAr: 'أصفر', minRate: 17, color: '#FFD700' },
+  red: { name: 'Red', nameAr: 'أحمر', minRate: 0, color: '#DC143C' },
 } as const
 
 // =============================================================================
@@ -84,8 +127,12 @@ export const SANED_RATES = {
 export const GOSI_SALARY_CONSTRAINTS = {
   /** Minimum base salary for GOSI calculation: SAR 1,500 */
   MIN_BASE: 1500,
+  /** Alias for MIN_BASE */
+  MIN_SALARY: 1500,
   /** Maximum base salary for GOSI calculation: SAR 45,000 */
   MAX_BASE: 45000,
+  /** Alias for MAX_BASE */
+  MAX_SALARY: 45000,
   /** Standard housing allowance percentage: 25% of basic */
   HOUSING_ALLOWANCE_PERCENT: 0.25,
 } as const

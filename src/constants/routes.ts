@@ -430,6 +430,21 @@ export const ROUTES = {
         wps: {
           index: '/dashboard/finance/saudi-banking/wps',
           new: '/dashboard/finance/saudi-banking/wps/new',
+          generate: '/dashboard/finance/saudi-banking/wps/generate',
+          history: '/dashboard/finance/saudi-banking/wps/history',
+          detail: (fileId: string) => `/dashboard/finance/saudi-banking/wps/${fileId}`,
+        },
+        gosi: {
+          index: '/dashboard/finance/saudi-banking/gosi',
+          calculator: '/dashboard/finance/saudi-banking/gosi/calculator',
+          reports: '/dashboard/finance/saudi-banking/gosi/reports',
+          newReport: '/dashboard/finance/saudi-banking/gosi/reports/new',
+        },
+        compliance: {
+          index: '/dashboard/finance/saudi-banking/compliance',
+          nitaqat: '/dashboard/finance/saudi-banking/compliance/nitaqat',
+          deadlines: '/dashboard/finance/saudi-banking/compliance/deadlines',
+          iqamaAlerts: '/dashboard/finance/saudi-banking/compliance/iqama-alerts',
         },
       },
 

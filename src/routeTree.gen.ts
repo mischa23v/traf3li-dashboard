@@ -420,6 +420,8 @@ import { Route as AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport } from
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.index'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.index'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.sadad.index'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingGosiIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.gosi.index'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.compliance.index'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsNewRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.new'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsJobIdRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.$jobId'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsNewRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.new'
@@ -431,7 +433,10 @@ import { Route as AuthenticatedDashboardFinanceSubscriptionsSubscriptionIdEditRo
 import { Route as AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRouteImport } from './routes/_authenticated/dashboard.finance.subscription-plans.$planId.edit'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId.edit'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.new'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.generate'
 import { Route as AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.sadad.pay'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.gosi.calculator'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.compliance.iqama-alerts'
 import { Route as AuthenticatedDashboardFinanceRecurringInvoicesIdEditRouteImport } from './routes/_authenticated/dashboard.finance.recurring-invoices.$id.edit'
 import { Route as AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport } from './routes/_authenticated/dashboard.finance.invoices.$invoiceId.edit'
 import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdEditRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId.edit'
@@ -2860,6 +2865,18 @@ const AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute =
     path: '/saudi-banking/sadad/',
     getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute =
+  AuthenticatedDashboardFinanceSaudiBankingGosiIndexRouteImport.update({
+    id: '/saudi-banking/gosi/',
+    path: '/saudi-banking/gosi/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute =
+  AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRouteImport.update({
+    id: '/saudi-banking/compliance/',
+    path: '/saudi-banking/compliance/',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
 const AuthenticatedDashboardHrRecruitmentJobsNewRoute =
   AuthenticatedDashboardHrRecruitmentJobsNewRouteImport.update({
     id: '/recruitment/jobs/new',
@@ -2931,12 +2948,32 @@ const AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute =
     path: '/saudi-banking/wps/new',
     getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute =
+  AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRouteImport.update({
+    id: '/saudi-banking/wps/generate',
+    path: '/saudi-banking/wps/generate',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
 const AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute =
   AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport.update({
     id: '/saudi-banking/sadad/pay',
     path: '/saudi-banking/sadad/pay',
     getParentRoute: () => AuthenticatedDashboardFinanceRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute =
+  AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRouteImport.update({
+    id: '/saudi-banking/gosi/calculator',
+    path: '/saudi-banking/gosi/calculator',
+    getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute =
+  AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRouteImport.update(
+    {
+      id: '/saudi-banking/compliance/iqama-alerts',
+      path: '/saudi-banking/compliance/iqama-alerts',
+      getParentRoute: () => AuthenticatedDashboardFinanceRoute,
+    } as any,
+  )
 const AuthenticatedDashboardFinanceRecurringInvoicesIdEditRoute =
   AuthenticatedDashboardFinanceRecurringInvoicesIdEditRouteImport.update({
     id: '/edit',
@@ -3391,7 +3428,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
   '/dashboard/finance/recurring-invoices/$id/edit': typeof AuthenticatedDashboardFinanceRecurringInvoicesIdEditRoute
+  '/dashboard/finance/saudi-banking/compliance/iqama-alerts': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute
+  '/dashboard/finance/saudi-banking/gosi/calculator': typeof AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute
   '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/dashboard/finance/saudi-banking/wps/generate': typeof AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute
   '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
@@ -3403,6 +3443,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/dashboard/finance/saudi-banking/compliance': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute
+  '/dashboard/finance/saudi-banking/gosi': typeof AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute
   '/dashboard/finance/saudi-banking/sadad': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
   '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
@@ -3812,7 +3854,10 @@ export interface FileRoutesByTo {
   '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
   '/dashboard/finance/recurring-invoices/$id/edit': typeof AuthenticatedDashboardFinanceRecurringInvoicesIdEditRoute
+  '/dashboard/finance/saudi-banking/compliance/iqama-alerts': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute
+  '/dashboard/finance/saudi-banking/gosi/calculator': typeof AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute
   '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/dashboard/finance/saudi-banking/wps/generate': typeof AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute
   '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
@@ -3824,6 +3869,8 @@ export interface FileRoutesByTo {
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/dashboard/finance/saudi-banking/compliance': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute
+  '/dashboard/finance/saudi-banking/gosi': typeof AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute
   '/dashboard/finance/saudi-banking/sadad': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
   '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
@@ -4245,7 +4292,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/_authenticated/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
   '/_authenticated/dashboard/finance/recurring-invoices/$id/edit': typeof AuthenticatedDashboardFinanceRecurringInvoicesIdEditRoute
+  '/_authenticated/dashboard/finance/saudi-banking/compliance/iqama-alerts': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute
+  '/_authenticated/dashboard/finance/saudi-banking/gosi/calculator': typeof AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute
   '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/_authenticated/dashboard/finance/saudi-banking/wps/generate': typeof AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute
   '/_authenticated/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/_authenticated/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/_authenticated/dashboard/finance/subscription-plans/$planId/edit': typeof AuthenticatedDashboardFinanceSubscriptionPlansPlanIdEditRoute
@@ -4257,6 +4307,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/_authenticated/dashboard/finance/saudi-banking/compliance/': typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute
+  '/_authenticated/dashboard/finance/saudi-banking/gosi/': typeof AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute
   '/_authenticated/dashboard/finance/saudi-banking/sadad/': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
   '/_authenticated/dashboard/finance/saudi-banking/wps/': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/_authenticated/dashboard/hr/recruitment/applicants/': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
@@ -4676,7 +4728,10 @@ export interface FileRouteTypes {
     | '/dashboard/finance/expenses/$expenseId/edit'
     | '/dashboard/finance/invoices/$invoiceId/edit'
     | '/dashboard/finance/recurring-invoices/$id/edit'
+    | '/dashboard/finance/saudi-banking/compliance/iqama-alerts'
+    | '/dashboard/finance/saudi-banking/gosi/calculator'
     | '/dashboard/finance/saudi-banking/sadad/pay'
+    | '/dashboard/finance/saudi-banking/wps/generate'
     | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/subscription-plans/$planId/edit'
@@ -4688,6 +4743,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
     | '/dashboard/hr/recruitment/jobs/new'
+    | '/dashboard/finance/saudi-banking/compliance'
+    | '/dashboard/finance/saudi-banking/gosi'
     | '/dashboard/finance/saudi-banking/sadad'
     | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
@@ -5097,7 +5154,10 @@ export interface FileRouteTypes {
     | '/dashboard/finance/expenses/$expenseId/edit'
     | '/dashboard/finance/invoices/$invoiceId/edit'
     | '/dashboard/finance/recurring-invoices/$id/edit'
+    | '/dashboard/finance/saudi-banking/compliance/iqama-alerts'
+    | '/dashboard/finance/saudi-banking/gosi/calculator'
     | '/dashboard/finance/saudi-banking/sadad/pay'
+    | '/dashboard/finance/saudi-banking/wps/generate'
     | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/subscription-plans/$planId/edit'
@@ -5109,6 +5169,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
     | '/dashboard/hr/recruitment/jobs/new'
+    | '/dashboard/finance/saudi-banking/compliance'
+    | '/dashboard/finance/saudi-banking/gosi'
     | '/dashboard/finance/saudi-banking/sadad'
     | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
@@ -5529,7 +5591,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/expenses/$expenseId/edit'
     | '/_authenticated/dashboard/finance/invoices/$invoiceId/edit'
     | '/_authenticated/dashboard/finance/recurring-invoices/$id/edit'
+    | '/_authenticated/dashboard/finance/saudi-banking/compliance/iqama-alerts'
+    | '/_authenticated/dashboard/finance/saudi-banking/gosi/calculator'
     | '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
+    | '/_authenticated/dashboard/finance/saudi-banking/wps/generate'
     | '/_authenticated/dashboard/finance/saudi-banking/wps/new'
     | '/_authenticated/dashboard/finance/statements/$statementId/edit'
     | '/_authenticated/dashboard/finance/subscription-plans/$planId/edit'
@@ -5541,6 +5606,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/recruitment/applicants/new'
     | '/_authenticated/dashboard/hr/recruitment/jobs/$jobId'
     | '/_authenticated/dashboard/hr/recruitment/jobs/new'
+    | '/_authenticated/dashboard/finance/saudi-banking/compliance/'
+    | '/_authenticated/dashboard/finance/saudi-banking/gosi/'
     | '/_authenticated/dashboard/finance/saudi-banking/sadad/'
     | '/_authenticated/dashboard/finance/saudi-banking/wps/'
     | '/_authenticated/dashboard/hr/recruitment/applicants/'
@@ -8468,6 +8535,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
+    '/_authenticated/dashboard/finance/saudi-banking/gosi/': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/gosi/'
+      path: '/saudi-banking/gosi'
+      fullPath: '/dashboard/finance/saudi-banking/gosi'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingGosiIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/compliance/': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/compliance/'
+      path: '/saudi-banking/compliance'
+      fullPath: '/dashboard/finance/saudi-banking/compliance'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
     '/_authenticated/dashboard/hr/recruitment/jobs/new': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/new'
       path: '/recruitment/jobs/new'
@@ -8545,11 +8626,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
+    '/_authenticated/dashboard/finance/saudi-banking/wps/generate': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/wps/generate'
+      path: '/saudi-banking/wps/generate'
+      fullPath: '/dashboard/finance/saudi-banking/wps/generate'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
     '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': {
       id: '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
       path: '/saudi-banking/sadad/pay'
       fullPath: '/dashboard/finance/saudi-banking/sadad/pay'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/gosi/calculator': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/gosi/calculator'
+      path: '/saudi-banking/gosi/calculator'
+      fullPath: '/dashboard/finance/saudi-banking/gosi/calculator'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/compliance/iqama-alerts': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/compliance/iqama-alerts'
+      path: '/saudi-banking/compliance/iqama-alerts'
+      fullPath: '/dashboard/finance/saudi-banking/compliance/iqama-alerts'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceRoute
     }
     '/_authenticated/dashboard/finance/recurring-invoices/$id/edit': {
@@ -9194,8 +9296,13 @@ interface AuthenticatedDashboardFinanceRouteChildren {
   AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
   AuthenticatedDashboardFinanceVendorsIndexRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute: typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute
+  AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute: typeof AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute
   AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute
   AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
+  AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute
   AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
   AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
 }
@@ -9358,10 +9465,20 @@ const AuthenticatedDashboardFinanceRouteChildren: AuthenticatedDashboardFinanceR
       AuthenticatedDashboardFinanceTransactionsIndexRoute,
     AuthenticatedDashboardFinanceVendorsIndexRoute:
       AuthenticatedDashboardFinanceVendorsIndexRoute,
+    AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute:
+      AuthenticatedDashboardFinanceSaudiBankingComplianceIqamaAlertsRoute,
+    AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute:
+      AuthenticatedDashboardFinanceSaudiBankingGosiCalculatorRoute,
     AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute:
       AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute,
+    AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute:
+      AuthenticatedDashboardFinanceSaudiBankingWpsGenerateRoute,
     AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute:
       AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute,
+    AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute:
+      AuthenticatedDashboardFinanceSaudiBankingComplianceIndexRoute,
+    AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute:
+      AuthenticatedDashboardFinanceSaudiBankingGosiIndexRoute,
     AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute:
       AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute,
     AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute:
