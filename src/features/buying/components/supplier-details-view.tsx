@@ -21,7 +21,6 @@ import {
   Globe,
   FileText,
   DollarSign,
-  Package,
   Receipt,
   Calendar,
   Lock,
@@ -63,7 +62,7 @@ import {
 import { BuyingSidebar } from './buying-sidebar'
 
 // Hooks
-import { useSupplier, useDeleteSupplier, usePurchaseOrders } from '@/hooks/use-buying'
+import { useSupplier, useDeleteSupplier } from '@/hooks/use-buying'
 
 // Other
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -83,25 +82,11 @@ export function SupplierDetailsView() {
   const { data: supplier, isLoading, isError, error } = useSupplier(supplierId)
   const deleteSupplierMutation = useDeleteSupplier()
 
-  // Fetch purchase orders for this supplier
-  const { data: purchaseOrdersData } = usePurchaseOrders({ supplierId, limit: 10 })
-  const purchaseOrders = purchaseOrdersData?.data || []
-
   const topNav = [
-    {
-      title: t('buying.common.overview'),
-      href: ROUTES.dashboard.buying.overview,
-      isActive: false
-    },
     {
       title: t('buying.suppliers'),
       href: ROUTES.dashboard.buying.suppliers.list,
       isActive: true
-    },
-    {
-      title: t('buying.purchaseOrder.purchaseOrders'),
-      href: ROUTES.dashboard.buying.purchaseOrders.list,
-      isActive: false
     },
   ]
 
@@ -154,20 +139,6 @@ export function SupplierDetailsView() {
       individual: t('buying.individual'),
     }
     return types[type as keyof typeof types] || type
-  }
-
-  const getPOStatusBadge = (status: string) => {
-    const statusConfig = {
-      draft: { label: t('buying.poStatus.draft'), className: 'bg-gray-100 text-gray-700' },
-      submitted: { label: t('buying.poStatus.submitted'), className: 'bg-blue-100 text-blue-700' },
-      approved: { label: t('buying.poStatus.approved'), className: 'bg-purple-100 text-purple-700' },
-      received: { label: t('buying.poStatus.received'), className: 'bg-teal-100 text-teal-700' },
-      billed: { label: t('buying.poStatus.billed'), className: 'bg-emerald-100 text-emerald-700' },
-      cancelled: { label: t('buying.poStatus.cancelled'), className: 'bg-red-100 text-red-700' },
-      closed: { label: t('buying.poStatus.closed'), className: 'bg-slate-100 text-slate-700' },
-    }
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
-    return <Badge className={config.className}>{config.label}</Badge>
   }
 
   // Loading State
@@ -293,7 +264,7 @@ export function SupplierDetailsView() {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <div className="border-b border-slate-100 px-6 pt-4">
                     <TabsList className="bg-transparent h-auto p-0 gap-6">
-                      {['overview', 'purchase-orders', 'payments', 'documents'].map((tab) => (
+                      {['overview', 'payments', 'documents'].map((tab) => (
                         <TabsTrigger
                           key={tab}
                           value={tab}
@@ -306,11 +277,9 @@ export function SupplierDetailsView() {
                         >
                           {tab === 'overview'
                             ? t('buying.common.overview')
-                            : tab === 'purchase-orders'
-                              ? t('buying.purchaseOrder.purchaseOrders')
-                              : tab === 'payments'
-                                ? t('buying.common.payments')
-                                : t('buying.common.documents')}
+                            : tab === 'payments'
+                              ? t('buying.common.payments')
+                              : t('buying.common.documents')}
                         </TabsTrigger>
                       ))}
                     </TabsList>
@@ -623,68 +592,6 @@ export function SupplierDetailsView() {
                           </CardContent>
                         </Card>
                       )}
-                    </TabsContent>
-
-                    {/* Purchase Orders Tab */}
-                    <TabsContent value="purchase-orders" className="mt-0">
-                      <Card className="border-none shadow-sm bg-white rounded-2xl">
-                        <CardHeader className="border-b border-slate-100">
-                          <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                            <Package className="h-5 w-5 text-brand-blue" aria-hidden="true" />
-                            {t('buying.purchaseOrder.purchaseOrders')}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                          {purchaseOrders.length === 0 ? (
-                            <div className="text-center py-12 text-slate-500">
-                              <Package className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
-                              <p>
-                                {isArabic
-                                  ? 'لا توجد أوامر شراء لهذا المورد'
-                                  : 'No purchase orders for this supplier'}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="overflow-x-auto">
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>
-                                      {t('buying.purchaseOrder.poNumber')}
-                                    </TableHead>
-                                    <TableHead>
-                                      {t('buying.common.date')}
-                                    </TableHead>
-                                    <TableHead>
-                                      {t('buying.common.total')}
-                                    </TableHead>
-                                    <TableHead>
-                                      {t('buying.common.status')}
-                                    </TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {purchaseOrders.map((po: any) => (
-                                    <TableRow key={po._id}>
-                                      <TableCell className="font-medium">
-                                        <Link
-                                          to={ROUTES.dashboard.buying.purchaseOrders.detail(po._id)}
-                                          className="text-brand-blue hover:underline"
-                                        >
-                                          {po.poNumber}
-                                        </Link>
-                                      </TableCell>
-                                      <TableCell>{formatDate(po.orderDate)}</TableCell>
-                                      <TableCell>{formatCurrency(po.grandTotal)}</TableCell>
-                                      <TableCell>{getPOStatusBadge(po.status)}</TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
                     </TabsContent>
 
                     {/* Payments Tab */}

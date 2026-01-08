@@ -461,14 +461,6 @@ export function useSidebarData(): SidebarData {
               title: 'sidebar.nav.warehouses',
               url: ROUTES.dashboard.inventory.warehouses.list,
             },
-            {
-              title: 'sidebar.nav.stockEntries',
-              url: ROUTES.dashboard.inventory.stockEntries.list,
-            },
-            {
-              title: 'sidebar.nav.stockLedger',
-              url: ROUTES.dashboard.inventory.stockLedger,
-            },
           ],
         },
       ],
@@ -483,22 +475,6 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.suppliers',
               url: ROUTES.dashboard.buying.list,
-            },
-            {
-              title: 'sidebar.nav.purchaseOrders',
-              url: ROUTES.dashboard.buying.purchaseOrders.list,
-            },
-            {
-              title: 'sidebar.nav.materialRequests',
-              url: ROUTES.dashboard.buying.materialRequests.list,
-            },
-            {
-              title: 'sidebar.nav.purchaseReceipts',
-              url: ROUTES.dashboard.buying.purchaseReceipts.list,
-            },
-            {
-              title: 'sidebar.nav.rfqs',
-              url: ROUTES.dashboard.buying.rfq.list,
             },
           ],
         },

@@ -19,7 +19,6 @@ import {
   CheckCircle2,
   XCircle,
   LayoutGrid,
-  History,
   TrendingUp,
   Boxes,
   AlertTriangle,
@@ -61,7 +60,6 @@ import {
   useWarehouse,
   useWarehouseStock,
   useDeleteWarehouse,
-  useStockEntries,
   useWarehouses,
 } from '@/hooks/use-inventory'
 import { InventorySidebar } from './inventory-sidebar'
@@ -79,12 +77,6 @@ export function WarehouseDetailsView() {
 
   const { data: warehouse, isLoading, error } = useWarehouse(warehouseId)
   const { data: stockData } = useWarehouseStock(warehouseId)
-  const { data: stockEntriesData } = useStockEntries({
-    fromWarehouse: warehouseId,
-    limit: 10,
-    sortBy: 'postingDate',
-    sortOrder: 'desc',
-  })
   const { data: warehousesData } = useWarehouses()
   const deleteWarehouseMutation = useDeleteWarehouse()
 
@@ -141,45 +133,8 @@ export function WarehouseDetailsView() {
     }
   }
 
-  const getEntryTypeBadge = (type: string) => {
-    switch (type) {
-      case 'receipt':
-        return (
-          <Badge variant="outline" className="border-emerald-500 text-emerald-500">
-            {t('inventory.entryType.receipt', 'استلام')}
-          </Badge>
-        )
-      case 'issue':
-        return (
-          <Badge variant="outline" className="border-red-500 text-red-500">
-            {t('inventory.entryType.issue', 'صرف')}
-          </Badge>
-        )
-      case 'transfer':
-        return (
-          <Badge variant="outline" className="border-blue-500 text-blue-500">
-            {t('inventory.entryType.transfer', 'نقل')}
-          </Badge>
-        )
-      case 'manufacture':
-        return (
-          <Badge variant="outline" className="border-purple-500 text-purple-500">
-            {t('inventory.entryType.manufacture', 'تصنيع')}
-          </Badge>
-        )
-      default:
-        return <Badge variant="outline">{type}</Badge>
-    }
-  }
-
   const formatCurrency = (amount: number, currency: string = 'SAR') => {
     return new Intl.NumberFormat('ar-SA', { style: 'currency', currency }).format(amount)
-  }
-
-  const formatDate = (date: string) => {
-    return new Intl.DateTimeFormat('ar-SA', { dateStyle: 'medium', timeStyle: 'short' }).format(
-      new Date(date)
-    )
   }
 
   // Calculate warehouse metrics
@@ -401,7 +356,7 @@ export function WarehouseDetailsView() {
             <Card className="rounded-3xl">
               <Tabs defaultValue="overview" className="w-full">
                 <CardHeader className="pb-0">
-                  <TabsList className="grid w-full grid-cols-4 rounded-xl">
+                  <TabsList className="grid w-full grid-cols-3 rounded-xl">
                     <TabsTrigger value="overview" className="rounded-lg">
                       <Building2 className="w-4 h-4 ml-2" />
                       {t('inventory.overview', 'نظرة عامة')}
@@ -409,10 +364,6 @@ export function WarehouseDetailsView() {
                     <TabsTrigger value="stock" className="rounded-lg">
                       <Package className="w-4 h-4 ml-2" />
                       {t('inventory.stockSummary', 'ملخص المخزون')}
-                    </TabsTrigger>
-                    <TabsTrigger value="entries" className="rounded-lg">
-                      <History className="w-4 h-4 ml-2" />
-                      {t('inventory.stockEntries', 'حركات المخزون')}
                     </TabsTrigger>
                     <TabsTrigger value="children" className="rounded-lg">
                       <LayoutGrid className="w-4 h-4 ml-2" />
@@ -606,87 +557,6 @@ export function WarehouseDetailsView() {
                               <TableCell>{formatCurrency(bin.valuationRate)}</TableCell>
                               <TableCell className="font-mono">
                                 {formatCurrency(bin.stockValue)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </TabsContent>
-
-                  {/* Stock Entries Tab */}
-                  <TabsContent value="entries" className="mt-0">
-                    {!stockEntriesData?.data || stockEntriesData.data.length === 0 ? (
-                      <div className="text-center py-8">
-                        <History className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">
-                          {t('inventory.noStockEntries', 'لا توجد حركات مخزون')}
-                        </p>
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-right">
-                              {t('inventory.entryId', 'رقم الحركة')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.date', 'التاريخ')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.entryType', 'النوع')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.items', 'الأصناف')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.totalQty', 'الكمية')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.totalAmount', 'المبلغ')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('inventory.status', 'الحالة')}
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {stockEntriesData.data.map((entry) => (
-                            <TableRow
-                              key={entry._id}
-                              className="cursor-pointer hover:bg-muted/50"
-                              onClick={() =>
-                                navigate({
-                                  to: ROUTES.dashboard.inventory.stockEntries.detail(entry._id),
-                                })
-                              }
-                            >
-                              <TableCell className="font-mono text-sm">
-                                {entry.stockEntryId}
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                {formatDate(entry.postingDate)}
-                              </TableCell>
-                              <TableCell>{getEntryTypeBadge(entry.entryType)}</TableCell>
-                              <TableCell>{entry.items?.length || 0}</TableCell>
-                              <TableCell>{entry.totalQty}</TableCell>
-                              <TableCell className="font-mono">
-                                {formatCurrency(entry.totalAmount)}
-                              </TableCell>
-                              <TableCell>
-                                {entry.status === 'submitted' ? (
-                                  <Badge variant="default" className="bg-emerald-500">
-                                    {t('inventory.status.submitted', 'مرحّل')}
-                                  </Badge>
-                                ) : entry.status === 'draft' ? (
-                                  <Badge variant="secondary">
-                                    {t('inventory.status.draft', 'مسودة')}
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="destructive">
-                                    {t('inventory.status.cancelled', 'ملغي')}
-                                  </Badge>
-                                )}
                               </TableCell>
                             </TableRow>
                           ))}

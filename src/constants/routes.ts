@@ -840,15 +840,7 @@ export const ROUTES = {
       list: '/dashboard/inventory',
       create: '/dashboard/inventory/create',
       settings: '/dashboard/inventory/settings',
-      stockLedger: '/dashboard/inventory/stock-ledger',
       detail: (itemId: string) => `/dashboard/inventory/${itemId}`,
-
-      // Stock entries
-      stockEntries: {
-        list: '/dashboard/inventory/stock-entries',
-        create: '/dashboard/inventory/stock-entries/create',
-        detail: (stockEntryId: string) => `/dashboard/inventory/stock-entries/${stockEntryId}`,
-      },
 
       // Warehouses
       warehouses: {
@@ -905,46 +897,14 @@ export const ROUTES = {
       list: '/dashboard/buying',
       create: '/dashboard/buying/create',
       settings: '/dashboard/buying/settings',
-      overview: '/dashboard/buying/overview',
       detail: (supplierId: string) => `/dashboard/buying/${supplierId}`,
 
-      // Suppliers
+      // Suppliers (simplified for office supplies)
       suppliers: {
         list: '/dashboard/buying/suppliers',
         new: '/dashboard/buying/suppliers/new',
         detail: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}`,
         edit: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}/edit`,
-      },
-
-      // Material requests
-      materialRequests: {
-        list: '/dashboard/buying/material-requests',
-        create: '/dashboard/buying/material-requests/create',
-        detail: (materialRequestId: string) => `/dashboard/buying/material-requests/${materialRequestId}`,
-      },
-
-      // Purchase orders
-      purchaseOrders: {
-        list: '/dashboard/buying/purchase-orders',
-        create: '/dashboard/buying/purchase-orders/create',
-        detail: (purchaseOrderId: string) => `/dashboard/buying/purchase-orders/${purchaseOrderId}`,
-      },
-
-      // Purchase receipts
-      purchaseReceipts: {
-        list: '/dashboard/buying/purchase-receipts',
-      },
-
-      // RFQ (Request for Quotation)
-      rfq: {
-        list: '/dashboard/buying/rfq',
-        create: '/dashboard/buying/rfq/create',
-      },
-
-      // Reports
-      reports: {
-        analytics: '/dashboard/buying/reports/analytics',
-        supplierPerformance: '/dashboard/buying/reports/supplier-performance',
       },
     },
 

@@ -9,13 +9,10 @@ import {
   Package,
   Plus,
   Warehouse,
-  ArrowRightLeft,
-  FileText,
   BarChart3,
   Settings,
   AlertTriangle,
   TrendingUp,
-  TrendingDown,
   Boxes,
   ListChecks,
   Clock,
@@ -31,7 +28,7 @@ import { ROUTES } from '@/constants/routes'
 import { useLowStockItems, useInventoryStats, useWarehouses } from '@/hooks/use-inventory'
 
 interface InventorySidebarProps {
-  context?: 'items' | 'warehouses' | 'stock-entries' | 'details'
+  context?: 'items' | 'warehouses' | 'details'
 }
 
 export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
@@ -64,13 +61,6 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
               {t('inventory.newWarehouse', 'مستودع جديد')}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
-            <Link to={ROUTES.dashboard.inventory.stockEntries.create}>
-              <Plus className="w-4 h-4 ml-2" />
-              {t('inventory.newStockEntry', 'حركة مخزون جديدة')}
-              <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘E</kbd>
-            </Link>
-          </Button>
         </CardContent>
       </Card>
 
@@ -93,18 +83,6 @@ export function InventorySidebar({ context = 'items' }: InventorySidebarProps) {
             <Link to={ROUTES.dashboard.inventory.warehouses.list}>
               <Warehouse className="w-4 h-4 ml-2" />
               {t('inventory.warehouses', 'المستودعات')}
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to={ROUTES.dashboard.inventory.stockEntries.list}>
-              <ArrowRightLeft className="w-4 h-4 ml-2" />
-              {t('inventory.stockEntries', 'حركات المخزون')}
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
-            <Link to={ROUTES.dashboard.inventory.stockLedger}>
-              <FileText className="w-4 h-4 ml-2" />
-              {t('inventory.stockLedger', 'دفتر المخزون')}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
