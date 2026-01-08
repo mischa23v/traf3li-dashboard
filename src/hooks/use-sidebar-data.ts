@@ -400,6 +400,36 @@ export function useSidebarData(): SidebarData {
               url: ROUTES.dashboard.finance.saudiBanking.index,
               module: 'payments',
             },
+            // Saudi Banking - WPS Generator
+            {
+              title: 'sidebar.nav.wpsGenerator',
+              url: ROUTES.dashboard.finance.saudiBanking.wps.generate,
+              module: 'payments',
+            },
+            // Saudi Banking - GOSI Dashboard
+            {
+              title: 'sidebar.nav.gosiDashboard',
+              url: ROUTES.dashboard.finance.saudiBanking.gosi.index,
+              module: 'payments',
+            },
+            // Saudi Banking - GOSI Calculator
+            {
+              title: 'sidebar.nav.gosiCalculator',
+              url: ROUTES.dashboard.finance.saudiBanking.gosi.calculator,
+              module: 'payments',
+            },
+            // Saudi Banking - Compliance Dashboard
+            {
+              title: 'sidebar.nav.complianceDashboard',
+              url: ROUTES.dashboard.finance.saudiBanking.compliance.index,
+              module: 'payments',
+            },
+            // Saudi Banking - Iqama Alerts
+            {
+              title: 'sidebar.nav.iqamaAlerts',
+              url: ROUTES.dashboard.finance.saudiBanking.compliance.iqamaAlerts,
+              module: 'payments',
+            },
             // Fiscal Periods
             {
               title: 'sidebar.nav.fiscalPeriods',
