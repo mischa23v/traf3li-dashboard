@@ -4,6 +4,14 @@
  */
 
 import { api } from '@/lib/api'
+import {
+  EmployeeNationality,
+  NitaqatBand,
+  GosiRegistrationStatus,
+  WpsPaymentStatus,
+  SadadPaymentStatus,
+  MudadSubmissionStatus,
+} from '@/constants/saudi-banking'
 
 // ==================== LEAN TECHNOLOGIES ====================
 
@@ -65,14 +73,52 @@ export interface WPSFile {
   totalEmployees: number
   totalAmount: number
   paymentDate: string
-  status: string
+  status: WpsPaymentStatus
   createdAt: string
+  downloadUrl?: string
+  submittedAt?: string
+  processedAt?: string
+}
+
+export interface WPSEmployee {
+  employeeId: string
+  nationalId: string
+  iban: string
+  bankCode: string
+  basicSalary: number
+  housingAllowance: number
+  otherAllowances?: number
+  deductions?: number
+  netSalary: number
+  nationality: EmployeeNationality
+}
+
+export interface WPSEstablishment {
+  establishmentId: string
+  establishmentName: string
+  molId: string // Ministry of Labor ID
+  bankCode: string
+  bankAccountNumber: string
+  iban: string
 }
 
 export interface SarieBank {
   code: string
   name: string
   nameAr: string
+}
+
+export interface WPSValidationResult {
+  valid: boolean
+  errors: WPSValidationError[]
+  warnings: string[]
+}
+
+export interface WPSValidationError {
+  employeeId?: string
+  field: string
+  message: string
+  code: string
 }
 
 // ==================== SADAD ====================
@@ -82,6 +128,7 @@ export interface SadadBiller {
   name: string
   nameAr: string
   category: string
+  logoUrl?: string
 }
 
 export interface SadadBill {
@@ -90,7 +137,10 @@ export interface SadadBill {
   billerName: string
   amount: number
   dueDate: string
-  status: string
+  status: SadadPaymentStatus
+  minimumAmount?: number
+  maximumAmount?: number
+  currency: string
 }
 
 export interface SadadPayment {
@@ -99,8 +149,10 @@ export interface SadadPayment {
   billNumber: string
   amount: number
   paymentDate: string
-  status: string
+  status: SadadPaymentStatus
   reference: string
+  receiptNumber?: string
+  debitAccount: string
 }
 
 // ==================== MUDAD ====================
@@ -108,29 +160,143 @@ export interface SadadPayment {
 export interface PayrollCalculation {
   employeeId: string
   employeeName: string
+  nationalId: string
+  nationality: EmployeeNationality
   basicSalary: number
-  allowances: number
+  housingAllowance: number
+  otherAllowances: number
+  totalAllowances: number
   deductions: number
   gosiEmployee: number
   gosiEmployer: number
+  sanedEmployee: number
+  sanedEmployer: number
   netSalary: number
+  grossSalary: number
+  isReformEmployee: boolean
 }
 
 export interface GOSICalculation {
-  employeeContribution: number
-  employerContribution: number
-  totalContribution: number
-  nationality: string
+  /** Capped base salary used for calculation */
+  baseSalary: number
+  /** Original basic salary before capping */
   basicSalary: number
+  /** Housing allowance */
+  housingAllowance: number
+  /** Employee nationality */
+  nationality: EmployeeNationality
+  /** Employee hire date */
+  employeeStartDate?: string
+  /** Whether 2024 reform rates apply */
+  isReformEmployee: boolean
+  /** Detailed contribution breakdown */
+  breakdown: GOSIContributionBreakdown
+  /** Total employee contribution (pension + SANED) */
+  employeeContribution: number
+  /** Total employer contribution (pension + OHI + SANED) */
+  employerContribution: number
+  /** Grand total contribution */
+  totalContribution: number
+}
+
+export interface GOSIContributionBreakdown {
+  /** Employee pension contribution */
+  employeePension: number
+  /** Employer pension contribution */
+  employerPension: number
+  /** Employer OHI (Occupational Hazard Insurance) */
+  employerOHI: number
+  /** SANED employee contribution */
+  sanedEmployee: number
+  /** SANED employer contribution */
+  sanedEmployer: number
 }
 
 export interface NitaqatCheck {
+  /** Current saudization percentage */
   saudizationRate: number
+  /** Required rate for current band */
   requiredRate: number
-  status: 'green' | 'yellow' | 'red'
+  /** Current Nitaqat band/color */
+  band: NitaqatBand
+  /** Legacy status field for backwards compatibility */
+  status: 'green' | 'yellow' | 'red' | 'platinum'
+  /** Total headcount */
   totalEmployees: number
+  /** Saudi employee count (raw) */
   saudiEmployees: number
+  /** Saudi employee count (weighted by salary) */
+  weightedSaudiCount: number
+  /** Non-Saudi employee count */
   nonSaudiEmployees: number
+  /** Activity type */
+  activityType?: string
+  /** Company size bracket */
+  sizeBracket?: 'small' | 'medium' | 'large' | 'giant'
+  /** Points breakdown */
+  points?: NitaqatPointsBreakdown
+}
+
+export interface NitaqatPointsBreakdown {
+  /** Full points (SAR 4000+ salary) */
+  fullPoints: number
+  /** Half points (SAR 3000-3999 salary) */
+  halfPoints: number
+  /** No points (below SAR 3000) */
+  zeroPoints: number
+  /** Total weighted points */
+  totalPoints: number
+}
+
+export interface MudadSubmission {
+  submissionId: string
+  establishmentId: string
+  payrollPeriod: string
+  status: MudadSubmissionStatus
+  submittedAt: string
+  processedAt?: string
+  totalEmployees: number
+  totalAmount: number
+  errors?: MudadSubmissionError[]
+}
+
+export interface MudadSubmissionError {
+  employeeId?: string
+  field: string
+  message: string
+  code: string
+}
+
+export interface ComplianceDeadline {
+  type: 'gosi' | 'wps' | 'mudad' | 'nitaqat'
+  deadline: string
+  period: string
+  status: 'upcoming' | 'due' | 'overdue' | 'completed'
+  daysRemaining: number
+  description: string
+}
+
+export interface ComplianceStatus {
+  gosi: {
+    status: GosiRegistrationStatus
+    lastPaymentDate?: string
+    nextDueDate: string
+    amountDue: number
+  }
+  wps: {
+    lastSubmissionDate?: string
+    nextDueDate: string
+    status: 'compliant' | 'pending' | 'overdue'
+  }
+  nitaqat: {
+    band: NitaqatBand
+    saudizationRate: number
+    targetRate: number
+  }
+  mudad: {
+    registrationStatus: 'active' | 'pending' | 'suspended'
+    lastSubmission?: string
+  }
 }
 
 // ==================== SERVICE ====================
@@ -204,8 +370,8 @@ export const saudiBankingService = {
 
   // ============ WPS - Wage Protection System ============
   generateWPSFile: async (data: {
-    establishment: any
-    employees: any[]
+    establishment: WPSEstablishment
+    employees: WPSEmployee[]
     paymentDate: string
     batchReference: string
   }): Promise<WPSFile> => {
@@ -214,8 +380,8 @@ export const saudiBankingService = {
   },
 
   downloadWPSFile: async (data: {
-    establishment: any
-    employees: any[]
+    establishment: WPSEstablishment
+    employees: WPSEmployee[]
     paymentDate: string
     batchReference: string
   }): Promise<Blob> => {
@@ -226,9 +392,9 @@ export const saudiBankingService = {
   },
 
   validateWPSData: async (data: {
-    establishment: any
-    employees: any[]
-  }): Promise<{ valid: boolean; errors: string[] }> => {
+    establishment: WPSEstablishment
+    employees: WPSEmployee[]
+  }): Promise<WPSValidationResult> => {
     const response = await api.post('/saudi-banking/wps/validate', data)
     return response.data
   },
@@ -300,23 +466,34 @@ export const saudiBankingService = {
 
   // ============ MUDAD - Payroll Compliance ============
   calculatePayroll: async (data: {
-    employees: any[]
+    employees: Array<{
+      employeeId: string
+      nationalId: string
+      nationality: EmployeeNationality
+      basicSalary: number
+      housingAllowance?: number
+      otherAllowances?: number
+      deductions?: number
+      employeeStartDate?: string
+    }>
   }): Promise<PayrollCalculation[]> => {
     const response = await api.post('/saudi-banking/mudad/payroll/calculate', data)
     return response.data
   },
 
   calculateGOSI: async (data: {
-    nationality: string
+    nationality: EmployeeNationality
     basicSalary: number
+    housingAllowance?: number
+    employeeStartDate?: string
   }): Promise<GOSICalculation> => {
     const response = await api.post('/saudi-banking/mudad/gosi/calculate', data)
     return response.data
   },
 
   generateMudadWPS: async (data: {
-    establishment: any
-    employees: any[]
+    establishment: WPSEstablishment
+    employees: WPSEmployee[]
     paymentDate: string
     batchReference: string
   }): Promise<WPSFile> => {
@@ -325,21 +502,39 @@ export const saudiBankingService = {
   },
 
   submitPayroll: async (data: {
-    establishment: any
-    employees: any[]
+    establishment: WPSEstablishment
+    employees: WPSEmployee[]
     paymentDate: string
-  }): Promise<{ submissionId: string; status: string }> => {
+  }): Promise<MudadSubmission> => {
     const response = await api.post('/saudi-banking/mudad/payroll/submit', data)
     return response.data
   },
 
-  getSubmissionStatus: async (submissionId: string): Promise<any> => {
+  getSubmissionStatus: async (submissionId: string): Promise<MudadSubmission> => {
     const response = await api.get(`/saudi-banking/mudad/submissions/${submissionId}/status`)
     return response.data
   },
 
+  getSubmissionHistory: async (params?: {
+    page?: number
+    pageSize?: number
+    fromDate?: string
+    toDate?: string
+    status?: MudadSubmissionStatus
+  }): Promise<{ submissions: MudadSubmission[]; total: number }> => {
+    const response = await api.get('/saudi-banking/mudad/submissions', { params })
+    return response.data
+  },
+
   generateGOSIReport: async (data: {
-    employees: any[]
+    employees: Array<{
+      employeeId: string
+      nationalId: string
+      nationality: EmployeeNationality
+      basicSalary: number
+      housingAllowance?: number
+      employeeStartDate?: string
+    }>
     month: string
   }): Promise<Blob> => {
     const response = await api.post('/saudi-banking/mudad/gosi/report', data, {
@@ -349,16 +544,54 @@ export const saudiBankingService = {
   },
 
   checkNitaqat: async (data: {
-    employees: any[]
+    employees: Array<{
+      employeeId: string
+      nationality: EmployeeNationality
+      salary: number
+    }>
+    activityType?: string
   }): Promise<NitaqatCheck> => {
     const response = await api.post('/saudi-banking/mudad/compliance/nitaqat', data)
     return response.data
   },
 
   checkMinimumWage: async (data: {
-    employees: any[]
-  }): Promise<{ compliant: boolean; violations: any[] }> => {
+    employees: Array<{
+      employeeId: string
+      nationality: EmployeeNationality
+      salary: number
+    }>
+  }): Promise<{
+    compliant: boolean
+    violations: Array<{
+      employeeId: string
+      currentSalary: number
+      minimumRequired: number
+      deficit: number
+    }>
+  }> => {
     const response = await api.post('/saudi-banking/mudad/compliance/minimum-wage', data)
+    return response.data
+  },
+
+  // ============ COMPLIANCE DEADLINES ============
+  getComplianceDeadlines: async (params?: {
+    month?: string
+    types?: Array<'gosi' | 'wps' | 'mudad' | 'nitaqat'>
+  }): Promise<ComplianceDeadline[]> => {
+    const response = await api.get('/saudi-banking/compliance/deadlines', { params })
+    return response.data
+  },
+
+  getComplianceStatus: async (): Promise<ComplianceStatus> => {
+    const response = await api.get('/saudi-banking/compliance/status')
+    return response.data
+  },
+
+  getUpcomingDeadlines: async (daysAhead?: number): Promise<ComplianceDeadline[]> => {
+    const response = await api.get('/saudi-banking/compliance/deadlines/upcoming', {
+      params: { daysAhead: daysAhead ?? 30 }
+    })
     return response.data
   },
 }

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -17,20 +17,32 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import { Switch } from '@/components/ui/switch'
 import {
     Search, Bell, AlertCircle, Calculator, Users, ChevronLeft, Shield,
     CheckCircle, XCircle, TrendingUp, FileText, Building2, Percent,
-    DollarSign, AlertTriangle, Info, ArrowRight, RefreshCw
+    DollarSign, AlertTriangle, Info, ArrowRight, RefreshCw, Calendar
 } from 'lucide-react'
 import {
     useCalculateGOSI,
     useCheckNitaqat,
     useCheckMinimumWage,
     useMudadCompliance,
-    type GOSICalculation,
     type NitaqatResult,
     type MinimumWageResult
 } from '@/hooks/useSaudiBanking'
+import {
+    EmployeeNationality,
+    GOSI_SALARY_CONSTRAINTS,
+    GOSI_RATES_SAUDI_LEGACY,
+    GOSI_RATES_SAUDI_REFORM,
+    GOSI_RATES_NON_SAUDI,
+    SANED_RATES,
+    REGULATORY_DATES,
+    calculateGosiContribution,
+    type GosiContributionBreakdown,
+} from '@/constants/saudi-banking'
+import { ROUTES } from '@/constants/routes'
 
 // Sidebar Component
 function MudadSidebar() {
@@ -70,26 +82,57 @@ function MudadSidebar() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                    {/* Legacy Saudi rates */}
                     <div className="p-3 bg-slate-50 rounded-xl">
                         <div className="flex justify-between mb-1">
                             <span className="text-sm text-slate-600">اشتراك الموظف السعودي</span>
-                            <span className="font-bold text-navy">9.75%</span>
+                            <span className="font-bold text-navy">{(GOSI_RATES_SAUDI_LEGACY.employee * 100).toFixed(2)}%</span>
                         </div>
-                        <p className="text-xs text-slate-500">من الراتب الأساسي + بدل السكن</p>
+                        <p className="text-xs text-slate-500">للموظفين المعينين قبل 3 يوليو 2024</p>
                     </div>
                     <div className="p-3 bg-slate-50 rounded-xl">
                         <div className="flex justify-between mb-1">
                             <span className="text-sm text-slate-600">اشتراك صاحب العمل (سعودي)</span>
-                            <span className="font-bold text-navy">11.75%</span>
+                            <span className="font-bold text-navy">{(GOSI_RATES_SAUDI_LEGACY.employer * 100).toFixed(2)}%</span>
                         </div>
-                        <p className="text-xs text-slate-500">معاشات + أخطار مهنية</p>
+                        <p className="text-xs text-slate-500">معاشات 9.75% + أخطار مهنية 2%</p>
                     </div>
+                    {/* 2024 Reform rates */}
+                    <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-emerald-500 text-white text-xs">إصلاح 2024</Badge>
+                        </div>
+                        <div className="flex justify-between mb-1">
+                            <span className="text-sm text-emerald-700">الموظف السعودي الجديد</span>
+                            <span className="font-bold text-emerald-700">0%</span>
+                        </div>
+                        <div className="flex justify-between mb-1">
+                            <span className="text-sm text-emerald-700">صاحب العمل</span>
+                            <span className="font-bold text-emerald-700">{(GOSI_RATES_SAUDI_REFORM.employer * 100).toFixed(1)}%</span>
+                        </div>
+                        <p className="text-xs text-emerald-600">للمعينين من 3 يوليو 2024</p>
+                    </div>
+                    {/* Non-Saudi */}
                     <div className="p-3 bg-slate-50 rounded-xl">
                         <div className="flex justify-between mb-1">
-                            <span className="text-sm text-slate-600">اشتراك غير السعودي</span>
-                            <span className="font-bold text-navy">2%</span>
+                            <span className="text-sm text-slate-600">غير السعودي</span>
+                            <span className="font-bold text-navy">{(GOSI_RATES_NON_SAUDI.employer * 100)}%</span>
                         </div>
                         <p className="text-xs text-slate-500">أخطار مهنية فقط (صاحب العمل)</p>
+                    </div>
+                    {/* SANED */}
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
+                        <div className="flex justify-between mb-1">
+                            <span className="text-sm text-blue-700">ساند (للسعوديين)</span>
+                            <span className="font-bold text-blue-700">{(SANED_RATES.total * 100).toFixed(1)}%</span>
+                        </div>
+                        <p className="text-xs text-blue-600">0.75% موظف + 0.75% صاحب عمل</p>
+                    </div>
+                    {/* Salary cap info */}
+                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                        <p className="text-xs text-amber-700">
+                            <strong>سقف الراتب:</strong> {GOSI_SALARY_CONSTRAINTS.MIN_BASE.toLocaleString()} - {GOSI_SALARY_CONSTRAINTS.MAX_BASE.toLocaleString()} ر.س
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -115,9 +158,12 @@ export function SaudiBankingMudadView() {
     const [activeTab, setActiveTab] = useState('gosi')
 
     // GOSI Calculator State
-    const [nationality, setNationality] = useState('SA')
+    const [nationality, setNationality] = useState<EmployeeNationality>(EmployeeNationality.SAUDI)
     const [basicSalary, setBasicSalary] = useState('')
-    const [gosiResult, setGosiResult] = useState<GOSICalculation | null>(null)
+    const [housingAllowance, setHousingAllowance] = useState('')
+    const [isReformEmployee, setIsReformEmployee] = useState(false)
+    const [employeeStartDate, setEmployeeStartDate] = useState('')
+    const [gosiResult, setGosiResult] = useState<GosiContributionBreakdown | null>(null)
 
     // Mutations
     const calculateGOSIMutation = useCalculateGOSI()
@@ -157,39 +203,27 @@ export function SaudiBankingMudadView() {
         { title: 'الخدمات المصرفية', href: '/dashboard/finance/saudi-banking', isActive: true },
     ]
 
-    const handleCalculateGOSI = () => {
+    const handleCalculateGOSI = useCallback(() => {
         if (!basicSalary) return
 
-        const salary = parseFloat(basicSalary)
+        const basic = parseFloat(basicSalary)
+        const housing = housingAllowance ? parseFloat(housingAllowance) : undefined
 
-        // Calculate GOSI based on nationality
-        if (nationality === 'SA') {
-            // Saudi: Employee 9.75%, Employer 11.75%
-            const employeeContribution = salary * 0.0975
-            const pensionContribution = salary * 0.09 // Part of employer contribution
-            const hazardContribution = salary * 0.02 // Part of employer contribution
-            const employerContribution = pensionContribution + hazardContribution + (salary * 0.0075)
+        // Use the employee start date if provided, otherwise use isReformEmployee toggle
+        const startDate = employeeStartDate
+            ? employeeStartDate
+            : (isReformEmployee ? REGULATORY_DATES.GOSI_REFORM_DATE : '2020-01-01')
 
-            setGosiResult({
-                employeeContribution,
-                employerContribution,
-                totalContribution: employeeContribution + employerContribution,
-                pensionContribution,
-                hazardContribution,
-            })
-        } else {
-            // Non-Saudi: Only 2% hazard contribution from employer
-            const hazardContribution = salary * 0.02
+        // Use the centralized calculation function from constants
+        const result = calculateGosiContribution(
+            basic,
+            housing,
+            nationality,
+            nationality === EmployeeNationality.SAUDI ? startDate : undefined
+        )
 
-            setGosiResult({
-                employeeContribution: 0,
-                employerContribution: hazardContribution,
-                totalContribution: hazardContribution,
-                pensionContribution: 0,
-                hazardContribution,
-            })
-        }
-    }
+        setGosiResult(result)
+    }, [basicSalary, housingAllowance, nationality, isReformEmployee, employeeStartDate])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
@@ -274,21 +308,21 @@ export function SaudiBankingMudadView() {
                                     <TabsContent value="gosi" className="m-0">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {/* Calculator Form */}
-                                            <div className="space-y-6">
+                                            <div className="space-y-5">
                                                 <div>
                                                     <Label className="text-navy font-medium mb-2 block">الجنسية</Label>
                                                     <div className="flex gap-3">
                                                         <Button
-                                                            variant={nationality === 'SA' ? 'default' : 'outline'}
-                                                            onClick={() => setNationality('SA')}
-                                                            className={`flex-1 rounded-xl ${nationality === 'SA' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
+                                                            variant={nationality === EmployeeNationality.SAUDI ? 'default' : 'outline'}
+                                                            onClick={() => setNationality(EmployeeNationality.SAUDI)}
+                                                            className={`flex-1 rounded-xl ${nationality === EmployeeNationality.SAUDI ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
                                                         >
                                                             سعودي
                                                         </Button>
                                                         <Button
-                                                            variant={nationality !== 'SA' ? 'default' : 'outline'}
-                                                            onClick={() => setNationality('OTHER')}
-                                                            className={`flex-1 rounded-xl ${nationality !== 'SA' ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                                            variant={nationality === EmployeeNationality.EXPAT ? 'default' : 'outline'}
+                                                            onClick={() => setNationality(EmployeeNationality.EXPAT)}
+                                                            className={`flex-1 rounded-xl ${nationality === EmployeeNationality.EXPAT ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                                                         >
                                                             غير سعودي
                                                         </Button>
@@ -296,19 +330,87 @@ export function SaudiBankingMudadView() {
                                                 </div>
 
                                                 <div>
-                                                    <Label className="text-navy font-medium mb-2 block">الراتب الأساسي + بدل السكن (ريال)</Label>
+                                                    <Label className="text-navy font-medium mb-2 block">الراتب الأساسي (ريال)</Label>
                                                     <Input
                                                         type="number"
-                                                        placeholder="مثال: 10000"
+                                                        placeholder="مثال: 8000"
                                                         value={basicSalary}
                                                         onChange={(e) => setBasicSalary(e.target.value)}
-                                                        className="rounded-xl h-12 text-lg"
+                                                        className="rounded-xl h-11"
+                                                        min={0}
                                                     />
                                                 </div>
+
+                                                <div>
+                                                    <Label className="text-navy font-medium mb-2 block">بدل السكن (ريال)</Label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="مثال: 2000 (اختياري - افتراضي 25%)"
+                                                        value={housingAllowance}
+                                                        onChange={(e) => setHousingAllowance(e.target.value)}
+                                                        className="rounded-xl h-11"
+                                                        min={0}
+                                                    />
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                        إذا تُرك فارغاً، سيُحسب كـ 25% من الراتب الأساسي
+                                                    </p>
+                                                </div>
+
+                                                {/* 2024 Reform Toggle - Only for Saudis */}
+                                                {nationality === EmployeeNationality.SAUDI && (
+                                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-2">
+                                                                <Calendar className="h-4 w-4 text-emerald-600" />
+                                                                <Label className="text-emerald-700 font-medium">
+                                                                    موظف جديد (إصلاح 2024)
+                                                                </Label>
+                                                            </div>
+                                                            <Switch
+                                                                checked={isReformEmployee}
+                                                                onCheckedChange={setIsReformEmployee}
+                                                            />
+                                                        </div>
+                                                        <p className="text-xs text-emerald-600 mt-2">
+                                                            للمعينين من 3 يوليو 2024 - صاحب العمل يتحمل كامل الاشتراك
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Salary Cap Warning */}
+                                                {basicSalary && parseFloat(basicSalary) > 0 && (
+                                                    (() => {
+                                                        const basic = parseFloat(basicSalary)
+                                                        const housing = housingAllowance ? parseFloat(housingAllowance) : basic * 0.25
+                                                        const total = basic + housing
+                                                        if (total > GOSI_SALARY_CONSTRAINTS.MAX_BASE) {
+                                                            return (
+                                                                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                                                                    <p className="text-xs text-amber-700">
+                                                                        <AlertTriangle className="h-3 w-3 inline me-1" />
+                                                                        الراتب يتجاوز السقف ({GOSI_SALARY_CONSTRAINTS.MAX_BASE.toLocaleString()} ر.س). سيتم احتساب التأمينات على السقف.
+                                                                    </p>
+                                                                </div>
+                                                            )
+                                                        }
+                                                        if (total < GOSI_SALARY_CONSTRAINTS.MIN_BASE) {
+                                                            return (
+                                                                <div className="p-3 bg-red-50 rounded-xl border border-red-200">
+                                                                    <p className="text-xs text-red-700">
+                                                                        <AlertTriangle className="h-3 w-3 inline me-1" />
+                                                                        الراتب أقل من الحد الأدنى ({GOSI_SALARY_CONSTRAINTS.MIN_BASE.toLocaleString()} ر.س)
+                                                                    </p>
+                                                                </div>
+                                                            )
+                                                        }
+                                                        return null
+                                                    })()
+                                                )}
 
                                                 <Button
                                                     onClick={handleCalculateGOSI}
                                                     className="w-full bg-orange-500 hover:bg-orange-600 rounded-xl h-12 shadow-lg shadow-orange-500/20"
+                                                    disabled={!basicSalary}
                                                 >
                                                     <Calculator className="h-5 w-5 ms-2" />
                                                     احسب التأمينات
@@ -323,34 +425,82 @@ export function SaudiBankingMudadView() {
                                                 </h4>
 
                                                 {gosiResult ? (
-                                                    <div className="space-y-4">
+                                                    <div className="space-y-3">
+                                                        {/* Base Salary Used */}
+                                                        <div className="bg-slate-100 rounded-xl p-3">
+                                                            <p className="text-xs text-slate-500 mb-1">الراتب المحتسب (بعد السقف)</p>
+                                                            <p className="text-lg font-bold text-slate-700">
+                                                                {formatCurrency(gosiResult.baseSalary)} <span className="text-sm font-normal">ر.س</span>
+                                                            </p>
+                                                        </div>
+
+                                                        {/* Reform Badge */}
+                                                        {gosiResult.isReformRate && (
+                                                            <div className="flex items-center gap-2 p-2 bg-emerald-100 rounded-lg">
+                                                                <Badge className="bg-emerald-500 text-white text-xs">إصلاح 2024</Badge>
+                                                                <span className="text-xs text-emerald-700">صاحب العمل يتحمل كامل الاشتراك</span>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Employee Contribution */}
                                                         <div className="bg-white rounded-xl p-4">
-                                                            <p className="text-sm text-slate-500 mb-1">اشتراك الموظف</p>
-                                                            <p className="text-2xl font-bold text-navy">
+                                                            <p className="text-sm text-slate-500 mb-1">اشتراك الموظف (معاشات)</p>
+                                                            <p className="text-xl font-bold text-navy">
                                                                 {formatCurrency(gosiResult.employeeContribution)} <span className="text-sm font-normal">ر.س</span>
                                                             </p>
-                                                            {nationality === 'SA' && (
+                                                            {nationality === EmployeeNationality.SAUDI && !gosiResult.isReformRate && (
                                                                 <p className="text-xs text-slate-500 mt-1">9.75% من الراتب</p>
                                                             )}
-                                                        </div>
-
-                                                        <div className="bg-white rounded-xl p-4">
-                                                            <p className="text-sm text-slate-500 mb-1">اشتراك صاحب العمل</p>
-                                                            <p className="text-2xl font-bold text-emerald-600">
-                                                                {formatCurrency(gosiResult.employerContribution)} <span className="text-sm font-normal">ر.س</span>
-                                                            </p>
-                                                            {nationality === 'SA' ? (
-                                                                <p className="text-xs text-slate-500 mt-1">11.75% من الراتب</p>
-                                                            ) : (
-                                                                <p className="text-xs text-slate-500 mt-1">2% أخطار مهنية</p>
+                                                            {gosiResult.isReformRate && (
+                                                                <p className="text-xs text-emerald-600 mt-1">معفى (إصلاح 2024)</p>
                                                             )}
                                                         </div>
 
+                                                        {/* Employer Contribution Breakdown */}
+                                                        <div className="bg-white rounded-xl p-4">
+                                                            <p className="text-sm text-slate-500 mb-2">اشتراك صاحب العمل</p>
+                                                            <p className="text-xl font-bold text-emerald-600 mb-2">
+                                                                {formatCurrency(gosiResult.employerTotalContribution)} <span className="text-sm font-normal">ر.س</span>
+                                                            </p>
+                                                            <div className="space-y-1 text-xs text-slate-500 border-t pt-2">
+                                                                <div className="flex justify-between">
+                                                                    <span>معاشات</span>
+                                                                    <span>{formatCurrency(gosiResult.employerPensionContribution)} ر.س</span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span>أخطار مهنية (OHI)</span>
+                                                                    <span>{formatCurrency(gosiResult.employerOhiContribution)} ر.س</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* SANED Contribution - Saudi Only */}
+                                                        {nationality === EmployeeNationality.SAUDI && (
+                                                            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                                                                <p className="text-sm text-blue-700 mb-2">اشتراك ساند (التعطل عن العمل)</p>
+                                                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                                                    <div>
+                                                                        <p className="text-xs text-blue-600">الموظف (0.75%)</p>
+                                                                        <p className="font-bold text-blue-800">{formatCurrency(gosiResult.sanedEmployeeContribution)} ر.س</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-xs text-blue-600">صاحب العمل (0.75%)</p>
+                                                                        <p className="font-bold text-blue-800">{formatCurrency(gosiResult.sanedEmployerContribution)} ر.س</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Total */}
                                                         <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-                                                            <p className="text-sm text-orange-600 mb-1">إجمالي الاشتراكات</p>
-                                                            <p className="text-3xl font-bold text-orange-600">
+                                                            <p className="text-sm text-orange-600 mb-1">إجمالي الاشتراكات الشهرية</p>
+                                                            <p className="text-2xl font-bold text-orange-600">
                                                                 {formatCurrency(gosiResult.totalContribution)} <span className="text-sm font-normal">ر.س</span>
                                                             </p>
+                                                            <div className="flex justify-between text-xs text-orange-500 mt-2 pt-2 border-t border-orange-200">
+                                                                <span>على الموظف: {formatCurrency(gosiResult.employeeContribution + gosiResult.sanedEmployeeContribution)} ر.س</span>
+                                                                <span>على صاحب العمل: {formatCurrency(gosiResult.employerTotalContribution + gosiResult.sanedEmployerContribution)} ر.س</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ) : (

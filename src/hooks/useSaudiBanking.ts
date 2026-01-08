@@ -3,11 +3,43 @@ import { CACHE_TIMES } from '@/config'
 import api from '@/lib/api'
 import { toast } from 'sonner'
 import { invalidateCache } from '@/lib/cache-invalidation'
+import {
+  EmployeeNationality,
+  NitaqatBand,
+  MudadSubmissionStatus,
+} from '@/constants/saudi-banking'
+import type {
+  GOSICalculation,
+  GOSIContributionBreakdown,
+  NitaqatCheck,
+  PayrollCalculation,
+  ComplianceDeadline,
+  ComplianceStatus,
+  MudadSubmission,
+  WPSFile as ServiceWPSFile,
+  WPSEmployee as ServiceWPSEmployee,
+  WPSEstablishment as ServiceWPSEstablishment,
+  WPSValidationResult,
+} from '@/services/saudiBankingService'
 
 // ==================== Cache Configuration ====================
 const STATS_STALE_TIME = CACHE_TIMES.LONG // 30 minutes
 const STATS_GC_TIME = CACHE_TIMES.GC_LONG // 1 hour
 const LIST_STALE_TIME = CACHE_TIMES.MEDIUM // 5 minutes for lists
+
+// ============================================
+// RE-EXPORT TYPES FROM SERVICE FOR CONVENIENCE
+// ============================================
+export type {
+  GOSICalculation,
+  GOSIContributionBreakdown,
+  NitaqatCheck,
+  PayrollCalculation,
+  ComplianceDeadline,
+  ComplianceStatus,
+  MudadSubmission,
+  WPSValidationResult,
+}
 
 // ============================================
 // TYPES
@@ -64,8 +96,8 @@ export interface LeanTransaction {
   status: 'COMPLETED' | 'PENDING' | 'FAILED'
 }
 
-// WPS Types
-export interface WPSEstablishment {
+// WPS Types (extended from service types)
+export interface WPSEstablishment extends Omit<ServiceWPSEstablishment, 'establishmentId' | 'establishmentName'> {
   molId: string
   name: string
   iban: string
@@ -74,9 +106,13 @@ export interface WPSEstablishment {
 
 export interface WPSEmployee {
   name: string
+  employeeId?: string
   molId: string
-  nationality: string
+  nationalId: string
+  nationality: EmployeeNationality
   iban: string
+  bankCode: string
+  employeeStartDate?: string
   salary: {
     basic: number
     housing: number
@@ -88,6 +124,7 @@ export interface WPSEmployee {
 
 export interface WPSFile {
   _id: string
+  fileId?: string
   filename: string
   establishment: WPSEstablishment
   totalRecords: number
@@ -96,6 +133,7 @@ export interface WPSFile {
   batchReference: string
   status: 'PENDING' | 'UPLOADED' | 'PROCESSED' | 'FAILED'
   createdAt: string
+  downloadUrl?: string
 }
 
 export interface SARIEBank {
@@ -140,44 +178,40 @@ export interface SADADPayment {
   remarks?: string
 }
 
-// Mudad Types
+// Mudad Types (updated to match API contracts)
 export interface MudadEmployee {
+  employeeId?: string
   name: string
-  nationality: string
+  nationalId?: string
+  nationality: EmployeeNationality | string
   basicSalary: number
   housingAllowance?: number
   transportAllowance?: number
   otherAllowances?: number
-}
-
-export interface GOSICalculation {
-  employeeContribution: number
-  employerContribution: number
-  totalContribution: number
-  pensionContribution: number
-  hazardContribution: number
-}
-
-export interface PayrollCalculation {
-  employee: MudadEmployee
-  grossSalary: number
-  gosi: GOSICalculation
-  netSalary: number
+  employeeStartDate?: string // For GOSI 2024 reform
 }
 
 export interface NitaqatResult {
   totalEmployees: number
   saudiCount: number
+  weightedSaudiCount: number
   nonSaudiCount: number
   saudizationPercentage: number
   requiredPercentage: number
-  category: 'PLATINUM' | 'GREEN_HIGH' | 'GREEN_MID' | 'GREEN_LOW' | 'YELLOW' | 'RED'
+  category: NitaqatBand | 'PLATINUM' | 'GREEN_HIGH' | 'GREEN_MID' | 'GREEN_LOW' | 'YELLOW' | 'RED'
   isCompliant: boolean
   shortfall?: number
+  points?: {
+    fullPoints: number
+    halfPoints: number
+    zeroPoints: number
+    totalPoints: number
+  }
 }
 
 export interface MinimumWageResult {
   employee: string
+  employeeId?: string
   nationality: string
   salary: number
   minimumRequired: number
@@ -540,11 +574,26 @@ export function useCalculatePayroll() {
   })
 }
 
-// Calculate GOSI for single employee
+// Calculate GOSI for single employee (updated for 2024 reform)
 export function useCalculateGOSI() {
   return useMutation({
-    mutationFn: async ({ nationality, basicSalary }: { nationality: string; basicSalary: number }) => {
-      const response = await api.post('/saudi-banking/mudad/gosi/calculate', { nationality, basicSalary })
+    mutationFn: async ({
+      nationality,
+      basicSalary,
+      housingAllowance,
+      employeeStartDate,
+    }: {
+      nationality: EmployeeNationality | string
+      basicSalary: number
+      housingAllowance?: number
+      employeeStartDate?: string
+    }): Promise<GOSICalculation> => {
+      const response = await api.post('/saudi-banking/mudad/gosi/calculate', {
+        nationality,
+        basicSalary,
+        housingAllowance,
+        employeeStartDate,
+      })
       return response.data
     },
   })
@@ -608,6 +657,92 @@ export function useMudadCompliance() {
       const response = await api.get('/saudi-banking/mudad/compliance')
       return response.data
     },
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    retry: false,
+  })
+}
+
+// ============================================
+// COMPLIANCE DEADLINE HOOKS
+// ============================================
+
+// Get all compliance deadlines
+export function useComplianceDeadlines(params?: {
+  month?: string
+  types?: Array<'gosi' | 'wps' | 'mudad' | 'nitaqat'>
+}) {
+  return useQuery<ComplianceDeadline[]>({
+    queryKey: ['compliance', 'deadlines', params],
+    queryFn: async () => {
+      const response = await api.get('/saudi-banking/compliance/deadlines', { params })
+      return response.data
+    },
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    retry: false,
+  })
+}
+
+// Get overall compliance status
+export function useComplianceStatus() {
+  return useQuery<ComplianceStatus>({
+    queryKey: ['compliance', 'status'],
+    queryFn: async () => {
+      const response = await api.get('/saudi-banking/compliance/status')
+      return response.data
+    },
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    retry: false,
+  })
+}
+
+// Get upcoming deadlines (next N days)
+export function useUpcomingDeadlines(daysAhead: number = 30) {
+  return useQuery<ComplianceDeadline[]>({
+    queryKey: ['compliance', 'deadlines', 'upcoming', daysAhead],
+    queryFn: async () => {
+      const response = await api.get('/saudi-banking/compliance/deadlines/upcoming', {
+        params: { daysAhead },
+      })
+      return response.data
+    },
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    retry: false,
+  })
+}
+
+// Get Mudad submission history
+export function useMudadSubmissions(params?: {
+  page?: number
+  pageSize?: number
+  fromDate?: string
+  toDate?: string
+  status?: MudadSubmissionStatus
+}) {
+  return useQuery<{ submissions: MudadSubmission[]; total: number }>({
+    queryKey: ['mudad', 'submissions', params],
+    queryFn: async () => {
+      const response = await api.get('/saudi-banking/mudad/submissions', { params })
+      return response.data
+    },
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    retry: false,
+  })
+}
+
+// Get single submission status
+export function useMudadSubmissionStatus(submissionId: string) {
+  return useQuery<MudadSubmission>({
+    queryKey: ['mudad', 'submissions', submissionId],
+    queryFn: async () => {
+      const response = await api.get(`/saudi-banking/mudad/submissions/${submissionId}/status`)
+      return response.data
+    },
+    enabled: !!submissionId,
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     retry: false,
