@@ -21,6 +21,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
+  GosiCard,
+  GosiCardHeader,
+  GosiCardTitle,
+  GosiCardContent,
+  GosiButton,
+} from '@/components/ui/gosi-ui'
+import {
   Table,
   TableBody,
   TableCell,

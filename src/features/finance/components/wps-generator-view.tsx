@@ -25,6 +25,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -32,6 +33,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  GosiCard,
+  GosiCardHeader,
+  GosiCardTitle,
+  GosiCardContent,
+  GosiInput,
+  GosiLabel,
+  GosiSelect,
+  GosiSelectTrigger,
+  GosiSelectContent,
+  GosiSelectItem,
+  GosiSelectValue,
+  GosiButton,
+} from '@/components/ui/gosi-ui'
 import {
   Table,
   TableBody,
@@ -400,88 +415,86 @@ export function WPSGeneratorView() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Form Area */}
           <div className="lg:col-span-3">
-            <Card className="rounded-2xl shadow-sm">
+            <GosiCard>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <CardHeader className="pb-2">
-                  <TabsList className="bg-slate-100 p-1 rounded-xl">
+                <GosiCardHeader>
+                  <TabsList className="bg-slate-100/80 p-1.5 rounded-2xl backdrop-blur-sm">
                     <TabsTrigger
                       value="establishment"
-                      className="data-[state=active]:bg-navy data-[state=active]:text-white rounded-lg px-6"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 rounded-xl px-6 py-3 font-bold transition-all duration-300"
                     >
                       <Building2 className="h-4 w-4 ms-2" />
                       بيانات المنشأة
                     </TabsTrigger>
                     <TabsTrigger
                       value="employees"
-                      className="data-[state=active]:bg-navy data-[state=active]:text-white rounded-lg px-6"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 rounded-xl px-6 py-3 font-bold transition-all duration-300"
                     >
                       <Users className="h-4 w-4 ms-2" />
                       الموظفين ({employees.length})
                     </TabsTrigger>
                     <TabsTrigger
                       value="review"
-                      className="data-[state=active]:bg-navy data-[state=active]:text-white rounded-lg px-6"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/25 rounded-xl px-6 py-3 font-bold transition-all duration-300"
                     >
                       <CheckCircle className="h-4 w-4 ms-2" />
                       المراجعة والتحميل
                     </TabsTrigger>
                   </TabsList>
-                </CardHeader>
+                </GosiCardHeader>
 
-                <CardContent className="pt-6">
+                <GosiCardContent>
                   {/* Establishment Tab */}
-                  <TabsContent value="establishment" className="m-0 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
+                  <TabsContent value="establishment" className="m-0 space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
                         <div>
-                          <Label className="text-navy font-medium">رقم المنشأة (وزارة العمل)</Label>
-                          <Input
+                          <GosiLabel>رقم المنشأة (وزارة العمل)</GosiLabel>
+                          <GosiInput
                             placeholder="مثال: 1234567890123 (13 رقم)"
                             value={establishment.molEstablishmentId}
                             onChange={(e) =>
                               handleEstablishmentChange('molEstablishmentId', e.target.value)
                             }
-                            className="mt-2 rounded-xl"
                             maxLength={13}
                           />
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-slate-500 mt-2 ms-1">
                             رقم المنشأة المسجل لدى وزارة الموارد البشرية (13 رقم)
                           </p>
                         </div>
 
                         <div>
-                          <Label className="text-navy font-medium">اسم المنشأة</Label>
-                          <Input
+                          <GosiLabel>اسم المنشأة</GosiLabel>
+                          <GosiInput
                             placeholder="اسم الشركة / المؤسسة"
                             value={establishment.establishmentName}
                             onChange={(e) =>
                               handleEstablishmentChange('establishmentName', e.target.value)
                             }
-                            className="mt-2 rounded-xl"
                           />
                         </div>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <div>
-                          <Label className="text-navy font-medium">البنك</Label>
-                          <Select onValueChange={handleEstablishmentBankChange}>
-                            <SelectTrigger className="mt-2 rounded-xl">
+                          <GosiLabel>البنك</GosiLabel>
+                          <GosiSelect onValueChange={handleEstablishmentBankChange}>
+                            <GosiSelectTrigger>
                               <SelectValue placeholder="اختر البنك" />
-                            </SelectTrigger>
-                            <SelectContent>
+                            </GosiSelectTrigger>
+                            <GosiSelectContent>
                               {BANK_OPTIONS.map((bank) => (
                                 <SelectItem key={bank.value} value={bank.value}>
                                   {bank.label}
                                 </SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
+                            </GosiSelectContent>
+                          </GosiSelect>
                         </div>
 
                         <div>
-                          <Label className="text-navy font-medium">رقم الآيبان (IBAN)</Label>
-                          <Input
+                          <GosiLabel>رقم الآيبان (IBAN)</GosiLabel>
+                          <GosiInput
                             placeholder="SA0000000000000000000000"
                             value={establishment.bankAccountIban}
                             onChange={(e) =>
@@ -490,7 +503,7 @@ export function WPSGeneratorView() {
                                 e.target.value.toUpperCase()
                               )
                             }
-                            className="mt-2 rounded-xl font-mono"
+                            className="font-mono"
                             maxLength={24}
                             dir="ltr"
                           />
@@ -499,16 +512,16 @@ export function WPSGeneratorView() {
                     </div>
 
                     {/* Salary Month Selection */}
-                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-                      <Label className="text-emerald-800 font-bold">شهر الراتب</Label>
-                      <Input
+                    <div className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-2xl border border-emerald-200/50">
+                      <GosiLabel className="text-emerald-800">شهر الراتب</GosiLabel>
+                      <GosiInput
                         type="month"
                         value={salaryMonth}
                         onChange={(e) => setSalaryMonth(e.target.value)}
-                        className="mt-2 rounded-xl max-w-xs"
+                        className="max-w-xs bg-white"
                       />
                       {payPeriod.start && (
-                        <p className="text-sm text-emerald-700 mt-2">
+                        <p className="text-sm text-emerald-700 mt-3 font-medium">
                           فترة الدفع: {payPeriod.start} إلى {payPeriod.end} ({payPeriod.days} يوم)
                         </p>
                       )}
@@ -516,96 +529,97 @@ export function WPSGeneratorView() {
                   </TabsContent>
 
                   {/* Employees Tab */}
-                  <TabsContent value="employees" className="m-0 space-y-6">
+                  <TabsContent value="employees" className="m-0 space-y-8">
                     {/* Add Employee Form */}
-                    <Card className="bg-slate-50 border-slate-200">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <Plus className="h-5 w-5 text-emerald-600" />
-                          {editingIndex !== null ? 'تعديل موظف' : 'إضافة موظف جديد'}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-200/50">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                          <Plus className="h-6 w-6 text-emerald-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-900">
+                            {editingIndex !== null ? 'تعديل موظف' : 'إضافة موظف جديد'}
+                          </h3>
+                          <p className="text-sm text-slate-500">أدخل بيانات الموظف للملف</p>
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div>
-                            <Label>رقم الهوية/الإقامة (MOL ID)</Label>
-                            <Input
+                            <GosiLabel>رقم الهوية/الإقامة (MOL ID)</GosiLabel>
+                            <GosiInput
                               placeholder="14 رقم"
                               value={currentEmployee.molPersonId}
                               onChange={(e) => handleEmployeeChange('molPersonId', e.target.value)}
-                              className="mt-1 rounded-lg"
                               maxLength={14}
                             />
                           </div>
                           <div>
-                            <Label>الهوية الوطنية / رقم الإقامة</Label>
-                            <Input
+                            <GosiLabel>الهوية الوطنية / رقم الإقامة</GosiLabel>
+                            <GosiInput
                               placeholder="10 أرقام"
                               value={currentEmployee.nationalId}
                               onChange={(e) => handleEmployeeChange('nationalId', e.target.value)}
-                              className="mt-1 rounded-lg"
                               maxLength={10}
                             />
                           </div>
                           <div>
-                            <Label>اسم الموظف</Label>
-                            <Input
+                            <GosiLabel>اسم الموظف</GosiLabel>
+                            <GosiInput
                               placeholder="الاسم الكامل"
                               value={currentEmployee.employeeName}
                               onChange={(e) => handleEmployeeChange('employeeName', e.target.value)}
-                              className="mt-1 rounded-lg"
                             />
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
-                            <Label>بنك الموظف</Label>
-                            <Select onValueChange={handleEmployeeBankChange}>
-                              <SelectTrigger className="mt-1 rounded-lg">
+                            <GosiLabel>بنك الموظف</GosiLabel>
+                            <GosiSelect onValueChange={handleEmployeeBankChange}>
+                              <GosiSelectTrigger>
                                 <SelectValue placeholder="اختر البنك" />
-                              </SelectTrigger>
-                              <SelectContent>
+                              </GosiSelectTrigger>
+                              <GosiSelectContent>
                                 {BANK_OPTIONS.map((bank) => (
                                   <SelectItem key={bank.value} value={bank.value}>
                                     {bank.label}
                                   </SelectItem>
                                 ))}
-                              </SelectContent>
-                            </Select>
+                              </GosiSelectContent>
+                            </GosiSelect>
                           </div>
                           <div>
-                            <Label>رقم الآيبان (IBAN)</Label>
-                            <Input
+                            <GosiLabel>رقم الآيبان (IBAN)</GosiLabel>
+                            <GosiInput
                               placeholder="SA0000000000000000000000"
                               value={currentEmployee.accountNumber}
                               onChange={(e) =>
                                 handleEmployeeChange('accountNumber', e.target.value.toUpperCase())
                               }
-                              className="mt-1 rounded-lg font-mono"
+                              className="font-mono"
                               maxLength={24}
                               dir="ltr"
                             />
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                           <div>
-                            <Label>الراتب الأساسي</Label>
-                            <Input
+                            <GosiLabel>الراتب الأساسي</GosiLabel>
+                            <GosiInput
                               type="number"
                               placeholder="0"
                               value={currentEmployee.basicSalary || ''}
                               onChange={(e) =>
                                 handleEmployeeChange('basicSalary', parseFloat(e.target.value) || 0)
                               }
-                              className="mt-1 rounded-lg"
                               min={0}
                             />
                           </div>
                           <div>
-                            <Label>بدل السكن</Label>
-                            <Input
+                            <GosiLabel>بدل السكن</GosiLabel>
+                            <GosiInput
                               type="number"
                               placeholder="0"
                               value={currentEmployee.housingAllowance || ''}
@@ -615,13 +629,12 @@ export function WPSGeneratorView() {
                                   parseFloat(e.target.value) || 0
                                 )
                               }
-                              className="mt-1 rounded-lg"
                               min={0}
                             />
                           </div>
                           <div>
-                            <Label>بدلات أخرى</Label>
-                            <Input
+                            <GosiLabel>بدلات أخرى</GosiLabel>
+                            <GosiInput
                               type="number"
                               placeholder="0"
                               value={currentEmployee.otherEarnings || ''}
@@ -631,28 +644,26 @@ export function WPSGeneratorView() {
                                   parseFloat(e.target.value) || 0
                                 )
                               }
-                              className="mt-1 rounded-lg"
                               min={0}
                             />
                           </div>
                           <div>
-                            <Label>الاستقطاعات</Label>
-                            <Input
+                            <GosiLabel>الاستقطاعات</GosiLabel>
+                            <GosiInput
                               type="number"
                               placeholder="0"
                               value={currentEmployee.deductions || ''}
                               onChange={(e) =>
                                 handleEmployeeChange('deductions', parseFloat(e.target.value) || 0)
                               }
-                              className="mt-1 rounded-lg"
                               min={0}
                             />
                           </div>
                         </div>
 
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
                           {editingIndex !== null && (
-                            <Button
+                            <GosiButton
                               variant="outline"
                               onClick={() => {
                                 setEditingIndex(null)
@@ -660,60 +671,66 @@ export function WPSGeneratorView() {
                               }}
                             >
                               إلغاء
-                            </Button>
+                            </GosiButton>
                           )}
-                          <Button
-                            onClick={handleSaveEmployee}
-                            className="bg-emerald-500 hover:bg-emerald-600"
-                          >
+                          <GosiButton onClick={handleSaveEmployee}>
                             {editingIndex !== null ? 'تحديث' : 'إضافة موظف'}
-                          </Button>
+                          </GosiButton>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
 
                     {/* Employees List */}
                     {employees.length > 0 ? (
-                      <div className="border rounded-xl overflow-hidden">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="bg-slate-50">
-                              <TableHead className="text-right">#</TableHead>
-                              <TableHead className="text-right">الاسم</TableHead>
-                              <TableHead className="text-right">الهوية</TableHead>
-                              <TableHead className="text-right">البنك</TableHead>
-                              <TableHead className="text-right">صافي الراتب</TableHead>
-                              <TableHead className="text-right">إجراءات</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {employees.map((emp, index) => {
-                              const netSalary =
-                                emp.basicSalary +
-                                emp.housingAllowance +
-                                emp.otherEarnings -
-                                emp.deductions -
-                                (emp.leaveDeduction || 0)
-                              return (
-                                <TableRow key={index}>
-                                  <TableCell>{index + 1}</TableCell>
-                                  <TableCell className="font-medium">{emp.employeeName}</TableCell>
-                                  <TableCell className="font-mono text-sm">
-                                    {emp.nationalId}
-                                  </TableCell>
-                                  <TableCell>
-                                    {getBankNameFromSarieCode(emp.bankRoutingCode)}
-                                  </TableCell>
-                                  <TableCell
-                                    className={netSalary < 1500 ? 'text-red-600' : 'text-emerald-600'}
-                                  >
-                                    {formatCurrency(netSalary)} ر.س
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex gap-1">
+                      <div className="space-y-3">
+                        {employees.map((emp, index) => {
+                          const netSalary =
+                            emp.basicSalary +
+                            emp.housingAllowance +
+                            emp.otherEarnings -
+                            emp.deductions -
+                            (emp.leaveDeduction || 0)
+                          const isLowSalary = netSalary < 1500
+                          return (
+                            <div
+                              key={index}
+                              className="group relative bg-white rounded-2xl border border-slate-100 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 overflow-hidden"
+                            >
+                              {/* Priority Strip */}
+                              <div
+                                className={`absolute start-0 top-0 bottom-0 w-1.5 ${
+                                  isLowSalary ? 'bg-red-500' : 'bg-emerald-500'
+                                }`}
+                              />
+                              <div className="p-5 ps-6">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-600 text-lg">
+                                      {index + 1}
+                                    </div>
+                                    <div>
+                                      <p className="font-bold text-slate-900">{emp.employeeName || `موظف #${index + 1}`}</p>
+                                      <p className="text-sm text-slate-500 font-mono">{emp.nationalId}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-6">
+                                    <div className="text-left">
+                                      <p className="text-xs text-slate-400">البنك</p>
+                                      <p className="text-sm font-medium text-slate-600">
+                                        {getBankNameFromSarieCode(emp.bankRoutingCode)}
+                                      </p>
+                                    </div>
+                                    <div className="text-left">
+                                      <p className="text-xs text-slate-400">صافي الراتب</p>
+                                      <p className={`text-lg font-bold ${isLowSalary ? 'text-red-600' : 'text-emerald-600'}`}>
+                                        {formatCurrency(netSalary)} ر.س
+                                      </p>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                       <Button
                                         variant="ghost"
                                         size="sm"
+                                        className="rounded-xl hover:bg-emerald-50 hover:text-emerald-600"
                                         onClick={() => handleEditEmployee(index)}
                                       >
                                         <Eye className="h-4 w-4" />
@@ -721,189 +738,185 @@ export function WPSGeneratorView() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="text-red-600 hover:text-red-700"
+                                        className="rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600"
                                         onClick={() => handleDeleteEmployee(index)}
                                       >
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
                                     </div>
-                                  </TableCell>
-                                </TableRow>
-                              )
-                            })}
-                          </TableBody>
-                        </Table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     ) : (
-                      <div className="text-center py-12 bg-slate-50 rounded-xl">
-                        <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                        <p className="text-slate-500">لم يتم إضافة موظفين بعد</p>
-                        <p className="text-sm text-slate-400">أضف موظفين باستخدام النموذج أعلاه</p>
+                      <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border-2 border-dashed border-slate-200">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+                          <Users className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-slate-600 font-bold text-lg">لم يتم إضافة موظفين بعد</p>
+                        <p className="text-sm text-slate-400 mt-1">أضف موظفين باستخدام النموذج أعلاه</p>
                       </div>
                     )}
                   </TabsContent>
 
                   {/* Review Tab */}
-                  <TabsContent value="review" className="m-0 space-y-6">
+                  <TabsContent value="review" className="m-0 space-y-8">
                     {/* Validation Status */}
                     {validationResult && (
-                      <Alert
-                        className={
+                      <div
+                        className={`p-6 rounded-2xl border-2 ${
                           validationResult.isValid
-                            ? 'border-emerald-200 bg-emerald-50'
-                            : 'border-red-200 bg-red-50'
-                        }
+                            ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50'
+                            : 'border-red-200 bg-gradient-to-br from-red-50 to-red-100/50'
+                        }`}
                       >
-                        {validationResult.isValid ? (
-                          <CheckCircle className="h-5 w-5 text-emerald-600" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-600" />
-                        )}
-                        <AlertTitle
-                          className={
-                            validationResult.isValid ? 'text-emerald-800' : 'text-red-800'
-                          }
-                        >
-                          {validationResult.isValid ? 'البيانات صحيحة' : 'يوجد أخطاء في البيانات'}
-                        </AlertTitle>
-                        <AlertDescription>
-                          {validationResult.isValid ? (
-                            <span className="text-emerald-700">
-                              جميع البيانات متوافقة مع متطلبات WPS
-                            </span>
-                          ) : (
-                            <ul className="list-disc list-inside text-red-700 mt-2">
-                              {validationResult.errors.slice(0, 5).map((err, i) => (
-                                <li key={i}>
-                                  {err.employeeName && `${err.employeeName}: `}
-                                  {err.message}
-                                </li>
-                              ))}
-                              {validationResult.errors.length > 5 && (
-                                <li>و {validationResult.errors.length - 5} أخطاء أخرى...</li>
-                              )}
-                            </ul>
-                          )}
-                        </AlertDescription>
-                      </Alert>
+                        <div className="flex items-start gap-4">
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                              validationResult.isValid ? 'bg-emerald-100' : 'bg-red-100'
+                            }`}
+                          >
+                            {validationResult.isValid ? (
+                              <CheckCircle className="h-6 w-6 text-emerald-600" />
+                            ) : (
+                              <XCircle className="h-6 w-6 text-red-600" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4
+                              className={`font-bold text-lg ${
+                                validationResult.isValid ? 'text-emerald-800' : 'text-red-800'
+                              }`}
+                            >
+                              {validationResult.isValid ? 'البيانات صحيحة' : 'يوجد أخطاء في البيانات'}
+                            </h4>
+                            {validationResult.isValid ? (
+                              <p className="text-emerald-700 mt-1">
+                                جميع البيانات متوافقة مع متطلبات WPS
+                              </p>
+                            ) : (
+                              <ul className="list-disc list-inside text-red-700 mt-2 space-y-1">
+                                {validationResult.errors.slice(0, 5).map((err, i) => (
+                                  <li key={i}>
+                                    {err.employeeName && `${err.employeeName}: `}
+                                    {err.message}
+                                  </li>
+                                ))}
+                                {validationResult.errors.length > 5 && (
+                                  <li className="font-medium">و {validationResult.errors.length - 5} أخطاء أخرى...</li>
+                                )}
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     )}
 
-                    {/* Summary */}
+                    {/* Summary Cards */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <Card className="bg-slate-50">
-                        <CardContent className="pt-4">
-                          <p className="text-sm text-slate-500">عدد الموظفين</p>
-                          <p className="text-2xl font-bold text-navy">{employees.length}</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-emerald-50">
-                        <CardContent className="pt-4">
-                          <p className="text-sm text-emerald-600">إجمالي الرواتب</p>
-                          <p className="text-2xl font-bold text-emerald-700">
-                            {formatCurrency(totals.basicSalary + totals.housingAllowance)}
-                          </p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-blue-50">
-                        <CardContent className="pt-4">
-                          <p className="text-sm text-blue-600">البدلات الأخرى</p>
-                          <p className="text-2xl font-bold text-blue-700">
-                            {formatCurrency(totals.otherEarnings)}
-                          </p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-orange-50">
-                        <CardContent className="pt-4">
-                          <p className="text-sm text-orange-600">صافي المبلغ</p>
-                          <p className="text-2xl font-bold text-orange-700">
-                            {formatCurrency(totals.netSalary)}
-                          </p>
-                        </CardContent>
-                      </Card>
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200/50">
+                        <p className="text-sm text-slate-500 font-medium">عدد الموظفين</p>
+                        <p className="text-3xl font-bold text-slate-900 mt-1">{employees.length}</p>
+                      </div>
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/50">
+                        <p className="text-sm text-emerald-600 font-medium">إجمالي الرواتب</p>
+                        <p className="text-3xl font-bold text-emerald-700 mt-1">
+                          {formatCurrency(totals.basicSalary + totals.housingAllowance)}
+                        </p>
+                      </div>
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/50">
+                        <p className="text-sm text-blue-600 font-medium">البدلات الأخرى</p>
+                        <p className="text-3xl font-bold text-blue-700 mt-1">
+                          {formatCurrency(totals.otherEarnings)}
+                        </p>
+                      </div>
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200/50">
+                        <p className="text-sm text-orange-600 font-medium">صافي المبلغ</p>
+                        <p className="text-3xl font-bold text-orange-700 mt-1">
+                          {formatCurrency(totals.netSalary)}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-3">
-                      <Button
-                        variant="outline"
-                        onClick={handleValidate}
-                        className="rounded-xl"
-                      >
+                    <div className="flex flex-wrap gap-4 pt-4">
+                      <GosiButton variant="outline" onClick={handleValidate}>
                         <CheckCircle className="h-4 w-4 ms-2" />
                         التحقق من البيانات
-                      </Button>
-                      <Button
+                      </GosiButton>
+                      <GosiButton
                         variant="outline"
                         onClick={handlePreview}
-                        className="rounded-xl"
                         disabled={employees.length === 0}
                       >
                         <Eye className="h-4 w-4 ms-2" />
                         معاينة الملف
-                      </Button>
-                      <Button
+                      </GosiButton>
+                      <GosiButton
                         onClick={handleDownload}
-                        className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
                         disabled={employees.length === 0}
+                        size="lg"
                       >
                         <Download className="h-4 w-4 ms-2" />
                         تحميل ملف WPS
-                      </Button>
+                      </GosiButton>
                     </div>
                   </TabsContent>
-                </CardContent>
+                </GosiCardContent>
               </Tabs>
-            </Card>
+            </GosiCard>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Quick Info */}
-            <Card className="rounded-2xl">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Info className="h-5 w-5 text-blue-600" />
+            <GosiCard>
+              <GosiCardHeader>
+                <GosiCardTitle>
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Info className="h-5 w-5 text-blue-600" />
+                  </div>
                   معلومات هامة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="font-medium text-blue-800">الموعد النهائي</p>
-                  <p className="text-blue-600">
+                </GosiCardTitle>
+              </GosiCardHeader>
+              <GosiCardContent className="space-y-4 text-sm">
+                <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl border border-blue-200/50">
+                  <p className="font-bold text-blue-800">الموعد النهائي</p>
+                  <p className="text-blue-600 mt-1">
                     يجب رفع ملف WPS خلال أول 10 أيام من الشهر التالي
                   </p>
                 </div>
-                <div className="p-3 bg-amber-50 rounded-lg">
-                  <p className="font-medium text-amber-800">العملة</p>
-                  <p className="text-amber-600">جميع المبالغ بالريال السعودي (SAR) فقط</p>
+                <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl border border-amber-200/50">
+                  <p className="font-bold text-amber-800">العملة</p>
+                  <p className="text-amber-600 mt-1">جميع المبالغ بالريال السعودي (SAR) فقط</p>
                 </div>
-                <div className="p-3 bg-emerald-50 rounded-lg">
-                  <p className="font-medium text-emerald-800">صيغة الملف</p>
-                  <p className="text-emerald-600">SIF (Salary Information File)</p>
+                <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl border border-emerald-200/50">
+                  <p className="font-bold text-emerald-800">صيغة الملف</p>
+                  <p className="text-emerald-600 mt-1">SIF (Salary Information File)</p>
                 </div>
-              </CardContent>
-            </Card>
+              </GosiCardContent>
+            </GosiCard>
 
             {/* Help Links */}
-            <Card className="rounded-2xl bg-gradient-to-br from-navy to-navy/90">
-              <CardContent className="p-4 text-white">
-                <Shield className="h-8 w-8 mb-3 text-emerald-400" />
-                <h4 className="font-bold mb-2">نظام حماية الأجور</h4>
-                <p className="text-sm text-white/80 mb-3">
-                  نظام إلزامي لضمان صرف الرواتب في الوقت المحدد
-                </p>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={() =>
-                    window.open('https://mudad.com.sa', '_blank')
-                  }
-                >
-                  زيارة منصة مدد
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white shadow-xl">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-4">
+                <Shield className="h-7 w-7 text-emerald-400" />
+              </div>
+              <h4 className="font-bold text-xl mb-2">نظام حماية الأجور</h4>
+              <p className="text-sm text-white/70 mb-4">
+                نظام إلزامي لضمان صرف الرواتب في الوقت المحدد
+              </p>
+              <GosiButton
+                variant="secondary"
+                className="w-full"
+                onClick={() => window.open('https://mudad.com.sa', '_blank')}
+              >
+                زيارة منصة مدد
+              </GosiButton>
+            </div>
           </div>
         </div>
 

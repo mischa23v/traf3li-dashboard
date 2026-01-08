@@ -27,6 +27,18 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import {
+  GosiCard,
+  GosiCardHeader,
+  GosiCardTitle,
+  GosiCardContent,
+  GosiInput,
+  GosiLabel,
+  GosiSelect,
+  GosiSelectTrigger,
+  GosiSelectContent,
+  GosiButton,
+} from '@/components/ui/gosi-ui'
+import {
   Select,
   SelectContent,
   SelectItem,

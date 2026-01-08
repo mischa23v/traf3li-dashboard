@@ -28,6 +28,13 @@ import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import {
+  GosiCard,
+  GosiCardHeader,
+  GosiCardTitle,
+  GosiCardContent,
+  GosiButton,
+} from '@/components/ui/gosi-ui'
+import {
   ChevronLeft,
   Shield,
   AlertTriangle,
