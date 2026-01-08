@@ -929,29 +929,6 @@ export const invalidateCache = {
     settings: () => queryClient.invalidateQueries({ queryKey: ['inventory', 'settings'] }),
   },
 
-  // Manufacturing
-  manufacturing: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['manufacturing'] }),
-    // BOMs
-    boms: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'boms'] }),
-    bomDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'boms', id] }),
-    // Workstations
-    workstations: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'workstations'] }),
-    workstationDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'workstations', id] }),
-    // Work Orders
-    workOrders: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'work-orders'] }),
-    workOrderDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'work-orders', id] }),
-    // Job Cards
-    jobCards: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'job-cards'] }),
-    jobCardDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'job-cards', id] }),
-    // Production Plans
-    productionPlans: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'production-plans'] }),
-    productionPlanDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'production-plans', id] }),
-    // Stats & Settings
-    stats: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'stats'] }),
-    settings: () => queryClient.invalidateQueries({ queryKey: ['manufacturing', 'settings'] }),
-  },
-
   // Buying
   buying: {
     all: () => queryClient.invalidateQueries({ queryKey: ['buying'] }),
@@ -977,45 +954,6 @@ export const invalidateCache = {
     // Stats & Settings
     stats: () => queryClient.invalidateQueries({ queryKey: ['buying', 'stats'] }),
     settings: () => queryClient.invalidateQueries({ queryKey: ['buying', 'settings'] }),
-  },
-
-  // Quality
-  quality: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['quality'] }),
-    // Inspections
-    inspections: () => queryClient.invalidateQueries({ queryKey: ['quality', 'inspections'] }),
-    inspectionDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'inspections', id] }),
-    // Templates
-    templates: () => queryClient.invalidateQueries({ queryKey: ['quality', 'templates'] }),
-    templateDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'templates', id] }),
-    // Parameters
-    parameters: () => queryClient.invalidateQueries({ queryKey: ['quality', 'parameters'] }),
-    // Actions
-    actions: () => queryClient.invalidateQueries({ queryKey: ['quality', 'actions'] }),
-    actionDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'actions', id] }),
-    // NCRs (Non-Conformance Reports)
-    ncrs: () => queryClient.invalidateQueries({ queryKey: ['quality', 'ncrs'] }),
-    ncrDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['quality', 'ncrs', id] }),
-    // Stats & Settings
-    stats: () => queryClient.invalidateQueries({ queryKey: ['quality', 'stats'] }),
-    settings: () => queryClient.invalidateQueries({ queryKey: ['quality', 'settings'] }),
-  },
-
-  // Subcontracting
-  subcontracting: {
-    all: () => queryClient.invalidateQueries({ queryKey: ['subcontracting'] }),
-    // Orders
-    orders: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'orders'] }),
-    orderDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'orders', id] }),
-    // Receipts
-    receipts: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'receipts'] }),
-    receiptDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'receipts', id] }),
-    // BOMs
-    boms: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'boms'] }),
-    bomDetail: (id: string) => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'boms', id] }),
-    // Stats & Settings
-    stats: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'stats'] }),
-    settings: () => queryClient.invalidateQueries({ queryKey: ['subcontracting', 'settings'] }),
   },
 
   // Support

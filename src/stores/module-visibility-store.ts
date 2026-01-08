@@ -15,10 +15,7 @@ export type ToggleableModule =
   | 'sales'        // Sales/CRM
   | 'inventory'    // Inventory Management
   | 'buying'       // Purchasing
-  | 'manufacturing'// Manufacturing/Production
-  | 'quality'      // Quality Control
   | 'assets'       // Asset Management
-  | 'subcontracting' // Subcontracting
   | 'support'      // Help Desk/Support
   | 'library'      // Knowledge Library
   | 'excellence'   // Excellence/Reputation
@@ -70,32 +67,11 @@ export const TOGGLEABLE_MODULES: ModuleInfo[] = [
     navGroupKey: 'sidebar.nav.buyingGroup',
   },
   {
-    key: 'manufacturing',
-    titleKey: 'modules.manufacturing.title',
-    descriptionKey: 'modules.manufacturing.description',
-    icon: 'Factory',
-    navGroupKey: 'sidebar.nav.manufacturingGroup',
-  },
-  {
-    key: 'quality',
-    titleKey: 'modules.quality.title',
-    descriptionKey: 'modules.quality.description',
-    icon: 'ClipboardCheck',
-    navGroupKey: 'sidebar.nav.qualityGroup',
-  },
-  {
     key: 'assets',
     titleKey: 'modules.assets.title',
     descriptionKey: 'modules.assets.description',
     icon: 'Building2',
     navGroupKey: 'sidebar.nav.assetsGroup',
-  },
-  {
-    key: 'subcontracting',
-    titleKey: 'modules.subcontracting.title',
-    descriptionKey: 'modules.subcontracting.description',
-    icon: 'GitBranch',
-    navGroupKey: 'sidebar.nav.subcontractingGroup',
   },
   {
     key: 'support',
@@ -139,10 +115,7 @@ const defaultVisibility: Record<ToggleableModule, boolean> = {
   sales: true,
   inventory: true,
   buying: true,
-  manufacturing: true,
-  quality: true,
   assets: true,
-  subcontracting: true,
   support: true,
   library: true,
   excellence: true,

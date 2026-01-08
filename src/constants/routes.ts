@@ -882,48 +882,6 @@ export const ROUTES = {
       },
     },
 
-    /**
-     * Manufacturing module routes
-     */
-    manufacturing: {
-      list: '/dashboard/manufacturing',
-      create: '/dashboard/manufacturing/create',
-      settings: '/dashboard/manufacturing/settings',
-      detail: (workOrderId: string) => `/dashboard/manufacturing/${workOrderId}`,
-
-      // Bill of materials
-      bom: {
-        list: '/dashboard/manufacturing/bom',
-        create: '/dashboard/manufacturing/bom/create',
-        detail: (bomId: string) => `/dashboard/manufacturing/bom/${bomId}`,
-      },
-
-      // Work orders
-      workOrders: {
-        list: '/dashboard/manufacturing/work-orders',
-        create: '/dashboard/manufacturing/work-orders/create',
-        detail: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}`,
-        edit: (workOrderId: string) => `/dashboard/manufacturing/work-orders/${workOrderId}/edit`,
-      },
-
-      // Job cards
-      jobCards: {
-        list: '/dashboard/manufacturing/job-cards',
-        create: '/dashboard/manufacturing/job-cards/create',
-        detail: (jobCardId: string) => `/dashboard/manufacturing/job-cards/${jobCardId}`,
-      },
-
-      // Workstations
-      workstations: {
-        list: '/dashboard/manufacturing/workstations',
-        create: '/dashboard/manufacturing/workstations/create',
-      },
-
-      // Production plans
-      productionPlans: {
-        list: '/dashboard/manufacturing/production-plans',
-      },
-    },
 
     /**
      * Buying/Purchasing module routes
@@ -1010,57 +968,7 @@ export const ROUTES = {
       },
     },
 
-    /**
-     * Quality management routes
-     */
-    quality: {
-      list: '/dashboard/quality',
-      create: '/dashboard/quality/create',
-      settings: '/dashboard/quality/settings',
-      detail: (inspectionId: string) => `/dashboard/quality/${inspectionId}`,
 
-      // Actions
-      actions: {
-        list: '/dashboard/quality/actions',
-        create: '/dashboard/quality/actions/create',
-      },
-
-      // Templates
-      templates: {
-        list: '/dashboard/quality/templates',
-        create: '/dashboard/quality/templates/create',
-      },
-
-      // NCRs (Non-Conformance Reports)
-      ncrs: {
-        list: '/dashboard/quality/ncrs',
-      },
-    },
-
-    /**
-     * Subcontracting routes
-     */
-    subcontracting: {
-      list: '/dashboard/subcontracting',
-      create: '/dashboard/subcontracting/create',
-      settings: '/dashboard/subcontracting/settings',
-      materials: '/dashboard/subcontracting/materials',
-      detail: (orderId: string) => `/dashboard/subcontracting/${orderId}`,
-      edit: (orderId: string) => `/dashboard/subcontracting/${orderId}/edit`,
-
-      // Receipts
-      receipts: {
-        list: '/dashboard/subcontracting/receipts',
-        create: '/dashboard/subcontracting/receipts/create',
-        detail: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}`,
-        edit: (receiptId: string) => `/dashboard/subcontracting/receipts/${receiptId}/edit`,
-      },
-
-      // BOMs (Bill of Materials)
-      boms: {
-        list: '/dashboard/subcontracting/boms',
-      },
-    },
 
     /**
      * Support/Help desk routes
@@ -1378,20 +1286,12 @@ export type RouteParams = {
   warehouseId: string;
   assetId: string;
 
-  // Manufacturing
-  workOrderId: string;
-  bomId: string;
-  jobCardId: string;
-
   // Buying
   supplierId: string;
   materialRequestId: string;
   purchaseOrderId: string;
 
-  // Quality
-  inspectionId: string;
-
-  // Subcontracting
+  // Sales
   orderId: string;
 
   // Support

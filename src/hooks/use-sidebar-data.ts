@@ -17,10 +17,7 @@ import {
   Package,
   ShoppingCart,
   Headphones,
-  ClipboardCheck,
-  Factory,
   Building2,
-  GitBranch,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
@@ -478,64 +475,6 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'sidebar.nav.manufacturingGroup',
-      items: [
-        {
-          title: 'sidebar.nav.manufacturing',
-          icon: Factory,
-          items: [
-            {
-              title: 'sidebar.nav.workOrders',
-              url: ROUTES.dashboard.manufacturing.list,
-            },
-            {
-              title: 'sidebar.nav.boms',
-              url: ROUTES.dashboard.manufacturing.bom.list,
-            },
-            {
-              title: 'sidebar.nav.workstations',
-              url: ROUTES.dashboard.manufacturing.workstations.list,
-            },
-            {
-              title: 'sidebar.nav.jobCards',
-              url: ROUTES.dashboard.manufacturing.jobCards.list,
-            },
-            {
-              title: 'sidebar.nav.productionPlans',
-              url: ROUTES.dashboard.manufacturing.productionPlans.list,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'sidebar.nav.qualityGroup',
-      items: [
-        {
-          title: 'sidebar.nav.quality',
-          icon: ClipboardCheck,
-          items: [
-            {
-              title: 'sidebar.nav.qualityInspections',
-              url: ROUTES.dashboard.quality.list,
-            },
-            {
-              title: 'sidebar.nav.qualityTemplates',
-              url: ROUTES.dashboard.quality.templates.list,
-            },
-            {
-              title: 'sidebar.nav.qualityActions',
-              url: ROUTES.dashboard.quality.actions.list,
-            },
-            {
-              title: 'sidebar.nav.ncrs',
-              url: ROUTES.dashboard.quality.ncrs.list,
-            },
-          ],
-        },
-      ],
-    },
-    {
       title: 'sidebar.nav.assetsGroup',
       items: [
         {
@@ -561,29 +500,6 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.assetMovements',
               url: ROUTES.dashboard.assets.movements.list,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'sidebar.nav.subcontractingGroup',
-      items: [
-        {
-          title: 'sidebar.nav.subcontracting',
-          icon: GitBranch,
-          items: [
-            {
-              title: 'sidebar.nav.subcontractingOrders',
-              url: ROUTES.dashboard.subcontracting.list,
-            },
-            {
-              title: 'sidebar.nav.subcontractingReceipts',
-              url: ROUTES.dashboard.subcontracting.receipts.list,
-            },
-            {
-              title: 'sidebar.nav.subcontractingBoms',
-              url: ROUTES.dashboard.subcontracting.boms.list,
             },
           ],
         },
