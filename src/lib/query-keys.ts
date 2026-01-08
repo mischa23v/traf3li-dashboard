@@ -912,16 +912,6 @@ export const QueryKeys = {
     movements: (itemId: string) => [...QueryKeys.inventory.all(), itemId, 'movements'] as const,
   },
 
-  // ==================== MANUFACTURING ====================
-  manufacturing: {
-    all: () => ['manufacturing'] as const,
-    lists: () => [...QueryKeys.manufacturing.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) => [...QueryKeys.manufacturing.lists(), filters] as const,
-    details: () => [...QueryKeys.manufacturing.all(), 'detail'] as const,
-    detail: (id: string) => [...QueryKeys.manufacturing.details(), id] as const,
-    stats: () => [...QueryKeys.manufacturing.all(), 'stats'] as const,
-  },
-
   // ==================== BUYING ====================
   buying: {
     all: () => ['buying'] as const,
@@ -930,25 +920,6 @@ export const QueryKeys = {
     details: () => [...QueryKeys.buying.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.buying.details(), id] as const,
     stats: () => [...QueryKeys.buying.all(), 'stats'] as const,
-  },
-
-  // ==================== QUALITY ====================
-  quality: {
-    all: () => ['quality'] as const,
-    lists: () => [...QueryKeys.quality.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) => [...QueryKeys.quality.lists(), filters] as const,
-    details: () => [...QueryKeys.quality.all(), 'detail'] as const,
-    detail: (id: string) => [...QueryKeys.quality.details(), id] as const,
-    stats: () => [...QueryKeys.quality.all(), 'stats'] as const,
-  },
-
-  // ==================== SUBCONTRACTING ====================
-  subcontracting: {
-    all: () => ['subcontracting'] as const,
-    lists: () => [...QueryKeys.subcontracting.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) => [...QueryKeys.subcontracting.lists(), filters] as const,
-    details: () => [...QueryKeys.subcontracting.all(), 'detail'] as const,
-    detail: (id: string) => [...QueryKeys.subcontracting.details(), id] as const,
   },
 
   // ==================== CRM - LEADS ====================

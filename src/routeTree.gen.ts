@@ -86,13 +86,10 @@ import { Route as AuthenticatedDashboardAppointmentsRouteImport } from './routes
 import { Route as authSignUpCompleteProfileRouteImport } from './routes/(auth)/sign-up.complete-profile'
 import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
 import { Route as AuthenticatedDashboardSupportIndexRouteImport } from './routes/_authenticated/dashboard.support.index'
-import { Route as AuthenticatedDashboardSubcontractingIndexRouteImport } from './routes/_authenticated/dashboard.subcontracting.index'
 import { Route as AuthenticatedDashboardStaffIndexRouteImport } from './routes/_authenticated/dashboard.staff.index'
 import { Route as AuthenticatedDashboardReportsIndexRouteImport } from './routes/_authenticated/dashboard.reports.index'
-import { Route as AuthenticatedDashboardQualityIndexRouteImport } from './routes/_authenticated/dashboard.quality.index'
 import { Route as AuthenticatedDashboardOrganizationsIndexRouteImport } from './routes/_authenticated/dashboard.organizations.index'
 import { Route as AuthenticatedDashboardNotificationsIndexRouteImport } from './routes/_authenticated/dashboard.notifications.index'
-import { Route as AuthenticatedDashboardManufacturingIndexRouteImport } from './routes/_authenticated/dashboard.manufacturing.index'
 import { Route as AuthenticatedDashboardInvoiceTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.invoice-templates.index'
 import { Route as AuthenticatedDashboardInventoryIndexRouteImport } from './routes/_authenticated/dashboard.inventory.index'
 import { Route as AuthenticatedDashboardFollowupsIndexRouteImport } from './routes/_authenticated/dashboard.followups.index'
@@ -115,10 +112,6 @@ import { Route as AuthenticatedDashboardSupportSlaRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardSupportSettingsRouteImport } from './routes/_authenticated/dashboard.support.settings'
 import { Route as AuthenticatedDashboardSupportCreateRouteImport } from './routes/_authenticated/dashboard.support.create'
 import { Route as AuthenticatedDashboardSupportTicketIdRouteImport } from './routes/_authenticated/dashboard.support.$ticketId'
-import { Route as AuthenticatedDashboardSubcontractingSettingsRouteImport } from './routes/_authenticated/dashboard.subcontracting.settings'
-import { Route as AuthenticatedDashboardSubcontractingReceiptsRouteImport } from './routes/_authenticated/dashboard.subcontracting.receipts'
-import { Route as AuthenticatedDashboardSubcontractingCreateRouteImport } from './routes/_authenticated/dashboard.subcontracting.create'
-import { Route as AuthenticatedDashboardSubcontractingOrderIdRouteImport } from './routes/_authenticated/dashboard.subcontracting.$orderId'
 import { Route as AuthenticatedDashboardStaffNewRouteImport } from './routes/_authenticated/dashboard.staff.new'
 import { Route as AuthenticatedDashboardSettingsTaxesRouteImport } from './routes/_authenticated/dashboard.settings.taxes'
 import { Route as AuthenticatedDashboardSettingsSecurityRouteImport } from './routes/_authenticated/dashboard.settings.security'
@@ -133,11 +126,6 @@ import { Route as AuthenticatedDashboardSettingsCrmRouteImport } from './routes/
 import { Route as AuthenticatedDashboardSettingsCompanyRouteImport } from './routes/_authenticated/dashboard.settings.company'
 import { Route as AuthenticatedDashboardReputationOverviewRouteImport } from './routes/_authenticated/dashboard.reputation.overview'
 import { Route as AuthenticatedDashboardReputationBadgesRouteImport } from './routes/_authenticated/dashboard.reputation.badges'
-import { Route as AuthenticatedDashboardQualityTemplatesRouteImport } from './routes/_authenticated/dashboard.quality.templates'
-import { Route as AuthenticatedDashboardQualitySettingsRouteImport } from './routes/_authenticated/dashboard.quality.settings'
-import { Route as AuthenticatedDashboardQualityCreateRouteImport } from './routes/_authenticated/dashboard.quality.create'
-import { Route as AuthenticatedDashboardQualityActionsRouteImport } from './routes/_authenticated/dashboard.quality.actions'
-import { Route as AuthenticatedDashboardQualityInspectionIdRouteImport } from './routes/_authenticated/dashboard.quality.$inspectionId'
 import { Route as AuthenticatedDashboardOrganizationsNewRouteImport } from './routes/_authenticated/dashboard.organizations.new'
 import { Route as AuthenticatedDashboardOrganizationsOrganizationIdRouteImport } from './routes/_authenticated/dashboard.organizations.$organizationId'
 import { Route as AuthenticatedDashboardNotificationsSettingsRouteImport } from './routes/_authenticated/dashboard.notifications.settings'
@@ -146,11 +134,6 @@ import { Route as AuthenticatedDashboardMlQueueRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardMlAnalyticsRouteImport } from './routes/_authenticated/dashboard.ml.analytics'
 import { Route as AuthenticatedDashboardMessagesEmailRouteImport } from './routes/_authenticated/dashboard.messages.email'
 import { Route as AuthenticatedDashboardMessagesChatRouteImport } from './routes/_authenticated/dashboard.messages.chat'
-import { Route as AuthenticatedDashboardManufacturingWorkstationsRouteImport } from './routes/_authenticated/dashboard.manufacturing.workstations'
-import { Route as AuthenticatedDashboardManufacturingSettingsRouteImport } from './routes/_authenticated/dashboard.manufacturing.settings'
-import { Route as AuthenticatedDashboardManufacturingCreateRouteImport } from './routes/_authenticated/dashboard.manufacturing.create'
-import { Route as AuthenticatedDashboardManufacturingBomRouteImport } from './routes/_authenticated/dashboard.manufacturing.bom'
-import { Route as AuthenticatedDashboardManufacturingWorkOrderIdRouteImport } from './routes/_authenticated/dashboard.manufacturing.$workOrderId'
 import { Route as AuthenticatedDashboardKnowledgeLawsRouteImport } from './routes/_authenticated/dashboard.knowledge.laws'
 import { Route as AuthenticatedDashboardKnowledgeJudgmentsRouteImport } from './routes/_authenticated/dashboard.knowledge.judgments'
 import { Route as AuthenticatedDashboardKnowledgeFormsRouteImport } from './routes/_authenticated/dashboard.knowledge.forms'
@@ -196,14 +179,8 @@ import { Route as AuthenticatedDashboardTasksReportsIndexRouteImport } from './r
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
 import { Route as AuthenticatedDashboardSupportSlaIndexRouteImport } from './routes/_authenticated/dashboard.support.sla.index'
-import { Route as AuthenticatedDashboardSubcontractingReceiptsIndexRouteImport } from './routes/_authenticated/dashboard.subcontracting.receipts.index'
 import { Route as AuthenticatedDashboardSalesReportsIndexRouteImport } from './routes/_authenticated/dashboard.sales.reports.index'
 import { Route as AuthenticatedDashboardSalesLeadsIndexRouteImport } from './routes/_authenticated/dashboard.sales.leads.index'
-import { Route as AuthenticatedDashboardQualityTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.quality.templates.index'
-import { Route as AuthenticatedDashboardQualityActionsIndexRouteImport } from './routes/_authenticated/dashboard.quality.actions.index'
-import { Route as AuthenticatedDashboardManufacturingWorkstationsIndexRouteImport } from './routes/_authenticated/dashboard.manufacturing.workstations.index'
-import { Route as AuthenticatedDashboardManufacturingJobCardsIndexRouteImport } from './routes/_authenticated/dashboard.manufacturing.job-cards.index'
-import { Route as AuthenticatedDashboardManufacturingBomIndexRouteImport } from './routes/_authenticated/dashboard.manufacturing.bom.index'
 import { Route as AuthenticatedDashboardInventoryWarehousesIndexRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.index'
 import { Route as AuthenticatedDashboardInventoryStockEntriesIndexRouteImport } from './routes/_authenticated/dashboard.inventory.stock-entries.index'
 import { Route as AuthenticatedDashboardHrVehiclesIndexRouteImport } from './routes/_authenticated/dashboard.hr.vehicles.index'
@@ -283,16 +260,8 @@ import { Route as AuthenticatedDashboardTasksRemindersReminderIdRouteImport } fr
 import { Route as AuthenticatedDashboardTasksEventsNewRouteImport } from './routes/_authenticated/dashboard.tasks.events.new'
 import { Route as AuthenticatedDashboardTasksEventsEventIdRouteImport } from './routes/_authenticated/dashboard.tasks.events.$eventId'
 import { Route as AuthenticatedDashboardSupportSlaCreateRouteImport } from './routes/_authenticated/dashboard.support.sla.create'
-import { Route as AuthenticatedDashboardSubcontractingReceiptsCreateRouteImport } from './routes/_authenticated/dashboard.subcontracting.receipts.create'
 import { Route as AuthenticatedDashboardSalesReportsNewRouteImport } from './routes/_authenticated/dashboard.sales.reports.new'
 import { Route as AuthenticatedDashboardSalesReportsReportIdRouteImport } from './routes/_authenticated/dashboard.sales.reports.$reportId'
-import { Route as AuthenticatedDashboardQualityTemplatesCreateRouteImport } from './routes/_authenticated/dashboard.quality.templates.create'
-import { Route as AuthenticatedDashboardQualityActionsCreateRouteImport } from './routes/_authenticated/dashboard.quality.actions.create'
-import { Route as AuthenticatedDashboardManufacturingWorkstationsCreateRouteImport } from './routes/_authenticated/dashboard.manufacturing.workstations.create'
-import { Route as AuthenticatedDashboardManufacturingWorkOrdersCreateRouteImport } from './routes/_authenticated/dashboard.manufacturing.work-orders.create'
-import { Route as AuthenticatedDashboardManufacturingJobCardsJobCardIdRouteImport } from './routes/_authenticated/dashboard.manufacturing.job-cards.$jobCardId'
-import { Route as AuthenticatedDashboardManufacturingBomCreateRouteImport } from './routes/_authenticated/dashboard.manufacturing.bom.create'
-import { Route as AuthenticatedDashboardManufacturingBomBomIdRouteImport } from './routes/_authenticated/dashboard.manufacturing.bom.$bomId'
 import { Route as AuthenticatedDashboardInventoryWarehousesCreateRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.create'
 import { Route as AuthenticatedDashboardInventoryWarehousesWarehouseIdRouteImport } from './routes/_authenticated/dashboard.inventory.warehouses.$warehouseId'
 import { Route as AuthenticatedDashboardInventoryStockEntriesCreateRouteImport } from './routes/_authenticated/dashboard.inventory.stock-entries.create'
@@ -885,12 +854,6 @@ const AuthenticatedDashboardSupportIndexRoute =
     path: '/dashboard/support/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardSubcontractingIndexRoute =
-  AuthenticatedDashboardSubcontractingIndexRouteImport.update({
-    id: '/dashboard/subcontracting/',
-    path: '/dashboard/subcontracting/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardStaffIndexRoute =
   AuthenticatedDashboardStaffIndexRouteImport.update({
     id: '/dashboard/staff/',
@@ -903,12 +866,6 @@ const AuthenticatedDashboardReportsIndexRoute =
     path: '/dashboard/reports/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardQualityIndexRoute =
-  AuthenticatedDashboardQualityIndexRouteImport.update({
-    id: '/dashboard/quality/',
-    path: '/dashboard/quality/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardOrganizationsIndexRoute =
   AuthenticatedDashboardOrganizationsIndexRouteImport.update({
     id: '/dashboard/organizations/',
@@ -919,12 +876,6 @@ const AuthenticatedDashboardNotificationsIndexRoute =
   AuthenticatedDashboardNotificationsIndexRouteImport.update({
     id: '/dashboard/notifications/',
     path: '/dashboard/notifications/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingIndexRoute =
-  AuthenticatedDashboardManufacturingIndexRouteImport.update({
-    id: '/dashboard/manufacturing/',
-    path: '/dashboard/manufacturing/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardInvoiceTemplatesIndexRoute =
@@ -1059,30 +1010,6 @@ const AuthenticatedDashboardSupportTicketIdRoute =
     path: '/dashboard/support/$ticketId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardSubcontractingSettingsRoute =
-  AuthenticatedDashboardSubcontractingSettingsRouteImport.update({
-    id: '/dashboard/subcontracting/settings',
-    path: '/dashboard/subcontracting/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardSubcontractingReceiptsRoute =
-  AuthenticatedDashboardSubcontractingReceiptsRouteImport.update({
-    id: '/dashboard/subcontracting/receipts',
-    path: '/dashboard/subcontracting/receipts',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardSubcontractingCreateRoute =
-  AuthenticatedDashboardSubcontractingCreateRouteImport.update({
-    id: '/dashboard/subcontracting/create',
-    path: '/dashboard/subcontracting/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardSubcontractingOrderIdRoute =
-  AuthenticatedDashboardSubcontractingOrderIdRouteImport.update({
-    id: '/dashboard/subcontracting/$orderId',
-    path: '/dashboard/subcontracting/$orderId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardStaffNewRoute =
   AuthenticatedDashboardStaffNewRouteImport.update({
     id: '/dashboard/staff/new',
@@ -1167,36 +1094,6 @@ const AuthenticatedDashboardReputationBadgesRoute =
     path: '/dashboard/reputation/badges',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardQualityTemplatesRoute =
-  AuthenticatedDashboardQualityTemplatesRouteImport.update({
-    id: '/dashboard/quality/templates',
-    path: '/dashboard/quality/templates',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualitySettingsRoute =
-  AuthenticatedDashboardQualitySettingsRouteImport.update({
-    id: '/dashboard/quality/settings',
-    path: '/dashboard/quality/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualityCreateRoute =
-  AuthenticatedDashboardQualityCreateRouteImport.update({
-    id: '/dashboard/quality/create',
-    path: '/dashboard/quality/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualityActionsRoute =
-  AuthenticatedDashboardQualityActionsRouteImport.update({
-    id: '/dashboard/quality/actions',
-    path: '/dashboard/quality/actions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualityInspectionIdRoute =
-  AuthenticatedDashboardQualityInspectionIdRouteImport.update({
-    id: '/dashboard/quality/$inspectionId',
-    path: '/dashboard/quality/$inspectionId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardOrganizationsNewRoute =
   AuthenticatedDashboardOrganizationsNewRouteImport.update({
     id: '/dashboard/organizations/new',
@@ -1243,36 +1140,6 @@ const AuthenticatedDashboardMessagesChatRoute =
   AuthenticatedDashboardMessagesChatRouteImport.update({
     id: '/dashboard/messages/chat',
     path: '/dashboard/messages/chat',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingWorkstationsRoute =
-  AuthenticatedDashboardManufacturingWorkstationsRouteImport.update({
-    id: '/dashboard/manufacturing/workstations',
-    path: '/dashboard/manufacturing/workstations',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingSettingsRoute =
-  AuthenticatedDashboardManufacturingSettingsRouteImport.update({
-    id: '/dashboard/manufacturing/settings',
-    path: '/dashboard/manufacturing/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingCreateRoute =
-  AuthenticatedDashboardManufacturingCreateRouteImport.update({
-    id: '/dashboard/manufacturing/create',
-    path: '/dashboard/manufacturing/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingBomRoute =
-  AuthenticatedDashboardManufacturingBomRouteImport.update({
-    id: '/dashboard/manufacturing/bom',
-    path: '/dashboard/manufacturing/bom',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingWorkOrderIdRoute =
-  AuthenticatedDashboardManufacturingWorkOrderIdRouteImport.update({
-    id: '/dashboard/manufacturing/$workOrderId',
-    path: '/dashboard/manufacturing/$workOrderId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardKnowledgeLawsRoute =
@@ -1545,12 +1412,6 @@ const AuthenticatedDashboardSupportSlaIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardSupportSlaRoute,
   } as any)
-const AuthenticatedDashboardSubcontractingReceiptsIndexRoute =
-  AuthenticatedDashboardSubcontractingReceiptsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardSubcontractingReceiptsRoute,
-  } as any)
 const AuthenticatedDashboardSalesReportsIndexRoute =
   AuthenticatedDashboardSalesReportsIndexRouteImport.update({
     id: '/dashboard/sales/reports/',
@@ -1562,36 +1423,6 @@ const AuthenticatedDashboardSalesLeadsIndexRoute =
     id: '/dashboard/sales/leads/',
     path: '/dashboard/sales/leads/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualityTemplatesIndexRoute =
-  AuthenticatedDashboardQualityTemplatesIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardQualityTemplatesRoute,
-  } as any)
-const AuthenticatedDashboardQualityActionsIndexRoute =
-  AuthenticatedDashboardQualityActionsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardQualityActionsRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingWorkstationsIndexRoute =
-  AuthenticatedDashboardManufacturingWorkstationsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardManufacturingWorkstationsRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingJobCardsIndexRoute =
-  AuthenticatedDashboardManufacturingJobCardsIndexRouteImport.update({
-    id: '/dashboard/manufacturing/job-cards/',
-    path: '/dashboard/manufacturing/job-cards/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingBomIndexRoute =
-  AuthenticatedDashboardManufacturingBomIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardManufacturingBomRoute,
   } as any)
 const AuthenticatedDashboardInventoryWarehousesIndexRoute =
   AuthenticatedDashboardInventoryWarehousesIndexRouteImport.update({
@@ -2067,12 +1898,6 @@ const AuthenticatedDashboardSupportSlaCreateRoute =
     path: '/create',
     getParentRoute: () => AuthenticatedDashboardSupportSlaRoute,
   } as any)
-const AuthenticatedDashboardSubcontractingReceiptsCreateRoute =
-  AuthenticatedDashboardSubcontractingReceiptsCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardSubcontractingReceiptsRoute,
-  } as any)
 const AuthenticatedDashboardSalesReportsNewRoute =
   AuthenticatedDashboardSalesReportsNewRouteImport.update({
     id: '/dashboard/sales/reports/new',
@@ -2084,48 +1909,6 @@ const AuthenticatedDashboardSalesReportsReportIdRoute =
     id: '/dashboard/sales/reports/$reportId',
     path: '/dashboard/sales/reports/$reportId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardQualityTemplatesCreateRoute =
-  AuthenticatedDashboardQualityTemplatesCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardQualityTemplatesRoute,
-  } as any)
-const AuthenticatedDashboardQualityActionsCreateRoute =
-  AuthenticatedDashboardQualityActionsCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardQualityActionsRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingWorkstationsCreateRoute =
-  AuthenticatedDashboardManufacturingWorkstationsCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardManufacturingWorkstationsRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingWorkOrdersCreateRoute =
-  AuthenticatedDashboardManufacturingWorkOrdersCreateRouteImport.update({
-    id: '/dashboard/manufacturing/work-orders/create',
-    path: '/dashboard/manufacturing/work-orders/create',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute =
-  AuthenticatedDashboardManufacturingJobCardsJobCardIdRouteImport.update({
-    id: '/dashboard/manufacturing/job-cards/$jobCardId',
-    path: '/dashboard/manufacturing/job-cards/$jobCardId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingBomCreateRoute =
-  AuthenticatedDashboardManufacturingBomCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => AuthenticatedDashboardManufacturingBomRoute,
-  } as any)
-const AuthenticatedDashboardManufacturingBomBomIdRoute =
-  AuthenticatedDashboardManufacturingBomBomIdRouteImport.update({
-    id: '/$bomId',
-    path: '/$bomId',
-    getParentRoute: () => AuthenticatedDashboardManufacturingBomRoute,
   } as any)
 const AuthenticatedDashboardInventoryWarehousesCreateRoute =
   AuthenticatedDashboardInventoryWarehousesCreateRouteImport.update({
@@ -3311,11 +3094,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
   '/dashboard/knowledge/judgments': typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
   '/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
-  '/dashboard/manufacturing/$workOrderId': typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
-  '/dashboard/manufacturing/bom': typeof AuthenticatedDashboardManufacturingBomRouteWithChildren
-  '/dashboard/manufacturing/create': typeof AuthenticatedDashboardManufacturingCreateRoute
-  '/dashboard/manufacturing/settings': typeof AuthenticatedDashboardManufacturingSettingsRoute
-  '/dashboard/manufacturing/workstations': typeof AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
   '/dashboard/ml/analytics': typeof AuthenticatedDashboardMlAnalyticsRoute
@@ -3324,11 +3102,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/notifications/settings': typeof AuthenticatedDashboardNotificationsSettingsRoute
   '/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
-  '/dashboard/quality/$inspectionId': typeof AuthenticatedDashboardQualityInspectionIdRoute
-  '/dashboard/quality/actions': typeof AuthenticatedDashboardQualityActionsRouteWithChildren
-  '/dashboard/quality/create': typeof AuthenticatedDashboardQualityCreateRoute
-  '/dashboard/quality/settings': typeof AuthenticatedDashboardQualitySettingsRoute
-  '/dashboard/quality/templates': typeof AuthenticatedDashboardQualityTemplatesRouteWithChildren
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
@@ -3343,10 +3116,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
-  '/dashboard/subcontracting/$orderId': typeof AuthenticatedDashboardSubcontractingOrderIdRoute
-  '/dashboard/subcontracting/create': typeof AuthenticatedDashboardSubcontractingCreateRoute
-  '/dashboard/subcontracting/receipts': typeof AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren
-  '/dashboard/subcontracting/settings': typeof AuthenticatedDashboardSubcontractingSettingsRoute
   '/dashboard/support/$ticketId': typeof AuthenticatedDashboardSupportTicketIdRoute
   '/dashboard/support/create': typeof AuthenticatedDashboardSupportCreateRoute
   '/dashboard/support/settings': typeof AuthenticatedDashboardSupportSettingsRoute
@@ -3369,13 +3138,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/dashboard/inventory/': typeof AuthenticatedDashboardInventoryIndexRoute
   '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
-  '/dashboard/manufacturing': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/dashboard/quality': typeof AuthenticatedDashboardQualityIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
-  '/dashboard/subcontracting': typeof AuthenticatedDashboardSubcontractingIndexRoute
   '/dashboard/support': typeof AuthenticatedDashboardSupportIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
@@ -3531,16 +3297,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
-  '/dashboard/manufacturing/bom/$bomId': typeof AuthenticatedDashboardManufacturingBomBomIdRoute
-  '/dashboard/manufacturing/bom/create': typeof AuthenticatedDashboardManufacturingBomCreateRoute
-  '/dashboard/manufacturing/job-cards/$jobCardId': typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
-  '/dashboard/manufacturing/work-orders/create': typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
-  '/dashboard/manufacturing/workstations/create': typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
-  '/dashboard/quality/actions/create': typeof AuthenticatedDashboardQualityActionsCreateRoute
-  '/dashboard/quality/templates/create': typeof AuthenticatedDashboardQualityTemplatesCreateRoute
   '/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
   '/dashboard/sales/reports/new': typeof AuthenticatedDashboardSalesReportsNewRoute
-  '/dashboard/subcontracting/receipts/create': typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
   '/dashboard/support/sla/create': typeof AuthenticatedDashboardSupportSlaCreateRoute
   '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -3620,14 +3378,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/dashboard/inventory/stock-entries': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/dashboard/inventory/warehouses': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
-  '/dashboard/manufacturing/bom/': typeof AuthenticatedDashboardManufacturingBomIndexRoute
-  '/dashboard/manufacturing/job-cards': typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
-  '/dashboard/manufacturing/workstations/': typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
-  '/dashboard/quality/actions/': typeof AuthenticatedDashboardQualityActionsIndexRoute
-  '/dashboard/quality/templates/': typeof AuthenticatedDashboardQualityTemplatesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
-  '/dashboard/subcontracting/receipts/': typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
   '/dashboard/support/sla/': typeof AuthenticatedDashboardSupportSlaIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
@@ -3764,9 +3516,6 @@ export interface FileRoutesByTo {
   '/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
   '/dashboard/knowledge/judgments': typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
   '/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
-  '/dashboard/manufacturing/$workOrderId': typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
-  '/dashboard/manufacturing/create': typeof AuthenticatedDashboardManufacturingCreateRoute
-  '/dashboard/manufacturing/settings': typeof AuthenticatedDashboardManufacturingSettingsRoute
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
   '/dashboard/ml/analytics': typeof AuthenticatedDashboardMlAnalyticsRoute
@@ -3775,9 +3524,6 @@ export interface FileRoutesByTo {
   '/dashboard/notifications/settings': typeof AuthenticatedDashboardNotificationsSettingsRoute
   '/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
-  '/dashboard/quality/$inspectionId': typeof AuthenticatedDashboardQualityInspectionIdRoute
-  '/dashboard/quality/create': typeof AuthenticatedDashboardQualityCreateRoute
-  '/dashboard/quality/settings': typeof AuthenticatedDashboardQualitySettingsRoute
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
@@ -3792,9 +3538,6 @@ export interface FileRoutesByTo {
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
-  '/dashboard/subcontracting/$orderId': typeof AuthenticatedDashboardSubcontractingOrderIdRoute
-  '/dashboard/subcontracting/create': typeof AuthenticatedDashboardSubcontractingCreateRoute
-  '/dashboard/subcontracting/settings': typeof AuthenticatedDashboardSubcontractingSettingsRoute
   '/dashboard/support/$ticketId': typeof AuthenticatedDashboardSupportTicketIdRoute
   '/dashboard/support/create': typeof AuthenticatedDashboardSupportCreateRoute
   '/dashboard/support/settings': typeof AuthenticatedDashboardSupportSettingsRoute
@@ -3816,13 +3559,10 @@ export interface FileRoutesByTo {
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryIndexRoute
   '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
-  '/dashboard/manufacturing': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/dashboard/quality': typeof AuthenticatedDashboardQualityIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
-  '/dashboard/subcontracting': typeof AuthenticatedDashboardSubcontractingIndexRoute
   '/dashboard/support': typeof AuthenticatedDashboardSupportIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
@@ -3978,16 +3718,8 @@ export interface FileRoutesByTo {
   '/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
-  '/dashboard/manufacturing/bom/$bomId': typeof AuthenticatedDashboardManufacturingBomBomIdRoute
-  '/dashboard/manufacturing/bom/create': typeof AuthenticatedDashboardManufacturingBomCreateRoute
-  '/dashboard/manufacturing/job-cards/$jobCardId': typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
-  '/dashboard/manufacturing/work-orders/create': typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
-  '/dashboard/manufacturing/workstations/create': typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
-  '/dashboard/quality/actions/create': typeof AuthenticatedDashboardQualityActionsCreateRoute
-  '/dashboard/quality/templates/create': typeof AuthenticatedDashboardQualityTemplatesCreateRoute
   '/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
   '/dashboard/sales/reports/new': typeof AuthenticatedDashboardSalesReportsNewRoute
-  '/dashboard/subcontracting/receipts/create': typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
   '/dashboard/support/sla/create': typeof AuthenticatedDashboardSupportSlaCreateRoute
   '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -4067,14 +3799,8 @@ export interface FileRoutesByTo {
   '/dashboard/hr/vehicles': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/dashboard/inventory/stock-entries': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/dashboard/inventory/warehouses': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
-  '/dashboard/manufacturing/bom': typeof AuthenticatedDashboardManufacturingBomIndexRoute
-  '/dashboard/manufacturing/job-cards': typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
-  '/dashboard/manufacturing/workstations': typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
-  '/dashboard/quality/actions': typeof AuthenticatedDashboardQualityActionsIndexRoute
-  '/dashboard/quality/templates': typeof AuthenticatedDashboardQualityTemplatesIndexRoute
   '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/sales/reports': typeof AuthenticatedDashboardSalesReportsIndexRoute
-  '/dashboard/subcontracting/receipts': typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
   '/dashboard/support/sla': typeof AuthenticatedDashboardSupportSlaIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
@@ -4222,11 +3948,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/knowledge/forms': typeof AuthenticatedDashboardKnowledgeFormsRoute
   '/_authenticated/dashboard/knowledge/judgments': typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
   '/_authenticated/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
-  '/_authenticated/dashboard/manufacturing/$workOrderId': typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
-  '/_authenticated/dashboard/manufacturing/bom': typeof AuthenticatedDashboardManufacturingBomRouteWithChildren
-  '/_authenticated/dashboard/manufacturing/create': typeof AuthenticatedDashboardManufacturingCreateRoute
-  '/_authenticated/dashboard/manufacturing/settings': typeof AuthenticatedDashboardManufacturingSettingsRoute
-  '/_authenticated/dashboard/manufacturing/workstations': typeof AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren
   '/_authenticated/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/_authenticated/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
   '/_authenticated/dashboard/ml/analytics': typeof AuthenticatedDashboardMlAnalyticsRoute
@@ -4235,11 +3956,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/notifications/settings': typeof AuthenticatedDashboardNotificationsSettingsRoute
   '/_authenticated/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/_authenticated/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
-  '/_authenticated/dashboard/quality/$inspectionId': typeof AuthenticatedDashboardQualityInspectionIdRoute
-  '/_authenticated/dashboard/quality/actions': typeof AuthenticatedDashboardQualityActionsRouteWithChildren
-  '/_authenticated/dashboard/quality/create': typeof AuthenticatedDashboardQualityCreateRoute
-  '/_authenticated/dashboard/quality/settings': typeof AuthenticatedDashboardQualitySettingsRoute
-  '/_authenticated/dashboard/quality/templates': typeof AuthenticatedDashboardQualityTemplatesRouteWithChildren
   '/_authenticated/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/_authenticated/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
   '/_authenticated/dashboard/settings/company': typeof AuthenticatedDashboardSettingsCompanyRoute
@@ -4254,10 +3970,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/_authenticated/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/_authenticated/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
-  '/_authenticated/dashboard/subcontracting/$orderId': typeof AuthenticatedDashboardSubcontractingOrderIdRoute
-  '/_authenticated/dashboard/subcontracting/create': typeof AuthenticatedDashboardSubcontractingCreateRoute
-  '/_authenticated/dashboard/subcontracting/receipts': typeof AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren
-  '/_authenticated/dashboard/subcontracting/settings': typeof AuthenticatedDashboardSubcontractingSettingsRoute
   '/_authenticated/dashboard/support/$ticketId': typeof AuthenticatedDashboardSupportTicketIdRoute
   '/_authenticated/dashboard/support/create': typeof AuthenticatedDashboardSupportCreateRoute
   '/_authenticated/dashboard/support/settings': typeof AuthenticatedDashboardSupportSettingsRoute
@@ -4280,13 +3992,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/followups/': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/_authenticated/dashboard/inventory/': typeof AuthenticatedDashboardInventoryIndexRoute
   '/_authenticated/dashboard/invoice-templates/': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
-  '/_authenticated/dashboard/manufacturing/': typeof AuthenticatedDashboardManufacturingIndexRoute
   '/_authenticated/dashboard/notifications/': typeof AuthenticatedDashboardNotificationsIndexRoute
   '/_authenticated/dashboard/organizations/': typeof AuthenticatedDashboardOrganizationsIndexRoute
-  '/_authenticated/dashboard/quality/': typeof AuthenticatedDashboardQualityIndexRoute
   '/_authenticated/dashboard/reports/': typeof AuthenticatedDashboardReportsIndexRoute
   '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
-  '/_authenticated/dashboard/subcontracting/': typeof AuthenticatedDashboardSubcontractingIndexRoute
   '/_authenticated/dashboard/support/': typeof AuthenticatedDashboardSupportIndexRoute
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
@@ -4442,16 +4151,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/inventory/stock-entries/create': typeof AuthenticatedDashboardInventoryStockEntriesCreateRoute
   '/_authenticated/dashboard/inventory/warehouses/$warehouseId': typeof AuthenticatedDashboardInventoryWarehousesWarehouseIdRoute
   '/_authenticated/dashboard/inventory/warehouses/create': typeof AuthenticatedDashboardInventoryWarehousesCreateRoute
-  '/_authenticated/dashboard/manufacturing/bom/$bomId': typeof AuthenticatedDashboardManufacturingBomBomIdRoute
-  '/_authenticated/dashboard/manufacturing/bom/create': typeof AuthenticatedDashboardManufacturingBomCreateRoute
-  '/_authenticated/dashboard/manufacturing/job-cards/$jobCardId': typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
-  '/_authenticated/dashboard/manufacturing/work-orders/create': typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
-  '/_authenticated/dashboard/manufacturing/workstations/create': typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
-  '/_authenticated/dashboard/quality/actions/create': typeof AuthenticatedDashboardQualityActionsCreateRoute
-  '/_authenticated/dashboard/quality/templates/create': typeof AuthenticatedDashboardQualityTemplatesCreateRoute
   '/_authenticated/dashboard/sales/reports/$reportId': typeof AuthenticatedDashboardSalesReportsReportIdRoute
   '/_authenticated/dashboard/sales/reports/new': typeof AuthenticatedDashboardSalesReportsNewRoute
-  '/_authenticated/dashboard/subcontracting/receipts/create': typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
   '/_authenticated/dashboard/support/sla/create': typeof AuthenticatedDashboardSupportSlaCreateRoute
   '/_authenticated/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/_authenticated/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -4531,14 +4232,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/vehicles/': typeof AuthenticatedDashboardHrVehiclesIndexRoute
   '/_authenticated/dashboard/inventory/stock-entries/': typeof AuthenticatedDashboardInventoryStockEntriesIndexRoute
   '/_authenticated/dashboard/inventory/warehouses/': typeof AuthenticatedDashboardInventoryWarehousesIndexRoute
-  '/_authenticated/dashboard/manufacturing/bom/': typeof AuthenticatedDashboardManufacturingBomIndexRoute
-  '/_authenticated/dashboard/manufacturing/job-cards/': typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
-  '/_authenticated/dashboard/manufacturing/workstations/': typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
-  '/_authenticated/dashboard/quality/actions/': typeof AuthenticatedDashboardQualityActionsIndexRoute
-  '/_authenticated/dashboard/quality/templates/': typeof AuthenticatedDashboardQualityTemplatesIndexRoute
   '/_authenticated/dashboard/sales/leads/': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/_authenticated/dashboard/sales/reports/': typeof AuthenticatedDashboardSalesReportsIndexRoute
-  '/_authenticated/dashboard/subcontracting/receipts/': typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
   '/_authenticated/dashboard/support/sla/': typeof AuthenticatedDashboardSupportSlaIndexRoute
   '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/_authenticated/dashboard/tasks/reminders/': typeof AuthenticatedDashboardTasksRemindersIndexRoute
@@ -4684,11 +4379,6 @@ export interface FileRouteTypes {
     | '/dashboard/knowledge/forms'
     | '/dashboard/knowledge/judgments'
     | '/dashboard/knowledge/laws'
-    | '/dashboard/manufacturing/$workOrderId'
-    | '/dashboard/manufacturing/bom'
-    | '/dashboard/manufacturing/create'
-    | '/dashboard/manufacturing/settings'
-    | '/dashboard/manufacturing/workstations'
     | '/dashboard/messages/chat'
     | '/dashboard/messages/email'
     | '/dashboard/ml/analytics'
@@ -4697,11 +4387,6 @@ export interface FileRouteTypes {
     | '/dashboard/notifications/settings'
     | '/dashboard/organizations/$organizationId'
     | '/dashboard/organizations/new'
-    | '/dashboard/quality/$inspectionId'
-    | '/dashboard/quality/actions'
-    | '/dashboard/quality/create'
-    | '/dashboard/quality/settings'
-    | '/dashboard/quality/templates'
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
     | '/dashboard/settings/company'
@@ -4716,10 +4401,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
-    | '/dashboard/subcontracting/$orderId'
-    | '/dashboard/subcontracting/create'
-    | '/dashboard/subcontracting/receipts'
-    | '/dashboard/subcontracting/settings'
     | '/dashboard/support/$ticketId'
     | '/dashboard/support/create'
     | '/dashboard/support/settings'
@@ -4742,13 +4423,10 @@ export interface FileRouteTypes {
     | '/dashboard/followups'
     | '/dashboard/inventory/'
     | '/dashboard/invoice-templates'
-    | '/dashboard/manufacturing'
     | '/dashboard/notifications'
     | '/dashboard/organizations'
-    | '/dashboard/quality'
     | '/dashboard/reports'
     | '/dashboard/staff'
-    | '/dashboard/subcontracting'
     | '/dashboard/support'
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
@@ -4904,16 +4582,8 @@ export interface FileRouteTypes {
     | '/dashboard/inventory/stock-entries/create'
     | '/dashboard/inventory/warehouses/$warehouseId'
     | '/dashboard/inventory/warehouses/create'
-    | '/dashboard/manufacturing/bom/$bomId'
-    | '/dashboard/manufacturing/bom/create'
-    | '/dashboard/manufacturing/job-cards/$jobCardId'
-    | '/dashboard/manufacturing/work-orders/create'
-    | '/dashboard/manufacturing/workstations/create'
-    | '/dashboard/quality/actions/create'
-    | '/dashboard/quality/templates/create'
     | '/dashboard/sales/reports/$reportId'
     | '/dashboard/sales/reports/new'
-    | '/dashboard/subcontracting/receipts/create'
     | '/dashboard/support/sla/create'
     | '/dashboard/tasks/events/$eventId'
     | '/dashboard/tasks/events/new'
@@ -4993,14 +4663,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/vehicles'
     | '/dashboard/inventory/stock-entries'
     | '/dashboard/inventory/warehouses'
-    | '/dashboard/manufacturing/bom/'
-    | '/dashboard/manufacturing/job-cards'
-    | '/dashboard/manufacturing/workstations/'
-    | '/dashboard/quality/actions/'
-    | '/dashboard/quality/templates/'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
-    | '/dashboard/subcontracting/receipts/'
     | '/dashboard/support/sla/'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
@@ -5137,9 +4801,6 @@ export interface FileRouteTypes {
     | '/dashboard/knowledge/forms'
     | '/dashboard/knowledge/judgments'
     | '/dashboard/knowledge/laws'
-    | '/dashboard/manufacturing/$workOrderId'
-    | '/dashboard/manufacturing/create'
-    | '/dashboard/manufacturing/settings'
     | '/dashboard/messages/chat'
     | '/dashboard/messages/email'
     | '/dashboard/ml/analytics'
@@ -5148,9 +4809,6 @@ export interface FileRouteTypes {
     | '/dashboard/notifications/settings'
     | '/dashboard/organizations/$organizationId'
     | '/dashboard/organizations/new'
-    | '/dashboard/quality/$inspectionId'
-    | '/dashboard/quality/create'
-    | '/dashboard/quality/settings'
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
     | '/dashboard/settings/company'
@@ -5165,9 +4823,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
-    | '/dashboard/subcontracting/$orderId'
-    | '/dashboard/subcontracting/create'
-    | '/dashboard/subcontracting/settings'
     | '/dashboard/support/$ticketId'
     | '/dashboard/support/create'
     | '/dashboard/support/settings'
@@ -5189,13 +4844,10 @@ export interface FileRouteTypes {
     | '/dashboard/followups'
     | '/dashboard/inventory'
     | '/dashboard/invoice-templates'
-    | '/dashboard/manufacturing'
     | '/dashboard/notifications'
     | '/dashboard/organizations'
-    | '/dashboard/quality'
     | '/dashboard/reports'
     | '/dashboard/staff'
-    | '/dashboard/subcontracting'
     | '/dashboard/support'
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
@@ -5351,16 +5003,8 @@ export interface FileRouteTypes {
     | '/dashboard/inventory/stock-entries/create'
     | '/dashboard/inventory/warehouses/$warehouseId'
     | '/dashboard/inventory/warehouses/create'
-    | '/dashboard/manufacturing/bom/$bomId'
-    | '/dashboard/manufacturing/bom/create'
-    | '/dashboard/manufacturing/job-cards/$jobCardId'
-    | '/dashboard/manufacturing/work-orders/create'
-    | '/dashboard/manufacturing/workstations/create'
-    | '/dashboard/quality/actions/create'
-    | '/dashboard/quality/templates/create'
     | '/dashboard/sales/reports/$reportId'
     | '/dashboard/sales/reports/new'
-    | '/dashboard/subcontracting/receipts/create'
     | '/dashboard/support/sla/create'
     | '/dashboard/tasks/events/$eventId'
     | '/dashboard/tasks/events/new'
@@ -5440,14 +5084,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/vehicles'
     | '/dashboard/inventory/stock-entries'
     | '/dashboard/inventory/warehouses'
-    | '/dashboard/manufacturing/bom'
-    | '/dashboard/manufacturing/job-cards'
-    | '/dashboard/manufacturing/workstations'
-    | '/dashboard/quality/actions'
-    | '/dashboard/quality/templates'
     | '/dashboard/sales/leads'
     | '/dashboard/sales/reports'
-    | '/dashboard/subcontracting/receipts'
     | '/dashboard/support/sla'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
@@ -5594,11 +5232,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/knowledge/forms'
     | '/_authenticated/dashboard/knowledge/judgments'
     | '/_authenticated/dashboard/knowledge/laws'
-    | '/_authenticated/dashboard/manufacturing/$workOrderId'
-    | '/_authenticated/dashboard/manufacturing/bom'
-    | '/_authenticated/dashboard/manufacturing/create'
-    | '/_authenticated/dashboard/manufacturing/settings'
-    | '/_authenticated/dashboard/manufacturing/workstations'
     | '/_authenticated/dashboard/messages/chat'
     | '/_authenticated/dashboard/messages/email'
     | '/_authenticated/dashboard/ml/analytics'
@@ -5607,11 +5240,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/notifications/settings'
     | '/_authenticated/dashboard/organizations/$organizationId'
     | '/_authenticated/dashboard/organizations/new'
-    | '/_authenticated/dashboard/quality/$inspectionId'
-    | '/_authenticated/dashboard/quality/actions'
-    | '/_authenticated/dashboard/quality/create'
-    | '/_authenticated/dashboard/quality/settings'
-    | '/_authenticated/dashboard/quality/templates'
     | '/_authenticated/dashboard/reputation/badges'
     | '/_authenticated/dashboard/reputation/overview'
     | '/_authenticated/dashboard/settings/company'
@@ -5626,10 +5254,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings/security'
     | '/_authenticated/dashboard/settings/taxes'
     | '/_authenticated/dashboard/staff/new'
-    | '/_authenticated/dashboard/subcontracting/$orderId'
-    | '/_authenticated/dashboard/subcontracting/create'
-    | '/_authenticated/dashboard/subcontracting/receipts'
-    | '/_authenticated/dashboard/subcontracting/settings'
     | '/_authenticated/dashboard/support/$ticketId'
     | '/_authenticated/dashboard/support/create'
     | '/_authenticated/dashboard/support/settings'
@@ -5652,13 +5276,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/followups/'
     | '/_authenticated/dashboard/inventory/'
     | '/_authenticated/dashboard/invoice-templates/'
-    | '/_authenticated/dashboard/manufacturing/'
     | '/_authenticated/dashboard/notifications/'
     | '/_authenticated/dashboard/organizations/'
-    | '/_authenticated/dashboard/quality/'
     | '/_authenticated/dashboard/reports/'
     | '/_authenticated/dashboard/staff/'
-    | '/_authenticated/dashboard/subcontracting/'
     | '/_authenticated/dashboard/support/'
     | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/assets/categories/create'
@@ -5814,16 +5435,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/inventory/stock-entries/create'
     | '/_authenticated/dashboard/inventory/warehouses/$warehouseId'
     | '/_authenticated/dashboard/inventory/warehouses/create'
-    | '/_authenticated/dashboard/manufacturing/bom/$bomId'
-    | '/_authenticated/dashboard/manufacturing/bom/create'
-    | '/_authenticated/dashboard/manufacturing/job-cards/$jobCardId'
-    | '/_authenticated/dashboard/manufacturing/work-orders/create'
-    | '/_authenticated/dashboard/manufacturing/workstations/create'
-    | '/_authenticated/dashboard/quality/actions/create'
-    | '/_authenticated/dashboard/quality/templates/create'
     | '/_authenticated/dashboard/sales/reports/$reportId'
     | '/_authenticated/dashboard/sales/reports/new'
-    | '/_authenticated/dashboard/subcontracting/receipts/create'
     | '/_authenticated/dashboard/support/sla/create'
     | '/_authenticated/dashboard/tasks/events/$eventId'
     | '/_authenticated/dashboard/tasks/events/new'
@@ -5903,14 +5516,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/vehicles/'
     | '/_authenticated/dashboard/inventory/stock-entries/'
     | '/_authenticated/dashboard/inventory/warehouses/'
-    | '/_authenticated/dashboard/manufacturing/bom/'
-    | '/_authenticated/dashboard/manufacturing/job-cards/'
-    | '/_authenticated/dashboard/manufacturing/workstations/'
-    | '/_authenticated/dashboard/quality/actions/'
-    | '/_authenticated/dashboard/quality/templates/'
     | '/_authenticated/dashboard/sales/leads/'
     | '/_authenticated/dashboard/sales/reports/'
-    | '/_authenticated/dashboard/subcontracting/receipts/'
     | '/_authenticated/dashboard/support/sla/'
     | '/_authenticated/dashboard/tasks/events/'
     | '/_authenticated/dashboard/tasks/reminders/'
@@ -6523,13 +6130,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSupportIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/subcontracting/': {
-      id: '/_authenticated/dashboard/subcontracting/'
-      path: '/dashboard/subcontracting'
-      fullPath: '/dashboard/subcontracting'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/staff/': {
       id: '/_authenticated/dashboard/staff/'
       path: '/dashboard/staff'
@@ -6544,13 +6144,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardReportsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/quality/': {
-      id: '/_authenticated/dashboard/quality/'
-      path: '/dashboard/quality'
-      fullPath: '/dashboard/quality'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/organizations/': {
       id: '/_authenticated/dashboard/organizations/'
       path: '/dashboard/organizations'
@@ -6563,13 +6156,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/notifications'
       fullPath: '/dashboard/notifications'
       preLoaderRoute: typeof AuthenticatedDashboardNotificationsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/': {
-      id: '/_authenticated/dashboard/manufacturing/'
-      path: '/dashboard/manufacturing'
-      fullPath: '/dashboard/manufacturing'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/invoice-templates/': {
@@ -6726,34 +6312,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSupportTicketIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/subcontracting/settings': {
-      id: '/_authenticated/dashboard/subcontracting/settings'
-      path: '/dashboard/subcontracting/settings'
-      fullPath: '/dashboard/subcontracting/settings'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/subcontracting/receipts': {
-      id: '/_authenticated/dashboard/subcontracting/receipts'
-      path: '/dashboard/subcontracting/receipts'
-      fullPath: '/dashboard/subcontracting/receipts'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/subcontracting/create': {
-      id: '/_authenticated/dashboard/subcontracting/create'
-      path: '/dashboard/subcontracting/create'
-      fullPath: '/dashboard/subcontracting/create'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/subcontracting/$orderId': {
-      id: '/_authenticated/dashboard/subcontracting/$orderId'
-      path: '/dashboard/subcontracting/$orderId'
-      fullPath: '/dashboard/subcontracting/$orderId'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingOrderIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/staff/new': {
       id: '/_authenticated/dashboard/staff/new'
       path: '/dashboard/staff/new'
@@ -6852,41 +6410,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardReputationBadgesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/quality/templates': {
-      id: '/_authenticated/dashboard/quality/templates'
-      path: '/dashboard/quality/templates'
-      fullPath: '/dashboard/quality/templates'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityTemplatesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/settings': {
-      id: '/_authenticated/dashboard/quality/settings'
-      path: '/dashboard/quality/settings'
-      fullPath: '/dashboard/quality/settings'
-      preLoaderRoute: typeof AuthenticatedDashboardQualitySettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/create': {
-      id: '/_authenticated/dashboard/quality/create'
-      path: '/dashboard/quality/create'
-      fullPath: '/dashboard/quality/create'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/actions': {
-      id: '/_authenticated/dashboard/quality/actions'
-      path: '/dashboard/quality/actions'
-      fullPath: '/dashboard/quality/actions'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityActionsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/$inspectionId': {
-      id: '/_authenticated/dashboard/quality/$inspectionId'
-      path: '/dashboard/quality/$inspectionId'
-      fullPath: '/dashboard/quality/$inspectionId'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityInspectionIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/organizations/new': {
       id: '/_authenticated/dashboard/organizations/new'
       path: '/dashboard/organizations/new'
@@ -6941,41 +6464,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/messages/chat'
       fullPath: '/dashboard/messages/chat'
       preLoaderRoute: typeof AuthenticatedDashboardMessagesChatRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/workstations': {
-      id: '/_authenticated/dashboard/manufacturing/workstations'
-      path: '/dashboard/manufacturing/workstations'
-      fullPath: '/dashboard/manufacturing/workstations'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/settings': {
-      id: '/_authenticated/dashboard/manufacturing/settings'
-      path: '/dashboard/manufacturing/settings'
-      fullPath: '/dashboard/manufacturing/settings'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/create': {
-      id: '/_authenticated/dashboard/manufacturing/create'
-      path: '/dashboard/manufacturing/create'
-      fullPath: '/dashboard/manufacturing/create'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/bom': {
-      id: '/_authenticated/dashboard/manufacturing/bom'
-      path: '/dashboard/manufacturing/bom'
-      fullPath: '/dashboard/manufacturing/bom'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingBomRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/$workOrderId': {
-      id: '/_authenticated/dashboard/manufacturing/$workOrderId'
-      path: '/dashboard/manufacturing/$workOrderId'
-      fullPath: '/dashboard/manufacturing/$workOrderId'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingWorkOrderIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/knowledge/laws': {
@@ -7293,13 +6781,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSupportSlaIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardSupportSlaRoute
     }
-    '/_authenticated/dashboard/subcontracting/receipts/': {
-      id: '/_authenticated/dashboard/subcontracting/receipts/'
-      path: '/'
-      fullPath: '/dashboard/subcontracting/receipts/'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingReceiptsIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRoute
-    }
     '/_authenticated/dashboard/sales/reports/': {
       id: '/_authenticated/dashboard/sales/reports/'
       path: '/dashboard/sales/reports'
@@ -7313,41 +6794,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/sales/leads'
       preLoaderRoute: typeof AuthenticatedDashboardSalesLeadsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/templates/': {
-      id: '/_authenticated/dashboard/quality/templates/'
-      path: '/'
-      fullPath: '/dashboard/quality/templates/'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityTemplatesIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardQualityTemplatesRoute
-    }
-    '/_authenticated/dashboard/quality/actions/': {
-      id: '/_authenticated/dashboard/quality/actions/'
-      path: '/'
-      fullPath: '/dashboard/quality/actions/'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityActionsIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardQualityActionsRoute
-    }
-    '/_authenticated/dashboard/manufacturing/workstations/': {
-      id: '/_authenticated/dashboard/manufacturing/workstations/'
-      path: '/'
-      fullPath: '/dashboard/manufacturing/workstations/'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingWorkstationsIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRoute
-    }
-    '/_authenticated/dashboard/manufacturing/job-cards/': {
-      id: '/_authenticated/dashboard/manufacturing/job-cards/'
-      path: '/dashboard/manufacturing/job-cards'
-      fullPath: '/dashboard/manufacturing/job-cards'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingJobCardsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/bom/': {
-      id: '/_authenticated/dashboard/manufacturing/bom/'
-      path: '/'
-      fullPath: '/dashboard/manufacturing/bom/'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingBomIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardManufacturingBomRoute
     }
     '/_authenticated/dashboard/inventory/warehouses/': {
       id: '/_authenticated/dashboard/inventory/warehouses/'
@@ -7902,13 +7348,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSupportSlaCreateRouteImport
       parentRoute: typeof AuthenticatedDashboardSupportSlaRoute
     }
-    '/_authenticated/dashboard/subcontracting/receipts/create': {
-      id: '/_authenticated/dashboard/subcontracting/receipts/create'
-      path: '/create'
-      fullPath: '/dashboard/subcontracting/receipts/create'
-      preLoaderRoute: typeof AuthenticatedDashboardSubcontractingReceiptsCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRoute
-    }
     '/_authenticated/dashboard/sales/reports/new': {
       id: '/_authenticated/dashboard/sales/reports/new'
       path: '/dashboard/sales/reports/new'
@@ -7922,55 +7361,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/sales/reports/$reportId'
       preLoaderRoute: typeof AuthenticatedDashboardSalesReportsReportIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/quality/templates/create': {
-      id: '/_authenticated/dashboard/quality/templates/create'
-      path: '/create'
-      fullPath: '/dashboard/quality/templates/create'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityTemplatesCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardQualityTemplatesRoute
-    }
-    '/_authenticated/dashboard/quality/actions/create': {
-      id: '/_authenticated/dashboard/quality/actions/create'
-      path: '/create'
-      fullPath: '/dashboard/quality/actions/create'
-      preLoaderRoute: typeof AuthenticatedDashboardQualityActionsCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardQualityActionsRoute
-    }
-    '/_authenticated/dashboard/manufacturing/workstations/create': {
-      id: '/_authenticated/dashboard/manufacturing/workstations/create'
-      path: '/create'
-      fullPath: '/dashboard/manufacturing/workstations/create'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingWorkstationsCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRoute
-    }
-    '/_authenticated/dashboard/manufacturing/work-orders/create': {
-      id: '/_authenticated/dashboard/manufacturing/work-orders/create'
-      path: '/dashboard/manufacturing/work-orders/create'
-      fullPath: '/dashboard/manufacturing/work-orders/create'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/job-cards/$jobCardId': {
-      id: '/_authenticated/dashboard/manufacturing/job-cards/$jobCardId'
-      path: '/dashboard/manufacturing/job-cards/$jobCardId'
-      fullPath: '/dashboard/manufacturing/job-cards/$jobCardId'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/manufacturing/bom/create': {
-      id: '/_authenticated/dashboard/manufacturing/bom/create'
-      path: '/create'
-      fullPath: '/dashboard/manufacturing/bom/create'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingBomCreateRouteImport
-      parentRoute: typeof AuthenticatedDashboardManufacturingBomRoute
-    }
-    '/_authenticated/dashboard/manufacturing/bom/$bomId': {
-      id: '/_authenticated/dashboard/manufacturing/bom/$bomId'
-      path: '/$bomId'
-      fullPath: '/dashboard/manufacturing/bom/$bomId'
-      preLoaderRoute: typeof AuthenticatedDashboardManufacturingBomBomIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardManufacturingBomRoute
     }
     '/_authenticated/dashboard/inventory/warehouses/create': {
       id: '/_authenticated/dashboard/inventory/warehouses/create'
@@ -10455,99 +9845,6 @@ const AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren =
     AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren,
   )
 
-interface AuthenticatedDashboardManufacturingBomRouteChildren {
-  AuthenticatedDashboardManufacturingBomBomIdRoute: typeof AuthenticatedDashboardManufacturingBomBomIdRoute
-  AuthenticatedDashboardManufacturingBomCreateRoute: typeof AuthenticatedDashboardManufacturingBomCreateRoute
-  AuthenticatedDashboardManufacturingBomIndexRoute: typeof AuthenticatedDashboardManufacturingBomIndexRoute
-}
-
-const AuthenticatedDashboardManufacturingBomRouteChildren: AuthenticatedDashboardManufacturingBomRouteChildren =
-  {
-    AuthenticatedDashboardManufacturingBomBomIdRoute:
-      AuthenticatedDashboardManufacturingBomBomIdRoute,
-    AuthenticatedDashboardManufacturingBomCreateRoute:
-      AuthenticatedDashboardManufacturingBomCreateRoute,
-    AuthenticatedDashboardManufacturingBomIndexRoute:
-      AuthenticatedDashboardManufacturingBomIndexRoute,
-  }
-
-const AuthenticatedDashboardManufacturingBomRouteWithChildren =
-  AuthenticatedDashboardManufacturingBomRoute._addFileChildren(
-    AuthenticatedDashboardManufacturingBomRouteChildren,
-  )
-
-interface AuthenticatedDashboardManufacturingWorkstationsRouteChildren {
-  AuthenticatedDashboardManufacturingWorkstationsCreateRoute: typeof AuthenticatedDashboardManufacturingWorkstationsCreateRoute
-  AuthenticatedDashboardManufacturingWorkstationsIndexRoute: typeof AuthenticatedDashboardManufacturingWorkstationsIndexRoute
-}
-
-const AuthenticatedDashboardManufacturingWorkstationsRouteChildren: AuthenticatedDashboardManufacturingWorkstationsRouteChildren =
-  {
-    AuthenticatedDashboardManufacturingWorkstationsCreateRoute:
-      AuthenticatedDashboardManufacturingWorkstationsCreateRoute,
-    AuthenticatedDashboardManufacturingWorkstationsIndexRoute:
-      AuthenticatedDashboardManufacturingWorkstationsIndexRoute,
-  }
-
-const AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren =
-  AuthenticatedDashboardManufacturingWorkstationsRoute._addFileChildren(
-    AuthenticatedDashboardManufacturingWorkstationsRouteChildren,
-  )
-
-interface AuthenticatedDashboardQualityActionsRouteChildren {
-  AuthenticatedDashboardQualityActionsCreateRoute: typeof AuthenticatedDashboardQualityActionsCreateRoute
-  AuthenticatedDashboardQualityActionsIndexRoute: typeof AuthenticatedDashboardQualityActionsIndexRoute
-}
-
-const AuthenticatedDashboardQualityActionsRouteChildren: AuthenticatedDashboardQualityActionsRouteChildren =
-  {
-    AuthenticatedDashboardQualityActionsCreateRoute:
-      AuthenticatedDashboardQualityActionsCreateRoute,
-    AuthenticatedDashboardQualityActionsIndexRoute:
-      AuthenticatedDashboardQualityActionsIndexRoute,
-  }
-
-const AuthenticatedDashboardQualityActionsRouteWithChildren =
-  AuthenticatedDashboardQualityActionsRoute._addFileChildren(
-    AuthenticatedDashboardQualityActionsRouteChildren,
-  )
-
-interface AuthenticatedDashboardQualityTemplatesRouteChildren {
-  AuthenticatedDashboardQualityTemplatesCreateRoute: typeof AuthenticatedDashboardQualityTemplatesCreateRoute
-  AuthenticatedDashboardQualityTemplatesIndexRoute: typeof AuthenticatedDashboardQualityTemplatesIndexRoute
-}
-
-const AuthenticatedDashboardQualityTemplatesRouteChildren: AuthenticatedDashboardQualityTemplatesRouteChildren =
-  {
-    AuthenticatedDashboardQualityTemplatesCreateRoute:
-      AuthenticatedDashboardQualityTemplatesCreateRoute,
-    AuthenticatedDashboardQualityTemplatesIndexRoute:
-      AuthenticatedDashboardQualityTemplatesIndexRoute,
-  }
-
-const AuthenticatedDashboardQualityTemplatesRouteWithChildren =
-  AuthenticatedDashboardQualityTemplatesRoute._addFileChildren(
-    AuthenticatedDashboardQualityTemplatesRouteChildren,
-  )
-
-interface AuthenticatedDashboardSubcontractingReceiptsRouteChildren {
-  AuthenticatedDashboardSubcontractingReceiptsCreateRoute: typeof AuthenticatedDashboardSubcontractingReceiptsCreateRoute
-  AuthenticatedDashboardSubcontractingReceiptsIndexRoute: typeof AuthenticatedDashboardSubcontractingReceiptsIndexRoute
-}
-
-const AuthenticatedDashboardSubcontractingReceiptsRouteChildren: AuthenticatedDashboardSubcontractingReceiptsRouteChildren =
-  {
-    AuthenticatedDashboardSubcontractingReceiptsCreateRoute:
-      AuthenticatedDashboardSubcontractingReceiptsCreateRoute,
-    AuthenticatedDashboardSubcontractingReceiptsIndexRoute:
-      AuthenticatedDashboardSubcontractingReceiptsIndexRoute,
-  }
-
-const AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren =
-  AuthenticatedDashboardSubcontractingReceiptsRoute._addFileChildren(
-    AuthenticatedDashboardSubcontractingReceiptsRouteChildren,
-  )
-
 interface AuthenticatedDashboardSupportSlaRouteChildren {
   AuthenticatedDashboardSupportSlaCreateRoute: typeof AuthenticatedDashboardSupportSlaCreateRoute
   AuthenticatedDashboardSupportSlaIndexRoute: typeof AuthenticatedDashboardSupportSlaIndexRoute
@@ -10601,11 +9898,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardKnowledgeFormsRoute: typeof AuthenticatedDashboardKnowledgeFormsRoute
   AuthenticatedDashboardKnowledgeJudgmentsRoute: typeof AuthenticatedDashboardKnowledgeJudgmentsRoute
   AuthenticatedDashboardKnowledgeLawsRoute: typeof AuthenticatedDashboardKnowledgeLawsRoute
-  AuthenticatedDashboardManufacturingWorkOrderIdRoute: typeof AuthenticatedDashboardManufacturingWorkOrderIdRoute
-  AuthenticatedDashboardManufacturingBomRoute: typeof AuthenticatedDashboardManufacturingBomRouteWithChildren
-  AuthenticatedDashboardManufacturingCreateRoute: typeof AuthenticatedDashboardManufacturingCreateRoute
-  AuthenticatedDashboardManufacturingSettingsRoute: typeof AuthenticatedDashboardManufacturingSettingsRoute
-  AuthenticatedDashboardManufacturingWorkstationsRoute: typeof AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren
   AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
   AuthenticatedDashboardMessagesEmailRoute: typeof AuthenticatedDashboardMessagesEmailRoute
   AuthenticatedDashboardMlAnalyticsRoute: typeof AuthenticatedDashboardMlAnalyticsRoute
@@ -10614,18 +9906,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardNotificationsSettingsRoute: typeof AuthenticatedDashboardNotificationsSettingsRoute
   AuthenticatedDashboardOrganizationsOrganizationIdRoute: typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   AuthenticatedDashboardOrganizationsNewRoute: typeof AuthenticatedDashboardOrganizationsNewRoute
-  AuthenticatedDashboardQualityInspectionIdRoute: typeof AuthenticatedDashboardQualityInspectionIdRoute
-  AuthenticatedDashboardQualityActionsRoute: typeof AuthenticatedDashboardQualityActionsRouteWithChildren
-  AuthenticatedDashboardQualityCreateRoute: typeof AuthenticatedDashboardQualityCreateRoute
-  AuthenticatedDashboardQualitySettingsRoute: typeof AuthenticatedDashboardQualitySettingsRoute
-  AuthenticatedDashboardQualityTemplatesRoute: typeof AuthenticatedDashboardQualityTemplatesRouteWithChildren
   AuthenticatedDashboardReputationBadgesRoute: typeof AuthenticatedDashboardReputationBadgesRoute
   AuthenticatedDashboardReputationOverviewRoute: typeof AuthenticatedDashboardReputationOverviewRoute
   AuthenticatedDashboardStaffNewRoute: typeof AuthenticatedDashboardStaffNewRoute
-  AuthenticatedDashboardSubcontractingOrderIdRoute: typeof AuthenticatedDashboardSubcontractingOrderIdRoute
-  AuthenticatedDashboardSubcontractingCreateRoute: typeof AuthenticatedDashboardSubcontractingCreateRoute
-  AuthenticatedDashboardSubcontractingReceiptsRoute: typeof AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren
-  AuthenticatedDashboardSubcontractingSettingsRoute: typeof AuthenticatedDashboardSubcontractingSettingsRoute
   AuthenticatedDashboardSupportTicketIdRoute: typeof AuthenticatedDashboardSupportTicketIdRoute
   AuthenticatedDashboardSupportCreateRoute: typeof AuthenticatedDashboardSupportCreateRoute
   AuthenticatedDashboardSupportSettingsRoute: typeof AuthenticatedDashboardSupportSettingsRoute
@@ -10640,25 +9923,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
   AuthenticatedDashboardFollowupsIndexRoute: typeof AuthenticatedDashboardFollowupsIndexRoute
   AuthenticatedDashboardInvoiceTemplatesIndexRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
-  AuthenticatedDashboardManufacturingIndexRoute: typeof AuthenticatedDashboardManufacturingIndexRoute
   AuthenticatedDashboardNotificationsIndexRoute: typeof AuthenticatedDashboardNotificationsIndexRoute
   AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
-  AuthenticatedDashboardQualityIndexRoute: typeof AuthenticatedDashboardQualityIndexRoute
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
-  AuthenticatedDashboardSubcontractingIndexRoute: typeof AuthenticatedDashboardSubcontractingIndexRoute
   AuthenticatedDashboardSupportIndexRoute: typeof AuthenticatedDashboardSupportIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
   AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsMaterialRequestIdRoute
   AuthenticatedDashboardBuyingMaterialRequestsCreateRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsCreateRoute
   AuthenticatedDashboardBuyingRfqCreateRoute: typeof AuthenticatedDashboardBuyingRfqCreateRoute
-  AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute: typeof AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute
-  AuthenticatedDashboardManufacturingWorkOrdersCreateRoute: typeof AuthenticatedDashboardManufacturingWorkOrdersCreateRoute
   AuthenticatedDashboardSalesReportsReportIdRoute: typeof AuthenticatedDashboardSalesReportsReportIdRoute
   AuthenticatedDashboardSalesReportsNewRoute: typeof AuthenticatedDashboardSalesReportsNewRoute
   AuthenticatedDashboardBuyingMaterialRequestsIndexRoute: typeof AuthenticatedDashboardBuyingMaterialRequestsIndexRoute
   AuthenticatedDashboardBuyingRfqIndexRoute: typeof AuthenticatedDashboardBuyingRfqIndexRoute
-  AuthenticatedDashboardManufacturingJobCardsIndexRoute: typeof AuthenticatedDashboardManufacturingJobCardsIndexRoute
   AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
   AuthenticatedDashboardSalesReportsIndexRoute: typeof AuthenticatedDashboardSalesReportsIndexRoute
 }
@@ -10718,16 +9995,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardKnowledgeJudgmentsRoute,
   AuthenticatedDashboardKnowledgeLawsRoute:
     AuthenticatedDashboardKnowledgeLawsRoute,
-  AuthenticatedDashboardManufacturingWorkOrderIdRoute:
-    AuthenticatedDashboardManufacturingWorkOrderIdRoute,
-  AuthenticatedDashboardManufacturingBomRoute:
-    AuthenticatedDashboardManufacturingBomRouteWithChildren,
-  AuthenticatedDashboardManufacturingCreateRoute:
-    AuthenticatedDashboardManufacturingCreateRoute,
-  AuthenticatedDashboardManufacturingSettingsRoute:
-    AuthenticatedDashboardManufacturingSettingsRoute,
-  AuthenticatedDashboardManufacturingWorkstationsRoute:
-    AuthenticatedDashboardManufacturingWorkstationsRouteWithChildren,
   AuthenticatedDashboardMessagesChatRoute:
     AuthenticatedDashboardMessagesChatRoute,
   AuthenticatedDashboardMessagesEmailRoute:
@@ -10742,29 +10009,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardOrganizationsOrganizationIdRoute,
   AuthenticatedDashboardOrganizationsNewRoute:
     AuthenticatedDashboardOrganizationsNewRoute,
-  AuthenticatedDashboardQualityInspectionIdRoute:
-    AuthenticatedDashboardQualityInspectionIdRoute,
-  AuthenticatedDashboardQualityActionsRoute:
-    AuthenticatedDashboardQualityActionsRouteWithChildren,
-  AuthenticatedDashboardQualityCreateRoute:
-    AuthenticatedDashboardQualityCreateRoute,
-  AuthenticatedDashboardQualitySettingsRoute:
-    AuthenticatedDashboardQualitySettingsRoute,
-  AuthenticatedDashboardQualityTemplatesRoute:
-    AuthenticatedDashboardQualityTemplatesRouteWithChildren,
   AuthenticatedDashboardReputationBadgesRoute:
     AuthenticatedDashboardReputationBadgesRoute,
   AuthenticatedDashboardReputationOverviewRoute:
     AuthenticatedDashboardReputationOverviewRoute,
   AuthenticatedDashboardStaffNewRoute: AuthenticatedDashboardStaffNewRoute,
-  AuthenticatedDashboardSubcontractingOrderIdRoute:
-    AuthenticatedDashboardSubcontractingOrderIdRoute,
-  AuthenticatedDashboardSubcontractingCreateRoute:
-    AuthenticatedDashboardSubcontractingCreateRoute,
-  AuthenticatedDashboardSubcontractingReceiptsRoute:
-    AuthenticatedDashboardSubcontractingReceiptsRouteWithChildren,
-  AuthenticatedDashboardSubcontractingSettingsRoute:
-    AuthenticatedDashboardSubcontractingSettingsRoute,
   AuthenticatedDashboardSupportTicketIdRoute:
     AuthenticatedDashboardSupportTicketIdRoute,
   AuthenticatedDashboardSupportCreateRoute:
@@ -10792,19 +10041,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFollowupsIndexRoute,
   AuthenticatedDashboardInvoiceTemplatesIndexRoute:
     AuthenticatedDashboardInvoiceTemplatesIndexRoute,
-  AuthenticatedDashboardManufacturingIndexRoute:
-    AuthenticatedDashboardManufacturingIndexRoute,
   AuthenticatedDashboardNotificationsIndexRoute:
     AuthenticatedDashboardNotificationsIndexRoute,
   AuthenticatedDashboardOrganizationsIndexRoute:
     AuthenticatedDashboardOrganizationsIndexRoute,
-  AuthenticatedDashboardQualityIndexRoute:
-    AuthenticatedDashboardQualityIndexRoute,
   AuthenticatedDashboardReportsIndexRoute:
     AuthenticatedDashboardReportsIndexRoute,
   AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,
-  AuthenticatedDashboardSubcontractingIndexRoute:
-    AuthenticatedDashboardSubcontractingIndexRoute,
   AuthenticatedDashboardSupportIndexRoute:
     AuthenticatedDashboardSupportIndexRoute,
   AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
@@ -10814,10 +10057,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardBuyingMaterialRequestsCreateRoute,
   AuthenticatedDashboardBuyingRfqCreateRoute:
     AuthenticatedDashboardBuyingRfqCreateRoute,
-  AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute:
-    AuthenticatedDashboardManufacturingJobCardsJobCardIdRoute,
-  AuthenticatedDashboardManufacturingWorkOrdersCreateRoute:
-    AuthenticatedDashboardManufacturingWorkOrdersCreateRoute,
   AuthenticatedDashboardSalesReportsReportIdRoute:
     AuthenticatedDashboardSalesReportsReportIdRoute,
   AuthenticatedDashboardSalesReportsNewRoute:
@@ -10826,8 +10065,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardBuyingMaterialRequestsIndexRoute,
   AuthenticatedDashboardBuyingRfqIndexRoute:
     AuthenticatedDashboardBuyingRfqIndexRoute,
-  AuthenticatedDashboardManufacturingJobCardsIndexRoute:
-    AuthenticatedDashboardManufacturingJobCardsIndexRoute,
   AuthenticatedDashboardSalesLeadsIndexRoute:
     AuthenticatedDashboardSalesLeadsIndexRoute,
   AuthenticatedDashboardSalesReportsIndexRoute:
