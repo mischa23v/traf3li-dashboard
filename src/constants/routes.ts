@@ -906,6 +906,18 @@ export const ROUTES = {
         detail: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}`,
         edit: (supplierId: string) => `/dashboard/buying/suppliers/${supplierId}/edit`,
       },
+
+      // Purchase orders (important for finance tracking)
+      purchaseOrders: {
+        list: '/dashboard/buying/purchase-orders',
+        create: '/dashboard/buying/purchase-orders/create',
+        detail: (purchaseOrderId: string) => `/dashboard/buying/purchase-orders/${purchaseOrderId}`,
+      },
+
+      // Purchase receipts
+      purchaseReceipts: {
+        list: '/dashboard/buying/purchase-receipts',
+      },
     },
 
     /**

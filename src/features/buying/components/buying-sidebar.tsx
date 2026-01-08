@@ -12,6 +12,8 @@ import {
   Settings,
   TrendingUp,
   FolderOpen,
+  FileText,
+  ClipboardList,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,6 +45,13 @@ export function BuyingSidebar() {
               <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘N</kbd>
             </Link>
           </Button>
+          <Button asChild variant="outline" className="w-full justify-start rounded-xl">
+            <Link to={ROUTES.dashboard.buying.purchaseOrders.create}>
+              <FileText className="w-4 h-4 ml-2" />
+              {t('buying.newPurchaseOrder', 'أمر شراء جديد')}
+              <kbd className="mr-auto bg-muted px-2 py-0.5 rounded text-xs">⌘O</kbd>
+            </Link>
+          </Button>
         </CardContent>
       </Card>
 
@@ -59,6 +68,12 @@ export function BuyingSidebar() {
             <Link to={ROUTES.dashboard.buying.list}>
               <Users className="w-4 h-4 ml-2" />
               {t('buying.suppliers', 'الموردين')}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full justify-start rounded-xl">
+            <Link to={ROUTES.dashboard.buying.purchaseOrders.list}>
+              <ClipboardList className="w-4 h-4 ml-2" />
+              {t('buying.purchaseOrders', 'أوامر الشراء')}
             </Link>
           </Button>
           <Separator className="my-2" />
