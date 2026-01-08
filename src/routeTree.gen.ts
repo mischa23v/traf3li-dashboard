@@ -402,6 +402,8 @@ import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } fro
 import { Route as AuthenticatedDashboardCasesPipelineBoardRouteImport } from './routes/_authenticated/dashboard.cases.pipeline.board'
 import { Route as AuthenticatedDashboardCasesCaseIdPipelineRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.pipeline'
 import { Route as AuthenticatedDashboardCasesCaseIdNotionRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.notion'
+import { Route as AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport } from './routes/_authenticated/dashboard.buying.purchase-orders.create'
+import { Route as AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport } from './routes/_authenticated/dashboard.buying.purchase-orders.$purchaseOrderId'
 import { Route as AuthenticatedDashboardAssetsMaintenanceCreateRouteImport } from './routes/_authenticated/dashboard.assets.maintenance.create'
 import { Route as AuthenticatedDashboardAssetsCategoriesCreateRouteImport } from './routes/_authenticated/dashboard.assets.categories.create'
 import { Route as AuthenticatedDashboardHrSettingsShiftTypesIndexRouteImport } from './routes/_authenticated/dashboard.hr.settings.shift-types.index'
@@ -2744,6 +2746,18 @@ const AuthenticatedDashboardCasesCaseIdNotionRoute =
     path: '/notion',
     getParentRoute: () => AuthenticatedDashboardCasesCaseIdRoute,
   } as any)
+const AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute =
+  AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedDashboardBuyingPurchaseOrdersRoute,
+  } as any)
+const AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute =
+  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport.update({
+    id: '/$purchaseOrderId',
+    path: '/$purchaseOrderId',
+    getParentRoute: () => AuthenticatedDashboardBuyingPurchaseOrdersRoute,
+  } as any)
 const AuthenticatedDashboardAssetsMaintenanceCreateRoute =
   AuthenticatedDashboardAssetsMaintenanceCreateRouteImport.update({
     id: '/create',
@@ -3019,7 +3033,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
   '/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3103,6 +3117,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
+  '/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
+  '/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -3435,7 +3451,7 @@ export interface FileRoutesByTo {
   '/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+  '/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
   '/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3518,6 +3534,8 @@ export interface FileRoutesByTo {
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
+  '/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
+  '/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
   '/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -3861,7 +3879,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/assets/settings': typeof AuthenticatedDashboardAssetsSettingsRoute
   '/_authenticated/dashboard/buying/$supplierId': typeof AuthenticatedDashboardBuyingSupplierIdRoute
   '/_authenticated/dashboard/buying/create': typeof AuthenticatedDashboardBuyingCreateRoute
-  '/_authenticated/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+  '/_authenticated/dashboard/buying/purchase-orders': typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
   '/_authenticated/dashboard/buying/settings': typeof AuthenticatedDashboardBuyingSettingsRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/_authenticated/dashboard/cases/kanban': typeof AuthenticatedDashboardCasesKanbanRoute
@@ -3945,6 +3963,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/assets/categories/create': typeof AuthenticatedDashboardAssetsCategoriesCreateRoute
   '/_authenticated/dashboard/assets/maintenance/create': typeof AuthenticatedDashboardAssetsMaintenanceCreateRoute
+  '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId': typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
+  '/_authenticated/dashboard/buying/purchase-orders/create': typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
   '/_authenticated/dashboard/cases/$caseId/notion': typeof AuthenticatedDashboardCasesCaseIdNotionRouteWithChildren
   '/_authenticated/dashboard/cases/$caseId/pipeline': typeof AuthenticatedDashboardCasesCaseIdPipelineRoute
   '/_authenticated/dashboard/cases/pipeline/board': typeof AuthenticatedDashboardCasesPipelineBoardRoute
@@ -4370,6 +4390,8 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
     | '/dashboard/assets/maintenance/create'
+    | '/dashboard/buying/purchase-orders/$purchaseOrderId'
+    | '/dashboard/buying/purchase-orders/create'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
@@ -4785,6 +4807,8 @@ export interface FileRouteTypes {
     | '/dashboard/tags'
     | '/dashboard/assets/categories/create'
     | '/dashboard/assets/maintenance/create'
+    | '/dashboard/buying/purchase-orders/$purchaseOrderId'
+    | '/dashboard/buying/purchase-orders/create'
     | '/dashboard/cases/$caseId/notion'
     | '/dashboard/cases/$caseId/pipeline'
     | '/dashboard/cases/pipeline/board'
@@ -5211,6 +5235,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/assets/categories/create'
     | '/_authenticated/dashboard/assets/maintenance/create'
+    | '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId'
+    | '/_authenticated/dashboard/buying/purchase-orders/create'
     | '/_authenticated/dashboard/cases/$caseId/notion'
     | '/_authenticated/dashboard/cases/$caseId/pipeline'
     | '/_authenticated/dashboard/cases/pipeline/board'
@@ -8264,6 +8290,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCasesCaseIdNotionRouteImport
       parentRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
     }
+    '/_authenticated/dashboard/buying/purchase-orders/create': {
+      id: '/_authenticated/dashboard/buying/purchase-orders/create'
+      path: '/create'
+      fullPath: '/dashboard/buying/purchase-orders/create'
+      preLoaderRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRouteImport
+      parentRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+    }
+    '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId': {
+      id: '/_authenticated/dashboard/buying/purchase-orders/$purchaseOrderId'
+      path: '/$purchaseOrderId'
+      fullPath: '/dashboard/buying/purchase-orders/$purchaseOrderId'
+      preLoaderRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+    }
     '/_authenticated/dashboard/assets/maintenance/create': {
       id: '/_authenticated/dashboard/assets/maintenance/create'
       path: '/create'
@@ -9710,6 +9750,24 @@ const AuthenticatedDashboardTasksRouteWithChildren =
     AuthenticatedDashboardTasksRouteChildren,
   )
 
+interface AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren {
+  AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute
+  AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute
+}
+
+const AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren: AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren =
+  {
+    AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute:
+      AuthenticatedDashboardBuyingPurchaseOrdersPurchaseOrderIdRoute,
+    AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute:
+      AuthenticatedDashboardBuyingPurchaseOrdersCreateRoute,
+  }
+
+const AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren =
+  AuthenticatedDashboardBuyingPurchaseOrdersRoute._addFileChildren(
+    AuthenticatedDashboardBuyingPurchaseOrdersRouteChildren,
+  )
+
 interface AuthenticatedDashboardSupportSlaRouteChildren {
   AuthenticatedDashboardSupportSlaCreateRoute: typeof AuthenticatedDashboardSupportSlaCreateRoute
   AuthenticatedDashboardSupportSlaIndexRoute: typeof AuthenticatedDashboardSupportSlaIndexRoute
@@ -9752,7 +9810,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardBuyingSupplierIdRoute: typeof AuthenticatedDashboardBuyingSupplierIdRoute
   AuthenticatedDashboardBuyingCreateRoute: typeof AuthenticatedDashboardBuyingCreateRoute
-  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRoute
+  AuthenticatedDashboardBuyingPurchaseOrdersRoute: typeof AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren
   AuthenticatedDashboardBuyingSettingsRoute: typeof AuthenticatedDashboardBuyingSettingsRoute
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
@@ -9836,7 +9894,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardBuyingCreateRoute:
     AuthenticatedDashboardBuyingCreateRoute,
   AuthenticatedDashboardBuyingPurchaseOrdersRoute:
-    AuthenticatedDashboardBuyingPurchaseOrdersRoute,
+    AuthenticatedDashboardBuyingPurchaseOrdersRouteWithChildren,
   AuthenticatedDashboardBuyingSettingsRoute:
     AuthenticatedDashboardBuyingSettingsRoute,
   AuthenticatedDashboardClientsClientIdRoute:

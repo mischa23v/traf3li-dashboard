@@ -447,12 +447,13 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'sidebar.nav.inventoryGroup',
+      title: 'sidebar.nav.operationsGroup',
       items: [
         {
-          title: 'sidebar.nav.inventory',
+          title: 'sidebar.nav.operations',
           icon: Package,
           items: [
+            // Inventory
             {
               title: 'sidebar.nav.items',
               url: ROUTES.dashboard.inventory.list,
@@ -461,20 +462,14 @@ export function useSidebarData(): SidebarData {
               title: 'sidebar.nav.warehouses',
               url: ROUTES.dashboard.inventory.warehouses.list,
             },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'sidebar.nav.buyingGroup',
-      items: [
-        {
-          title: 'sidebar.nav.buying',
-          icon: ShoppingCart,
-          items: [
+            // Buying
             {
               title: 'sidebar.nav.suppliers',
               url: ROUTES.dashboard.buying.list,
+            },
+            {
+              title: 'sidebar.nav.purchaseOrders',
+              url: ROUTES.dashboard.buying.purchaseOrders.list,
             },
           ],
         },
