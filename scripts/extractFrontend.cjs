@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 
 /**
- * Frontend Structure Extractor
+ * Frontend Structure Extractor - Complete Edition
  *
  * Automatically scans all frontend files and extracts:
  * - Pages/Routes
  * - Components
  * - Hooks
- * - API Services
+ * - API Services & Endpoints
+ * - TypeScript Types & Interfaces (Entity Shapes)
+ * - Request/Response Types
+ * - Enums
  * - Query Keys
  * - Constants/Routes
+ * - Zod Schemas
  *
  * Outputs to docs/FRONTEND_STRUCTURE.md and docs/frontend-structure.json
  *
- * Usage: node scripts/extractFrontend.js
+ * Usage: node scripts/extractFrontend.cjs
  */
 
 const fs = require('fs');
@@ -35,16 +39,17 @@ const results = {
     components: [],
     hooks: [],
     services: [],
+    types: [],
+    interfaces: [],
+    enums: [],
+    schemas: [],
     queryKeys: [],
     routes: [],
+    apiEndpoints: [],
+    requestTypes: [],
+    responseTypes: [],
     features: {},
-    stats: {
-        totalPages: 0,
-        totalComponents: 0,
-        totalHooks: 0,
-        totalServices: 0,
-        totalFeatures: 0
-    }
+    stats: {}
 };
 
 /**
@@ -60,7 +65,6 @@ function getAllFiles(dir, extensions = ['.tsx', '.ts'], fileList = []) {
         const stat = fs.statSync(filePath);
 
         if (stat.isDirectory()) {
-            // Skip node_modules and hidden directories
             if (!file.startsWith('.') && file !== 'node_modules') {
                 getAllFiles(filePath, extensions, fileList);
             }
@@ -73,7 +77,246 @@ function getAllFiles(dir, extensions = ['.tsx', '.ts'], fileList = []) {
 }
 
 /**
- * Extract component/hook name and props from file
+ * Extract TypeScript interfaces from content
+ */
+function extractInterfaces(content, filePath) {
+    const interfaces = [];
+    const relativePath = path.relative(SRC_DIR, filePath);
+
+    const interfaceRegex = /(?:export\s+)?interface\s+(\w+)(?:\s+extends\s+([^{]+))?\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/gs;
+    let match;
+
+    while ((match = interfaceRegex.exec(content)) !== null) {
+        const name = match[1];
+        const extends_ = match[2] ? match[2].trim() : null;
+        const body = match[3].trim();
+
+        const fields = [];
+        const fieldRegex = /(\w+)(\?)?:\s*([^;]+);?/g;
+        let fieldMatch;
+        while ((fieldMatch = fieldRegex.exec(body)) !== null) {
+            fields.push({
+                name: fieldMatch[1],
+                optional: !!fieldMatch[2],
+                type: fieldMatch[3].trim()
+            });
+        }
+
+        interfaces.push({
+            name,
+            extends: extends_,
+            fields,
+            path: relativePath,
+            isExported: content.includes(`export interface ${name}`) || content.includes(`export { ${name}`)
+        });
+    }
+
+    return interfaces;
+}
+
+/**
+ * Extract TypeScript type aliases from content
+ */
+function extractTypes(content, filePath) {
+    const types = [];
+    const relativePath = path.relative(SRC_DIR, filePath);
+
+    const typeRegex = /(?:export\s+)?type\s+(\w+)(?:<[^>]+>)?\s*=\s*([^;]+);/g;
+    let match;
+
+    while ((match = typeRegex.exec(content)) !== null) {
+        const name = match[1];
+        const definition = match[2].trim();
+
+        let kind = 'alias';
+        if (definition.includes('|')) kind = 'union';
+        else if (definition.includes('&')) kind = 'intersection';
+        else if (definition.startsWith('{')) kind = 'object';
+        else if (definition.includes('=>')) kind = 'function';
+
+        types.push({
+            name,
+            definition: definition.length > 200 ? definition.substring(0, 200) + '...' : definition,
+            kind,
+            path: relativePath,
+            isExported: content.includes(`export type ${name}`)
+        });
+    }
+
+    return types;
+}
+
+/**
+ * Extract enums from content
+ */
+function extractEnums(content, filePath) {
+    const enums = [];
+    const relativePath = path.relative(SRC_DIR, filePath);
+
+    const enumRegex = /(?:export\s+)?(?:const\s+)?enum\s+(\w+)\s*\{([^}]+)\}/g;
+    let match;
+
+    while ((match = enumRegex.exec(content)) !== null) {
+        const name = match[1];
+        const body = match[2].trim();
+
+        const values = [];
+        const valueRegex = /(\w+)\s*(?:=\s*['"`]?([^,'"}`\n]+)['"`]?)?/g;
+        let valueMatch;
+        while ((valueMatch = valueRegex.exec(body)) !== null) {
+            if (valueMatch[1]) {
+                values.push({
+                    key: valueMatch[1].trim(),
+                    value: valueMatch[2] ? valueMatch[2].trim() : null
+                });
+            }
+        }
+
+        enums.push({
+            name,
+            values,
+            path: relativePath,
+            isExported: content.includes(`export enum ${name}`) || content.includes(`export const enum ${name}`)
+        });
+    }
+
+    // Also extract const object enums
+    const constEnumRegex = /(?:export\s+)?const\s+(\w+)\s*=\s*\{([^}]+)\}\s*as\s+const/g;
+    while ((match = constEnumRegex.exec(content)) !== null) {
+        const name = match[1];
+        const body = match[2].trim();
+
+        const values = [];
+        const valueRegex = /(\w+)\s*:\s*['"`]([^'"`]+)['"`]/g;
+        let valueMatch;
+        while ((valueMatch = valueRegex.exec(body)) !== null) {
+            values.push({
+                key: valueMatch[1],
+                value: valueMatch[2]
+            });
+        }
+
+        if (values.length > 0) {
+            enums.push({
+                name,
+                values,
+                path: relativePath,
+                isConst: true,
+                isExported: content.includes(`export const ${name}`)
+            });
+        }
+    }
+
+    return enums;
+}
+
+/**
+ * Extract Zod schemas from content
+ */
+function extractSchemas(content, filePath) {
+    const schemas = [];
+    const relativePath = path.relative(SRC_DIR, filePath);
+
+    const schemaRegex = /(?:export\s+)?const\s+(\w+(?:Schema|Validator))\s*=\s*z\.(object|array|string|number|enum)\s*\(/gs;
+    let match;
+
+    while ((match = schemaRegex.exec(content)) !== null) {
+        const name = match[1];
+        const type = match[2];
+
+        schemas.push({
+            name,
+            type,
+            path: relativePath,
+            isExported: content.includes(`export const ${name}`)
+        });
+    }
+
+    return schemas;
+}
+
+/**
+ * Extract API endpoints from hooks and services
+ */
+function extractApiEndpoints(content, filePath) {
+    const endpoints = [];
+    const relativePath = path.relative(SRC_DIR, filePath);
+
+    const patterns = [
+        /api\s*\.\s*(get|post|put|patch|delete)\s*<([^>]+)>\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+        /api\s*\.\s*(get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/gi,
+        /apiClient\s*\.\s*(get|post|put|patch|delete)\s*[<(]\s*['"`]([^'"`]+)['"`]/gi,
+        /fetch\s*\(\s*['"`](\/api\/[^'"`]+)['"`]/gi,
+        /axios\s*\.\s*(get|post|put|patch|delete)\s*[<(]\s*['"`]([^'"`]+)['"`]/gi,
+    ];
+
+    for (const pattern of patterns) {
+        let match;
+        while ((match = pattern.exec(content)) !== null) {
+            let method, endpoint, responseType;
+
+            if (match.length === 4) {
+                method = match[1].toUpperCase();
+                responseType = match[2];
+                endpoint = match[3];
+            } else if (match.length === 3) {
+                method = match[1].toUpperCase();
+                endpoint = match[2];
+            } else if (match.length === 2) {
+                method = 'GET';
+                endpoint = match[1];
+            }
+
+            if (endpoint) {
+                endpoints.push({
+                    method: method || 'UNKNOWN',
+                    endpoint,
+                    responseType: responseType || null,
+                    source: relativePath
+                });
+            }
+        }
+    }
+
+    // Template literals
+    const templatePattern = /api\s*\.\s*(get|post|put|patch|delete)\s*[<(][^`]*`([^`]+)`/gi;
+    let tmatch;
+    while ((tmatch = templatePattern.exec(content)) !== null) {
+        endpoints.push({
+            method: tmatch[1].toUpperCase(),
+            endpoint: tmatch[2].replace(/\$\{[^}]+\}/g, ':param'),
+            source: relativePath,
+            dynamic: true
+        });
+    }
+
+    return endpoints;
+}
+
+/**
+ * Extract request/response types
+ */
+function extractRequestResponseTypes(content, filePath) {
+    const relativePath = path.relative(SRC_DIR, filePath);
+    const requests = [];
+    const responses = [];
+
+    const requestRegex = /(?:export\s+)?(?:interface|type)\s+(\w*(?:Request|Payload|Input|Params|Args|CreateDTO|UpdateDTO)\w*)\s*[={]/g;
+    let match;
+    while ((match = requestRegex.exec(content)) !== null) {
+        requests.push({ name: match[1], path: relativePath });
+    }
+
+    const responseRegex = /(?:export\s+)?(?:interface|type)\s+(\w*(?:Response|Result|Output|Data|DTO)\w*)\s*[={]/g;
+    while ((match = responseRegex.exec(content)) !== null) {
+        responses.push({ name: match[1], path: relativePath });
+    }
+
+    return { requests, responses };
+}
+
+/**
+ * Extract component info
  */
 function extractComponentInfo(filePath, content) {
     const fileName = path.basename(filePath, path.extname(filePath));
@@ -84,39 +327,35 @@ function extractComponentInfo(filePath, content) {
         path: relativePath,
         type: 'component',
         exports: [],
-        imports: [],
         props: null,
-        hooks: []
+        hooks: [],
+        apiCalls: []
     };
 
-    // Detect if it's a hook
     if (fileName.startsWith('use') || fileName.startsWith('Use')) {
         info.type = 'hook';
     }
 
-    // Extract exports
     const exportMatches = content.matchAll(/export\s+(?:default\s+)?(?:function|const|class)\s+(\w+)/g);
     for (const match of exportMatches) {
         info.exports.push(match[1]);
     }
 
-    // Extract named exports
-    const namedExports = content.matchAll(/export\s+\{\s*([^}]+)\s*\}/g);
-    for (const match of namedExports) {
-        const names = match[1].split(',').map(n => n.trim().split(' ')[0]);
-        info.exports.push(...names);
-    }
-
-    // Extract interface/type for props
-    const propsMatch = content.match(/interface\s+(\w+Props)\s*\{([^}]+)\}/s);
+    const propsMatch = content.match(/interface\s+(\w+Props)\s*(?:extends\s+[^{]+)?\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/s);
     if (propsMatch) {
-        info.props = {
-            name: propsMatch[1],
-            definition: propsMatch[2].trim()
-        };
+        const fields = [];
+        const fieldRegex = /(\w+)(\?)?:\s*([^;]+);/g;
+        let fieldMatch;
+        while ((fieldMatch = fieldRegex.exec(propsMatch[2])) !== null) {
+            fields.push({
+                name: fieldMatch[1],
+                optional: !!fieldMatch[2],
+                type: fieldMatch[3].trim()
+            });
+        }
+        info.props = { name: propsMatch[1], fields };
     }
 
-    // Extract hooks used
     const hookMatches = content.matchAll(/\buse[A-Z]\w+/g);
     const hooksUsed = new Set();
     for (const match of hookMatches) {
@@ -124,67 +363,67 @@ function extractComponentInfo(filePath, content) {
     }
     info.hooks = Array.from(hooksUsed);
 
-    // Extract API calls
-    const apiMatches = content.matchAll(/(?:api|apiClient|fetch)\s*\.\s*(get|post|put|patch|delete)\s*[<(]\s*['"`]([^'"`]+)['"`]/gi);
-    info.apiCalls = [];
-    for (const match of apiMatches) {
-        info.apiCalls.push({
-            method: match[1].toUpperCase(),
-            endpoint: match[2]
-        });
-    }
+    info.apiCalls = extractApiEndpoints(content, filePath);
 
     return info;
 }
 
 /**
- * Extract route definitions from routes file
+ * Extract routes
  */
-function extractRoutes(filePath, content) {
+function extractRoutes(content) {
     const routes = [];
 
-    // Match route definitions like: list: '/dashboard/tasks'
     const routeMatches = content.matchAll(/(\w+)\s*:\s*['"`]([^'"`]+)['"`]/g);
     for (const match of routeMatches) {
-        routes.push({
-            name: match[1],
-            path: match[2]
-        });
+        routes.push({ name: match[1], path: match[2] });
     }
 
-    // Match function routes like: detail: (id: string) => `/dashboard/tasks/${id}`
     const funcRouteMatches = content.matchAll(/(\w+)\s*:\s*\([^)]*\)\s*=>\s*[`'"]([^`'"]+)[`'"]/g);
     for (const match of funcRouteMatches) {
-        routes.push({
-            name: match[1],
-            path: match[2],
-            dynamic: true
-        });
+        routes.push({ name: match[1], path: match[2], dynamic: true });
     }
 
     return routes;
 }
 
 /**
- * Extract query keys from query-keys file
+ * Extract query keys
  */
-function extractQueryKeys(filePath, content) {
+function extractQueryKeys(content) {
     const queryKeys = [];
 
-    // Match query key definitions
-    const keyMatches = content.matchAll(/(\w+)\s*:\s*(?:\[[^\]]+\]|\([^)]*\)\s*=>\s*\[[^\]]+\]|['"`][^'"`]+['"`])/g);
+    const keyMatches = content.matchAll(/(\w+)\s*:\s*(\[[^\]]+\]|\([^)]*\)\s*=>\s*\[[^\]]+\])/g);
     for (const match of keyMatches) {
-        queryKeys.push({
-            name: match[1],
-            definition: match[0]
-        });
+        queryKeys.push({ name: match[1], definition: match[2] });
     }
 
     return queryKeys;
 }
 
 /**
- * Extract page components (route components)
+ * Scan all TypeScript files
+ */
+function extractAllTypes(dir) {
+    const files = getAllFiles(dir);
+
+    for (const file of files) {
+        const content = fs.readFileSync(file, 'utf-8');
+
+        results.interfaces.push(...extractInterfaces(content, file));
+        results.types.push(...extractTypes(content, file));
+        results.enums.push(...extractEnums(content, file));
+        results.schemas.push(...extractSchemas(content, file));
+        results.apiEndpoints.push(...extractApiEndpoints(content, file));
+
+        const reqRes = extractRequestResponseTypes(content, file);
+        results.requestTypes.push(...reqRes.requests);
+        results.responseTypes.push(...reqRes.responses);
+    }
+}
+
+/**
+ * Extract pages
  */
 function extractPages(dir) {
     const pagesDir = path.join(dir, 'routes');
@@ -197,7 +436,6 @@ function extractPages(dir) {
         const info = extractComponentInfo(file, content);
         info.type = 'page';
 
-        // Extract route path from file structure
         const relativePath = path.relative(pagesDir, file);
         info.routePath = '/' + relativePath
             .replace(/\\/g, '/')
@@ -211,7 +449,7 @@ function extractPages(dir) {
 }
 
 /**
- * Extract all hooks
+ * Extract hooks
  */
 function extractHooks(dir) {
     const hooksDir = path.join(dir, 'hooks');
@@ -224,7 +462,6 @@ function extractHooks(dir) {
         const info = extractComponentInfo(file, content);
         info.type = 'hook';
 
-        // Extract what the hook returns
         const returnMatch = content.match(/return\s*\{([^}]+)\}/s);
         if (returnMatch) {
             info.returns = returnMatch[1]
@@ -238,15 +475,14 @@ function extractHooks(dir) {
 }
 
 /**
- * Extract feature modules
+ * Extract features
  */
 function extractFeatures(dir) {
     const featuresDir = path.join(dir, 'features');
     if (!fs.existsSync(featuresDir)) return;
 
     const featureDirs = fs.readdirSync(featuresDir).filter(f => {
-        const fullPath = path.join(featuresDir, f);
-        return fs.statSync(fullPath).isDirectory();
+        return fs.statSync(path.join(featuresDir, f)).isDirectory();
     });
 
     for (const feature of featureDirs) {
@@ -256,45 +492,46 @@ function extractFeatures(dir) {
             components: [],
             pages: [],
             hooks: [],
+            types: [],
             hasIndex: false
         };
 
-        // Check subdirectories
-        const subdirs = ['components', 'pages', 'hooks', 'views'];
+        const subdirs = ['components', 'pages', 'hooks', 'views', 'types'];
         for (const subdir of subdirs) {
             const subdirPath = path.join(featurePath, subdir);
             if (fs.existsSync(subdirPath)) {
                 const files = getAllFiles(subdirPath);
                 for (const file of files) {
                     const content = fs.readFileSync(file, 'utf-8');
-                    const info = extractComponentInfo(file, content);
 
                     if (subdir === 'components') {
+                        const info = extractComponentInfo(file, content);
                         featureInfo.components.push(info);
                         results.components.push({ ...info, feature });
                     } else if (subdir === 'pages' || subdir === 'views') {
+                        const info = extractComponentInfo(file, content);
                         info.type = 'page';
                         featureInfo.pages.push(info);
                     } else if (subdir === 'hooks') {
+                        const info = extractComponentInfo(file, content);
                         info.type = 'hook';
                         featureInfo.hooks.push(info);
+                    } else if (subdir === 'types') {
+                        featureInfo.types.push(...extractInterfaces(content, file));
                     }
                 }
             }
         }
 
-        // Check for index file
-        if (fs.existsSync(path.join(featurePath, 'index.ts')) ||
-            fs.existsSync(path.join(featurePath, 'index.tsx'))) {
-            featureInfo.hasIndex = true;
-        }
+        featureInfo.hasIndex = fs.existsSync(path.join(featurePath, 'index.ts')) ||
+            fs.existsSync(path.join(featurePath, 'index.tsx'));
 
         results.features[feature] = featureInfo;
     }
 }
 
 /**
- * Extract shared components
+ * Extract components
  */
 function extractComponents(dir) {
     const componentsDir = path.join(dir, 'components');
@@ -306,24 +543,18 @@ function extractComponents(dir) {
         const content = fs.readFileSync(file, 'utf-8');
         const info = extractComponentInfo(file, content);
 
-        // Categorize by subdirectory
         const relativePath = path.relative(componentsDir, file);
-        const category = relativePath.split(path.sep)[0];
-        info.category = category === info.name + '.tsx' ? 'root' : category;
+        info.category = relativePath.split(path.sep)[0];
 
         results.components.push(info);
     }
 }
 
 /**
- * Extract services/API layer
+ * Extract services
  */
 function extractServices(dir) {
-    const servicesDir = path.join(dir, 'services');
-    const libDir = path.join(dir, 'lib');
-    const apiDir = path.join(dir, 'api');
-
-    const searchDirs = [servicesDir, libDir, apiDir].filter(d => fs.existsSync(d));
+    const searchDirs = ['services', 'lib', 'api'].map(d => path.join(dir, d)).filter(fs.existsSync);
 
     for (const searchDir of searchDirs) {
         const files = getAllFiles(searchDir);
@@ -332,71 +563,45 @@ function extractServices(dir) {
             const content = fs.readFileSync(file, 'utf-8');
             const fileName = path.basename(file);
 
-            // Skip non-API files
-            if (!content.includes('api') && !content.includes('fetch') && !content.includes('axios')) {
-                continue;
-            }
+            if (!content.includes('api') && !content.includes('fetch') && !content.includes('axios')) continue;
 
-            const info = {
-                name: fileName,
-                path: path.relative(SRC_DIR, file),
-                endpoints: []
-            };
-
-            // Extract API endpoints
-            const apiMatches = content.matchAll(/(?:api|apiClient|axios|fetch)\s*\.\s*(get|post|put|patch|delete)\s*[<(]\s*['"`]([^'"`]+)['"`]/gi);
-            for (const match of apiMatches) {
-                info.endpoints.push({
-                    method: match[1].toUpperCase(),
-                    path: match[2]
+            const endpoints = extractApiEndpoints(content, file);
+            if (endpoints.length > 0) {
+                results.services.push({
+                    name: fileName,
+                    path: path.relative(SRC_DIR, file),
+                    endpoints
                 });
-            }
-
-            // Extract endpoint strings
-            const endpointStrings = content.matchAll(/['"`](\/api\/[^'"`]+)['"`]/g);
-            for (const match of endpointStrings) {
-                if (!info.endpoints.some(e => e.path === match[1])) {
-                    info.endpoints.push({
-                        method: 'UNKNOWN',
-                        path: match[1]
-                    });
-                }
-            }
-
-            if (info.endpoints.length > 0) {
-                results.services.push(info);
             }
         }
     }
 }
 
 /**
- * Extract constants and routes
+ * Extract constants
  */
 function extractConstants(dir) {
-    const constantsDir = path.join(dir, 'constants');
-    if (!fs.existsSync(constantsDir)) return;
-
-    // Routes file
-    const routesFile = path.join(constantsDir, 'routes.ts');
+    const routesFile = path.join(dir, 'constants', 'routes.ts');
     if (fs.existsSync(routesFile)) {
-        const content = fs.readFileSync(routesFile, 'utf-8');
-        results.routes = extractRoutes(routesFile, content);
+        results.routes = extractRoutes(fs.readFileSync(routesFile, 'utf-8'));
     }
 
-    // Query keys file
-    const libDir = path.join(dir, 'lib');
-    const queryKeysFile = path.join(libDir, 'query-keys.ts');
+    const queryKeysFile = path.join(dir, 'lib', 'query-keys.ts');
     if (fs.existsSync(queryKeysFile)) {
-        const content = fs.readFileSync(queryKeysFile, 'utf-8');
-        results.queryKeys = extractQueryKeys(queryKeysFile, content);
+        results.queryKeys = extractQueryKeys(fs.readFileSync(queryKeysFile, 'utf-8'));
     }
 }
 
 /**
- * Generate Markdown documentation
+ * Generate Markdown
  */
 function generateMarkdown() {
+    const uniqueEndpoints = new Map();
+    for (const ep of results.apiEndpoints) {
+        const key = `${ep.method}:${ep.endpoint}`;
+        if (!uniqueEndpoints.has(key)) uniqueEndpoints.set(key, ep);
+    }
+
     let md = `# Frontend Structure Documentation
 
 > Auto-generated on ${new Date().toISOString().split('T')[0]}
@@ -411,18 +616,31 @@ function generateMarkdown() {
 | Components | ${results.components.length} |
 | Hooks | ${results.hooks.length} |
 | Services | ${results.services.length} |
+| **Interfaces (Entity Shapes)** | ${results.interfaces.length} |
+| **Type Aliases** | ${results.types.length} |
+| **Enums** | ${results.enums.length} |
+| **Zod Schemas** | ${results.schemas.length} |
+| **API Endpoints** | ${uniqueEndpoints.size} |
+| **Request Types** | ${results.requestTypes.length} |
+| **Response Types** | ${results.responseTypes.length} |
 | Routes Defined | ${results.routes.length} |
+| Query Keys | ${results.queryKeys.length} |
 
 ---
 
 ## Table of Contents
 
 - [Features/Modules](#featuresmodules)
+- [Entity Interfaces](#entity-interfaces)
+- [Type Aliases](#type-aliases)
+- [Enums](#enums)
+- [Zod Schemas](#zod-schemas)
+- [API Endpoints](#api-endpoints)
+- [Request/Response Types](#requestresponse-types)
 - [Pages](#pages)
-- [Shared Components](#shared-components)
 - [Hooks](#hooks)
-- [Services/API](#servicesapi)
 - [Routes](#routes)
+- [Query Keys](#query-keys)
 
 ---
 
@@ -430,76 +648,108 @@ function generateMarkdown() {
 
 `;
 
-    // Features
-    const sortedFeatures = Object.entries(results.features)
-        .sort((a, b) => a[0].localeCompare(b[0]));
-
-    for (const [name, feature] of sortedFeatures) {
-        const totalItems = feature.components.length + feature.pages.length + feature.hooks.length;
-        md += `### ${name}\n\n`;
+    for (const [name, feature] of Object.entries(results.features).sort()) {
+        md += `### ${name}\n`;
         md += `| Type | Count |\n|------|-------|\n`;
         md += `| Components | ${feature.components.length} |\n`;
         md += `| Pages/Views | ${feature.pages.length} |\n`;
-        md += `| Hooks | ${feature.hooks.length} |\n\n`;
+        md += `| Hooks | ${feature.hooks.length} |\n`;
+        md += `| Types | ${feature.types.length} |\n\n`;
 
         if (feature.components.length > 0) {
-            md += `**Components:**\n`;
-            for (const comp of feature.components) {
-                md += `- \`${comp.name}\``;
-                if (comp.props) md += ` (Props: ${comp.props.name})`;
-                md += `\n`;
-            }
-            md += `\n`;
+            md += `**Components:** ${feature.components.map(c => `\`${c.name}\``).join(', ')}\n\n`;
         }
-
         if (feature.pages.length > 0) {
-            md += `**Pages/Views:**\n`;
-            for (const page of feature.pages) {
-                md += `- \`${page.name}\`\n`;
-            }
-            md += `\n`;
+            md += `**Pages:** ${feature.pages.map(p => `\`${p.name}\``).join(', ')}\n\n`;
         }
-
-        if (feature.hooks.length > 0) {
-            md += `**Hooks:**\n`;
-            for (const hook of feature.hooks) {
-                md += `- \`${hook.name}\`\n`;
-            }
-            md += `\n`;
-        }
-
         md += `---\n\n`;
     }
 
-    // Pages
-    md += `## Pages\n\n`;
-    md += `| Page | Route Path | Hooks Used |\n`;
-    md += `|------|------------|------------|\n`;
-    for (const page of results.pages.sort((a, b) => a.routePath.localeCompare(b.routePath))) {
-        const hooksStr = page.hooks.slice(0, 3).join(', ') + (page.hooks.length > 3 ? '...' : '');
-        md += `| ${page.name} | \`${page.routePath}\` | ${hooksStr} |\n`;
+    // Entity Interfaces
+    md += `## Entity Interfaces\n\n`;
+    md += `| Interface | Fields | Extends | Path |\n`;
+    md += `|-----------|--------|---------|------|\n`;
+    const entityInterfaces = results.interfaces
+        .filter(i => !i.name.includes('Props') && !i.name.includes('State') && i.isExported)
+        .slice(0, 300);
+    for (const intf of entityInterfaces) {
+        md += `| \`${intf.name}\` | ${intf.fields.length} | ${intf.extends || '-'} | ${intf.path} |\n`;
+    }
+    if (results.interfaces.length > 300) {
+        md += `\n*... and ${results.interfaces.length - 300} more*\n`;
     }
     md += `\n---\n\n`;
 
-    // Shared Components
-    md += `## Shared Components\n\n`;
-    const componentsByCategory = {};
-    for (const comp of results.components) {
-        const cat = comp.category || 'uncategorized';
-        if (!componentsByCategory[cat]) componentsByCategory[cat] = [];
-        componentsByCategory[cat].push(comp);
+    // Type Aliases
+    md += `## Type Aliases\n\n`;
+    md += `| Type | Kind | Definition |\n`;
+    md += `|------|------|------------|\n`;
+    for (const type of results.types.filter(t => t.isExported).slice(0, 200)) {
+        const shortDef = type.definition.length > 50 ? type.definition.substring(0, 50) + '...' : type.definition;
+        md += `| \`${type.name}\` | ${type.kind} | \`${shortDef}\` |\n`;
     }
+    md += `\n---\n\n`;
 
-    for (const [category, components] of Object.entries(componentsByCategory).sort()) {
-        md += `### ${category}\n\n`;
-        for (const comp of components.sort((a, b) => a.name.localeCompare(b.name))) {
-            md += `- **${comp.name}**`;
-            if (comp.props) md += ` - Props: \`${comp.props.name}\``;
-            md += `\n`;
+    // Enums
+    md += `## Enums\n\n`;
+    for (const enumDef of results.enums.filter(e => e.isExported).slice(0, 100)) {
+        md += `### ${enumDef.name}${enumDef.isConst ? ' (const)' : ''}\n`;
+        md += `**Path:** \`${enumDef.path}\`\n\n`;
+        md += `| Key | Value |\n|-----|-------|\n`;
+        for (const val of enumDef.values.slice(0, 15)) {
+            md += `| ${val.key} | ${val.value || 'auto'} |\n`;
         }
+        if (enumDef.values.length > 15) md += `| ... | +${enumDef.values.length - 15} more |\n`;
         md += `\n`;
     }
     md += `---\n\n`;
+
+    // Zod Schemas
+    md += `## Zod Schemas\n\n`;
+    md += `| Schema | Type | Path |\n`;
+    md += `|--------|------|------|\n`;
+    for (const schema of results.schemas) {
+        md += `| \`${schema.name}\` | ${schema.type} | ${schema.path} |\n`;
+    }
+    md += `\n---\n\n`;
+
+    // API Endpoints
+    md += `## API Endpoints\n\n`;
+    md += `| Method | Endpoint | Response Type | Source |\n`;
+    md += `|--------|----------|---------------|--------|\n`;
+    const sortedEndpoints = Array.from(uniqueEndpoints.values())
+        .sort((a, b) => a.endpoint.localeCompare(b.endpoint));
+    for (const ep of sortedEndpoints.slice(0, 500)) {
+        md += `| ${ep.method} | \`${ep.endpoint}\` | ${ep.responseType || '-'} | ${ep.source} |\n`;
+    }
+    if (sortedEndpoints.length > 500) {
+        md += `\n*... and ${sortedEndpoints.length - 500} more endpoints*\n`;
+    }
+    md += `\n---\n\n`;
+
+    // Request/Response Types
+    md += `## Request/Response Types\n\n`;
+    md += `### Request Types (${results.requestTypes.length})\n`;
+    md += `| Type | Path |\n|------|------|\n`;
+    for (const req of results.requestTypes.slice(0, 150)) {
+        md += `| \`${req.name}\` | ${req.path} |\n`;
+    }
+    md += `\n### Response Types (${results.responseTypes.length})\n`;
+    md += `| Type | Path |\n|------|------|\n`;
+    for (const res of results.responseTypes.slice(0, 150)) {
+        md += `| \`${res.name}\` | ${res.path} |\n`;
+    }
+    md += `\n---\n\n`;
+
+    // Pages
+    md += `## Pages\n\n`;
+    md += `| Page | Route | Hooks Used |\n`;
+    md += `|------|-------|------------|\n`;
+    for (const page of results.pages.sort((a, b) => a.routePath.localeCompare(b.routePath))) {
+        const hooks = page.hooks.slice(0, 3).join(', ') + (page.hooks.length > 3 ? '...' : '');
+        md += `| ${page.name} | \`${page.routePath}\` | ${hooks} |\n`;
+    }
+    md += `\n---\n\n`;
 
     // Hooks
     md += `## Hooks\n\n`;
@@ -507,25 +757,9 @@ function generateMarkdown() {
     md += `|------|---------|------------|\n`;
     for (const hook of results.hooks.sort((a, b) => a.name.localeCompare(b.name))) {
         const returns = hook.returns ? hook.returns.slice(0, 3).join(', ') : '-';
-        const apiCalls = hook.apiCalls?.length || 0;
-        md += `| \`${hook.name}\` | ${returns} | ${apiCalls} |\n`;
+        md += `| \`${hook.name}\` | ${returns} | ${hook.apiCalls?.length || 0} |\n`;
     }
     md += `\n---\n\n`;
-
-    // Services
-    md += `## Services/API\n\n`;
-    for (const service of results.services.sort((a, b) => a.name.localeCompare(b.name))) {
-        md += `### ${service.name}\n\n`;
-        md += `**Path:** \`${service.path}\`\n\n`;
-        if (service.endpoints.length > 0) {
-            md += `| Method | Endpoint |\n|--------|----------|\n`;
-            for (const ep of service.endpoints) {
-                md += `| ${ep.method} | \`${ep.path}\` |\n`;
-            }
-        }
-        md += `\n`;
-    }
-    md += `---\n\n`;
 
     // Routes
     md += `## Routes\n\n`;
@@ -534,17 +768,27 @@ function generateMarkdown() {
     for (const route of results.routes) {
         md += `| ${route.name} | \`${route.path}\` | ${route.dynamic ? '✓' : ''} |\n`;
     }
+    md += `\n---\n\n`;
+
+    // Query Keys
+    md += `## Query Keys\n\n`;
+    md += `| Key | Definition |\n`;
+    md += `|-----|------------|\n`;
+    for (const key of results.queryKeys.slice(0, 200)) {
+        const shortDef = key.definition.length > 60 ? key.definition.substring(0, 60) + '...' : key.definition;
+        md += `| ${key.name} | \`${shortDef}\` |\n`;
+    }
 
     return md;
 }
 
 /**
- * Main execution
+ * Main
  */
 function main() {
     console.log('🔍 Scanning frontend structure...\n');
 
-    // Extract all data
+    extractAllTypes(SRC_DIR);
     extractPages(SRC_DIR);
     extractHooks(SRC_DIR);
     extractFeatures(SRC_DIR);
@@ -552,47 +796,56 @@ function main() {
     extractServices(SRC_DIR);
     extractConstants(SRC_DIR);
 
-    // Calculate stats
+    // Dedupe endpoints
+    const uniqueEndpoints = new Map();
+    for (const ep of results.apiEndpoints) {
+        uniqueEndpoints.set(`${ep.method}:${ep.endpoint}`, ep);
+    }
+
     results.stats = {
         totalFeatures: Object.keys(results.features).length,
         totalPages: results.pages.length,
         totalComponents: results.components.length,
         totalHooks: results.hooks.length,
         totalServices: results.services.length,
-        totalRoutes: results.routes.length
+        totalInterfaces: results.interfaces.length,
+        totalTypes: results.types.length,
+        totalEnums: results.enums.length,
+        totalSchemas: results.schemas.length,
+        totalApiEndpoints: uniqueEndpoints.size,
+        totalRequestTypes: results.requestTypes.length,
+        totalResponseTypes: results.responseTypes.length,
+        totalRoutes: results.routes.length,
+        totalQueryKeys: results.queryKeys.length
     };
 
-    // Generate outputs
-    const markdown = generateMarkdown();
-    fs.writeFileSync(OUTPUT_MD, markdown);
+    fs.writeFileSync(OUTPUT_MD, generateMarkdown());
     fs.writeFileSync(OUTPUT_JSON, JSON.stringify(results, null, 2));
 
-    // Print summary
     console.log('📊 Frontend Structure Summary');
     console.log('═'.repeat(50));
-    console.log(`  Features/Modules:  ${results.stats.totalFeatures}`);
-    console.log(`  Pages:             ${results.stats.totalPages}`);
-    console.log(`  Components:        ${results.stats.totalComponents}`);
-    console.log(`  Hooks:             ${results.stats.totalHooks}`);
-    console.log(`  Services:          ${results.stats.totalServices}`);
-    console.log(`  Routes:            ${results.stats.totalRoutes}`);
+    console.log(`  Features/Modules:      ${results.stats.totalFeatures}`);
+    console.log(`  Pages:                 ${results.stats.totalPages}`);
+    console.log(`  Components:            ${results.stats.totalComponents}`);
+    console.log(`  Hooks:                 ${results.stats.totalHooks}`);
+    console.log(`  Services:              ${results.stats.totalServices}`);
+    console.log('─'.repeat(50));
+    console.log(`  Interfaces:            ${results.stats.totalInterfaces}`);
+    console.log(`  Type Aliases:          ${results.stats.totalTypes}`);
+    console.log(`  Enums:                 ${results.stats.totalEnums}`);
+    console.log(`  Zod Schemas:           ${results.stats.totalSchemas}`);
+    console.log('─'.repeat(50));
+    console.log(`  API Endpoints:         ${results.stats.totalApiEndpoints}`);
+    console.log(`  Request Types:         ${results.stats.totalRequestTypes}`);
+    console.log(`  Response Types:        ${results.stats.totalResponseTypes}`);
+    console.log('─'.repeat(50));
+    console.log(`  Routes:                ${results.stats.totalRoutes}`);
+    console.log(`  Query Keys:            ${results.stats.totalQueryKeys}`);
     console.log('═'.repeat(50));
-
-    // Top features by component count
-    console.log('\n📦 Top Features by Component Count:');
-    const topFeatures = Object.entries(results.features)
-        .map(([name, f]) => ({ name, count: f.components.length + f.pages.length }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-    for (const f of topFeatures) {
-        console.log(`  ${f.name.padEnd(25)} ${f.count} items`);
-    }
 
     console.log(`\n✅ Generated:`);
     console.log(`   ${OUTPUT_MD}`);
     console.log(`   ${OUTPUT_JSON}`);
-    console.log(`\n💡 Add to package.json: "docs:frontend": "node scripts/extractFrontend.js"`);
 }
 
 main();

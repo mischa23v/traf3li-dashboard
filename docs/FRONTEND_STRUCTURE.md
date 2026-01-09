@@ -11,1252 +11,3412 @@
 | Pages | 427 |
 | Components | 818 |
 | Hooks | 159 |
-| Services | 177 |
+| Services | 180 |
+| **Interfaces (Entity Shapes)** | 3508 |
+| **Type Aliases** | 167 |
+| **Enums** | 92 |
+| **Zod Schemas** | 212 |
+| **API Endpoints** | 3711 |
+| **Request Types** | 186 |
+| **Response Types** | 880 |
 | Routes Defined | 512 |
+| Query Keys | 1040 |
 
 ---
 
 ## Table of Contents
 
 - [Features/Modules](#featuresmodules)
+- [Entity Interfaces](#entity-interfaces)
+- [Type Aliases](#type-aliases)
+- [Enums](#enums)
+- [Zod Schemas](#zod-schemas)
+- [API Endpoints](#api-endpoints)
+- [Request/Response Types](#requestresponse-types)
 - [Pages](#pages)
-- [Shared Components](#shared-components)
 - [Hooks](#hooks)
-- [Services/API](#servicesapi)
 - [Routes](#routes)
+- [Query Keys](#query-keys)
 
 ---
 
 ## Features/Modules
 
 ### activities
-
 | Type | Count |
 |------|-------|
 | Components | 4 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `activity-bell` (Props: ActivityBellProps)
-- `activity-list` (Props: ActivityListProps)
-- `activity-scheduler` (Props: ActivitySchedulerProps)
-- `activity-stats` (Props: StatCardProps)
+**Components:** `activity-bell`, `activity-list`, `activity-scheduler`, `activity-stats`
 
 ---
 
 ### appointments
-
 | Type | Count |
 |------|-------|
 | Components | 3 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `appointment-detail-dialog` (Props: AppointmentDetailDialogProps)
-- `appointments-view`
-- `manage-availability-dialog` (Props: ManageAvailabilityDialogProps)
+**Components:** `appointment-detail-dialog`, `appointments-view`, `manage-availability-dialog`
 
 ---
 
 ### apps
-
 | Type | Count |
 |------|-------|
 | Components | 0 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
 ---
 
 ### assets
-
 | Type | Count |
 |------|-------|
 | Components | 10 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `asset-details-view`
-- `assets-list-view`
-- `assets-settings-view`
-- `assets-sidebar`
-- `category-list-view`
-- `create-asset-view`
-- `create-category-view`
-- `create-maintenance-view`
-- `index`
-- `maintenance-list-view`
+**Components:** `asset-details-view`, `assets-list-view`, `assets-settings-view`, `assets-sidebar`, `category-list-view`, `create-asset-view`, `create-category-view`, `create-maintenance-view`, `index`, `maintenance-list-view`
 
 ---
 
 ### auth
-
 | Type | Count |
 |------|-------|
 | Components | 0 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
 ---
 
 ### automated-actions
-
 | Type | Count |
 |------|-------|
 | Components | 2 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `automated-action-list` (Props: AutomatedActionListProps)
-- `domain-builder` (Props: DomainBuilderProps)
+**Components:** `automated-action-list`, `domain-builder`
 
 ---
 
 ### billing-rates
-
 | Type | Count |
 |------|-------|
 | Components | 13 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `group-action-dialog` (Props: GroupActionDialogProps)
-- `group-delete-dialog` (Props: GroupDeleteDialogProps)
-- `group-view-dialog` (Props: GroupViewDialogProps)
-- `groups-columns`
-- `groups-row-actions` (Props: GroupsRowActionsProps)
-- `groups-table` (Props: GroupsTableProps)
-- `rate-action-dialog` (Props: RateActionDialogProps)
-- `rate-delete-dialog` (Props: RateDeleteDialogProps)
-- `rate-view-dialog` (Props: RateViewDialogProps)
-- `rates-columns`
-- `rates-provider` (Props: RatesProviderProps)
-- `rates-row-actions` (Props: RatesRowActionsProps)
-- `rates-table` (Props: RatesTableProps)
+**Components:** `group-action-dialog`, `group-delete-dialog`, `group-view-dialog`, `groups-columns`, `groups-row-actions`, `groups-table`, `rate-action-dialog`, `rate-delete-dialog`, `rate-view-dialog`, `rates-columns`, `rates-provider`, `rates-row-actions`, `rates-table`
 
 ---
 
 ### buying
-
 | Type | Count |
 |------|-------|
 | Components | 9 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `buying-list-view`
-- `buying-settings-view`
-- `buying-sidebar`
-- `create-purchase-order-view`
-- `create-supplier-view`
-- `index`
-- `purchase-order-details-view`
-- `purchase-order-list-view`
-- `supplier-details-view`
+**Components:** `buying-list-view`, `buying-settings-view`, `buying-sidebar`, `create-purchase-order-view`, `create-supplier-view`, `index`, `purchase-order-details-view`, `purchase-order-list-view`, `supplier-details-view`
 
 ---
 
 ### case-notion
-
 | Type | Count |
 |------|-------|
 | Components | 15 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `block-editor` (Props: BlockEditorProps)
-- `case-notion-list-view`
-- `case-notion-sidebar` (Props: CaseNotionSidebarProps)
-- `notion-page-view` (Props: NotionPageViewProps)
-- `notion-sidebar` (Props: NotionSidebarProps)
-- `block-connections` (Props: BlockConnectionsProps)
-- `block-detail-panel` (Props: BlockDetailPanelProps)
-- `case-info-sidebar` (Props: CaseInfoSidebarProps)
-- `frame-renderer` (Props: FrameRendererProps)
-- `index`
-- `shape-renderer` (Props: ShapeRendererProps)
-- `shape-selector` (Props: ShapeSelectorProps)
-- `whiteboard-block` (Props: WhiteboardBlockProps)
-- `whiteboard-canvas` (Props: WhiteboardCanvasProps)
-- `whiteboard-view` (Props: WhiteboardViewProps)
+**Components:** `block-editor`, `case-notion-list-view`, `case-notion-sidebar`, `notion-page-view`, `notion-sidebar`, `block-connections`, `block-detail-panel`, `case-info-sidebar`, `frame-renderer`, `index`, `shape-renderer`, `shape-selector`, `whiteboard-block`, `whiteboard-canvas`, `whiteboard-view`
 
 ---
 
 ### case-workflows
-
 | Type | Count |
 |------|-------|
 | Components | 12 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-table-row-actions` (Props: DataTableRowActionsProps)
-- `data-table-toolbar` (Props: DataTableToolbarProps)
-- `workflows-action-dialog` (Props: WorkflowsActionDialogProps)
-- `workflows-columns`
-- `workflows-delete-dialog` (Props: WorkflowsDeleteDialogProps)
-- `workflows-dialogs`
-- `workflows-duplicate-dialog` (Props: WorkflowsDuplicateDialogProps)
-- `workflows-primary-buttons`
-- `workflows-provider` (Props: WorkflowsProviderProps)
-- `workflows-stages-dialog` (Props: WorkflowsStagesDialogProps)
-- `workflows-table` (Props: WorkflowsTableProps)
-- `workflows-view-dialog` (Props: WorkflowsViewDialogProps)
+**Components:** `data-table-row-actions`, `data-table-toolbar`, `workflows-action-dialog`, `workflows-columns`, `workflows-delete-dialog`, `workflows-dialogs`, `workflows-duplicate-dialog`, `workflows-primary-buttons`, `workflows-provider`, `workflows-stages-dialog`, `workflows-table`, `workflows-view-dialog`
 
 ---
 
 ### cases
-
 | Type | Count |
 |------|-------|
 | Components | 15 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `case-details-view`
-- `case-pipeline-board-view`
-- `case-pipeline-detail-view`
-- `case-pipeline-list-view`
-- `case-pipeline-sidebar` (Props: CasePipelineSidebarProps)
-- `case-pipeline-view`
-- `cases-kanban-view`
-- `cases-list-view`
-- `cases-view`
-- `create-case-form` (Props: CreateCaseFormProps)
-- `create-case-view`
-- `practice-sidebar` (Props: PracticeSidebarProps)
-- `rich-document-form` (Props: RichDocumentFormProps)
-- `rich-document-view` (Props: RichDocumentViewProps)
-- `rich-documents-list` (Props: RichDocumentsListProps)
+**Components:** `case-details-view`, `case-pipeline-board-view`, `case-pipeline-detail-view`, `case-pipeline-list-view`, `case-pipeline-sidebar`, `case-pipeline-view`, `cases-kanban-view`, `cases-list-view`, `cases-view`, `create-case-form`, `create-case-view`, `practice-sidebar`, `rich-document-form`, `rich-document-view`, `rich-documents-list`
 
 ---
 
 ### chats
-
 | Type | Count |
 |------|-------|
 | Components | 1 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `new-chat`
+**Components:** `new-chat`
 
 ---
 
 ### chatter
-
 | Type | Count |
 |------|-------|
 | Components | 1 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `chatter` (Props: ChatterProps)
+**Components:** `chatter`
 
 ---
 
 ### clients
-
 | Type | Count |
 |------|-------|
 | Components | 12 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `clients-action-dialog`
-- `clients-columns`
-- `clients-delete-dialog`
-- `clients-dialogs`
-- `clients-primary-buttons`
-- `clients-provider`
-- `clients-sidebar` (Props: ClientsSidebarProps)
-- `clients-table`
-- `clients-view-dialog`
-- `create-client-view`
-- `data-table-bulk-actions`
-- `data-table-row-actions`
+**Components:** `clients-action-dialog`, `clients-columns`, `clients-delete-dialog`, `clients-dialogs`, `clients-primary-buttons`, `clients-provider`, `clients-sidebar`, `clients-table`, `clients-view-dialog`, `create-client-view`, `data-table-bulk-actions`, `data-table-row-actions`
 
 ---
 
 ### companies
-
 | Type | Count |
 |------|-------|
 | Components | 3 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `company-management-page`
-- `company-switcher` (Props: CompanySwitcherProps)
-- `company-tree-view` (Props: CompanyTreeViewProps)
+**Components:** `company-management-page`, `company-switcher`, `company-tree-view`
 
 ---
 
 ### contacts
-
 | Type | Count |
 |------|-------|
 | Components | 12 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `contact-details-view`
-- `contacts-action-dialog`
-- `contacts-columns`
-- `contacts-delete-dialog`
-- `contacts-dialogs`
-- `contacts-primary-buttons`
-- `contacts-provider`
-- `contacts-table` (Props: ContactsTableProps)
-- `contacts-view-dialog`
-- `create-contact-view`
-- `data-table-bulk-actions` (Props: ContactsBulkActionsProps)
-- `data-table-row-actions` (Props: ContactsRowActionsProps)
+**Components:** `contact-details-view`, `contacts-action-dialog`, `contacts-columns`, `contacts-delete-dialog`, `contacts-dialogs`, `contacts-primary-buttons`, `contacts-provider`, `contacts-table`, `contacts-view-dialog`, `create-contact-view`, `data-table-bulk-actions`, `data-table-row-actions`
 
 ---
 
 ### crm
-
 | Type | Count |
 |------|-------|
 | Components | 45 |
 | Pages/Views | 50 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `activities-view`
-- `activity-details-view`
-- `activity-plan-builder` (Props: ActivityPlanBuilderProps)
-- `create-activity-view`
-- `create-lead-view`
-- `create-referral-view`
-- `crm-reports-create-view`
-- `crm-reports-details-view`
-- `crm-reports-list-view`
-- `crm-setup-wizard`
-- `crm-sidebar` (Props: CrmSidebarProps)
-- `duplicate-detection-panel` (Props: DuplicateDetectionPanelProps)
-- `email-campaign-create-view`
-- `email-campaign-details-view`
-- `email-marketing-list-view`
-- `lead-details-view`
-- `lead-scoring-dashboard`
-- `leads-list-view`
-- `office-type-selector` (Props: OfficeTypeSelectorProps)
-- `pipeline-automation-dialog` (Props: PipelineAutomationDialogProps)
-- `pipeline-view`
-- `quota-progress-widget` (Props: QuotaProgressWidgetProps)
-- `referral-details-view`
-- `referrals-list-view`
-- `activity-analytics-report`
-- `campaign-efficiency-report`
-- `deal-aging-report`
-- `first-response-time-report`
-- `index`
-- `lead-conversion-time-report`
-- `lead-owner-efficiency-report`
-- `leads-by-source-report`
-- `lost-opportunity-report`
-- `prospects-engaged-report`
-- `revenue-forecast-report`
-- `sales-funnel-report`
-- `sales-pipeline-analytics-report`
-- `win-loss-analysis-report`
-- `revenue-forecast-chart` (Props: RevenueForecastChartProps)
-- `sales-sidebar` (Props: SalesSidebarProps)
-- `stale-lead-indicator` (Props: StaleLeadIndicatorProps)
-- `whatsapp-conversation-view`
-- `whatsapp-list-view`
-- `whatsapp-new-conversation`
-- `whatsapp-start-conversation`
+**Components:** `activities-view`, `activity-details-view`, `activity-plan-builder`, `create-activity-view`, `create-lead-view`, `create-referral-view`, `crm-reports-create-view`, `crm-reports-details-view`, `crm-reports-list-view`, `crm-setup-wizard`, `crm-sidebar`, `duplicate-detection-panel`, `email-campaign-create-view`, `email-campaign-details-view`, `email-marketing-list-view`, `lead-details-view`, `lead-scoring-dashboard`, `leads-list-view`, `office-type-selector`, `pipeline-automation-dialog`, `pipeline-view`, `quota-progress-widget`, `referral-details-view`, `referrals-list-view`, `activity-analytics-report`, `campaign-efficiency-report`, `deal-aging-report`, `first-response-time-report`, `index`, `lead-conversion-time-report`, `lead-owner-efficiency-report`, `leads-by-source-report`, `lost-opportunity-report`, `prospects-engaged-report`, `revenue-forecast-report`, `sales-funnel-report`, `sales-pipeline-analytics-report`, `win-loss-analysis-report`, `revenue-forecast-chart`, `sales-sidebar`, `stale-lead-indicator`, `whatsapp-conversation-view`, `whatsapp-list-view`, `whatsapp-new-conversation`, `whatsapp-start-conversation`
 
-**Pages/Views:**
-- `activities-calendar-view`
-- `barcode-scanner-dialog`
-- `brands-list`
-- `campaign-detail-view`
-- `campaign-form-view`
-- `campaigns-list-view`
-- `client-detail-view`
-- `contact-detail-view`
-- `contact-form-view`
-- `contacts-list-view`
-- `crm-dashboard-view`
-- `crm-reports-dashboard-view`
-- `activity-settings-section`
-- `campaign-settings-section`
-- `crm-settings-field`
-- `email-settings-section`
-- `general-settings-section`
-- `integration-settings-section`
-- `lead-settings-section`
-- `notification-settings-section`
-- `pipeline-settings-section`
-- `quote-settings-section`
-- `referral-settings-section`
-- `crm-settings-view`
-- `crm-transactions-view`
-- `index`
-- `pipeline-kanban-view`
-- `product-barcodes-tab`
-- `product-detail-view`
-- `product-form-view`
-- `product-suppliers-tab`
-- `product-variants-tab`
-- `products-list-view`
-- `quote-form-view`
-- `quotes-list-view`
-- `activity-plans-settings-view`
-- `crm-settings-view`
-- `duplicate-detection-settings-view`
-- `email-templates-view`
-- `general-settings-view`
-- `index`
-- `lost-reasons-view`
-- `quotas-settings-view`
-- `sales-teams-view`
-- `tags-view`
-- `teams-view`
-- `territories-view`
-- `tasks-list-view`
-- `units-of-measure-list`
-- `variant-generator-dialog`
+**Pages:** `activities-calendar-view`, `barcode-scanner-dialog`, `brands-list`, `campaign-detail-view`, `campaign-form-view`, `campaigns-list-view`, `client-detail-view`, `contact-detail-view`, `contact-form-view`, `contacts-list-view`, `crm-dashboard-view`, `crm-reports-dashboard-view`, `activity-settings-section`, `campaign-settings-section`, `crm-settings-field`, `email-settings-section`, `general-settings-section`, `integration-settings-section`, `lead-settings-section`, `notification-settings-section`, `pipeline-settings-section`, `quote-settings-section`, `referral-settings-section`, `crm-settings-view`, `crm-transactions-view`, `index`, `pipeline-kanban-view`, `product-barcodes-tab`, `product-detail-view`, `product-form-view`, `product-suppliers-tab`, `product-variants-tab`, `products-list-view`, `quote-form-view`, `quotes-list-view`, `activity-plans-settings-view`, `crm-settings-view`, `duplicate-detection-settings-view`, `email-templates-view`, `general-settings-view`, `index`, `lost-reasons-view`, `quotas-settings-view`, `sales-teams-view`, `tags-view`, `teams-view`, `territories-view`, `tasks-list-view`, `units-of-measure-list`, `variant-generator-dialog`
 
 ---
 
 ### dashboard
-
 | Type | Count |
 |------|-------|
 | Components | 15 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `analytics-chart`
-- `analytics-tab` (Props: CaseOverviewChartProps)
-- `analytics`
-- `calendar-sync-dialog` (Props: CalendarSyncDialogProps)
-- `calendar-view`
-- `fullcalendar-view`
-- `hero-banner`
-- `kpi-metrics` (Props: MetricCardProps)
-- `notifications-tab`
-- `overview-chart` (Props: OverviewChartProps)
-- `overview-stats` (Props: OverviewStatsProps)
-- `overview-tab` (Props: ScheduleCardProps)
-- `overview`
-- `recent-sales`
-- `reports-tab` (Props: CasesChartCardProps)
+**Components:** `analytics-chart`, `analytics-tab`, `analytics`, `calendar-sync-dialog`, `calendar-view`, `fullcalendar-view`, `hero-banner`, `kpi-metrics`, `notifications-tab`, `overview-chart`, `overview-stats`, `overview-tab`, `overview`, `recent-sales`, `reports-tab`
 
 ---
 
 ### dashboard-settings
-
 | Type | Count |
 |------|-------|
 | Components | 0 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
 ---
 
 ### data-export
-
 | Type | Count |
 |------|-------|
 | Components | 4 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-export-sidebar` (Props: DataExportSidebarProps)
-- `export-dialog` (Props: ExportDialogProps)
-- `import-dialog` (Props: ImportDialogProps)
-- `job-history`
+**Components:** `data-export-sidebar`, `export-dialog`, `import-dialog`, `job-history`
 
 ---
 
 ### documents
-
 | Type | Count |
 |------|-------|
 | Components | 17 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-table-bulk-actions`
-- `data-table-row-actions` (Props: DataTableRowActionsProps)
-- `data-table-toolbar`
-- `document-versions` (Props: DocumentVersionsProps)
-- `documents-columns`
-- `documents-delete-dialog` (Props: DocumentsDeleteDialogProps)
-- `documents-dialogs`
-- `documents-edit-dialog` (Props: DocumentsEditDialogProps)
-- `documents-primary-buttons`
-- `documents-provider`
-- `documents-share-dialog` (Props: DocumentsShareDialogProps)
-- `documents-table` (Props: DocumentsTableProps)
-- `documents-upload-dialog` (Props: DocumentsUploadDialogProps)
-- `documents-versions-dialog` (Props: DocumentsVersionsDialogProps)
-- `documents-view-dialog` (Props: DocumentsViewDialogProps)
-- `version-compare` (Props: VersionCompareProps)
-- `version-upload-dialog` (Props: VersionUploadDialogProps)
+**Components:** `data-table-bulk-actions`, `data-table-row-actions`, `data-table-toolbar`, `document-versions`, `documents-columns`, `documents-delete-dialog`, `documents-dialogs`, `documents-edit-dialog`, `documents-primary-buttons`, `documents-provider`, `documents-share-dialog`, `documents-table`, `documents-upload-dialog`, `documents-versions-dialog`, `documents-view-dialog`, `version-compare`, `version-upload-dialog`
 
 ---
 
 ### errors
-
 | Type | Count |
 |------|-------|
 | Components | 0 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
 ---
 
 ### finance
-
 | Type | Count |
 |------|-------|
 | Components | 109 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 28 |
 
-**Components:**
-- `account-activity-dashboard`
-- `account-form-dialog` (Props: AccountFormDialogProps)
-- `account-statement-dashboard`
-- `accounts-dashboard` (Props: AccountsDashboardProps)
-- `activity-details-view`
-- `bill-details-view`
-- `bills-dashboard`
-- `budget-check-dialog` (Props: BudgetCheckDialogProps)
-- `budgets-dashboard`
-- `card-reconciliation-view`
-- `chart-of-accounts-view`
-- `compliance-dashboard-view`
-- `corporate-cards-dashboard`
-- `create-account-activity-view`
-- `create-bill-view` (Props: CreateBillViewProps)
-- `create-credit-note-view`
-- `create-expense-view`
-- `create-invoice-view`
-- `create-journal-entry-view`
-- `create-payment-view`
-- `create-quote-view`
-- `create-recurring-view` (Props: CreateRecurringViewProps)
-- `create-retainer-view`
-- `create-statement-view`
-- `create-time-entry-view`
-- `create-vendor-view` (Props: CreateVendorViewProps)
-- `credit-note-details-view`
-- `credit-notes-dashboard`
-- `csv-import-dialog` (Props: CSVImportDialogProps)
-- `currency-create-view`
-- `currency-details-view`
-- `currency-list-view`
-- `debit-notes-dashboard`
-- `edit-account-activity-view`
-- `edit-expense-view`
-- `edit-invoice-view`
-- `edit-statement-view`
-- `edit-time-entry-view`
-- `expense-budget-integration-example`
-- `expense-details-view`
-- `expenses-dashboard`
-- `finance-reports-create-view`
-- `finance-reports-details-view`
-- `finance-reports-list-view`
-- `finance-setup-wizard`
-- `finance-sidebar` (Props: FinanceSidebarProps)
-- `fiscal-periods-dashboard`
-- `fiscal-periods-view`
-- `full-reports-view`
-- `general-ledger-view`
-- `gl-transactions-view.example`
-- `gl-transactions-view` (Props: GLTransactionsViewProps)
-- `gosi-calculator-view`
-- `gosi-dashboard-view`
-- `inter-company-balances`
-- `inter-company-dashboard`
-- `inter-company-reconciliation` (Props: InterCompanyReconciliationProps)
-- `inter-company-transaction` (Props: InterCompanyTransactionFormProps)
-- `invoice-approvals-view`
-- `invoice-dashboard`
-- `invoice-details-view`
-- `invoices-dashboard`
-- `iqama-alerts-view`
-- `journal-entries-dashboard`
-- `journal-entry-details-view`
-- `month-calendar-view`
-- `opening-balances-view`
-- `payment-details-view`
-- `payment-receipt-template` (Props: PaymentReceiptTemplateProps)
-- `payments-dashboard`
-- `pending-approvals-badge` (Props: PendingApprovalsBadgeProps)
-- `quote-details-view`
-- `quotes-dashboard`
-- `reconciliation-create-view`
-- `reconciliation-details-view`
-- `reconciliation-list-view`
-- `recurring-details-view`
-- `recurring-invoice-details` (Props: RecurringInvoiceDetailsProps)
-- `recurring-invoice-form` (Props: RecurringInvoiceFormProps)
-- `recurring-invoices-list`
-- `recurring-transactions-dashboard`
-- `accounts-aging-report`
-- `financial-reports-dashboard`
-- `index`
-- `outstanding-invoices-report`
-- `reports-dashboard`
-- `revenue-by-client-report`
-- `time-entries-report`
-- `retainer-details-view`
-- `retainers-dashboard`
-- `saudi-banking-lean-view`
-- `saudi-banking-list-view`
-- `saudi-banking-mudad-view`
-- `saudi-banking-sadad-pay-view`
-- `saudi-banking-sadad-view`
-- `saudi-banking-wps-create-view`
-- `saudi-banking-wps-view`
-- `statement-details-view`
-- `statements-history-dashboard`
-- `time-entries-dashboard`
-- `time-entry-approvals-view`
-- `time-entry-details-view`
-- `transactions-dashboard`
-- `vendor-details-view`
-- `vendors-action-dialog`
-- `vendors-dashboard`
-- `vendors-delete-dialog`
-- `weekly-time-entries-view`
-- `wps-generator-view`
+**Components:** `account-activity-dashboard`, `account-form-dialog`, `account-statement-dashboard`, `accounts-dashboard`, `activity-details-view`, `bill-details-view`, `bills-dashboard`, `budget-check-dialog`, `budgets-dashboard`, `card-reconciliation-view`, `chart-of-accounts-view`, `compliance-dashboard-view`, `corporate-cards-dashboard`, `create-account-activity-view`, `create-bill-view`, `create-credit-note-view`, `create-expense-view`, `create-invoice-view`, `create-journal-entry-view`, `create-payment-view`, `create-quote-view`, `create-recurring-view`, `create-retainer-view`, `create-statement-view`, `create-time-entry-view`, `create-vendor-view`, `credit-note-details-view`, `credit-notes-dashboard`, `csv-import-dialog`, `currency-create-view`, `currency-details-view`, `currency-list-view`, `debit-notes-dashboard`, `edit-account-activity-view`, `edit-expense-view`, `edit-invoice-view`, `edit-statement-view`, `edit-time-entry-view`, `expense-budget-integration-example`, `expense-details-view`, `expenses-dashboard`, `finance-reports-create-view`, `finance-reports-details-view`, `finance-reports-list-view`, `finance-setup-wizard`, `finance-sidebar`, `fiscal-periods-dashboard`, `fiscal-periods-view`, `full-reports-view`, `general-ledger-view`, `gl-transactions-view.example`, `gl-transactions-view`, `gosi-calculator-view`, `gosi-dashboard-view`, `inter-company-balances`, `inter-company-dashboard`, `inter-company-reconciliation`, `inter-company-transaction`, `invoice-approvals-view`, `invoice-dashboard`, `invoice-details-view`, `invoices-dashboard`, `iqama-alerts-view`, `journal-entries-dashboard`, `journal-entry-details-view`, `month-calendar-view`, `opening-balances-view`, `payment-details-view`, `payment-receipt-template`, `payments-dashboard`, `pending-approvals-badge`, `quote-details-view`, `quotes-dashboard`, `reconciliation-create-view`, `reconciliation-details-view`, `reconciliation-list-view`, `recurring-details-view`, `recurring-invoice-details`, `recurring-invoice-form`, `recurring-invoices-list`, `recurring-transactions-dashboard`, `accounts-aging-report`, `financial-reports-dashboard`, `index`, `outstanding-invoices-report`, `reports-dashboard`, `revenue-by-client-report`, `time-entries-report`, `retainer-details-view`, `retainers-dashboard`, `saudi-banking-lean-view`, `saudi-banking-list-view`, `saudi-banking-mudad-view`, `saudi-banking-sadad-pay-view`, `saudi-banking-sadad-view`, `saudi-banking-wps-create-view`, `saudi-banking-wps-view`, `statement-details-view`, `statements-history-dashboard`, `time-entries-dashboard`, `time-entry-approvals-view`, `time-entry-details-view`, `transactions-dashboard`, `vendor-details-view`, `vendors-action-dialog`, `vendors-dashboard`, `vendors-delete-dialog`, `weekly-time-entries-view`, `wps-generator-view`
 
 ---
 
 ### followups
-
 | Type | Count |
 |------|-------|
 | Components | 13 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-table-bulk-actions`
-- `data-table-row-actions` (Props: DataTableRowActionsProps)
-- `data-table-toolbar`
-- `followups-action-dialog` (Props: FollowupsActionDialogProps)
-- `followups-columns`
-- `followups-complete-dialog` (Props: FollowupsCompleteDialogProps)
-- `followups-delete-dialog` (Props: FollowupsDeleteDialogProps)
-- `followups-dialogs`
-- `followups-primary-buttons`
-- `followups-provider`
-- `followups-reschedule-dialog` (Props: FollowupsRescheduleDialogProps)
-- `followups-table` (Props: FollowupsTableProps)
-- `followups-view-dialog` (Props: FollowupsViewDialogProps)
+**Components:** `data-table-bulk-actions`, `data-table-row-actions`, `data-table-toolbar`, `followups-action-dialog`, `followups-columns`, `followups-complete-dialog`, `followups-delete-dialog`, `followups-dialogs`, `followups-primary-buttons`, `followups-provider`, `followups-reschedule-dialog`, `followups-table`, `followups-view-dialog`
 
 ---
 
 ### help
-
 | Type | Count |
 |------|-------|
 | Components | 1 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `help-sidebar` (Props: HelpSidebarProps)
+**Components:** `help-sidebar`
 
 ---
 
 ### hr
-
 | Type | Count |
 |------|-------|
 | Components | 95 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `advances-create-view`
-- `advances-details-view`
-- `advances-list-view`
-- `applicant-create-view`
-- `applicant-details-view`
-- `applicants-list-view`
-- `asset-assignment-create-view`
-- `asset-assignment-details-view`
-- `asset-assignment-list-view`
-- `attendance-record-create-view`
-- `attendance-record-details-view`
-- `attendance-records-list-view`
-- `benefits-create-view`
-- `benefits-details-view`
-- `benefits-list-view`
-- `biometric-create-view`
-- `biometric-dashboard`
-- `biometric-details-view`
-- `biometric-list-view`
-- `bulk-leave-allocation-dialog` (Props: BulkLeaveAllocationDialogProps)
-- `compensation-create-view`
-- `compensation-details-view`
-- `compensation-list-view`
-- `employee-create-view`
-- `employee-details-view`
-- `employee-promotions-list-view`
-- `employee-transfer-create-view`
-- `employee-transfer-details-view`
-- `employee-transfers-list-view`
-- `employees-list-view`
-- `expense-claims-create-view`
-- `expense-claims-details-view`
-- `expense-claims-list-view`
-- `geofencing-create-view`
-- `geofencing-details-view`
-- `geofencing-interactive-map` (Props: GeofencingCreateMapProps)
-- `geofencing-list-view`
-- `geofencing-map` (Props: GeofencingMapProps)
-- `grievances-create-view`
-- `grievances-details-view`
-- `grievances-list-view`
-- `hr-analytics-dashboard`
-- `hr-predictions-dashboard`
-- `hr-setup-wizard`
-- `hr-sidebar` (Props: HRSidebarProps)
-- `job-positions-create-view`
-- `job-positions-details-view`
-- `job-positions-list-view`
-- `job-posting-create-view`
-- `job-posting-details-view`
-- `job-postings-list-view`
-- `leave-allocation-create-view` (Props: LeaveAllocationCreateViewProps)
-- `leave-allocations-list-view`
-- `leave-periods-list-view`
-- `leave-policies-list-view`
-- `leave-policy-action-dialog`
-- `leave-policy-assign-dialog`
-- `leave-policy-assignments-list-view`
-- `leave-request-create-view`
-- `leave-request-details-view`
-- `leave-requests-list-view`
-- `loans-create-view`
-- `loans-details-view`
-- `loans-list-view`
-- `offboarding-create-view`
-- `offboarding-details-view`
-- `offboarding-list-view`
-- `onboarding-create-view`
-- `onboarding-details-view`
-- `onboarding-list-view`
-- `organizational-structure-create-view`
-- `organizational-structure-details-view`
-- `organizational-structure-list-view`
-- `payroll-create-view`
-- `payroll-details-view`
-- `payroll-list-view`
-- `payroll-run-create-view`
-- `payroll-run-details-view`
-- `payroll-runs-list-view`
-- `performance-review-create-view`
-- `performance-review-details-view`
-- `performance-reviews-list-view`
-- `promotion-create-view`
-- `promotion-details-view`
-- `reports-create-view`
-- `reports-details-view`
-- `reports-list-view`
-- `shift-assignments-list-view`
-- `shift-types-list-view`
-- `succession-planning-create-view`
-- `succession-planning-details-view`
-- `succession-planning-list-view`
-- `training-create-view`
-- `training-details-view`
-- `training-list-view`
+**Components:** `advances-create-view`, `advances-details-view`, `advances-list-view`, `applicant-create-view`, `applicant-details-view`, `applicants-list-view`, `asset-assignment-create-view`, `asset-assignment-details-view`, `asset-assignment-list-view`, `attendance-record-create-view`, `attendance-record-details-view`, `attendance-records-list-view`, `benefits-create-view`, `benefits-details-view`, `benefits-list-view`, `biometric-create-view`, `biometric-dashboard`, `biometric-details-view`, `biometric-list-view`, `bulk-leave-allocation-dialog`, `compensation-create-view`, `compensation-details-view`, `compensation-list-view`, `employee-create-view`, `employee-details-view`, `employee-promotions-list-view`, `employee-transfer-create-view`, `employee-transfer-details-view`, `employee-transfers-list-view`, `employees-list-view`, `expense-claims-create-view`, `expense-claims-details-view`, `expense-claims-list-view`, `geofencing-create-view`, `geofencing-details-view`, `geofencing-interactive-map`, `geofencing-list-view`, `geofencing-map`, `grievances-create-view`, `grievances-details-view`, `grievances-list-view`, `hr-analytics-dashboard`, `hr-predictions-dashboard`, `hr-setup-wizard`, `hr-sidebar`, `job-positions-create-view`, `job-positions-details-view`, `job-positions-list-view`, `job-posting-create-view`, `job-posting-details-view`, `job-postings-list-view`, `leave-allocation-create-view`, `leave-allocations-list-view`, `leave-periods-list-view`, `leave-policies-list-view`, `leave-policy-action-dialog`, `leave-policy-assign-dialog`, `leave-policy-assignments-list-view`, `leave-request-create-view`, `leave-request-details-view`, `leave-requests-list-view`, `loans-create-view`, `loans-details-view`, `loans-list-view`, `offboarding-create-view`, `offboarding-details-view`, `offboarding-list-view`, `onboarding-create-view`, `onboarding-details-view`, `onboarding-list-view`, `organizational-structure-create-view`, `organizational-structure-details-view`, `organizational-structure-list-view`, `payroll-create-view`, `payroll-details-view`, `payroll-list-view`, `payroll-run-create-view`, `payroll-run-details-view`, `payroll-runs-list-view`, `performance-review-create-view`, `performance-review-details-view`, `performance-reviews-list-view`, `promotion-create-view`, `promotion-details-view`, `reports-create-view`, `reports-details-view`, `reports-list-view`, `shift-assignments-list-view`, `shift-types-list-view`, `succession-planning-create-view`, `succession-planning-details-view`, `succession-planning-list-view`, `training-create-view`, `training-details-view`, `training-list-view`
 
 ---
 
 ### inventory
-
 | Type | Count |
 |------|-------|
 | Components | 9 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-item-view`
-- `create-warehouse-view`
-- `index`
-- `inventory-list-view`
-- `inventory-settings-view`
-- `inventory-sidebar` (Props: InventorySidebarProps)
-- `item-details-view`
-- `warehouse-details-view`
-- `warehouse-list-view`
+**Components:** `create-item-view`, `create-warehouse-view`, `index`, `inventory-list-view`, `inventory-settings-view`, `inventory-sidebar`, `item-details-view`, `warehouse-details-view`, `warehouse-list-view`
 
 ---
 
 ### invoice-templates
-
 | Type | Count |
 |------|-------|
 | Components | 8 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `template-action-dialog` (Props: TemplateActionDialogProps)
-- `template-delete-dialog` (Props: TemplateDeleteDialogProps)
-- `template-duplicate-dialog` (Props: TemplateDuplicateDialogProps)
-- `template-view-dialog` (Props: TemplateViewDialogProps)
-- `templates-columns`
-- `templates-provider`
-- `templates-row-actions` (Props: TemplatesRowActionsProps)
-- `templates-table` (Props: TemplatesTableProps)
+**Components:** `template-action-dialog`, `template-delete-dialog`, `template-duplicate-dialog`, `template-view-dialog`, `templates-columns`, `templates-provider`, `templates-row-actions`, `templates-table`
 
 ---
 
 ### jobs
-
 | Type | Count |
 |------|-------|
 | Components | 2 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `browse-jobs`
-- `jobs-sidebar` (Props: JobsSidebarProps)
+**Components:** `browse-jobs`, `jobs-sidebar`
 
 ---
 
 ### knowledge
-
 | Type | Count |
 |------|-------|
 | Components | 4 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `forms-view`
-- `judgments-view`
-- `knowledge-sidebar` (Props: KnowledgeSidebarProps)
-- `laws-view`
+**Components:** `forms-view`, `judgments-view`, `knowledge-sidebar`, `laws-view`
 
 ---
 
 ### leads
-
 | Type | Count |
 |------|-------|
 | Components | 1 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-lead-view`
+**Components:** `create-lead-view`
 
 ---
 
 ### lock-dates
-
 | Type | Count |
 |------|-------|
 | Components | 2 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `date-locked-warning` (Props: DateLockedWarningProps)
-- `lock-date-settings` (Props: LockDateSettingsProps)
+**Components:** `date-locked-warning`, `lock-date-settings`
 
 ---
 
 ### messages
-
 | Type | Count |
 |------|-------|
 | Components | 2 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `chat-view`
-- `email-view`
+**Components:** `chat-view`, `email-view`
 
 ---
 
 ### ml-scoring
-
 | Type | Count |
 |------|-------|
 | Components | 5 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `index`
-- `ml-score-card` (Props: MLScoreCardProps)
-- `priority-queue` (Props: PriorityQueueProps)
-- `score-explanation` (Props: ScoreExplanationProps)
-- `sla-dashboard` (Props: SLADashboardProps)
+**Components:** `index`, `ml-score-card`, `priority-queue`, `score-explanation`, `sla-dashboard`
 
 ---
 
 ### notifications
-
 | Type | Count |
 |------|-------|
 | Components | 0 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
 ---
 
 ### onboarding
-
 | Type | Count |
 |------|-------|
 | Components | 10 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `feature-tour`
-- `index`
-- `initial-setup-wizard`
-- `quick-start-checklist` (Props: QuickStartChecklistProps)
-- `setup-celebration` (Props: SetupCelebrationProps)
-- `setup-orchestrator` (Props: SetupOrchestratorProps)
-- `setup-progress-sidebar` (Props: SetupProgressSidebarProps)
-- `setup-reminder-banner`
-- `welcome-modal` (Props: WelcomeModalProps)
-- `welcome-screen` (Props: WelcomeScreenProps)
+**Components:** `feature-tour`, `index`, `initial-setup-wizard`, `quick-start-checklist`, `setup-celebration`, `setup-orchestrator`, `setup-progress-sidebar`, `setup-reminder-banner`, `welcome-modal`, `welcome-screen`
 
 ---
 
 ### organizations
-
 | Type | Count |
 |------|-------|
 | Components | 12 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-organization-view`
-- `data-table-bulk-actions` (Props: OrganizationsBulkActionsProps)
-- `data-table-row-actions` (Props: OrganizationsRowActionsProps)
-- `organization-details-view`
-- `organizations-action-dialog`
-- `organizations-columns`
-- `organizations-delete-dialog`
-- `organizations-dialogs`
-- `organizations-primary-buttons`
-- `organizations-provider` (Props: OrganizationsProviderProps)
-- `organizations-table` (Props: OrganizationsTableProps)
-- `organizations-view-dialog`
+**Components:** `create-organization-view`, `data-table-bulk-actions`, `data-table-row-actions`, `organization-details-view`, `organizations-action-dialog`, `organizations-columns`, `organizations-delete-dialog`, `organizations-dialogs`, `organizations-primary-buttons`, `organizations-provider`, `organizations-table`, `organizations-view-dialog`
 
 ---
 
 ### reports
-
 | Type | Count |
 |------|-------|
 | Components | 9 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `company-comparison-chart` (Props: CompanyComparisonChartProps)
-- `consolidated-financial-report` (Props: ConsolidatedFinancialReportProps)
-- `consolidated-report`
-- `index`
-- `inter-company-elimination` (Props: InterCompanyEliminationProps)
-- `report-config-dialog` (Props: ReportConfigDialogProps)
-- `report-viewer` (Props: ReportViewerProps)
-- `reports-sidebar` (Props: ReportsSidebarProps)
-- `saved-reports-list` (Props: SavedReportsListProps)
+**Components:** `company-comparison-chart`, `consolidated-financial-report`, `consolidated-report`, `index`, `inter-company-elimination`, `report-config-dialog`, `report-viewer`, `reports-sidebar`, `saved-reports-list`
 
 ---
 
 ### reputation
-
 | Type | Count |
 |------|-------|
 | Components | 2 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `badges-view`
-- `reputation-sidebar` (Props: ReputationSidebarProps)
+**Components:** `badges-view`, `reputation-sidebar`
 
 ---
 
 ### sales
-
 | Type | Count |
 |------|-------|
 | Components | 20 |
 | Pages/Views | 1 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-lead-view` (Props: CreateLeadViewProps)
-- `lead-details-view`
-- `leads-dashboard` (Props: LeadCardProps)
-- `leads-page-example`
-- `sales-reports-create-view`
-- `sales-reports-details-view`
-- `sales-reports-list-view`
-- `commission-settings-section` (Props: CommissionSettingsSectionProps)
-- `delivery-settings-section` (Props: DeliverySettingsSectionProps)
-- `discount-settings-section` (Props: DiscountSettingsSectionProps)
-- `document-settings-section` (Props: DocumentSettingsSectionProps)
-- `general-settings-section` (Props: GeneralSettingsSectionProps)
-- `order-settings-section` (Props: OrderSettingsSectionProps)
-- `pricing-settings-section` (Props: PricingSettingsSectionProps)
-- `quote-settings-section` (Props: QuoteSettingsSectionProps)
-- `return-settings-section` (Props: ReturnSettingsSectionProps)
-- `sales-settings-page`
-- `sequence-settings-section` (Props: SequenceSettingsSectionProps)
-- `settings-field` (Props: SettingsFieldProps)
-- `tax-settings-section` (Props: TaxSettingsSectionProps)
+**Components:** `create-lead-view`, `lead-details-view`, `leads-dashboard`, `leads-page-example`, `sales-reports-create-view`, `sales-reports-details-view`, `sales-reports-list-view`, `commission-settings-section`, `delivery-settings-section`, `discount-settings-section`, `document-settings-section`, `general-settings-section`, `order-settings-section`, `pricing-settings-section`, `quote-settings-section`, `return-settings-section`, `sales-settings-page`, `sequence-settings-section`, `settings-field`, `tax-settings-section`
 
-**Pages/Views:**
-- `sales-transactions-view`
+**Pages:** `sales-transactions-view`
 
 ---
 
 ### settings
-
 | Type | Count |
 |------|-------|
 | Components | 36 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `api-keys-settings`
-- `audit-log-viewer`
-- `billing-history`
-- `billing-settings` (Props: UsageMetricCardProps)
-- `captcha-settings`
-- `company-settings`
-- `content-section`
-- `create-api-key-dialog` (Props: CreateApiKeyDialogProps)
-- `crm-settings`
-- `email-settings`
-- `email-signatures-manager`
-- `email-templates-list`
-- `enterprise-settings`
-- `expense-policies-settings`
-- `finance-settings` (Props: AccountsListProps)
-- `integration-card` (Props: IntegrationCardProps)
-- `integrations-settings`
-- `ldap-config-form` (Props: LDAPConfigFormProps)
-- `ldap-settings`
-- `ldap-test-dialog` (Props: LDAPTestDialogProps)
-- `payment-method-settings` (Props: PaymentMethodCardProps)
-- `payment-modes-settings`
-- `payment-terms-settings` (Props: PaymentTermCardProps)
-- `plan-comparison` (Props: PlanComparisonProps)
-- `plan-upgrade-example`
-- `plan-upgrade-modal` (Props: PlanUpgradeModalProps)
-- `pricing-table` (Props: PricingTableProps)
-- `settings-sidebar` (Props: SettingsSidebarProps)
-- `sidebar-nav`
-- `smtp-config-form`
-- `sso-provider-card` (Props: SSOProviderCardProps)
-- `sso-settings`
-- `tax-settings`
-- `webhook-dialog` (Props: WebhookDialogProps)
-- `webhook-logs` (Props: WebhookLogsProps)
-- `webhooks-settings`
+**Components:** `api-keys-settings`, `audit-log-viewer`, `billing-history`, `billing-settings`, `captcha-settings`, `company-settings`, `content-section`, `create-api-key-dialog`, `crm-settings`, `email-settings`, `email-signatures-manager`, `email-templates-list`, `enterprise-settings`, `expense-policies-settings`, `finance-settings`, `integration-card`, `integrations-settings`, `ldap-config-form`, `ldap-settings`, `ldap-test-dialog`, `payment-method-settings`, `payment-modes-settings`, `payment-terms-settings`, `plan-comparison`, `plan-upgrade-example`, `plan-upgrade-modal`, `pricing-table`, `settings-sidebar`, `sidebar-nav`, `smtp-config-form`, `sso-provider-card`, `sso-settings`, `tax-settings`, `webhook-dialog`, `webhook-logs`, `webhooks-settings`
 
 ---
 
 ### staff
-
 | Type | Count |
 |------|-------|
 | Components | 14 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-staff-view`
-- `data-table-bulk-actions`
-- `data-table-row-actions`
-- `staff-action-dialog`
-- `staff-columns`
-- `staff-delete-dialog`
-- `staff-departure-dialog`
-- `staff-details-view`
-- `staff-dialogs`
-- `staff-primary-buttons`
-- `staff-provider`
-- `staff-reinstate-dialog`
-- `staff-table`
-- `staff-view-dialog`
+**Components:** `create-staff-view`, `data-table-bulk-actions`, `data-table-row-actions`, `staff-action-dialog`, `staff-columns`, `staff-delete-dialog`, `staff-departure-dialog`, `staff-details-view`, `staff-dialogs`, `staff-primary-buttons`, `staff-provider`, `staff-reinstate-dialog`, `staff-table`, `staff-view-dialog`
 
 ---
 
 ### subscriptions
-
 | Type | Count |
 |------|-------|
 | Components | 5 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 17 |
 
-**Components:**
-- `subscription-create-view`
-- `subscription-detail-view`
-- `subscription-plan-form-view`
-- `subscription-plans-list-view`
-- `subscriptions-list-view` (Props: SubscriptionCardProps)
+**Components:** `subscription-create-view`, `subscription-detail-view`, `subscription-plan-form-view`, `subscription-plans-list-view`, `subscriptions-list-view`
 
 ---
 
 ### support
-
 | Type | Count |
 |------|-------|
 | Components | 8 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `create-sla-view`
-- `create-ticket-view`
-- `index`
-- `sla-list-view`
-- `support-list-view`
-- `support-settings-view`
-- `support-sidebar`
-- `ticket-details-view`
+**Components:** `create-sla-view`, `create-ticket-view`, `index`, `sla-list-view`, `support-list-view`, `support-settings-view`, `support-sidebar`, `ticket-details-view`
 
 ---
 
 ### tags
-
 | Type | Count |
 |------|-------|
 | Components | 12 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-table-bulk-actions`
-- `data-table-row-actions` (Props: DataTableRowActionsProps)
-- `data-table-toolbar`
-- `tag-input` (Props: TagInputProps)
-- `tags-action-dialog` (Props: TagsActionDialogProps)
-- `tags-columns`
-- `tags-delete-dialog` (Props: TagsDeleteDialogProps)
-- `tags-dialogs`
-- `tags-primary-buttons`
-- `tags-provider`
-- `tags-table` (Props: TagsTableProps)
-- `tags-view-dialog` (Props: TagsViewDialogProps)
+**Components:** `data-table-bulk-actions`, `data-table-row-actions`, `data-table-toolbar`, `tag-input`, `tags-action-dialog`, `tags-columns`, `tags-delete-dialog`, `tags-dialogs`, `tags-primary-buttons`, `tags-provider`, `tags-table`, `tags-view-dialog`
 
 ---
 
 ### tasks
-
 | Type | Count |
 |------|-------|
 | Components | 29 |
 | Pages/Views | 0 |
 | Hooks | 1 |
+| Types | 0 |
 
-**Components:**
-- `attachment-versions-dialog` (Props: AttachmentVersionsDialogProps)
-- `create-event-view`
-- `create-reminder-view`
-- `create-task-view`
-- `data-table-bulk-actions`
-- `data-table-row-actions`
-- `document-editor-dialog` (Props: DocumentEditorDialogProps)
-- `event-details-view`
-- `events-view`
-- `gantt-view`
-- `reminder-details-view`
-- `reminders-view`
-- `task-details-view`
-- `task-report-template` (Props: TaskReportTemplateProps)
-- `tasks-columns`
-- `tasks-dialogs`
-- `tasks-import-dialog`
-- `tasks-list-view`
-- `tasks-multi-delete-dialog`
-- `tasks-mutate-drawer`
-- `tasks-primary-buttons`
-- `tasks-provider`
-- `tasks-reports-create-view`
-- `tasks-reports-details-view`
-- `tasks-reports-list-view`
-- `tasks-sidebar` (Props: TasksSidebarProps)
-- `tasks-table`
-- `tasks-timeline-view`
-- `voice-memo-recorder` (Props: VoiceMemoRecorderProps)
-
-**Hooks:**
-- `useTaskFormValidation`
+**Components:** `attachment-versions-dialog`, `create-event-view`, `create-reminder-view`, `create-task-view`, `data-table-bulk-actions`, `data-table-row-actions`, `document-editor-dialog`, `event-details-view`, `events-view`, `gantt-view`, `reminder-details-view`, `reminders-view`, `task-details-view`, `task-report-template`, `tasks-columns`, `tasks-dialogs`, `tasks-import-dialog`, `tasks-list-view`, `tasks-multi-delete-dialog`, `tasks-mutate-drawer`, `tasks-primary-buttons`, `tasks-provider`, `tasks-reports-create-view`, `tasks-reports-details-view`, `tasks-reports-list-view`, `tasks-sidebar`, `tasks-table`, `tasks-timeline-view`, `voice-memo-recorder`
 
 ---
 
 ### users
-
 | Type | Count |
 |------|-------|
 | Components | 11 |
 | Pages/Views | 0 |
 | Hooks | 0 |
+| Types | 0 |
 
-**Components:**
-- `data-table-bulk-actions`
-- `data-table-row-actions`
-- `users-action-dialog`
-- `users-columns`
-- `users-delete-dialog`
-- `users-dialogs`
-- `users-invite-dialog`
-- `users-multi-delete-dialog`
-- `users-primary-buttons`
-- `users-provider`
-- `users-table`
+**Components:** `data-table-bulk-actions`, `data-table-row-actions`, `users-action-dialog`, `users-columns`, `users-delete-dialog`, `users-dialogs`, `users-invite-dialog`, `users-multi-delete-dialog`, `users-primary-buttons`, `users-provider`, `users-table`
+
+---
+
+## Entity Interfaces
+
+| Interface | Fields | Extends | Path |
+|-----------|--------|---------|------|
+| `CaptchaChallengeRef` | 1 | - | components/auth/captcha-challenge.tsx |
+| `CaptchaConfig` | 1 | - | components/auth/captcha-config.ts |
+| `CaptchaSettings` | 1 | - | components/auth/captcha-config.ts |
+| `BreadcrumbItem` | 1 | - | components/breadcrumb.tsx |
+| `MentionUser` | 1 | - | components/chatter/chatter-input.tsx |
+| `DealHealthFactor` | 1 | - | components/deal-health-indicator.tsx |
+| `KanbanStage` | 1 | - | components/kanban/kanban-board.tsx |
+| `KanbanCard` | 1 | - | components/kanban/kanban-board.tsx |
+| `KanbanCard` | 1 | - | components/kanban/kanban-card.tsx |
+| `PasswordStrengthResult` | 1 | - | components/password-strength.tsx |
+| `SmartButtonConfig` | 1 | - | components/smart-button/smart-button-config.ts |
+| `ValidationError` | 1 | - | components/validation-errors.tsx |
+| `FeatureFlag` | 1 | - | config/feature-flags.ts |
+| `PlanConfig` | 15 | - | config/plans.ts |
+| `FeatureConfig` | 7 | - | config/plans.ts |
+| `PlanLimits` | 5 | - | config/plans.ts |
+| `UpgradePath` | 4 | - | config/plans.ts |
+| `OfficeTypeConfig` | 1 | - | constants/crm-constants.ts |
+| `LeadStatusConfig` | 1 | - | constants/crm-constants.ts |
+| `LeadSourceConfig` | 1 | - | constants/crm-constants.ts |
+| `ActivityTypeConfig` | 1 | - | constants/crm-constants.ts |
+| `PriorityConfig` | 1 | - | constants/crm-constants.ts |
+| `ErrorMetadata` | 1 | - | constants/errorCodes.ts |
+| `GosiContributionBreakdown` | 1 | - | constants/saudi-banking.ts |
+| `Notification` | 1 | - | context/socket-provider.tsx |
+| `AppointmentDetail` | 1 | - | features/appointments/components/appointment-detail-dialog.tsx |
+| `Block` | 1 | - | features/case-notion/data/schema.ts |
+| `HistorySnapshot` | 1 | - | features/case-notion/stores/whiteboard-history.ts |
+| `CasePipelineStage` | 1 | - | features/cases/data/case-pipeline-schema.ts |
+| `CasePipelineConfig` | 1 | - | features/cases/data/case-pipeline-schema.ts |
+| `CasePipelineCard` | 1 | - | features/cases/data/case-pipeline-schema.ts |
+| `ChatParticipant` | 1 | - | features/chats/data/chat-types.ts |
+| `CaseStats` | 1 | - | features/dashboard/types.ts |
+| `TaskStats` | 1 | - | features/dashboard/types.ts |
+| `ReminderStats` | 1 | - | features/dashboard/types.ts |
+| `HeroStats` | 1 | - | features/dashboard/types.ts |
+| `ApprovalStep` | 3 | - | features/finance/types/approval-types.ts |
+| `ApprovalHistory` | 1 | ApprovalStep | features/finance/types/approval-types.ts |
+| `ApprovalWorkflowConfig` | 1 | - | features/finance/types/approval-types.ts |
+| `InvoiceApprovalData` | 1 | - | features/finance/types/approval-types.ts |
+| `ApprovalQueueFilters` | 1 | - | features/finance/types/approval-types.ts |
+| `SubmitForApprovalData` | 1 | - | features/finance/types/approval-types.ts |
+| `ApproveInvoiceData` | 1 | - | features/finance/types/approval-types.ts |
+| `RejectInvoiceData` | 1 | - | features/finance/types/approval-types.ts |
+| `RequestChangesData` | 1 | - | features/finance/types/approval-types.ts |
+| `EscalateApprovalData` | 1 | - | features/finance/types/approval-types.ts |
+| `CorporateCard` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CardTransaction` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `ReconciliationMatch` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CardStatistics` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CSVImportResult` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CreateCorporateCardData` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `UpdateCorporateCardData` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CreateCardTransactionData` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `ReconcileTransactionData` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CardTransactionFilters` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `CorporateCardFilters` | 1 | - | features/finance/types/corporate-card-types.ts |
+| `TimeEntryLockStatus` | 3 | - | features/finance/types/time-entry-lock-types.ts |
+| `TimeEntryUnlockRecord` | 3 | - | features/finance/types/time-entry-lock-types.ts |
+| `LockTimeEntryData` | 1 | - | features/finance/types/time-entry-lock-types.ts |
+| `UnlockTimeEntryData` | 1 | - | features/finance/types/time-entry-lock-types.ts |
+| `BulkLockTimeEntriesData` | 1 | - | features/finance/types/time-entry-lock-types.ts |
+| `LockByDateRangeData` | 1 | - | features/finance/types/time-entry-lock-types.ts |
+| `LockOperationResult` | 1 | - | features/finance/types/time-entry-lock-types.ts |
+| `ReportTypeOption` | 1 | - | features/reports/data/data.ts |
+| `PeriodOption` | 1 | - | features/reports/data/data.ts |
+| `FormatOption` | 1 | - | features/reports/data/data.ts |
+| `ChartTypeOption` | 1 | - | features/reports/data/data.ts |
+| `ExportFormatOption` | 1 | - | features/reports/data/data.ts |
+| `ScheduleFrequencyOption` | 1 | - | features/reports/data/data.ts |
+| `QuickDateRange` | 2 | - | features/reports/data/data.ts |
+| `PlanFeature` | 1 | - | features/settings/components/pricing-table.tsx |
+| `SubscriptionPlan` | 33 | - | features/subscriptions/types/subscription-types.ts |
+| `CreateSubscriptionPlanData` | 28 | - | features/subscriptions/types/subscription-types.ts |
+| `UpdateSubscriptionPlanData` | 0 | Partial<CreateSubscriptionPlanData> | features/subscriptions/types/subscription-types.ts |
+| `Subscription` | 10 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionHistoryEntry` | 11 | - | features/subscriptions/types/subscription-types.ts |
+| `CreateSubscriptionData` | 16 | - | features/subscriptions/types/subscription-types.ts |
+| `UpdateSubscriptionData` | 9 | - | features/subscriptions/types/subscription-types.ts |
+| `ChangePlanData` | 4 | - | features/subscriptions/types/subscription-types.ts |
+| `ConsumeHoursData` | 6 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionPlanFilters` | 12 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionFilters` | 17 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionPlanListResponse` | 5 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionListResponse` | 5 | - | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionStats` | 18 | - | features/subscriptions/types/subscription-types.ts |
+| `UpcomingInvoicePreview` | 15 | - | features/subscriptions/types/subscription-types.ts |
+| `HoursUsageSummary` | 3 | - | features/subscriptions/types/subscription-types.ts |
+| `RenewalPreview` | 8 | - | features/subscriptions/types/subscription-types.ts |
+| `StatusOption` | 1 | - | features/tasks/constants/task-options.ts |
+| `PriorityOption` | 1 | - | features/tasks/constants/task-options.ts |
+| `CategoryOption` | 1 | - | features/tasks/constants/task-options.ts |
+| `TaskFormData` | 1 | - | features/tasks/hooks/useTaskFormValidation.ts |
+| `DateRangeFilters` | 1 | - | hooks/use-crm-reports.ts |
+| `PipelineFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `ForecastFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `QuotaFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `LeaderboardFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `TeamFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `RepFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `HealthScoreFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `TerritoryFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `TransactionFilters` | 1 | DateRangeFilters | hooks/use-crm-reports.ts |
+| `PipelineOverview` | 1 | - | hooks/use-crm-reports.ts |
+| `PipelineVelocity` | 1 | - | hooks/use-crm-reports.ts |
+| `StageDuration` | 1 | - | hooks/use-crm-reports.ts |
+| `DealAging` | 1 | - | hooks/use-crm-reports.ts |
+| `PipelineMovement` | 1 | - | hooks/use-crm-reports.ts |
+| `LeadsBySource` | 1 | - | hooks/use-crm-reports.ts |
+| `LeadConversionFunnel` | 1 | - | hooks/use-crm-reports.ts |
+| `LeadResponseTime` | 1 | - | hooks/use-crm-reports.ts |
+| `LeadVelocityRate` | 1 | - | hooks/use-crm-reports.ts |
+| `LeadDistribution` | 1 | - | hooks/use-crm-reports.ts |
+| `ActivitySummary` | 1 | - | hooks/use-crm-reports.ts |
+| `CallAnalytics` | 1 | - | hooks/use-crm-reports.ts |
+| `EmailEngagement` | 1 | - | hooks/use-crm-reports.ts |
+| `MeetingAnalytics` | 1 | - | hooks/use-crm-reports.ts |
+| `TaskCompletion` | 1 | - | hooks/use-crm-reports.ts |
+| `SalesForecast` | 1 | - | hooks/use-crm-reports.ts |
+| `RevenueAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `QuotaAttainment` | 1 | - | hooks/use-crm-reports.ts |
+| `WinRateAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `DealSizeAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `SalesLeaderboard` | 1 | - | hooks/use-crm-reports.ts |
+| `TeamPerformance` | 1 | - | hooks/use-crm-reports.ts |
+| `RepScorecard` | 1 | - | hooks/use-crm-reports.ts |
+| `ActivityMetricsByRep` | 1 | - | hooks/use-crm-reports.ts |
+| `CustomerLifetimeValue` | 1 | - | hooks/use-crm-reports.ts |
+| `ChurnAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `CustomerHealthScore` | 1 | - | hooks/use-crm-reports.ts |
+| `AccountEngagement` | 1 | - | hooks/use-crm-reports.ts |
+| `WinLossAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `LostDealsAnalysis` | 1 | - | hooks/use-crm-reports.ts |
+| `CompetitorTracking` | 1 | - | hooks/use-crm-reports.ts |
+| `TerritoryPerformance` | 1 | - | hooks/use-crm-reports.ts |
+| `RegionalSales` | 1 | - | hooks/use-crm-reports.ts |
+| `GeographicPipeline` | 1 | - | hooks/use-crm-reports.ts |
+| `CrmTransaction` | 2 | - | hooks/use-crm-reports.ts |
+| `CrmTransactionsList` | 1 | - | hooks/use-crm-reports.ts |
+| `CrmTransactionSummary` | 1 | - | hooks/use-crm-reports.ts |
+| `ExportOptions` | 1 | - | hooks/use-crm-reports.ts |
+| `ValidationError` | 1 | - | hooks/useApiError.tsx |
+| `AppointmentFilters` | 1 | - | hooks/useAppointments.ts |
+| `BlockedTimeFilters` | 1 | - | hooks/useAppointments.ts |
+| `StatsFilters` | 1 | - | hooks/useAppointments.ts |
+| `SidebarData` | 1 | - | hooks/useCalendar.ts |
+| `UseCaptchaOptions` | 1 | - | hooks/useCaptcha.ts |
+| `UseCaptchaReturn` | 1 | - | hooks/useCaptcha.ts |
+| `Message` | 1 | - | hooks/useChat.ts |
+| `Conversation` | 1 | - | hooks/useChat.ts |
+| `DashboardParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `RevenueParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `FunnelParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `DateRangeParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `PipelineParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `TeamParams` | 1 | - | hooks/useCrmAnalytics.ts |
+| `UseFeatureFlagResult` | 1 | - | hooks/useFeatureFlag.ts |
+| `InvoicesWithStats` | 1 | - | hooks/useFinance.ts |
+| `PaymentsWithSummary` | 1 | - | hooks/useFinance.ts |
+| `PaymentFilters` | 1 | - | hooks/useFinance.ts |
+| `Payment` | 1 | - | hooks/useFinance.ts |
+| `FinancialOverviewData` | 1 | - | hooks/useFinance.ts |
+| `FieldConfig` | 1 | - | hooks/useFormValidation.ts |
+| `ValidationSchema` | 1 | - | hooks/useFormValidation.ts |
+| `CharacterCount` | 1 | - | hooks/useFormValidation.ts |
+| `HRAnalyticsDashboardData` | 1 | - | hooks/useHrAnalytics.ts |
+| `UseKanbanOptions` | 1 | - | hooks/useKanban.ts |
+| `ModuleLinks` | 1 | - | hooks/useKeyboardShortcuts.ts |
+| `ListCallbacks` | 1 | - | hooks/useKeyboardShortcuts.ts |
+| `DetailCallbacks` | 1 | - | hooks/useKeyboardShortcuts.ts |
+| `CreateCallbacks` | 1 | - | hooks/useKeyboardShortcuts.ts |
+| `UseKeyboardShortcutsOptions` | 1 | - | hooks/useKeyboardShortcuts.ts |
+| `EventsWithStats` | 1 | - | hooks/useRemindersAndEvents.ts |
+| `RemindersWithStats` | 1 | - | hooks/useRemindersAndEvents.ts |
+| `LeanCustomer` | 1 | - | hooks/useSaudiBanking.ts |
+| `LeanEntity` | 1 | - | hooks/useSaudiBanking.ts |
+| `LeanAccount` | 1 | - | hooks/useSaudiBanking.ts |
+| `LeanBank` | 1 | - | hooks/useSaudiBanking.ts |
+| `LeanTransaction` | 1 | - | hooks/useSaudiBanking.ts |
+| `WPSEstablishment` | 1 | Omit<ServiceWPSEstablishment, 'establishmentId' | 'establishmentName'> | hooks/useSaudiBanking.ts |
+| `WPSEmployee` | 1 | - | hooks/useSaudiBanking.ts |
+| `WPSFile` | 1 | - | hooks/useSaudiBanking.ts |
+| `SARIEBank` | 1 | - | hooks/useSaudiBanking.ts |
+| `SADADBiller` | 1 | - | hooks/useSaudiBanking.ts |
+| `SADADBill` | 1 | - | hooks/useSaudiBanking.ts |
+| `SADADPayment` | 1 | - | hooks/useSaudiBanking.ts |
+| `MudadEmployee` | 1 | - | hooks/useSaudiBanking.ts |
+| `NitaqatResult` | 1 | - | hooks/useSaudiBanking.ts |
+| `MinimumWageResult` | 1 | - | hooks/useSaudiBanking.ts |
+| `SmartButtonCount` | 1 | - | hooks/useSmartButtonCounts.ts |
+| `SmartButtonCountsResult` | 1 | - | hooks/useSmartButtonCounts.ts |
+| `UseSmartButtonsResult` | 1 | - | hooks/useSmartButtons.ts |
+| `UseSmartButtonsBatchResult` | 1 | - | hooks/useSmartButtons.ts |
+| `CreateStaffData` | 1 | - | hooks/useStaff.ts |
+| `InviteStaffData` | 1 | - | hooks/useStaff.ts |
+| `UpdateStaffData` | 0 | Partial<CreateStaffData> | hooks/useStaff.ts |
+| `TaskWithRelated` | 1 | - | hooks/useTasks.ts |
+| `AdminDashboardData` | 1 | - | hooks/useUIAccess.ts |
+| `DebugError` | 1 | - | lib/aggressive-debug.ts |
+| `ApiCallTrace` | 1 | - | lib/api-debug.ts |
+| `ApiError` | 2 | - | lib/api.ts |
+| `RateLimitInfo` | 1 | - | lib/api.ts |
+| `BilingualError` | 1 | - | lib/bilingualErrorHandler.ts |
+| `ConsentRecord` | 1 | - | lib/consent-manager.ts |
+| `ConsentHistoryEntry` | 1 | - | lib/consent-manager.ts |
+| `SecureCookieOptions` | 1 | - | lib/cookies.ts |
+| `RetainedDataItem` | 1 | - | lib/data-retention.ts |
+| `LogEntry` | 1 | - | lib/document-debug-logger.ts |
+| `ErrorContext` | 1 | - | lib/error-handling.ts |
+| `HandledError` | 1 | - | lib/error-handling.ts |
+| `ValidationResult` | 1 | - | lib/file-validation.ts |
+| `SmartPreviewOptions` | 1 | - | lib/file-viewer.ts |
+| `SmartPreviewResult` | 1 | - | lib/file-viewer.ts |
+| `LogContext` | 1 | - | lib/logger.ts |
+| `LogEntry` | 1 | - | lib/logger.ts |
+| `LoggerConfig` | 1 | - | lib/logger.ts |
+| `IbanValidationResult` | 1 | - | lib/saudi-banking-validation.ts |
+| `SaudiIdValidationResult` | 1 | - | lib/saudi-banking-validation.ts |
+| `SalaryValidationResult` | 1 | - | lib/saudi-banking-validation.ts |
+| `TokenPair` | 1 | - | lib/secure-auth.ts |
+| `SecureAuthConfig` | 1 | - | lib/secure-auth.ts |
+| `SecurityHeader` | 2 | - | lib/security-headers.ts |
+| `CSPDirectives` | 0 | - | lib/security-headers.ts |
+| `WPSEmployeeRecord` | 1 | - | lib/wps-file-generator.ts |
+| `WPSEstablishmentRecord` | 1 | - | lib/wps-file-generator.ts |
+| `WPSGenerationOptions` | 1 | - | lib/wps-file-generator.ts |
+| `WPSValidationResult` | 1 | - | lib/wps-file-generator.ts |
+| `WPSValidationError` | 1 | - | lib/wps-file-generator.ts |
+| `WPSFilePreview` | 1 | - | lib/wps-file-generator.ts |
+| `FileRoutesByFullPath` | 0 | - | routeTree.gen.ts |
+| `FileRoutesByTo` | 0 | - | routeTree.gen.ts |
+| `FileRoutesById` | 1 | - | routeTree.gen.ts |
+| `FileRouteTypes` | 1 | - | routeTree.gen.ts |
+| `RootRouteChildren` | 1 | - | routeTree.gen.ts |
+| `User` | 29 | - | sdk/core/src/types.ts |
+| `UserFirm` | 4 | - | sdk/core/src/types.ts |
+| `UserPermissions` | 15 | - | sdk/core/src/types.ts |
+| `LoginCredentials` | 4 | - | sdk/core/src/types.ts |
+| `RegisterData` | 9 | - | sdk/core/src/types.ts |
+| `AuthResult` | 6 | - | sdk/core/src/types.ts |
+| `AuthTokens` | 2 | - | sdk/core/src/types.ts |
+| `MfaSetupResult` | 3 | - | sdk/core/src/types.ts |
+| `MfaVerifyResult` | 2 | - | sdk/core/src/types.ts |
+| `MfaChallengeData` | 3 | - | sdk/core/src/types.ts |
+| `Session` | 9 | - | sdk/core/src/types.ts |
+| `OAuthConfig` | 4 | - | sdk/core/src/types.ts |
+| `GoogleOneTapConfig` | 5 | - | sdk/core/src/types.ts |
+| `GoogleOneTapResponse` | 3 | - | sdk/core/src/types.ts |
+| `SSOProvider` | 7 | - | sdk/core/src/types.ts |
+| `SSODetectionResult` | 4 | - | sdk/core/src/types.ts |
+| `PasswordStrength` | 3 | - | sdk/core/src/types.ts |
+| `ForgotPasswordData` | 1 | - | sdk/core/src/types.ts |
+| `ResetPasswordData` | 2 | - | sdk/core/src/types.ts |
+| `ChangePasswordData` | 2 | - | sdk/core/src/types.ts |
+| `SendOtpData` | 2 | - | sdk/core/src/types.ts |
+| `VerifyOtpData` | 3 | - | sdk/core/src/types.ts |
+| `OtpResult` | 4 | - | sdk/core/src/types.ts |
+| `MagicLinkData` | 2 | - | sdk/core/src/types.ts |
+| `MagicLinkResult` | 3 | - | sdk/core/src/types.ts |
+| `TrafAuthConfig` | 8 | - | sdk/core/src/types.ts |
+| `TrafAuthError` | 6 | Error | sdk/core/src/types.ts |
+| `GoogleOneTapConfig` | 9 | - | sdk/integrations/google-onetap/types.ts |
+| `GoogleCredentialResponse` | 3 | - | sdk/integrations/google-onetap/types.ts |
+| `GoogleOneTapNotification` | 6 | - | sdk/integrations/google-onetap/types.ts |
+| `GoogleOneTapResult` | 6 | - | sdk/integrations/google-onetap/types.ts |
+| `GoogleOneTapCallbacks` | 3 | - | sdk/integrations/google-onetap/types.ts |
+| `DecodedGoogleToken` | 15 | - | sdk/integrations/google-onetap/types.ts |
+| `UseGoogleOneTapOptions` | 7 | Omit<GoogleOneTapConfig, 'apiUrl' | 'clientId'> | sdk/integrations/google-onetap/useGoogleOneTap.ts |
+| `UseGoogleOneTapReturn` | 11 | - | sdk/integrations/google-onetap/useGoogleOneTap.ts |
+| `TemplateManagerConfig` | 2 | - | sdk/integrations/organization-templates/TemplateManager.ts |
+| `AuthMethodConfig` | 3 | - | sdk/integrations/organization-templates/types.ts |
+| `PasswordPolicy` | 10 | - | sdk/integrations/organization-templates/types.ts |
+| `MFAPolicy` | 6 | - | sdk/integrations/organization-templates/types.ts |
+| `SessionPolicy` | 6 | - | sdk/integrations/organization-templates/types.ts |
+| `SSOPolicy` | 6 | - | sdk/integrations/organization-templates/types.ts |
+| `SecurityPolicy` | 8 | - | sdk/integrations/organization-templates/types.ts |
+| `BrandingConfig` | 7 | - | sdk/integrations/organization-templates/types.ts |
+| `ComplianceConfig` | 9 | - | sdk/integrations/organization-templates/types.ts |
+| `NotificationConfig` | 6 | - | sdk/integrations/organization-templates/types.ts |
+| `OrganizationTemplate` | 11 | - | sdk/integrations/organization-templates/types.ts |
+| `TemplateApplication` | 5 | - | sdk/integrations/organization-templates/types.ts |
+| `UseOrganizationTemplateOptions` | 2 | TemplateManagerConfig | sdk/integrations/organization-templates/useOrganizationTemplate.ts |
+| `UseOrganizationTemplateReturn` | 12 | - | sdk/integrations/organization-templates/useOrganizationTemplate.ts |
+| `SSOProvider` | 9 | - | sdk/integrations/sso-detection/types.ts |
+| `SSODomainMapping` | 7 | - | sdk/integrations/sso-detection/types.ts |
+| `SSODetectionConfig` | 5 | - | sdk/integrations/sso-detection/types.ts |
+| `SSODetectionResult` | 5 | - | sdk/integrations/sso-detection/types.ts |
+| `SSOLoginOptions` | 4 | - | sdk/integrations/sso-detection/types.ts |
+| `SSOSession` | 12 | - | sdk/integrations/sso-detection/types.ts |
+| `UseSSODetectionOptions` | 1 | SSODetectionConfig | sdk/integrations/sso-detection/useSSODetection.ts |
+| `UseSSODetectionReturn` | 7 | - | sdk/integrations/sso-detection/useSSODetection.ts |
+| `AuthRouteHandlerConfig` | 5 | - | sdk/nextjs/src/api/index.ts |
+| `AuthMiddlewareConfig` | 7 | - | sdk/nextjs/src/middleware/index.ts |
+| `WithAuthOptions` | 0 | Omit<AuthGuardProps, 'children'> | sdk/react/src/hoc/withAuth.tsx |
+| `LinkedAccount` | 6 | - | sdk/react/src/hooks/useAccountLinking.ts |
+| `UseAccountLinkingReturn` | 7 | - | sdk/react/src/hooks/useAccountLinking.ts |
+| `AnonymousSession` | 5 | - | sdk/react/src/hooks/useAnonymousSession.ts |
+| `ConvertToAccountData` | 4 | - | sdk/react/src/hooks/useAnonymousSession.ts |
+| `UseAnonymousSessionReturn` | 9 | - | sdk/react/src/hooks/useAnonymousSession.ts |
+| `ApiKey` | 8 | - | sdk/react/src/hooks/useApiKeys.ts |
+
+*... and 3208 more*
+
+---
+
+## Type Aliases
+
+| Type | Kind | Definition |
+|------|------|------------|
+| `DatePreset` | union | `| 'today'
+  | 'yesterday'
+  | 'last7days'
+  | 'las...` |
+| `StatStatus` | union | `'normal' | 'attention' | 'zero'` |
+| `PlanId` | union | `'free' | 'starter' | 'professional' | 'enterprise'` |
+| `FeatureId` | union | `| 'basic_cases'
+  | 'basic_clients'
+  | 'basic_inv...` |
+| `OfficeType` | union | `'solo' | 'small' | 'medium' | 'firm'
+
+export inter...` |
+| `ProspectLevel` | union | `'PL_NONE' | 'PL_LOW' | 'PL_MEDIUM' | 'PL_HIGH' | '...` |
+| `ValidationState` | union | `'unknown' | 'valid' | 'invalid' | 'bounced'
+
+expor...` |
+| `ErrorCode` | union | `(typeof ERROR_CODES)[keyof typeof ERROR_CODES]
+
+/*...` |
+| `NajizIdentityType` | alias | `typeof NAJIZ_IDENTITY_TYPES[number]['value']
+
+// ═...` |
+| `RouteParams` | object | `{
+  // Cases
+  caseId: string` |
+| `RouteFunction` | function | `(...args: string[]) => string` |
+| `StaticRoute` | union | `Extract<
+  | typeof ROUTES[keyof typeof ROUTES]
+  ...` |
+| `InvoiceStatus` | union | `| 'draft'
+  | 'pending_approval'
+  | 'approved'
+  ...` |
+| `TimeEntryLockReason` | union | `'approved' | 'billed' | 'period_closed' | 'manual'...` |
+| `BillingPeriod` | union | `'weekly' | 'biweekly' | 'monthly' | 'quarterly' | ...` |
+| `SubscriptionStatus` | union | `| 'draft'           // Not yet activated
+  | 'tria...` |
+| `SubscriptionPlanType` | union | `| 'retainer'        // Monthly retainer package
+  ...` |
+| `ProrationBehavior` | union | `| 'create_prorations'    // Calculate prorated amo...` |
+| `SubscriptionCurrency` | union | `'SAR' | 'USD' | 'EUR' | 'GBP' | 'AED'` |
+| `SubscriptionAction` | union | `| 'activate'
+  | 'pause'
+  | 'resume'
+  | 'cancel'...` |
+| `CircuitState` | union | `'CLOSED' | 'OPEN' | 'HALF_OPEN'
+
+interface Circuit...` |
+| `LogLevel` | union | `'debug' | 'info' | 'warn' | 'error'
+
+export type D...` |
+| `LogLevel` | union | `'debug' | 'info' | 'warn' | 'error' | 'none'
+
+expo...` |
+| `QueryKeyFactory` | function | `typeof QueryKeys
+
+// ==================== MAIN FAC...` |
+| `UserRole` | union | `'client' | 'lawyer' | 'admin'` |
+| `FirmRole` | union | `| 'owner'
+  | 'admin'
+  | 'partner'
+  | 'lawyer'
+ ...` |
+| `FirmStatus` | union | `'active' | 'departed' | 'suspended' | 'pending' | ...` |
+| `LawyerWorkMode` | union | `'solo' | 'firm_owner' | 'firm_member' | null` |
+| `Plan` | union | `'free' | 'starter' | 'professional' | 'enterprise'` |
+| `MfaMethod` | union | `'totp' | 'sms' | 'email'` |
+| `OAuthProvider` | union | `'google' | 'microsoft' | 'apple' | 'github'` |
+| `OtpPurpose` | union | `'login' | 'registration' | 'password_reset' | 'ema...` |
+| `TemplateType` | union | `| 'startup'
+  | 'enterprise'
+  | 'healthcare'
+  | ...` |
+| `SSOProviderType` | union | `| 'saml'
+  | 'oidc'
+  | 'google'
+  | 'microsoft'
+ ...` |
+| `WebhookEvent` | union | `| 'user.created'
+  | 'user.updated'
+  | 'user.dele...` |
+| `MFASetupMethod` | union | `'totp' | 'sms' | 'email'` |
+| `MFAMethod` | union | `'totp' | 'sms' | 'email'` |
+| `SocialProvider` | union | `'google' | 'microsoft' | 'apple' | 'github' | 'fac...` |
+| `ThemeMode` | union | `'light' | 'dark' | 'system'` |
+| `ThemeDirection` | union | `'ltr' | 'rtl'` |
+| `AccountTypeEnum` | union | `'Asset' | 'Liability' | 'Equity' | 'Income' | 'Exp...` |
+| `AccountType` | union | `'asset' | 'liability' | 'equity' | 'income' | 'exp...` |
+| `FiscalPeriodStatus` | union | `'future' | 'open' | 'closed' | 'locked'
+
+export in...` |
+| `PricingType` | union | `'percentage' | 'fixed' | 'rate_table'
+
+export inte...` |
+| `DebitNoteStatus` | union | `'draft' | 'pending' | 'approved' | 'applied' | 'ca...` |
+| `RetainerStatus` | union | `'active' | 'exhausted' | 'refunded' | 'closed'
+
+ex...` |
+| `LeadStage` | union | `'new' | 'contacted' | 'qualified' | 'proposal' | '...` |
+| `ActivityType` | union | `| 'task_created'
+  | 'task_updated'
+  | 'task_comp...` |
+| `AdvanceType` | union | `'salary' | 'emergency' | 'travel' | 'relocation' |...` |
+| `DayOfWeek` | union | `0 | 1 | 2 | 3 | 4 | 5 | 6
+
+/**
+ * Appointment dura...` |
+| `AssetAssignmentStatus` | union | `'assigned' | 'in_use' | 'returned' | 'lost' | 'dam...` |
+| `CheckMethod` | union | `'biometric' | 'mobile' | 'manual' | 'web' | 'card_...` |
+| `LoginResponse` | union | `LoginOTPRequiredResponse | LoginResult
+
+/**
+ * ...` |
+| `OTPPurpose` | union | `'login' | 'registration' | 'verify_email'
+
+/**
+...` |
+| `BenefitType` | union | `'health_insurance' | 'life_insurance' | 'disabilit...` |
+| `RateType` | union | `'hourly' | 'flat' | 'contingency' | 'retainer' | '...` |
+| `RequirementType` | union | `'document_upload' | 'approval' | 'payment' | 'sign...` |
+| `PartyType` | union | `'individual' | 'company' | 'government'
+
+/**
+ * En...` |
+| `RiskTier` | union | `'healthy' | 'monitor' | 'at_risk' | 'critical'
+
+//...` |
+| `UpdateCompensationInput` | intersection | `Partial<CreateCompensationInput>
+
+// API Functions...` |
+| `CompensatoryLeaveStatus` | union | `| 'draft'
+  | 'pending_approval'
+  | 'approved'
+  ...` |
+| `TransactionExportFormat` | union | `'csv' | 'xlsx' | 'json' | 'pdf'
+
+// ==============...` |
+| `ExportFormat` | union | `'xlsx' | 'csv' | 'pdf' | 'json'
+export type Entity...` |
+| `VersionType` | union | `'major' | 'minor' | 'patch'
+
+/**
+ * Result of comp...` |
+| `DocumentCategory` | union | `(typeof documentCategories)[number]
+
+// Document i...` |
+| `IncentiveType` | union | `| 'spot_bonus'
+  | 'performance_bonus'
+  | 'sales_...` |
+| `UpdateEmployeeIncentiveData` | union | `Partial<CreateEmployeeIncentiveData>
+
+export inter...` |
+| `UpdatePromotionInput` | alias | `Partial<CreatePromotionInput>
+
+export interface Pr...` |
+| `TransferType` | union | `'internal' | 'external' | 'temporary' | 'permanent...` |
+| `EventType` | union | `| 'meeting'       // Contract: Meeting
+  | 'sessio...` |
+| `RevaluationStatus` | union | `'draft' | 'posted' | 'reversed'
+
+export interface ...` |
+| `ExpenseCategory` | union | `'travel' | 'meals' | 'accommodation' | 'transporta...` |
+| `ExpenseStatus` | union | `'draft' | 'pending_approval' | 'submitted' | 'appr...` |
+| `FollowupType` | union | `(typeof followupTypes)[number]
+
+// Follow-up statu...` |
+| `GLReferenceModel` | union | `'Invoice' | 'Payment' | 'Expense' | 'Bill' | 'Jour...` |
+| `GrievanceType` | union | `'compensation' | 'benefits' | 'working_conditions'...` |
+| `NationalIdType` | union | `'saudi_id' | 'iqama' | 'gcc_id' | 'passport'
+expor...` |
+| `PositionType` | union | `'regular' | 'temporary' | 'project_based' | 'seaso...` |
+| `JournalEntryStatus` | union | `'draft' | 'posted' | 'voided'
+
+/**
+ * Journal Entr...` |
+| `LeaveType` | union | `| 'annual'       // إجازة سنوية (المادة 109)
+  | '...` |
+| `LoanType` | union | `'personal' | 'housing' | 'vehicle' | 'education' |...` |
+| `MFAMethod` | union | `'totp' | 'backup_code' | 'webauthn' | 'sms' | 'ema...` |
+| `PriorityTier` | union | `'P1_HOT' | 'P2_WARM' | 'P3_COOL' | 'P4_NURTURE'
+
+e...` |
+| `ContactType` | union | `'call' | 'email' | 'meeting' | 'whatsapp'
+
+export ...` |
+| `OAuthProvider` | union | `| 'google'
+  | 'facebook'
+  | 'apple'
+  | 'twitter...` |
+| `ExitType` | union | `'resignation' | 'termination' | 'contract_end' | '...` |
+| `OnboardingStatus` | union | `'pending' | 'in_progress' | 'completed' | 'on_hold...` |
+| `UnitType` | union | `'company' | 'division' | 'department' | 'section' ...` |
+| `PasswordStrengthLevel` | union | `| 'very_weak'
+  | 'weak'
+  | 'medium'
+  | 'strong'...` |
+| `PayrollRunStatus` | union | `'draft' | 'calculating' | 'calculated' | 'approved...` |
+| `PaymentStatus` | union | `'draft' | 'approved' | 'processing' | 'paid' | 'fa...` |
+| `ReviewType` | union | `'annual' | 'mid_year' | 'quarterly' | 'probation' ...` |
+| `OTPPurpose` | union | `'login' | 'registration' | 'verify_phone' | 'mfa'
+...` |
+| `QuoteStatus` | union | `| 'draft'
+  | 'pending'
+  | 'sent'
+  | 'accepted'
+...` |
+| `EmploymentType` | union | `'full_time' | 'part_time' | 'contract' | 'temporar...` |
+| `ReminderPriority` | union | `'low' | 'medium' | 'high' | 'urgent'
+
+// Reminder ...` |
+| `CreateReportInput` | union | `Omit<Report, 'reportId' | 'recordNumber' | 'create...` |
+| `RetainerStatus` | union | `'active' | 'depleted' | 'refunded' | 'expired' | '...` |
+| `ComponentType` | union | `'earning' | 'deduction'
+export type ApplicableFor ...` |
+| `ShiftAssignmentStatus` | union | `'active' | 'inactive' | 'scheduled'
+
+// Shift Requ...` |
+| `BreakType` | union | `'paid' | 'unpaid'
+
+// Day of Week
+export type DayO...` |
+| `SkillCategory` | union | `'technical' | 'soft_skill' | 'language' | 'legal' ...` |
+| `PlanStatus` | union | `'draft' | 'active' | 'closed'
+export type PlanPrio...` |
+| `ReauthMethod` | union | `'password' | 'totp' | 'email' | 'sms'
+
+/**
+ * Reau...` |
+| `UpdateSuccessionPlanInput` | intersection | `Partial<CreateSuccessionPlanInput>
+
+// API Functio...` |
+| `EntityType` | union | `'case' | 'client' | 'invoice' | 'document' | 'task...` |
+| `TaskStatus` | union | `'backlog' | 'todo' | 'in_progress' | 'done' | 'can...` |
+| `TeamMemberStatus` | union | `| 'pending'
+  | 'pending_approval'
+  | 'active'
+  ...` |
+| `TimeType` | union | `'billable' | 'non_billable' | 'pro_bono' | 'intern...` |
+| `TrainingType` | union | `'internal' | 'external' | 'online' | 'certificatio...` |
+| `TrustAccountType` | union | `'iolta' | 'client_trust' | 'escrow' | 'retainer'
+
+...` |
+| `VehicleType` | union | `'sedan' | 'suv' | 'van' | 'truck' | 'motorcycle' |...` |
+| `CountryCode` | union | `'SA' | 'AE' | 'US' | 'GB' | string
+
+/**
+ * Currenc...` |
+| `WorkflowTriggerType` | union | `'manual' | 'event' | 'schedule'
+export type Workfl...` |
+| `AssetStatus` | union | `'draft' | 'submitted' | 'partially_depreciated' | ...` |
+| `AutomatedActionTrigger` | union | `| 'on_create' // When record is created
+  | 'on_wr...` |
+| `LeadStatus` | union | `| 'new'
+  | 'contacted'
+  | 'qualified'
+  | 'propo...` |
+| `AutoActionTrigger` | union | `'enter' | 'exit' | 'stay'
+export type AutoActionTy...` |
+| `DocumentCategory` | union | `| 'contract'
+  | 'pleading'
+  | 'evidence'
+  | 'co...` |
+| `GanttTaskType` | union | `'task' | 'project' | 'milestone'
+export type TaskP...` |
+| `EmployeeStatus` | union | `'active' | 'inactive' | 'on_leave' | 'terminated' ...` |
+| `IPType` | union | `'IPv4' | 'IPv6' | 'CIDR' | 'Range'
+
+/**
+ * Valid d...` |
+| `LostReasonCategory` | union | `| 'price'        // Price-related issues (too high...` |
+| `ThreadMessageType` | union | `| 'comment' // User comment (public or internal)
+ ...` |
+| `NajizIdentityType` | union | `| 'national_id'
+  | 'iqama'
+  | 'gcc_id'
+  | 'pass...` |
+| `OrganizationStatus` | union | `'active' | 'inactive' | 'suspended' | 'dissolved'
+...` |
+| `ProductType` | union | `'product' | 'service' | 'subscription' | 'retainer...` |
+| `FirmRole` | union | `| 'owner'
+  | 'admin'
+  | 'partner'
+  | 'lawyer'
+ ...` |
+| `TicketStatus` | union | `'open' | 'replied' | 'resolved' | 'closed' | 'on_h...` |
+| `UserRole` | union | `| 'owner'
+  | 'admin'
+  | 'partner'
+  | 'lawyer'
+ ...` |
+| `SanitizationType` | union | `'html' | 'url'` |
+| `ValidationPatternKey` | union | `| 'nationalId'
+  | 'iban'
+  | 'phone'
+  | 'crNumbe...` |
+| `ValidationResult` | object | `{
+  isValid: boolean` |
+| `ErrorMessages` | object | `{
+  en: string` |
+
+---
+
+## Enums
+
+### ISSUE_SSO_TOKENS_MISSING (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | CRITICAL |
+| endpoint | POST /api/auth/sso/callback |
+| symptom | Users login via SSO but get 401 on all subsequent requests |
+| frontendFile | src/services/oauthService.ts:311-330 |
+| fix | Return accessToken and refreshToken at root level of response |
+
+### ISSUE_CSRF_COOKIE (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | CRITICAL |
+| endpoint | GET /api/auth/csrf + all mutating endpoints |
+| symptom | 403 errors on POST/PUT/PATCH/DELETE,  |
+| frontendFile | src/lib/api.ts:291-402 |
+| fix | Set cookie with httpOnly:false, sameSite:none, secure:true; return in body |
+
+### ISSUE_TOKEN_REFRESH (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | CRITICAL |
+| endpoint | POST /api/auth/refresh |
+| symptom | Users get logged out unexpectedly,  |
+| frontendFile | src/lib/api.ts:232-263 |
+| fix | Accept refreshToken in body, return both accessToken and refreshToken |
+
+### ISSUE_LOGIN_MFA (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | HIGH |
+| endpoint | POST /api/auth/login |
+| symptom | MFA flow broken, users with MFA enabled can bypass it |
+| frontendFile | src/services/authService.ts:93-148 |
+| fix | Include mfaEnabled, mfaPending, mfaMethod, firmId, firm, permissions in response |
+
+### ISSUE_CORS (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | HIGH |
+| endpoint | All endpoints |
+| symptom | Network errors, CORS errors in console, cookies not sent |
+| frontendFile | src/lib/api.ts |
+| fix | Configure CORS with credentials:true and proper origins |
+
+### ISSUE_OTP_TOKENS (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | HIGH |
+| endpoint | POST /api/auth/verify-otp |
+| symptom | OTP verification succeeds but user not authenticated |
+| frontendFile | src/services/authService.ts:891-933 |
+| fix | Return accessToken and refreshToken after successful OTP verification |
+
+### ISSUE_CAPTCHA (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | MEDIUM |
+| endpoint | POST /api/auth/forgot-password |
+| symptom | Security vulnerability if CAPTCHA not validated |
+| frontendFile | src/features/auth/forgot-password/components/forgot-password-form.tsx |
+| fix | Validate captchaToken with Cloudflare Turnstile API |
+
+### ISSUE_RATE_LIMIT (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | MEDIUM |
+| endpoint | All rate-limited endpoints |
+| symptom | UI shows wrong wait time on rate limit |
+| frontendFile | src/lib/api.ts:596-620, 936-980 |
+| fix | Include waitTime/retryAfter in 429 response body and Retry-After header |
+
+### ISSUE_ACCOUNT_LOCKOUT (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | MEDIUM |
+| endpoint | POST /api/auth/login |
+| symptom | UI shows wrong lockout time |
+| frontendFile | src/lib/api.ts:912-933 |
+| fix | Include remainingTime (minutes) in 423 response |
+
+### ISSUE_SESSION_HEADERS (const)
+**Path:** `config/BACKEND_AUTH_ISSUES.ts`
+
+| Key | Value |
+|-----|-------|
+| severity | MEDIUM |
+| endpoint | All authenticated endpoints |
+| symptom | Users get logged out without warning |
+| frontendFile | src/lib/api.ts:844-865 |
+| fix | Send x-session-* headers when approaching timeout |
+
+### API_CONFIG (const)
+**Path:** `config/api.ts`
+
+| Key | Value |
+|-----|-------|
+| version | v1 |
+
+### FeatureStatus (const)
+**Path:** `config/feature-flags.ts`
+
+| Key | Value |
+|-----|-------|
+| AVAILABLE | available |
+| NOT_IMPLEMENTED | not_implemented |
+| NOT_MOUNTED | not_mounted |
+| PARTIAL | partial |
+| TEST_ONLY | test_only |
+
+### TAX_CONFIG (const)
+**Path:** `config/tax.ts`
+
+| Key | Value |
+|-----|-------|
+| VAT_NUMBER_PREFIX | 3 |
+
+### EXPORT (const)
+**Path:** `config/ui-constants.ts`
+
+| Key | Value |
+|-----|-------|
+| DEFAULT_PAGE_SIZE | a4 |
+| DEFAULT_ORIENTATION | portrait |
+
+### ERROR_CODES (const)
+**Path:** `constants/errorCodes.ts`
+
+| Key | Value |
+|-----|-------|
+| RATE_LIMIT_EXCEEDED | RATE_LIMIT_EXCEEDED |
+| AUTH_RATE_LIMIT | AUTH_RATE_LIMIT |
+| TOKEN_EXPIRED | TOKEN_EXPIRED |
+| INVALID_TOKEN | INVALID_TOKEN |
+| TOKEN_NOT_ACTIVE | TOKEN_NOT_ACTIVE |
+| SESSION_IDLE_TIMEOUT | SESSION_IDLE_TIMEOUT |
+| SESSION_ABSOLUTE_TIMEOUT | SESSION_ABSOLUTE_TIMEOUT |
+| ACCOUNT_LOCKED | ACCOUNT_LOCKED |
+| INVALID_CREDENTIALS | INVALID_CREDENTIALS |
+| USER_NOT_FOUND | USER_NOT_FOUND |
+| CSRF_TOKEN_INVALID | CSRF_TOKEN_INVALID |
+| CSRF_TOKEN_MISSING | CSRF_TOKEN_MISSING |
+| VALIDATION_ERROR | VALIDATION_ERROR |
+| CIRCUIT_OPEN | CIRCUIT_OPEN |
+| CANCELLED | CANCELLED |
+
+### EmployeeNationality
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| SAUDI | SA |
+| GCC | GCC |
+| EXPAT | EXPAT |
+
+### NitaqatBand
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| PLATINUM | platinum |
+| GREEN_HIGH | green_high |
+| GREEN_MID | green_mid |
+| GREEN_LOW | green_low |
+| YELLOW | yellow |
+| RED | red |
+
+### GosiRegistrationStatus
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| ACTIVE | active |
+| PENDING | pending |
+| SUSPENDED | suspended |
+| TERMINATED | terminated |
+
+### WpsPaymentStatus
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| PENDING | pending |
+| SUBMITTED | submitted |
+| PROCESSING | processing |
+| COMPLETED | completed |
+| REJECTED | rejected |
+| FAILED | failed |
+
+### SadadPaymentStatus
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| PENDING | pending |
+| PAID | paid |
+| OVERDUE | overdue |
+| CANCELLED | cancelled |
+
+### MudadSubmissionStatus
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| DRAFT | draft |
+| SUBMITTED | submitted |
+| ACCEPTED | accepted |
+| REJECTED | rejected |
+| CORRECTION_REQUIRED | correction_required |
+
+### WPS_CONSTRAINTS (const)
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| FILE_FORMAT | SIF |
+| ENCODING | UTF-8 |
+
+### REGULATORY_DATES (const)
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| GOSI_REFORM_DATE | 2024-07-03 |
+| WPS_MANDATORY_DATE | 2013-09-01 |
+
+### SARIE_BANK_IDS (const)
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| SABB | 45 |
+| ALRAJHI | 80 |
+| SNB | 10 |
+| ALAHLI | 10 |
+| RIYADBANK | 20 |
+| BANQUE_SAUDI_FRANSI | 55 |
+| ARAB_NATIONAL_BANK | 30 |
+| SAMBA | 40 |
+| ALINMA | 05 |
+| ALBILAD | 15 |
+| ALJAZIRA | 60 |
+| GULF_INTERNATIONAL | 65 |
+| EMIRATES_NBD | 70 |
+| FIRST_ABU_DHABI | 75 |
+
+### SAUDI_BANKING_ERROR_CODES (const)
+**Path:** `constants/saudi-banking.ts`
+
+| Key | Value |
+|-----|-------|
+| GOSI_INVALID_ID | GOSI_001 |
+| GOSI_EMPLOYEE_NOT_FOUND | GOSI_002 |
+| GOSI_DUPLICATE_REGISTRATION | GOSI_003 |
+| GOSI_INVALID_SALARY | GOSI_004 |
+| GOSI_SUBSCRIPTION_EXPIRED | GOSI_005 |
+| WPS_INVALID_FILE_FORMAT | WPS_001 |
+| WPS_MISSING_EMPLOYEE_DATA | WPS_002 |
+| WPS_INVALID_BANK_CODE | WPS_003 |
+| WPS_BATCH_SIZE_EXCEEDED | WPS_004 |
+| WPS_DUPLICATE_PAYMENT | WPS_005 |
+| SADAD_INVALID_BILL_NUMBER | SADAD_001 |
+| SADAD_PAYMENT_FAILED | SADAD_002 |
+| SADAD_INSUFFICIENT_BALANCE | SADAD_003 |
+| SADAD_BILL_ALREADY_PAID | SADAD_004 |
+| MUDAD_SUBMISSION_FAILED | MUDAD_001 |
+| ... | +7 more |
+
+### KBD_COLORS (const)
+**Path:** `hooks/useKeyboardShortcuts.ts`
+
+| Key | Value |
+|-----|-------|
+| emerald | bg-emerald-100 text-emerald-600 |
+| blue | bg-blue-100 text-blue-600 |
+| amber | bg-amber-100 text-amber-600 |
+| red | bg-red-100 text-red-500 |
+| slate | bg-slate-100 text-slate-500 |
+
+### HSTS_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | Strict-Transport-Security |
+| value | max-age=31536000; includeSubDomains; preload |
+
+### X_FRAME_OPTIONS_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | X-Frame-Options |
+| value | DENY |
+
+### X_CONTENT_TYPE_OPTIONS_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | X-Content-Type-Options |
+| value | nosniff |
+
+### X_XSS_PROTECTION_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | X-XSS-Protection |
+| value | 1; mode=block |
+
+### REFERRER_POLICY_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | Referrer-Policy |
+| value | strict-origin-when-cross-origin |
+
+### PERMISSIONS_POLICY_HEADER (const)
+**Path:** `lib/security-headers.ts`
+
+| Key | Value |
+|-----|-------|
+| key | Permissions-Policy |
+| value | camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=() |
+
+### AUTH_ENDPOINTS (const)
+**Path:** `sdk/core/src/constants.ts`
+
+| Key | Value |
+|-----|-------|
+| LOGIN | /auth/login |
+| REGISTER | /auth/register |
+| LOGOUT | /auth/logout |
+| ME | /auth/me |
+| REFRESH | /auth/refresh |
+| CHECK_AVAILABILITY | /auth/check-availability |
+| OAUTH_GOOGLE | /auth/oauth/google |
+| OAUTH_MICROSOFT | /auth/oauth/microsoft |
+| OAUTH_CALLBACK | /auth/oauth/callback |
+| GOOGLE_ONE_TAP | /auth/google/one-tap |
+| SSO_DETECT | /auth/sso/detect |
+| SSO_INITIATE | /auth/sso/initiate |
+| SSO_CALLBACK | /auth/sso/callback |
+| SEND_OTP | /auth/send-otp |
+| VERIFY_OTP | /auth/verify-otp |
+| ... | +21 more |
+
+### STORAGE_KEYS (const)
+**Path:** `sdk/core/src/constants.ts`
+
+| Key | Value |
+|-----|-------|
+| ACCESS_TOKEN | traf3li_access_token |
+| REFRESH_TOKEN | traf3li_refresh_token |
+| USER | traf3li_user |
+| DEVICE_ID | traf3li_device_id |
+| MFA_PENDING | traf3li_mfa_pending |
+
+### ERROR_CODES (const)
+**Path:** `sdk/core/src/constants.ts`
+
+| Key | Value |
+|-----|-------|
+| INVALID_CREDENTIALS | INVALID_CREDENTIALS |
+| ACCOUNT_LOCKED | ACCOUNT_LOCKED |
+| ACCOUNT_DISABLED | ACCOUNT_DISABLED |
+| EMAIL_NOT_VERIFIED | EMAIL_NOT_VERIFIED |
+| MFA_REQUIRED | MFA_REQUIRED |
+| MFA_INVALID | MFA_INVALID |
+| TOKEN_EXPIRED | TOKEN_EXPIRED |
+| TOKEN_INVALID | TOKEN_INVALID |
+| REFRESH_TOKEN_EXPIRED | REFRESH_TOKEN_EXPIRED |
+| RATE_LIMITED | RATE_LIMITED |
+| TOO_MANY_ATTEMPTS | TOO_MANY_ATTEMPTS |
+| VALIDATION_ERROR | VALIDATION_ERROR |
+| EMAIL_TAKEN | EMAIL_TAKEN |
+| USERNAME_TAKEN | USERNAME_TAKEN |
+| PHONE_TAKEN | PHONE_TAKEN |
+| ... | +8 more |
+
+### DEFAULT_CONFIG (const)
+**Path:** `sdk/core/src/constants.ts`
+
+| Key | Value |
+|-----|-------|
+| storage | localStorage |
+
+### CompensationStatus
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| ACTIVE | active |
+| PENDING | pending |
+| HISTORICAL | historical |
+| CANCELLED | cancelled |
+
+### PaymentFrequency
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| MONTHLY | monthly |
+| BI_WEEKLY | bi_weekly |
+| WEEKLY | weekly |
+
+### SalaryBasis
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| MONTHLY | monthly |
+| ANNUAL | annual |
+| HOURLY | hourly |
+| DAILY | daily |
+
+### PaymentMethod
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| BANK_TRANSFER | bank_transfer |
+| CASH | cash |
+| CHECK | check |
+
+### CalculationType
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| FIXED | fixed |
+| PERCENTAGE_OF_BASIC | percentage_of_basic |
+
+### AllowanceType
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| HOUSING | housing |
+| TRANSPORTATION | transportation |
+| MOBILE | mobile |
+| EDUCATION | education |
+| MEAL | meal |
+| COST_OF_LIVING | cost_of_living |
+| SHIFT | shift |
+| HAZARD | hazard |
+| PROFESSIONAL | professional |
+| LANGUAGE | language |
+| CLOTHING | clothing |
+| RELOCATION | relocation |
+| UTILITIES | utilities |
+| OTHER | other |
+
+### BonusType
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| DISCRETIONARY | discretionary |
+| PERFORMANCE_BASED | performance_based |
+| PROFIT_SHARING | profit_sharing |
+| GUARANTEED | guaranteed |
+
+### ChangeType
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| NEW_HIRE | new_hire |
+| MERIT_INCREASE | merit_increase |
+| PROMOTION | promotion |
+| MARKET_ADJUSTMENT | market_adjustment |
+| COST_OF_LIVING | cost_of_living |
+| RETENTION | retention |
+| EQUITY_ADJUSTMENT | equity_adjustment |
+| RECLASSIFICATION | reclassification |
+| DEMOTION | demotion |
+| CORRECTION | correction |
+| OTHER | other |
+
+### ReviewStatus
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| NOT_STARTED | not_started |
+| IN_PROGRESS | in_progress |
+| PENDING_APPROVAL | pending_approval |
+| APPROVED | approved |
+| IMPLEMENTED | implemented |
+| DEFERRED | deferred |
+| DECLINED | declined |
+
+### CompaRatioCategory
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| BELOW_RANGE | below_range |
+| IN_RANGE_LOW | in_range_low |
+| IN_RANGE_MID | in_range_mid |
+| IN_RANGE_HIGH | in_range_high |
+| ABOVE_RANGE | above_range |
+
+### CompensationModel
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| SALARY | salary |
+| SALARY_PLUS_BONUS | salary_plus_bonus |
+| EAT_WHAT_YOU_KILL | eat_what_you_kill |
+| LOCKSTEP | lockstep |
+| MODIFIED_LOCKSTEP | modified_lockstep |
+| HYBRID | hybrid |
+
+### PartnershipTier
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| EQUITY_PARTNER | equity_partner |
+| NON_EQUITY_PARTNER | non_equity_partner |
+| INCOME_PARTNER | income_partner |
+| OF_COUNSEL | of_counsel |
+
+### EmploymentType
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| FULL_TIME | full_time |
+| PART_TIME | part_time |
+| CONTRACT | contract |
+
+### MaritalStatus
+**Path:** `services/compensationService.ts`
+
+| Key | Value |
+|-----|-------|
+| SINGLE | single |
+| MARRIED | married |
+| DIVORCED | divorced |
+| WIDOWED | widowed |
+
+### PromotionStatus
+**Path:** `services/employeePromotionService.ts`
+
+| Key | Value |
+|-----|-------|
+| DRAFT | draft |
+| PENDING_APPROVAL | pending_approval |
+| APPROVED | approved |
+| REJECTED | rejected |
+| CANCELLED | cancelled |
+
+### PromotionProperty
+**Path:** `services/employeePromotionService.ts`
+
+| Key | Value |
+|-----|-------|
+| DEPARTMENT | department |
+| DESIGNATION | designation |
+| GRADE | grade |
+| SALARY | salary |
+| BRANCH | branch |
+
+### ApprovalStepStatus
+**Path:** `services/employeePromotionService.ts`
+
+| Key | Value |
+|-----|-------|
+| PENDING | pending |
+| APPROVED | approved |
+| REJECTED | rejected |
+| SKIPPED | skipped |
+
+### ReportSection
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| HR | hr |
+| FINANCE | finance |
+| TASKS | tasks |
+| CRM | crm |
+| SALES | sales |
+| GENERAL | general |
+
+### ReportCategory
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| HR | auto |
+| Categories | auto |
+| EMPLOYEE_DATA | employee_data |
+| PAYROLL | payroll |
+| ATTENDANCE | attendance |
+| TIME_TRACKING | time_tracking |
+| PERFORMANCE | performance |
+| RECRUITMENT | recruitment |
+| TRAINING | training |
+| BENEFITS | benefits |
+| COMPENSATION | compensation |
+| SUCCESSION | succession |
+| Finance | auto |
+| Categories | auto |
+| INVOICES | invoices |
+| ... | +49 more |
+
+### ReportType
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| STANDARD | standard |
+| CUSTOM | custom |
+| DASHBOARD | dashboard |
+| KPI | kpi |
+| ANALYTICS | analytics |
+| COMPLIANCE | compliance |
+| AUDIT | audit |
+| EXCEPTION | exception |
+| TREND | trend |
+| COMPARISON | comparison |
+
+### ReportFormat
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| TABULAR | tabular |
+| SUMMARY | summary |
+| DETAILED | detailed |
+| GRAPH | graph |
+| CHART | chart |
+| PIVOT | pivot |
+| MATRIX | matrix |
+| DASHBOARD | dashboard |
+| SCORECARD | scorecard |
+
+### OutputFormat
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| PDF | pdf |
+| EXCEL | excel |
+| CSV | csv |
+| WORD | word |
+| POWERPOINT | powerpoint |
+| HTML | html |
+| JSON | json |
+| XML | xml |
+
+### UsageFrequency
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| DAILY | daily |
+| WEEKLY | weekly |
+| MONTHLY | monthly |
+| QUARTERLY | quarterly |
+| ANNUAL | annual |
+| AD_HOC | ad_hoc |
+
+### CriticalityLevel
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| CRITICAL | critical |
+| IMPORTANT | important |
+| STANDARD | standard |
+| NICE_TO_HAVE | nice_to_have |
+
+### DataSourceType
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| DATABASE | database |
+| API | api |
+| FILE | file |
+| EXTERNAL_SYSTEM | external_system |
+| DATA_WAREHOUSE | data_warehouse |
+
+### DataRefreshRate
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| REAL_TIME | real_time |
+| HOURLY | hourly |
+| DAILY | daily |
+| WEEKLY | weekly |
+| ON_DEMAND | on_demand |
+
+### ParameterType
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| DATE | date |
+| DATE_RANGE | date_range |
+| EMPLOYEE | employee |
+| DEPARTMENT | department |
+| LOCATION | location |
+| JOB_LEVEL | job_level |
+| SALARY_GRADE | salary_grade |
+| STATUS | status |
+| DROPDOWN | dropdown |
+| MULTI_SELECT | multi_select |
+| TEXT | text |
+| NUMBER | number |
+
+### FilterOperator
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| EQUALS | equals |
+| NOT_EQUALS | not_equals |
+| CONTAINS | contains |
+| STARTS_WITH | starts_with |
+| GREATER_THAN | greater_than |
+| LESS_THAN | less_than |
+| BETWEEN | between |
+| IN | in |
+| NOT_IN | not_in |
+
+### ChartType
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| BAR | bar |
+| COLUMN | column |
+| LINE | line |
+| PIE | pie |
+| DONUT | donut |
+| AREA | area |
+| SCATTER | scatter |
+| BUBBLE | bubble |
+| GAUGE | gauge |
+| FUNNEL | funnel |
+| WATERFALL | waterfall |
+| HEATMAP | heatmap |
+| TREEMAP | treemap |
+
+### ScheduleFrequency
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| DAILY | daily |
+| WEEKLY | weekly |
+| MONTHLY | monthly |
+| QUARTERLY | quarterly |
+| ANNUAL | annual |
+
+### ScheduleStatus
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| ACTIVE | active |
+| PAUSED | paused |
+| EXPIRED | expired |
+| COMPLETED | completed |
+
+### ExecutionStatus
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| SCHEDULED | scheduled |
+| RUNNING | running |
+| COMPLETED | completed |
+| FAILED | failed |
+| CANCELLED | cancelled |
+
+### AccessLevel
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| PUBLIC | public |
+| INTERNAL | internal |
+| MANAGEMENT | management |
+| HR | hr |
+| FINANCE | finance |
+| EXECUTIVE | executive |
+| RESTRICTED | restricted |
+| CONFIDENTIAL | confidential |
+
+### ReportStatus
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| ACTIVE | active |
+| INACTIVE | inactive |
+| DRAFT | draft |
+| ARCHIVED | archived |
+| DEPRECATED | deprecated |
+
+### DataModule
+**Path:** `services/reportsService.ts`
+
+| Key | Value |
+|-----|-------|
+| HR | auto |
+| Modules | auto |
+| EMPLOYEES | employees |
+| PAYROLL | payroll |
+| ATTENDANCE | attendance |
+| PERFORMANCE | performance |
+| RECRUITMENT | recruitment |
+| TRAINING | training |
+| BENEFITS | benefits |
+| COMPENSATION | compensation |
+| SUCCESSION | succession |
+| GRIEVANCES | grievances |
+| ORGANIZATIONAL_STRUCTURE | organizational_structure |
+| JOB_POSITIONS | job_positions |
+| Finance | auto |
+| ... | +39 more |
+
+### BonusType
+**Path:** `services/retentionBonusService.ts`
+
+| Key | Value |
+|-----|-------|
+| RETENTION | retention |
+| SIGNING | signing |
+| PROJECT_COMPLETION | project_completion |
+| PERFORMANCE | performance |
+| LOYALTY | loyalty |
+| REFERRAL | referral |
+
+### BonusStatus
+**Path:** `services/retentionBonusService.ts`
+
+| Key | Value |
+|-----|-------|
+| DRAFT | draft |
+| PENDING_APPROVAL | pending_approval |
+| APPROVED | approved |
+| PAID | paid |
+| CLAWED_BACK | clawed_back |
+| CANCELLED | cancelled |
+
+### PaymentMethod
+**Path:** `services/retentionBonusService.ts`
+
+| Key | Value |
+|-----|-------|
+| PAYROLL | payroll |
+| SEPARATE_PAYMENT | separate_payment |
+
+### ApprovalStatus
+**Path:** `services/retentionBonusService.ts`
+
+| Key | Value |
+|-----|-------|
+| PENDING | pending |
+| APPROVED | approved |
+| REJECTED | rejected |
+
+### PositionCriticality
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| CRITICAL | critical |
+| HIGH | high |
+| MEDIUM | medium |
+| LOW | low |
+
+### RiskLevel
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| HIGH | high |
+| MEDIUM | medium |
+| LOW | low |
+
+### PlanStatus
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| DRAFT | draft |
+| ACTIVE | active |
+| UNDER_REVIEW | under_review |
+| APPROVED | approved |
+| ON_HOLD | on_hold |
+| COMPLETED | completed |
+| ARCHIVED | archived |
+
+### PlanType
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| INDIVIDUAL | individual |
+| DEPARTMENT | department |
+| ORGANIZATION_WIDE | organization_wide |
+| EMERGENCY | emergency |
+
+### PlanScope
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| SINGLE_POSITION | single_position |
+| MULTIPLE_POSITIONS | multiple_positions |
+| LEADERSHIP_TIER | leadership_tier |
+| CRITICAL_ROLES | critical_roles |
+
+### ReviewCycle
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| QUARTERLY | quarterly |
+| SEMI_ANNUAL | semi_annual |
+| ANNUAL | annual |
+| BIENNIAL | biennial |
+
+### ReadinessLevel
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| READY_NOW | ready_now |
+| READY_1_YEAR | ready_1_year |
+| READY_2_YEARS | ready_2_years |
+| READY_3_PLUS_YEARS | ready_3_plus_years |
+| NOT_READY | not_ready |
+
+### PerformanceRating
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| EXCEPTIONAL | exceptional |
+| EXCEEDS | exceeds |
+| MEETS | meets |
+| NEEDS_IMPROVEMENT | needs_improvement |
+| UNSATISFACTORY | unsatisfactory |
+
+### PotentialRating
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| HIGH | high |
+| MEDIUM | medium |
+| LOW | low |
+| UNKNOWN | unknown |
+
+### RetentionRisk
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| HIGH | high |
+| MEDIUM | medium |
+| LOW | low |
+
+### ApprovalStatus
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| PENDING | pending |
+| APPROVED | approved |
+| REJECTED | rejected |
+| REVISION_REQUIRED | revision_required |
+
+### TransferStatus
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| NOT_STARTED | not_started |
+| IN_PROGRESS | in_progress |
+| COMPLETED | completed |
+| DELAYED | delayed |
+
+### BenchStrengthScore
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| STRONG | strong |
+| ADEQUATE | adequate |
+| WEAK | weak |
+| CRITICAL | critical |
+
+### PartnerTrack
+**Path:** `services/successionPlanningService.ts`
+
+| Key | Value |
+|-----|-------|
+| EQUITY | equity |
+| NON_EQUITY | non_equity |
+| COUNSEL | counsel |
+| OF_COUNSEL | of_counsel |
+
+### MESSAGE_SUBTYPES (const)
+**Path:** `types/message.ts`
+
+| Key | Value |
+|-----|-------|
+| COMMENT | mail.mt_comment |
+| NOTE | mail.mt_note |
+| ACTIVITIES | mail.mt_activities |
+| STAGE_CHANGE | mail.mt_stage_change |
+| TRACKING | mail.mt_tracking |
+
+### AUTH_ERROR_CODES (const)
+**Path:** `utils/authErrors.ts`
+
+| Key | Value |
+|-----|-------|
+| INVALID_CREDENTIALS | INVALID_CREDENTIALS |
+| ACCOUNT_LOCKED | ACCOUNT_LOCKED |
+| ACCOUNT_DISABLED | ACCOUNT_DISABLED |
+| ACCOUNT_SUSPENDED | ACCOUNT_SUSPENDED |
+| EMAIL_NOT_VERIFIED | EMAIL_NOT_VERIFIED |
+| PHONE_NOT_VERIFIED | PHONE_NOT_VERIFIED |
+| MFA_REQUIRED | MFA_REQUIRED |
+| MFA_INVALID_CODE | MFA_INVALID_CODE |
+| MFA_NOT_ENABLED | MFA_NOT_ENABLED |
+| MFA_ALREADY_ENABLED | MFA_ALREADY_ENABLED |
+| SESSION_EXPIRED | SESSION_EXPIRED |
+| SESSION_IDLE_TIMEOUT | SESSION_IDLE_TIMEOUT |
+| SESSION_ABSOLUTE_TIMEOUT | SESSION_ABSOLUTE_TIMEOUT |
+| REAUTHENTICATION_REQUIRED | REAUTHENTICATION_REQUIRED |
+| CONCURRENT_SESSION_LIMIT | CONCURRENT_SESSION_LIMIT |
+| ... | +33 more |
+
+---
+
+## Zod Schemas
+
+| Schema | Type | Path |
+|--------|------|------|
+| `shiftAssignmentSchema` | object | components/hr/attendance/ShiftAssignmentDialog.tsx |
+| `shiftRequestSchema` | object | components/hr/attendance/ShiftRequestDialog.tsx |
+| `incentiveFormSchema` | object | components/hr/compensation/EmployeeIncentiveDialog.tsx |
+| `bonusFormSchema` | object | components/hr/compensation/RetentionBonusDialog.tsx |
+| `educationSchema` | object | components/hr/employees/EducationDialog.tsx |
+| `workHistoryFormSchema` | object | components/hr/employees/WorkHistoryDialog.tsx |
+| `compensatoryLeaveFormSchema` | object | components/hr/leave/CompensatoryLeaveDialog.tsx |
+| `encashmentFormSchema` | object | components/hr/leave/LeaveEncashmentDialog.tsx |
+| `leavePeriodSchema` | object | components/hr/leave/LeavePeriodDialog.tsx |
+| `salaryComponentSchema` | object | components/hr/payroll/SalaryComponentDialog.tsx |
+| `formSchema` | object | components/hr/recruitment/StaffingPlanDetailDialog.tsx |
+| `formSchema` | object | components/hr/recruitment/StaffingPlanDialog.tsx |
+| `approveTrainingSchema` | object | components/hr/training/TrainingDialogs.tsx |
+| `rejectTrainingSchema` | object | components/hr/training/TrainingDialogs.tsx |
+| `completeTrainingSchema` | object | components/hr/training/TrainingDialogs.tsx |
+| `trainingEvaluationSchema` | object | components/hr/training/TrainingDialogs.tsx |
+| `vehicleSchema` | object | components/hr/vehicles/VehicleDialog.tsx |
+| `vehicleLogSchema` | object | components/hr/vehicles/VehicleLogDialog.tsx |
+| `formSchema` | object | features/auth/otp/components/otp-form.tsx |
+| `registrationSchema` | object | features/auth/sign-up/data/schema.ts |
+| `formSchema` | object | features/billing-rates/components/group-action-dialog.tsx |
+| `formSchema` | object | features/billing-rates/components/rate-action-dialog.tsx |
+| `rateTypeSchema` | enum | features/billing-rates/data/schema.ts |
+| `rateCategorySchema` | enum | features/billing-rates/data/schema.ts |
+| `currencySchema` | enum | features/billing-rates/data/schema.ts |
+| `billingRateSchema` | object | features/billing-rates/data/schema.ts |
+| `rateGroupSchema` | object | features/billing-rates/data/schema.ts |
+| `timeEntryStatusSchema` | enum | features/billing-rates/data/schema.ts |
+| `timeEntrySchema` | object | features/billing-rates/data/schema.ts |
+| `richTextAnnotationSchema` | object | features/case-notion/data/schema.ts |
+| `richTextItemSchema` | object | features/case-notion/data/schema.ts |
+| `blockConnectionSchema` | object | features/case-notion/data/schema.ts |
+| `pageIconSchema` | object | features/case-notion/data/schema.ts |
+| `pageCoverSchema` | object | features/case-notion/data/schema.ts |
+| `caseNotionPageSchema` | object | features/case-notion/data/schema.ts |
+| `syncedBlockSchema` | object | features/case-notion/data/schema.ts |
+| `pageTemplateSchema` | object | features/case-notion/data/schema.ts |
+| `blockCommentSchema` | object | features/case-notion/data/schema.ts |
+| `pageActivitySchema` | object | features/case-notion/data/schema.ts |
+| `createPageInputSchema` | object | features/case-notion/data/schema.ts |
+| `updatePageInputSchema` | object | features/case-notion/data/schema.ts |
+| `pageFiltersSchema` | object | features/case-notion/data/schema.ts |
+| `createBlockInputSchema` | object | features/case-notion/data/schema.ts |
+| `updateBlockInputSchema` | object | features/case-notion/data/schema.ts |
+| `moveBlockInputSchema` | object | features/case-notion/data/schema.ts |
+| `formSchema` | object | features/case-workflows/components/workflows-action-dialog.tsx |
+| `formSchema` | object | features/case-workflows/components/workflows-duplicate-dialog.tsx |
+| `stageFormSchema` | object | features/case-workflows/components/workflows-stages-dialog.tsx |
+| `stageRequirementSchema` | object | features/case-workflows/data/schema.ts |
+| `workflowStageSchema` | object | features/case-workflows/data/schema.ts |
+| `stageTransitionSchema` | object | features/case-workflows/data/schema.ts |
+| `workflowTemplateSchema` | object | features/case-workflows/data/schema.ts |
+| `stageHistoryEntrySchema` | object | features/case-workflows/data/schema.ts |
+| `completedRequirementSchema` | object | features/case-workflows/data/schema.ts |
+| `caseStageProgressSchema` | object | features/case-workflows/data/schema.ts |
+| `createCaseSchema` | object | features/cases/components/create-case-form.tsx |
+| `createCaseSchema` | object | features/cases/components/create-case-view.tsx |
+| `moveCaseToStageSchema` | object | features/cases/data/case-pipeline-schema.ts |
+| `endCaseSchema` | object | features/cases/data/case-pipeline-schema.ts |
+| `formSchema` | object | features/clients/components/clients-action-dialog.tsx |
+| `identityTypeSchema` | enum | features/clients/data/schema.ts |
+| `genderSchema` | enum | features/clients/data/schema.ts |
+| `maritalStatusSchema` | enum | features/clients/data/schema.ts |
+| `gccCountrySchema` | enum | features/clients/data/schema.ts |
+| `clientSchema` | object | features/clients/data/schema.ts |
+| `clientListSchema` | array | features/clients/data/schema.ts |
+| `createClientSchema` | object | features/clients/data/schema.ts |
+| `contactTypeSchema` | enum | features/contacts/data/schema.ts |
+| `contactCategorySchema` | enum | features/contacts/data/schema.ts |
+| `contactStatusSchema` | enum | features/contacts/data/schema.ts |
+| `arabicNameSchema` | object | features/contacts/data/schema.ts |
+| `contactSchema` | object | features/contacts/data/schema.ts |
+| `createContactSchema` | object | features/contacts/data/schema.ts |
+| `quoteFormSchema` | object | features/crm/views/quote-form-view.tsx |
+| `profileFormSchema` | object | features/dashboard-settings/profile-page.tsx |
+| `exportFormatSchema` | enum | features/data-export/data/schema.ts |
+| `entityTypeSchema` | enum | features/data-export/data/schema.ts |
+| `exportJobStatusSchema` | enum | features/data-export/data/schema.ts |
+| `importJobStatusSchema` | enum | features/data-export/data/schema.ts |
+| `exportOptionsSchema` | object | features/data-export/data/schema.ts |
+| `exportJobSchema` | object | features/data-export/data/schema.ts |
+| `importOptionsSchema` | object | features/data-export/data/schema.ts |
+| `importErrorSchema` | object | features/data-export/data/schema.ts |
+| `importJobSchema` | object | features/data-export/data/schema.ts |
+| `importPreviewSchema` | object | features/data-export/data/schema.ts |
+| `exportTemplateSchema` | object | features/data-export/data/schema.ts |
+| `entityColumnSchema` | object | features/data-export/data/schema.ts |
+| `documentSchema` | object | features/documents/data/schema.ts |
+| `documentVersionSchema` | object | features/documents/data/schema.ts |
+| `createDocumentSchema` | object | features/documents/data/schema.ts |
+| `updateDocumentSchema` | object | features/documents/data/schema.ts |
+| `documentFiltersSchema` | object | features/documents/data/schema.ts |
+| `formSchema` | object | features/finance/components/vendors-action-dialog.tsx |
+| `followupHistoryEntrySchema` | object | features/followups/data/schema.ts |
+| `followupSchema` | object | features/followups/data/schema.ts |
+| `createFollowupSchema` | object | features/followups/data/schema.ts |
+| `shiftTypeFormSchema` | object | features/hr/components/shift-types-list-view.tsx |
+| `formSchema` | object | features/invoice-templates/components/template-action-dialog.tsx |
+| `formSchema` | object | features/invoice-templates/components/template-duplicate-dialog.tsx |
+| `templateTypeSchema` | enum | features/invoice-templates/data/schema.ts |
+| `headerSchema` | object | features/invoice-templates/data/schema.ts |
+| `clientSectionSchema` | object | features/invoice-templates/data/schema.ts |
+| `itemsSectionSchema` | object | features/invoice-templates/data/schema.ts |
+| `footerSchema` | object | features/invoice-templates/data/schema.ts |
+| `stylingSchema` | object | features/invoice-templates/data/schema.ts |
+| `numberingFormatSchema` | object | features/invoice-templates/data/schema.ts |
+| `taxSettingsSchema` | object | features/invoice-templates/data/schema.ts |
+| `invoiceTemplateSchema` | object | features/invoice-templates/data/schema.ts |
+| `createLeadSchema` | object | features/leads/components/create-lead-view.tsx |
+| `organizationTypeSchema` | enum | features/organizations/data/schema.ts |
+| `organizationSizeSchema` | enum | features/organizations/data/schema.ts |
+| `organizationStatusSchema` | enum | features/organizations/data/schema.ts |
+| `conflictCheckStatusSchema` | enum | features/organizations/data/schema.ts |
+| `keyContactSchema` | object | features/organizations/data/schema.ts |
+| `organizationSchema` | object | features/organizations/data/schema.ts |
+| `reportConfigSchema` | object | features/reports/components/report-config-dialog.tsx |
+| `reportTypeSchema` | enum | features/reports/data/schema.ts |
+| `reportPeriodSchema` | enum | features/reports/data/schema.ts |
+| `reportFormatSchema` | enum | features/reports/data/schema.ts |
+| `chartTypeSchema` | enum | features/reports/data/schema.ts |
+| `scheduleFrequencySchema` | enum | features/reports/data/schema.ts |
+| `reportFiltersSchema` | object | features/reports/data/schema.ts |
+| `reportConfigSchema` | object | features/reports/data/schema.ts |
+| `savedReportSchema` | object | features/reports/data/schema.ts |
+| `widgetSizeSchema` | enum | features/reports/data/schema.ts |
+| `widgetTypeSchema` | enum | features/reports/data/schema.ts |
+| `dashboardWidgetSchema` | object | features/reports/data/schema.ts |
+| `revenueByPeriodSchema` | object | features/reports/data/schema.ts |
+| `revenueByClientSchema` | object | features/reports/data/schema.ts |
+| `revenueReportSchema` | object | features/reports/data/schema.ts |
+| `caseReportSchema` | object | features/reports/data/schema.ts |
+| `reportSummarySchema` | object | features/reports/data/schema.ts |
+| `createReportConfigSchema` | object | features/reports/data/schema.ts |
+| `appearanceFormSchema` | object | features/settings/appearance/appearance-form.tsx |
+| `displayFormSchema` | object | features/settings/display/display-form.tsx |
+| `notificationsFormSchema` | object | features/settings/notifications/notifications-form.tsx |
+| `editFormSchema` | object | features/staff/components/staff-action-dialog.tsx |
+| `inviteFormSchema` | object | features/staff/components/staff-action-dialog.tsx |
+| `staffSchema` | object | features/staff/data/schema.ts |
+| `staffListSchema` | array | features/staff/data/schema.ts |
+| `processDepartureSchema` | object | features/staff/data/schema.ts |
+| `subscriptionFormSchema` | object | features/subscriptions/components/subscription-create-view.tsx |
+| `subscriptionPlanSchema` | object | features/subscriptions/components/subscription-plan-form-view.tsx |
+| `tagSchema` | object | features/tags/data/schema.ts |
+| `createTagSchema` | object | features/tags/data/schema.ts |
+| `tagFiltersSchema` | object | features/tags/data/schema.ts |
+| `formSchema` | object | features/tasks/components/tasks-import-dialog.tsx |
+| `subtaskSchema` | object | features/tasks/data/schema.ts |
+| `checklistItemSchema` | object | features/tasks/data/schema.ts |
+| `checklistSchema` | object | features/tasks/data/schema.ts |
+| `timeSessionSchema` | object | features/tasks/data/schema.ts |
+| `timeTrackingSchema` | object | features/tasks/data/schema.ts |
+| `taskBillingSchema` | object | features/tasks/data/schema.ts |
+| `statutoryReferenceSchema` | object | features/tasks/data/schema.ts |
+| `hijriDateSchema` | object | features/tasks/data/schema.ts |
+| `attachmentSchema` | object | features/tasks/data/schema.ts |
+| `commentSchema` | object | features/tasks/data/schema.ts |
+| `historyEntrySchema` | object | features/tasks/data/schema.ts |
+| `linkedJudgmentSchema` | object | features/tasks/data/schema.ts |
+| `linkedLawSchema` | object | features/tasks/data/schema.ts |
+| `knowledgeLinksSchema` | object | features/tasks/data/schema.ts |
+| `relatedDocumentSchema` | object | features/tasks/data/schema.ts |
+| `locationSchema` | object | features/tasks/data/schema.ts |
+| `locationTriggerSchema` | object | features/tasks/data/schema.ts |
+| `recurringConfigSchema` | object | features/tasks/data/schema.ts |
+| `taskReminderSchema` | object | features/tasks/data/schema.ts |
+| `userReferenceSchema` | object | features/tasks/data/schema.ts |
+| `caseReferenceSchema` | object | features/tasks/data/schema.ts |
+| `clientReferenceSchema` | object | features/tasks/data/schema.ts |
+| `taskSchema` | object | features/tasks/data/schema.ts |
+| `taskFormSchema` | object | features/tasks/data/schema.ts |
+| `taskFiltersSchema` | object | features/tasks/data/schema.ts |
+| `formSchema` | object | features/users/components/users-invite-dialog.tsx |
+| `userSchema` | object | features/users/data/schema.ts |
+| `userListSchema` | array | features/users/data/schema.ts |
+| `paginationSchema` | object | lib/shared-schemas.ts |
+| `searchSchema` | object | lib/shared-schemas.ts |
+| `bulkOperationSchema` | object | lib/shared-schemas.ts |
+| `searchSchema` | object | routes/(auth)/magic-link.tsx |
+| `searchSchema` | object | routes/(auth)/mfa-challenge.tsx |
+| `otpSearchSchema` | object | routes/(auth)/otp.tsx |
+| `searchSchema` | object | routes/(auth)/sign-in.tsx |
+| `signUpSearchSchema` | object | routes/(auth)/sign-up.tsx |
+| `searchSchema` | object | routes/(auth)/verify-email.tsx |
+| `appsSearchSchema` | object | routes/_authenticated/apps/index.tsx |
+| `appsSearchSchema` | object | routes/_authenticated/dashboard.apps.index.tsx |
+| `billingRatesSearchSchema` | object | routes/_authenticated/dashboard.billing-rates.index.tsx |
+| `caseWorkflowsSearchSchema` | object | routes/_authenticated/dashboard.case-workflows.index.tsx |
+| `clientsSearchSchema` | object | routes/_authenticated/dashboard.clients.index.tsx |
+| `contactsSearchSchema` | object | routes/_authenticated/dashboard.contacts.index.tsx |
+| `dataExportSearchSchema` | object | routes/_authenticated/dashboard.data-export.index.tsx |
+| `documentsSearchSchema` | object | routes/_authenticated/dashboard.documents.index.tsx |
+| `followupsSearchSchema` | object | routes/_authenticated/dashboard.followups.index.tsx |
+| `invoiceTemplatesSearchSchema` | object | routes/_authenticated/dashboard.invoice-templates.index.tsx |
+| `organizationsSearchSchema` | object | routes/_authenticated/dashboard.organizations.index.tsx |
+| `reportsSearchSchema` | object | routes/_authenticated/dashboard.reports.index.tsx |
+| `staffSearchSchema` | object | routes/_authenticated/dashboard.staff.index.tsx |
+| `tagsSearchSchema` | object | routes/_authenticated/dashboard.tags.index.tsx |
+| `usersSearchSchema` | object | routes/_authenticated/users/index.tsx |
+| `createAssetSchema` | object | types/assets.ts |
+| `createSupplierSchema` | object | types/buying.ts |
+| `createPurchaseOrderSchema` | object | types/buying.ts |
+| `createItemSchema` | object | types/inventory.ts |
+| `createWarehouseSchema` | object | types/inventory.ts |
+| `createStockEntrySchema` | object | types/inventory.ts |
+| `arabicNameSchema` | object | types/najiz.ts |
+| `nationalAddressSchema` | object | types/najiz.ts |
+| `sponsorSchema` | object | types/najiz.ts |
+| `poBoxSchema` | object | types/najiz.ts |
+| `najizPersonFieldsSchema` | object | types/najiz.ts |
+| `najizCompanyFieldsSchema` | object | types/najiz.ts |
+| `createTicketSchema` | object | types/support.ts |
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Response Type | Source |
+|--------|----------|---------------|--------|
+| POST | `:param ثانية` | - | components/otp-input.tsx |
+| POST | `:params (:parammin)` | - | services/authService.ts |
+| GET | `:params (:parammin)` | - | services/authService.ts |
+| POST | `:paramx:param` | - | services/captchaService.ts |
+| POST | `@keyframes scaleIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } } .animate-scaleIn { animation: scaleIn 0.5s ease-out forwards; }` | - | features/auth/sign-up/components/sign-up-form.tsx |
+| POST | `/${entityType}s/${entityId}/counts` | - | hooks/useSmartButtonCounts.ts |
+| GET | `/accounts` | - | services/accountService.ts |
+| POST | `/accounts` | - | services/accountService.ts |
+| GET | `/accounts/${id}` | - | services/accountService.ts |
+| PATCH | `/accounts/${id}` | - | services/accountService.ts |
+| DELETE | `/accounts/${id}` | - | services/accountService.ts |
+| GET | `/accounts/${id}/balance` | - | services/accountService.ts |
+| GET | `/accounts/types` | - | services/accountService.ts |
+| POST | `/activities` | - | services/activityService.ts |
+| GET | `/activities` | - | services/financeService.ts |
+| GET | `/activities?${params.toString()}` | - | services/activityService.ts |
+| GET | `/activities/${id}` | - | services/activityService.ts |
+| PATCH | `/activities/${id}` | - | services/financeService.ts |
+| DELETE | `/activities/${id}` | - | services/financeService.ts |
+| POST | `/activities/${id}/cancel` | - | services/odooActivityService.ts |
+| POST | `/activities/${id}/done` | - | services/odooActivityService.ts |
+| PATCH | `/activities/${id}/reassign` | - | services/odooActivityService.ts |
+| PATCH | `/activities/${id}/reschedule` | - | services/odooActivityService.ts |
+| GET | `/activities/entity/${entityType}/${entityId}?limit=${limit}` | - | services/activityService.ts |
+| GET | `/activities/my?${params.toString()}` | - | services/odooActivityService.ts |
+| GET | `/activities/overview` | - | services/activityService.ts |
+| GET | `/activities/stats` | - | services/odooActivityService.ts |
+| GET | `/activities/summary` | - | services/activityService.ts |
+| GET | `/activities/types` | - | services/odooActivityService.ts |
+| POST | `/activities/types` | - | services/odooActivityService.ts |
+| PATCH | `/activities/types/${id}` | - | services/odooActivityService.ts |
+| DELETE | `/activities/types/${id}` | - | services/odooActivityService.ts |
+| GET | `/admin/dashboard` | - | hooks/useUIAccess.ts |
+| POST | `/analytics-reports` | - | services/reportsService.ts |
+| GET | `/analytics-reports?:param` | - | services/reportsService.ts |
+| GET | `/analytics-reports?${params.toString()}` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param` | - | services/reportsService.ts |
+| PATCH | `/analytics-reports/:param` | - | services/reportsService.ts |
+| PUT | `/analytics-reports/:param` | - | services/reportsService.ts |
+| DELETE | `/analytics-reports/:param` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/clone` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/export` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/favorite` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/pin` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/run` | - | services/reportsService.ts |
+| POST | `/analytics-reports/:param/schedule` | - | services/reportsService.ts |
+| DELETE | `/analytics-reports/:param/schedule` | - | services/reportsService.ts |
+| GET | `/analytics-reports/${id}` | - | services/reportsService.ts |
+| PATCH | `/analytics-reports/${id}` | - | services/reportsService.ts |
+| PUT | `/analytics-reports/${id}` | - | services/reportsService.ts |
+| DELETE | `/analytics-reports/${id}` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/clone` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/export` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/favorite` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/pin` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/run` | - | services/reportsService.ts |
+| POST | `/analytics-reports/${id}/schedule` | - | services/reportsService.ts |
+| DELETE | `/analytics-reports/${id}/schedule` | - | services/reportsService.ts |
+| POST | `/analytics-reports/bulk-delete` | - | services/reportsService.ts |
+| GET | `/analytics-reports/favorites` | - | services/reportsService.ts |
+| POST | `/analytics-reports/from-template/:param` | - | services/reportsService.ts |
+| POST | `/analytics-reports/from-template/${templateId}` | - | services/reportsService.ts |
+| GET | `/analytics-reports/pinned` | - | services/reportsService.ts |
+| GET | `/analytics-reports/section/:param` | - | services/reportsService.ts |
+| GET | `/analytics-reports/section/${section}` | - | services/reportsService.ts |
+| GET | `/analytics-reports/stats` | - | services/reportsService.ts |
+| GET | `/analytics-reports/templates` | - | services/reportsService.ts |
+| POST | `/answers` | - | services/answerService.ts |
+| PATCH | `/answers/${id}` | - | services/answerService.ts |
+| DELETE | `/answers/${id}` | - | services/answerService.ts |
+| GET | `/answers/${questionId}` | - | services/answerService.ts |
+| POST | `/answers/like/${id}` | - | services/answerService.ts |
+| PATCH | `/answers/verify/${id}` | - | services/answerService.ts |
+| GET | `/api-keys` | - | services/apiKeysService.ts |
+| POST | `/api-keys` | - | services/apiKeysService.ts |
+| DELETE | `/api-keys/${keyId}` | - | services/apiKeysService.ts |
+| PATCH | `/api-keys/${keyId}` | - | services/apiKeysService.ts |
+| GET | `/api-keys/stats` | - | services/apiKeysService.ts |
+| GET | `/api/inter-company/balances` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/balances/between` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/exchange-rate` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/firms` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/reconciliations` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/reconciliations/${id}` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/adjustments` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/approve` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/auto-match` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/complete` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/manual-match` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reconciliations/${reconciliationId}/unmatch` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/reports/export` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/reports/summary` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/transactions` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/transactions` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/transactions/${id}` | - | services/interCompanyService.ts |
+| PUT | `/api/inter-company/transactions/${id}` | - | services/interCompanyService.ts |
+| DELETE | `/api/inter-company/transactions/${id}` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/transactions/${id}/cancel` | - | services/interCompanyService.ts |
+| POST | `/api/inter-company/transactions/${id}/post` | - | services/interCompanyService.ts |
+| GET | `/api/inter-company/transactions/between` | - | services/interCompanyService.ts |
+| GET | `/api/settings/sales` | - | services/salesSettingsService.ts |
+| GET | `/api/settings/sales/export` | - | services/salesSettingsService.ts |
+| GET | `/api/settings/sales/history?limit=${limit}` | - | services/salesSettingsService.ts |
+| GET | `/api/settings/sales/import` | - | services/salesSettingsService.ts |
+| GET | `/api/settings/sales/reset/${section}` | - | services/salesSettingsService.ts |
+| GET | `/api/settings/sales/validate` | - | services/salesSettingsService.ts |
+| GET | `/api/users/${userId}` | - | utils/cache.ts |
+| GET | `/appointments/${id}/calendar.ics` | - | services/appointmentsService.ts |
+| GET | `/approvals/${id}` | - | services/approvalService.ts |
+| POST | `/approvals/${id}/approve` | - | services/approvalService.ts |
+| POST | `/approvals/${id}/cancel` | - | services/approvalService.ts |
+| POST | `/approvals/${id}/reject` | - | services/approvalService.ts |
+| POST | `/approvals/check` | - | services/approvalService.ts |
+| GET | `/approvals/my-requests` | - | services/approvalService.ts |
+| GET | `/approvals/pending` | - | services/approvalService.ts |
+| GET | `/approvals/rules` | - | services/approvalService.ts |
+| PUT | `/approvals/rules` | - | services/approvalService.ts |
+| POST | `/approvals/rules` | - | services/approvalService.ts |
+| DELETE | `/approvals/rules/${ruleId}` | - | services/approvalService.ts |
+| GET | `/approvals/stats` | - | services/approvalService.ts |
+| GET | `/approvals/templates` | - | services/approvalService.ts |
+| GET | `/apps` | - | services/appsService.ts |
+| GET | `/apps/${appId}` | - | services/appsService.ts |
+| POST | `/apps/${appId}/connect` | - | services/appsService.ts |
+| POST | `/apps/${appId}/disconnect` | - | services/appsService.ts |
+| GET | `/assets` | { assets: Asset[]; total: number; page: number; limit: number } | services/assetsService.ts |
+| POST | `/assets` | Asset | services/assetsService.ts |
+| GET | `/assets/:param` | - | services/assetsService.ts |
+| POST | `/assets/:param` | - | services/assetsService.ts |
+| DELETE | `/assets/:param` | - | services/assetsService.ts |
+| GET | `/assets/:param/depreciation` | - | services/assetsService.ts |
+| POST | `/assets/:param/depreciation` | - | services/assetsService.ts |
+| GET | `/assets/:param/maintenance` | - | services/assetsService.ts |
+| PUT | `/assets/:param/maintenance/:param` | - | services/assetsService.ts |
+| PATCH | `/assets/:param/maintenance/:param/complete` | - | services/assetsService.ts |
+| PATCH | `/assets/:param/scrap` | - | services/assetsService.ts |
+| PATCH | `/assets/:param/sell` | - | services/assetsService.ts |
+| PATCH | `/assets/:param/submit` | - | services/assetsService.ts |
+| GET | `/assets/${assetId}/depreciation` | DepreciationEntry[] | services/assetsService.ts |
+| POST | `/assets/${assetId}/depreciation` | DepreciationEntry | services/assetsService.ts |
+| POST | `/assets/${assetId}/maintenance` | MaintenanceSchedule | services/assetsService.ts |
+| PUT | `/assets/${assetId}/maintenance/${scheduleId}` | MaintenanceSchedule | services/assetsService.ts |
+| PATCH | `/assets/${assetId}/maintenance/${scheduleId}/complete` | MaintenanceSchedule | services/assetsService.ts |
+| GET | `/assets/${id}` | Asset | services/assetsService.ts |
+| PUT | `/assets/${id}` | Asset | services/assetsService.ts |
+| DELETE | `/assets/${id}` | - | services/assetsService.ts |
+| PATCH | `/assets/${id}/scrap` | Asset | services/assetsService.ts |
+| PATCH | `/assets/${id}/sell` | Asset | services/assetsService.ts |
+| PATCH | `/assets/${id}/submit` | Asset | services/assetsService.ts |
+| GET | `/assets/categories` | AssetCategory[] | services/assetsService.ts |
+| POST | `/assets/categories` | AssetCategory | services/assetsService.ts |
+| GET | `/assets/categories/:param` | - | services/assetsService.ts |
+| POST | `/assets/categories/:param` | - | services/assetsService.ts |
+| DELETE | `/assets/categories/:param` | - | services/assetsService.ts |
+| GET | `/assets/categories/${id}` | AssetCategory | services/assetsService.ts |
+| PUT | `/assets/categories/${id}` | AssetCategory | services/assetsService.ts |
+| DELETE | `/assets/categories/${id}` | - | services/assetsService.ts |
+| GET | `/assets/maintenance` | MaintenanceSchedule[] | services/assetsService.ts |
+| GET | `/assets/movements` | AssetMovement[] | services/assetsService.ts |
+| POST | `/assets/movements` | AssetMovement | services/assetsService.ts |
+| GET | `/assets/repairs` | AssetRepair[] | services/assetsService.ts |
+| POST | `/assets/repairs` | AssetRepair | services/assetsService.ts |
+| GET | `/assets/repairs/:param` | - | services/assetsService.ts |
+| POST | `/assets/repairs/:param` | - | services/assetsService.ts |
+| PATCH | `/assets/repairs/:param/complete` | - | services/assetsService.ts |
+| GET | `/assets/repairs/${id}` | AssetRepair | services/assetsService.ts |
+| PUT | `/assets/repairs/${id}` | AssetRepair | services/assetsService.ts |
+| PATCH | `/assets/repairs/${id}/complete` | AssetRepair | services/assetsService.ts |
+| GET | `/assets/settings` | AssetSettings | services/assetsService.ts |
+| PUT | `/assets/settings` | AssetSettings | services/assetsService.ts |
+| GET | `/assets/stats` | AssetStats | services/assetsService.ts |
+| POST | `/attendance` | - | services/attendanceService.ts |
+| GET | `/attendance?:param` | - | services/attendanceService.ts |
+| GET | `/attendance?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/:param` | - | services/attendanceService.ts |
+| POST | `/attendance/:param` | - | services/attendanceService.ts |
+| DELETE | `/attendance/:param` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/approve` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/approve-early-departure` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/approve-overtime` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/approve-timesheet` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/break/end` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/break/start` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/breaks` | - | services/attendanceService.ts |
+| GET | `/attendance/:param/breaks` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/corrections` | - | services/attendanceService.ts |
+| PUT | `/attendance/:param/corrections/:param` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/excuse-late` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/overtime/approve` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/reject` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/reject-timesheet` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/violations` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/violations/:param/appeal` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/violations/:param/confirm` | - | services/attendanceService.ts |
+| POST | `/attendance/:param/violations/:param/dismiss` | - | services/attendanceService.ts |
+| PUT | `/attendance/:param/violations/:param/resolve` | - | services/attendanceService.ts |
+| GET | `/attendance/${recordId}` | - | services/attendanceService.ts |
+| PUT | `/attendance/${recordId}` | - | services/attendanceService.ts |
+| DELETE | `/attendance/${recordId}` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/approve` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/approve-early-departure` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/approve-overtime` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/approve-timesheet` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/break/end` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/break/start` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/breaks` | - | services/attendanceService.ts |
+| GET | `/attendance/${recordId}/breaks` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/corrections` | - | services/attendanceService.ts |
+| PUT | `/attendance/${recordId}/corrections/${correctionId}` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/excuse-late` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/overtime/approve` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/reject` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/reject-timesheet` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/violations` | - | services/attendanceService.ts |
+| GET | `/attendance/${recordId}/violations` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/violations/${violationId}/confirm` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/violations/${violationId}/dismiss` | - | services/attendanceService.ts |
+| POST | `/attendance/${recordId}/violations/${violationIndex}/appeal` | - | services/attendanceService.ts |
+| PUT | `/attendance/${recordId}/violations/${violationIndex}/resolve` | - | services/attendanceService.ts |
+| POST | `/attendance/bulk` | - | services/attendanceService.ts |
+| POST | `/attendance/check-in` | - | services/attendanceService.ts |
+| POST | `/attendance/check-out` | - | services/attendanceService.ts |
+| GET | `/attendance/compliance-report?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/compliance-report?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/corrections/pending` | - | services/attendanceService.ts |
+| GET | `/attendance/daily-summary?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/daily-summary?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/employee-summary/:param?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/employee-summary/${employeeId}?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/employee/:param/date/:param` | - | services/attendanceService.ts |
+| GET | `/attendance/employee/${employeeId}/date/${date}` | - | services/attendanceService.ts |
+| POST | `/attendance/import` | - | services/attendanceService.ts |
+| POST | `/attendance/lock-for-payroll` | - | services/attendanceService.ts |
+| POST | `/attendance/mark-absences` | - | services/attendanceService.ts |
+| GET | `/attendance/report/monthly?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/report/monthly?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/stats?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/stats?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/stats/department?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/stats/department?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/status/:param` | - | services/attendanceService.ts |
+| GET | `/attendance/status/${employeeId}` | - | services/attendanceService.ts |
+| GET | `/attendance/summary/:param?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/summary/${employeeId}?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/today?:param` | - | services/attendanceService.ts |
+| GET | `/attendance/today?${params.toString()}` | - | services/attendanceService.ts |
+| GET | `/attendance/violations` | - | services/attendanceService.ts |
+| GET | `/audit-logs` | - | services/auditLogService.ts |
+| POST | `/audit-logs` | - | services/auditService.ts |
+| POST | `/audit-logs/batch` | - | services/auditService.ts |
+| POST | `/audit-logs/check-brute-force` | - | services/auditLogService.ts |
+| GET | `/audit-logs/entity/${type}/${id}` | - | services/auditLogService.ts |
+| GET | `/audit-logs/export` | - | services/auditLogService.ts |
+| GET | `/audit-logs/failed-logins` | - | services/auditLogService.ts |
+| GET | `/audit-logs/resource/${resource}/${resourceId}` | - | services/auditService.ts |
+| GET | `/audit-logs/security` | - | services/auditLogService.ts |
+| GET | `/audit-logs/stats` | - | services/auditService.ts |
+| GET | `/audit-logs/suspicious` | - | services/auditLogService.ts |
+| GET | `/audit-logs/user/${id}` | - | services/auditLogService.ts |
+| GET | `/audit-logs/user/${userId}` | - | services/auditService.ts |
+| POST | `/auth/anonymous` | AnonymousAuthResponse | services/anonymousAuthService.ts |
+| DELETE | `/auth/anonymous` | - | services/anonymousAuthService.ts |
+| POST | `/auth/anonymous/convert` | {
+        error: boolean
+        message: string
+        user?: User
+        accessToken?: string
+        refreshToken?: string
+      } | services/anonymousAuthService.ts |
+| POST | `/auth/anonymous/extend` | { expiresAt: string } | services/anonymousAuthService.ts |
+| POST | `/auth/captcha/check-required` | CaptchaRequirementCheck | services/captchaService.ts |
+| GET | `/auth/captcha/settings` | CaptchaSettings | services/captchaService.ts |
+| PUT | `/auth/captcha/settings` | CaptchaSettings | services/captchaService.ts |
+| POST | `/auth/captcha/verify` | VerifyCaptchaResponse | services/captchaService.ts |
+| POST | `/auth/change-password` | {
+        success: boolean
+        message: string
+      } | services/passwordService.ts |
+| POST | `/auth/check-availability` | - | features/auth/sign-up/components/sign-up-form.tsx |
+| POST | `/auth/forgot-password` | {
+        success: boolean
+        message: string
+      } | services/passwordService.ts |
+| POST | `/auth/login` | AuthResponse | services/authService.ts |
+| POST | `/auth/logout` | - | services/authService.ts |
+| POST | `/auth/magic-link/send` | {
+        success: boolean
+        message: string
+        expiresIn?: number
+      } | services/authService.ts |
+| POST | `/auth/magic-link/verify` | AuthResponse | services/authService.ts |
+| GET | `/auth/me` | AuthResponse | services/authService.ts |
+| GET | `/auth/mfa/backup-codes/count` | {
+        error?: boolean
+        remainingCodes: number
+      } | services/mfaService.ts |
+| POST | `/auth/mfa/backup-codes/generate` | {
+        error?: boolean
+        message?: string
+        codes?: string[]
+        backupCodes?: string[]
+        remainingCodes?: number
+      } | services/mfaService.ts |
+| POST | `/auth/mfa/disable` | { success: boolean; message: string } | services/mfaService.ts |
+| POST | `/auth/mfa/email/send` | {
+        success: boolean
+        expiresIn: number
+      } | services/mfaService.ts |
+| GET | `/auth/mfa/required` | { required: boolean } | services/mfaService.ts |
+| POST | `/auth/mfa/setup` | TOTPSetupResponse | services/mfaService.ts |
+| POST | `/auth/mfa/sms/send` | {
+        success: boolean
+        expiresIn: number
+      } | services/mfaService.ts |
+| GET | `/auth/mfa/status` | MFAStatus | services/mfaService.ts |
+| POST | `/auth/mfa/verify` | MFAVerifyResponse | services/mfaService.ts |
+| POST | `/auth/mfa/verify-setup` | { success: boolean; message: string } | services/mfaService.ts |
+| POST | `/auth/onboarding-progress` | - | services/onboardingWizardService.ts |
+| GET | `/auth/onboarding-status` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/company-info` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/company-logo` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/complete` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/modules` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/skip` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/user-avatar` | - | services/onboardingWizardService.ts |
+| POST | `/auth/onboarding/user-profile` | - | services/onboardingWizardService.ts |
+| GET | `/auth/otp-status` | {
+        success: boolean
+        data: {
+          attemptsRemaining: number
+          resetTime?: string
+        }
+      } | services/authService.ts |
+| GET | `/auth/password-status` | {
+        hasPassword: boolean
+        lastChangedAt?: string
+        expiresAt?: string
+        isExpired: boolean
+        mustChange: boolean
+        requirements: {
+          minLength: number
+          requireUppercase: boolean
+          requireLowercase: boolean
+          requireNumbers: boolean
+          requireSpecialChars: boolean
+        }
+      } | services/passwordService.ts |
+| POST | `/auth/password/check-breach` | {
+        breached: boolean
+        count?: number
+      } | services/passwordService.ts |
+| GET | `/auth/phone/otp-status` | OTPStatusResponse | services/phoneAuthService.ts |
+| POST | `/auth/phone/resend-otp` | PhoneOTPResponse | services/phoneAuthService.ts |
+| POST | `/auth/phone/send-otp` | PhoneOTPResponse | services/phoneAuthService.ts |
+| POST | `/auth/phone/verify` | {
+        success: boolean
+        message: string
+      } | services/phoneAuthService.ts |
+| POST | `/auth/phone/verify-otp` | PhoneAuthResponse | services/phoneAuthService.ts |
+| POST | `/auth/reauthenticate` | { success: boolean; message: string } | services/stepUpAuthService.ts |
+| POST | `/auth/reauthenticate/challenge` | ReauthChallenge | services/stepUpAuthService.ts |
+| GET | `/auth/reauthenticate/methods` | { methods: ReauthMethod[] } | services/stepUpAuthService.ts |
+| GET | `/auth/reauthenticate/status` | {
+        isRecent: boolean
+        lastAuthAt?: string
+        expiresAt?: string
+        requiredFor?: string[]
+      } | services/stepUpAuthService.ts |
+| POST | `/auth/reauthenticate/verify` | { success: boolean; message: string } | services/stepUpAuthService.ts |
+| POST | `/auth/refresh-activity` | - | hooks/use-session-warning.ts |
+| POST | `/auth/register` | - | features/auth/sign-up/components/sign-up-form.tsx |
+| POST | `/auth/resend-otp` | SendOtpResponse | services/otpService.ts |
+| POST | `/auth/resend-verification` | {
+        error: boolean
+        success?: boolean
+        message: string
+        messageEn?: string
+        expiresAt?: string
+      } | services/authService.ts |
+| POST | `/auth/reset-password` | {
+        success: boolean
+        message: string
+      } | services/passwordService.ts |
+| GET | `/auth/reset-password/validate` | {
+        valid: boolean
+        email?: string
+      } | services/passwordService.ts |
+| POST | `/auth/send-otp` | - | components/otp-input.tsx |
+| GET | `/auth/sessions` | { sessions: any[] } | services/sessionService.ts |
+| DELETE | `/auth/sessions` | { terminatedCount: number; count?: number } | services/sessionService.ts |
+| GET | `/auth/sessions/:param` | - | services/sessionService.ts |
+| DELETE | `/auth/sessions/:param/report` | - | services/sessionService.ts |
+| DELETE | `/auth/sessions/${sessionId}` | - | services/sessionService.ts |
+| POST | `/auth/sessions/${sessionId}/report` | - | services/sessionService.ts |
+| GET | `/auth/sessions/current` | any | services/sessionService.ts |
+| POST | `/auth/sessions/extend` | { expiresAt: string } | services/sessionService.ts |
+| POST | `/auth/sso/callback` | OAuthCallbackResponse | services/oauthService.ts |
+| POST | `/auth/sso/initiate` | OAuthAuthorizeResponse | services/oauthService.ts |
+| POST | `/auth/sso/link` | { authUrl: string } | services/oauthService.ts |
+| GET | `/auth/sso/providers` | {
+        providers: OAuthProvider[]
+      } | services/oauthService.ts |
+| GET | `/auth/sso/unlink/:param` | - | services/oauthService.ts |
+| DELETE | `/auth/sso/unlink/${provider}` | - | services/oauthService.ts |
+| POST | `/auth/verify-email` | {
+        error: boolean
+        success?: boolean
+        message: string
+        messageEn?: string
+        user?: {
+          id: string
+          email: string
+          isEmailVerified: boolean
+          emailVerifiedAt: string
+        }
+      } | services/authService.ts |
+| POST | `/auth/verify-otp` | - | components/otp-input.tsx |
+| POST | `/automated-actions` | - | services/automatedActionService.ts |
+| GET | `/automated-actions?${params.toString()}` | - | services/automatedActionService.ts |
+| GET | `/automated-actions/${actionId}/logs?${params.toString()}` | - | services/automatedActionService.ts |
+| GET | `/automated-actions/${id}` | - | services/automatedActionService.ts |
+| PUT | `/automated-actions/${id}` | - | services/automatedActionService.ts |
+| DELETE | `/automated-actions/${id}` | - | services/automatedActionService.ts |
+| POST | `/automated-actions/${id}/duplicate` | - | services/automatedActionService.ts |
+| POST | `/automated-actions/${id}/test` | - | services/automatedActionService.ts |
+| POST | `/automated-actions/${id}/toggle` | - | services/automatedActionService.ts |
+| DELETE | `/automated-actions/bulk` | - | services/automatedActionService.ts |
+| POST | `/automated-actions/bulk/disable` | - | services/automatedActionService.ts |
+| POST | `/automated-actions/bulk/enable` | - | services/automatedActionService.ts |
+| GET | `/automated-actions/logs?${params.toString()}` | - | services/automatedActionService.ts |
+| GET | `/automated-actions/models` | - | services/automatedActionService.ts |
+| GET | `/automated-actions/models/${modelName}/fields` | - | services/automatedActionService.ts |
+| POST | `/bank-accounts` | - | services/bankAccountService.ts |
+| GET | `/bank-accounts` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/:param` | - | services/bankAccountService.ts |
+| PUT | `/bank-accounts/:param` | - | services/bankAccountService.ts |
+| DELETE | `/bank-accounts/:param` | - | services/bankAccountService.ts |
+| GET | `/bank-accounts/:param/balance-history` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/:param/disconnect` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/:param/set-default` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/:param/sync` | - | services/bankAccountService.ts |
+| GET | `/bank-accounts/${id}` | - | services/bankAccountService.ts |
+| PUT | `/bank-accounts/${id}` | - | services/bankAccountService.ts |
+| DELETE | `/bank-accounts/${id}` | - | services/bankAccountService.ts |
+| GET | `/bank-accounts/${id}/balance-history` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/${id}/disconnect` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/${id}/set-default` | - | services/bankAccountService.ts |
+| POST | `/bank-accounts/${id}/sync` | - | services/bankAccountService.ts |
+| GET | `/bank-accounts/summary` | - | services/bankAccountService.ts |
+| POST | `/bank-reconciliation` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/:param` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/:param/cancel` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/:param/clear` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/:param/complete` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/:param/unclear` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/${id}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/${id}/cancel` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/${id}/clear` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/${id}/complete` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/${id}/unclear` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/auto-match/:param` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/auto-match/${accountId}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/currency/convert` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/currency/rates` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/currency/rates` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/currency/supported` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/currency/update` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/feeds` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/feeds` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/feeds/:param` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/feeds/:param` | - | services/bankReconciliationService.ts |
+| PUT | `/bank-reconciliation/feeds/${id}` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/feeds/${id}` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/feeds/${id}` | - | services/financeAdvancedService.ts |
+| POST | `/bank-reconciliation/feeds/${id}/fetch` | - | services/financeAdvancedService.ts |
+| GET | `/bank-reconciliation/feeds/${id}/transactions` | - | services/financeAdvancedService.ts |
+| POST | `/bank-reconciliation/import/csv` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/import/ofx` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/import/template` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/match/:param` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/match/${id}` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/match/${matchId}` | - | services/financeAdvancedService.ts |
+| POST | `/bank-reconciliation/match/confirm/:param` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/match/confirm/${id}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/match/confirm/${matchId}` | - | services/financeAdvancedService.ts |
+| POST | `/bank-reconciliation/match/reject/:param` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/match/reject/${id}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/match/reject/${matchId}` | - | services/financeAdvancedService.ts |
+| POST | `/bank-reconciliation/match/split` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/rules` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/rules` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/rules/:param` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/rules/:param` | - | services/bankReconciliationService.ts |
+| PUT | `/bank-reconciliation/rules/${id}` | - | services/bankReconciliationService.ts |
+| DELETE | `/bank-reconciliation/rules/${id}` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/statistics/matches` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/statistics/rules` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/status/:param` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/status/${accountId}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-reconciliation/suggestions/:param` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/suggestions/${accountId}` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/unmatched/:param` | - | services/bankReconciliationService.ts |
+| GET | `/bank-reconciliation/unmatched/${accountId}` | - | services/bankReconciliationService.ts |
+| POST | `/bank-transactions` | - | services/bankTransactionService.ts |
+| GET | `/bank-transactions` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/:param` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/:param/match` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/:param/unmatch` | - | services/bankTransactionService.ts |
+| GET | `/bank-transactions/${id}` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/${transactionId}/match` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/${transactionId}/unmatch` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/import/:param` | - | services/bankTransactionService.ts |
+| POST | `/bank-transactions/import/${accountId}` | - | services/bankTransactionService.ts |
+| POST | `/bank-transfers` | - | services/bankTransferService.ts |
+| GET | `/bank-transfers` | - | services/bankTransferService.ts |
+| POST | `/bank-transfers/:param` | - | services/bankTransferService.ts |
+| POST | `/bank-transfers/:param/cancel` | - | services/bankTransferService.ts |
+| GET | `/bank-transfers/${id}` | - | services/bankTransferService.ts |
+| POST | `/bank-transfers/${id}/cancel` | - | services/bankTransferService.ts |
+| POST | `/bill-payments` | - | services/billPaymentService.ts |
+| GET | `/bill-payments` | - | services/billPaymentService.ts |
+| GET | `/bill-payments/${id}` | - | services/billPaymentService.ts |
+| POST | `/bill-payments/${id}/cancel` | - | services/billPaymentService.ts |
+| DELETE | `/billing/groups/${id}` | - | services/billingRatesService.ts |
+| GET | `/billing/invoices` | - | services/billingService.ts |
+| GET | `/billing/invoices/${id}` | - | services/billingService.ts |
+| GET | `/billing/invoices/${id}/download` | - | services/billingService.ts |
+| POST | `/billing/invoices/${id}/pay` | - | services/billingService.ts |
+| GET | `/billing/payment-methods` | - | services/billingService.ts |
+| POST | `/billing/payment-methods` | - | services/billingService.ts |
+| DELETE | `/billing/payment-methods/${id}` | - | services/billingService.ts |
+| PATCH | `/billing/payment-methods/${id}/set-default` | - | services/billingService.ts |
+| POST | `/billing/payment-methods/setup-intent` | - | services/billingService.ts |
+| DELETE | `/billing/rates/${id}` | - | services/billingRatesService.ts |
+| GET | `/billing/subscription` | - | services/billingService.ts |
+| POST | `/billing/subscription/cancel` | - | services/billingService.ts |
+| POST | `/billing/subscription/change-plan` | - | services/billingService.ts |
+| POST | `/billing/subscription/reactivate` | - | services/billingService.ts |
+| GET | `/billing/subscription/upcoming-invoice` | - | services/billingService.ts |
+| DELETE | `/billing/time-entries/${id}` | - | services/billingRatesService.ts |
+| GET | `/billing/usage` | - | services/billingService.ts |
+| GET | `/bills` | - | services/accountingService.ts |
+| POST | `/bills` | - | services/accountingService.ts |
+| GET | `/bills/${billId}/debit-notes` | - | services/accountingService.ts |
+| GET | `/bills/${id}` | - | services/accountingService.ts |
+| PUT | `/bills/${id}` | - | services/accountingService.ts |
+| DELETE | `/bills/${id}` | - | services/accountingService.ts |
+| POST | `/bills/${id}/approve` | - | services/accountingService.ts |
+| POST | `/bills/${id}/attachments` | - | services/accountingService.ts |
+| DELETE | `/bills/${id}/attachments/${attachmentId}` | - | services/accountingService.ts |
+| POST | `/bills/${id}/cancel` | - | services/accountingService.ts |
+| POST | `/bills/${id}/duplicate` | - | services/accountingService.ts |
+| POST | `/bills/${id}/generate-next` | - | services/accountingService.ts |
+| POST | `/bills/${id}/pay` | - | services/accountingService.ts |
+| POST | `/bills/${id}/post-to-gl` | - | services/accountingService.ts |
+| POST | `/bills/${id}/receive` | - | services/accountingService.ts |
+| POST | `/bills/${id}/stop-recurring` | - | services/accountingService.ts |
+| GET | `/bills/export` | - | services/accountingService.ts |
+| GET | `/bills/overdue` | - | services/accountingService.ts |
+| GET | `/bills/recurring` | - | services/accountingService.ts |
+| GET | `/bills/reports/aging` | - | services/accountingService.ts |
+| GET | `/bills/summary` | - | services/accountingService.ts |
+| POST | `/biometric/checkin-gps` | - | services/biometricService.ts |
+| GET | `/biometric/devices` | - | services/biometricService.ts |
+| POST | `/biometric/devices` | - | services/biometricService.ts |
+| GET | `/biometric/devices/${id}` | - | services/biometricService.ts |
+| PUT | `/biometric/devices/${id}` | - | services/biometricService.ts |
+| DELETE | `/biometric/devices/${id}` | - | services/biometricService.ts |
+| POST | `/biometric/devices/${id}/heartbeat` | - | services/biometricService.ts |
+| POST | `/biometric/devices/${id}/sync` | - | services/biometricService.ts |
+| GET | `/biometric/enrollments` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments/${enrollmentId}/card` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments/${enrollmentId}/facial` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments/${enrollmentId}/fingerprint` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments/${enrollmentId}/pin` | - | services/biometricService.ts |
+| GET | `/biometric/enrollments/${id}` | - | services/biometricService.ts |
+| POST | `/biometric/enrollments/${id}/revoke` | - | services/biometricService.ts |
+| GET | `/biometric/enrollments/employee/${employeeId}` | - | services/biometricService.ts |
+| GET | `/biometric/enrollments/stats` | - | services/biometricService.ts |
+| GET | `/biometric/geofence` | - | services/biometricService.ts |
+| POST | `/biometric/geofence` | - | services/biometricService.ts |
+| GET | `/biometric/geofence/${id}` | - | services/biometricService.ts |
+| PUT | `/biometric/geofence/${id}` | - | services/biometricService.ts |
+
+*... and 3211 more endpoints*
+
+---
+
+## Request/Response Types
+
+### Request Types (186)
+| Type | Path |
+|------|------|
+| `ArabicNameInputProps` | components/arabic-name-input.tsx |
+| `ChatterInputProps` | components/chatter/chatter-input.tsx |
+| `CurrencyInputProps` | components/currency-input.tsx |
+| `ShiftRequestDialogProps` | components/hr/attendance/ShiftRequestDialog.tsx |
+| `ShiftRequestFormData` | components/hr/attendance/ShiftRequestDialog.tsx |
+| `NationalAddressInputProps` | components/national-address-input.tsx |
+| `OtpInputProps` | components/otp-input.tsx |
+| `PasswordInputProps` | components/password-input.tsx |
+| `RouteParams` | constants/routes.ts |
+| `CreatePageInput` | features/case-notion/data/schema.ts |
+| `UpdatePageInput` | features/case-notion/data/schema.ts |
+| `CreateBlockInput` | features/case-notion/data/schema.ts |
+| `UpdateBlockInput` | features/case-notion/data/schema.ts |
+| `MoveBlockInput` | features/case-notion/data/schema.ts |
+| `CreateClientInput` | features/clients/data/schema.ts |
+| `CreateContactInput` | features/contacts/data/schema.ts |
+| `RequestChangesData` | features/finance/types/approval-types.ts |
+| `TagInputProps` | features/tags/components/tag-input.tsx |
+| `AttendeeInput` | features/tasks/components/create-event-view.tsx |
+| `SubtaskInput` | features/tasks/components/create-task-view.tsx |
+| `AiTaskInput` | features/tasks/components/tasks-list-view.tsx |
+| `AiSuggestionRequest` | features/tasks/components/tasks-list-view.tsx |
+| `UseCancellableRequestOptions` | hooks/use-cancellable-request.ts |
+| `UseTableUrlStateParams` | hooks/use-table-url-state.ts |
+| `DashboardParams` | hooks/useCrmAnalytics.ts |
+| `RevenueParams` | hooks/useCrmAnalytics.ts |
+| `FunnelParams` | hooks/useCrmAnalytics.ts |
+| `DateRangeParams` | hooks/useCrmAnalytics.ts |
+| `PipelineParams` | hooks/useCrmAnalytics.ts |
+| `TeamParams` | hooks/useCrmAnalytics.ts |
+| `EventParams` | lib/analytics.ts |
+| `PendingRequest` | lib/request-deduplication.ts |
+| `CreateClientInput` | lib/shared-schemas.ts |
+| `UpdateClientInput` | lib/shared-schemas.ts |
+| `CreateVendorInput` | lib/shared-schemas.ts |
+| `CreateEmployeeInput` | lib/shared-schemas.ts |
+| `CreateUserInput` | lib/shared-schemas.ts |
+| `LoginInput` | lib/shared-schemas.ts |
+| `RegisterInput` | lib/shared-schemas.ts |
+| `CreateInvoiceInput` | lib/shared-schemas.ts |
+| `CreatePaymentInput` | lib/shared-schemas.ts |
+| `OtpSearchParams` | routes/(auth)/otp.tsx |
+| `SignUpSearchParams` | routes/(auth)/sign-up.tsx |
+| `RequestOptions` | sdk/core/src/api.ts |
+| `OTPInputProps` | sdk/react-ui/src/components/OTPInput.tsx |
+| `CreateActivityInput` | services/activityService.ts |
+| `RequestStatus` | services/advancesService.ts |
+| `ChatRequest` | services/ai.service.ts |
+| `SummarizeRequest` | services/ai.service.ts |
+| `CreateApiKeyRequest` | services/apiKeysService.ts |
+| `CreateAvailabilityRequest` | services/appointmentsService.ts |
+| `UpdateAvailabilityRequest` | services/appointmentsService.ts |
+| `CreateBlockedTimeRequest` | services/appointmentsService.ts |
+| `BookAppointmentRequest` | services/appointmentsService.ts |
+| `UpdateAppointmentRequest` | services/appointmentsService.ts |
+| `GetAvailableSlotsRequest` | services/appointmentsService.ts |
+| `UpdateSettingsRequest` | services/appointmentsService.ts |
+| `PublicBookingRequest` | services/appointmentsService.ts |
+| `ApprovalRequest` | services/approvalService.ts |
+| `CheckApprovalRequiredPayload` | services/approvalService.ts |
+| `GetAppsParams` | services/appsService.ts |
+| `CorrectionRequest` | services/attendanceService.ts |
+| `ExportAuditLogParams` | services/auditLogService.ts |
+| `ExportAuditParams` | services/auditService.ts |
+| `VerifyCaptchaRequest` | services/captchaService.ts |
+| `HealthScoreListParams` | services/churnService.ts |
+| `HealthScoreHistoryParams` | services/churnService.ts |
+| `ChurnEventListParams` | services/churnService.ts |
+| `ChurnRateParams` | services/churnService.ts |
+| `CohortAnalysisParams` | services/churnService.ts |
+| `InterventionListParams` | services/churnService.ts |
+| `AtRiskCustomersParams` | services/churnService.ts |
+| `CreateCompensationInput` | services/compensationService.ts |
+| `UpdateCompensationInput` | services/compensationService.ts |
+| `CompensatoryLeaveRequest` | services/compensatoryLeaveService.ts |
+| `CreateCompensatoryLeaveRequestData` | services/compensatoryLeaveService.ts |
+| `CompensatoryLeaveRequestsResponse` | services/compensatoryLeaveService.ts |
+| `ConflictCheckRequest` | services/conflictCheckService.ts |
+| `PaginationParams` | services/crmReportsService.ts |
+| `ConvertAmountRequest` | services/currencyService.ts |
+| `CreatePromotionInput` | services/employeePromotionService.ts |
+| `UpdatePromotionInput` | services/employeePromotionService.ts |
+| `GetGigsParams` | services/gigsService.ts |
+| `CreateGoogleEventRequest` | services/googleCalendarService.ts |
+| `UpdateCalendarsRequest` | services/googleCalendarService.ts |
+| `EnableAutoSyncRequest` | services/googleCalendarService.ts |
+| `CompensationInput` | services/hrService.ts |
+| `BatchQuotesRequest` | services/investmentSearchService.ts |
+| `CreateInvitationRequest` | services/invitationService.ts |
+| `AllocateLeavesRequest` | services/leavePeriodService.ts |
+| `LeaveRequest` | services/leaveService.ts |
+| `CreateLeaveRequestData` | services/leaveService.ts |
+| `LeaveRequestsResponse` | services/leaveService.ts |
+| `LeaveRequestFilters` | services/leaveService.ts |
+| `CreateMicrosoftEventRequest` | services/microsoftCalendarService.ts |
+| `MicrosoftImportRequest` | services/microsoftCalendarService.ts |
+| `EnableMicrosoftAutoSyncRequest` | services/microsoftCalendarService.ts |
+| `GetMLScoresParams` | services/mlScoringApi.ts |
+| `GetPriorityQueueParams` | services/mlScoringApi.ts |
+| `GetMLDashboardParams` | services/mlScoringApi.ts |
+| `GetOrdersParams` | services/ordersService.ts |
+| `SendOtpRequest` | services/otpService.ts |
+| `VerifyOtpRequest` | services/otpService.ts |
+| `AddJobPayload` | services/queueService.ts |
+| `BulkJobPayload` | services/queueService.ts |
+| `CleanJobsPayload` | services/queueService.ts |
+| `CreateReportInput` | services/reportsService.ts |
+| `UpdateReportInput` | services/reportsService.ts |
+| `CreateRetentionBonusInput` | services/retentionBonusService.ts |
+| `UpdateRetentionBonusInput` | services/retentionBonusService.ts |
+| `GetReviewsParams` | services/reviewsService.ts |
+| `CalculateComponentParams` | services/salaryComponentService.ts |
+| `ShiftRequestStatus` | services/shiftAssignmentService.ts |
+| `ShiftRequest` | services/shiftAssignmentService.ts |
+| `CreateShiftRequestData` | services/shiftAssignmentService.ts |
+| `ShiftRequestsResponse` | services/shiftAssignmentService.ts |
+| `ShiftRequestFilters` | services/shiftAssignmentService.ts |
+| `ShiftRequestStats` | services/shiftAssignmentService.ts |
+| `TestConnectionRequest` | services/ssoService.ts |
+| `SaveProviderRequest` | services/ssoService.ts |
+| `CreateSuccessionPlanInput` | services/successionPlanningService.ts |
+| `UpdateSuccessionPlanInput` | services/successionPlanningService.ts |
+| `RequestedChange` | services/timeTrackingService.ts |
+| `RequestStatus` | services/trainingService.ts |
+| `GetLawyersParams` | services/usersService.ts |
+| `GetUsersParams` | services/usersService.ts |
+| `CreateWorkflowTemplateRequest` | services/workflowService.ts |
+| `UpdateWorkflowTemplateRequest` | services/workflowService.ts |
+| `CreateWorkflowInstanceRequest` | services/workflowService.ts |
+| `AdvanceWorkflowInstanceRequest` | services/workflowService.ts |
+| `LoginRequest` | types/api.ts |
+| `SocketAuthTokenExpiredPayload` | types/api.ts |
+| `SocketAuthTokenInvalidPayload` | types/api.ts |
+| `AppointmentBookingRequest` | types/appointment.ts |
+| `CreateAssetInput` | types/assets.ts |
+| `BudgetCheckRequest` | types/budget.ts |
+| `GenerateDistributionRequest` | types/budget.ts |
+| `MaterialRequestType` | types/buying.ts |
+| `MaterialRequestStatus` | types/buying.ts |
+| `MaterialRequestItem` | types/buying.ts |
+| `MaterialRequest` | types/buying.ts |
+| `CreateMaterialRequestData` | types/buying.ts |
+| `RequestForQuotation` | types/buying.ts |
+| `CreateSupplierInput` | types/buying.ts |
+| `CreatePurchaseOrderInput` | types/buying.ts |
+| `CreateRichDocumentInput` | types/caseRichDocument.ts |
+| `UpdateRichDocumentInput` | types/caseRichDocument.ts |
+| `CreateCompetitorInput` | types/competitor.ts |
+| `UpdateCompetitorInput` | types/competitor.ts |
+| `ForecastRequest` | types/crm-enhanced.ts |
+
+### Response Types (880)
+| Type | Path |
+|------|------|
+| `ShiftAssignmentFormData` | components/hr/attendance/ShiftAssignmentDialog.tsx |
+| `ShiftRequestFormData` | components/hr/attendance/ShiftRequestDialog.tsx |
+| `EducationFormData` | components/hr/employees/EducationDialog.tsx |
+| `LeavePeriodFormData` | components/hr/leave/LeavePeriodDialog.tsx |
+| `SalaryComponentFormData` | components/hr/payroll/SalaryComponentDialog.tsx |
+| `ApproveTrainingData` | components/hr/training/TrainingDialogs.tsx |
+| `RejectTrainingData` | components/hr/training/TrainingDialogs.tsx |
+| `CompleteTrainingData` | components/hr/training/TrainingDialogs.tsx |
+| `TrainingEvaluationData` | components/hr/training/TrainingDialogs.tsx |
+| `VehicleFormData` | components/hr/vehicles/VehicleDialog.tsx |
+| `VehicleLogFormData` | components/hr/vehicles/VehicleLogDialog.tsx |
+| `SidebarData` | components/layout/types.ts |
+| `PasswordStrengthResult` | components/password-strength.tsx |
+| `CreateCategoryFormData` | features/assets/components/create-category-view.tsx |
+| `MaintenanceFormData` | features/assets/components/create-maintenance-view.tsx |
+| `DataTableRowActionsProps` | features/case-workflows/components/data-table-row-actions.tsx |
+| `DataTableToolbarProps` | features/case-workflows/components/data-table-toolbar.tsx |
+| `CaseCardData` | features/cases/components/case-pipeline-board-view.tsx |
+| `CreateCaseFormData` | features/cases/components/create-case-form.tsx |
+| `CreateCaseFormData` | features/cases/components/create-case-view.tsx |
+| `MoveCaseToStageData` | features/cases/data/case-pipeline-schema.ts |
+| `EndCaseData` | features/cases/data/case-pipeline-schema.ts |
+| `DataTableProps` | features/clients/components/clients-table.tsx |
+| `WathqResponse` | features/clients/components/create-client-view.tsx |
+| `MOJResponse` | features/clients/components/create-client-view.tsx |
+| `DataTableBulkActionsProps` | features/clients/components/data-table-bulk-actions.tsx |
+| `DataTableRowActionsProps` | features/clients/components/data-table-row-actions.tsx |
+| `WizardData` | features/crm/components/crm-setup-wizard.tsx |
+| `FirstResponseTimeFilters` | features/crm/components/reports/first-response-time-report.tsx |
+| `ResponseTimeMetrics` | features/crm/components/reports/first-response-time-report.tsx |
+| `ConversionData` | features/crm/components/reports/lead-conversion-time-report.tsx |
+| `QuoteFormData` | features/crm/views/quote-form-view.tsx |
+| `CrmSettingsFormData` | features/crm/views/settings/crm-settings-view.tsx |
+| `QuotaFormData` | features/crm/views/settings/quotas-settings-view.tsx |
+| `TerritoryFormData` | features/crm/views/settings/territories-view.tsx |
+| `DataExportSidebarProps` | features/data-export/components/data-export-sidebar.tsx |
+| `CreateExportTemplateData` | features/data-export/data/schema.ts |
+| `DataTableRowActionsProps` | features/documents/components/data-table-row-actions.tsx |
+| `CreateDocumentData` | features/documents/data/schema.ts |
+| `UpdateDocumentData` | features/documents/data/schema.ts |
+| `AccountFormData` | features/finance/components/account-form-dialog.tsx |
+| `WizardData` | features/finance/components/finance-setup-wizard.tsx |
+| `CalculationResult` | features/finance/components/gosi-calculator-view.tsx |
+| `InvoiceApprovalData` | features/finance/types/approval-types.ts |
+| `SubmitForApprovalData` | features/finance/types/approval-types.ts |
+| `ApproveInvoiceData` | features/finance/types/approval-types.ts |
+| `RejectInvoiceData` | features/finance/types/approval-types.ts |
+| `RequestChangesData` | features/finance/types/approval-types.ts |
+| `EscalateApprovalData` | features/finance/types/approval-types.ts |
+| `CSVImportResult` | features/finance/types/corporate-card-types.ts |
+| `CreateCorporateCardData` | features/finance/types/corporate-card-types.ts |
+| `UpdateCorporateCardData` | features/finance/types/corporate-card-types.ts |
+| `CreateCardTransactionData` | features/finance/types/corporate-card-types.ts |
+| `ReconcileTransactionData` | features/finance/types/corporate-card-types.ts |
+| `LockTimeEntryData` | features/finance/types/time-entry-lock-types.ts |
+| `UnlockTimeEntryData` | features/finance/types/time-entry-lock-types.ts |
+| `BulkLockTimeEntriesData` | features/finance/types/time-entry-lock-types.ts |
+| `LockByDateRangeData` | features/finance/types/time-entry-lock-types.ts |
+| `LockOperationResult` | features/finance/types/time-entry-lock-types.ts |
+| `DataTableRowActionsProps` | features/followups/components/data-table-row-actions.tsx |
+| `CreateFollowupData` | features/followups/data/schema.ts |
+| `UpdateFollowupData` | features/followups/data/schema.ts |
+| `GeofenceZoneData` | features/hr/components/geofencing-interactive-map.tsx |
+| `WizardData` | features/hr/components/hr-setup-wizard.tsx |
+| `PolicyFormData` | features/hr/components/leave-policy-action-dialog.tsx |
+| `AssignFormData` | features/hr/components/leave-policy-assign-dialog.tsx |
+| `ExtendedWarehouseData` | features/inventory/components/create-warehouse-view.tsx |
+| `InventorySettingsFormData` | features/inventory/components/inventory-settings-view.tsx |
+| `ReportData` | features/reports/components/report-viewer.tsx |
+| `CreateReportConfigData` | features/reports/data/schema.ts |
+| `SignatureFormData` | features/settings/components/email-signatures-manager.tsx |
+| `TemplateFormData` | features/settings/components/email-templates-list.tsx |
+| `DataTableBulkActionsProps` | features/staff/components/data-table-bulk-actions.tsx |
+| `DataTableRowActionsProps` | features/staff/components/data-table-row-actions.tsx |
+| `DataTableProps` | features/staff/components/staff-table.tsx |
+| `ProcessDepartureData` | features/staff/data/schema.ts |
+| `SubscriptionFormData` | features/subscriptions/components/subscription-create-view.tsx |
+| `SubscriptionPlanFormData` | features/subscriptions/components/subscription-plan-form-view.tsx |
+| `CreateSubscriptionPlanData` | features/subscriptions/types/subscription-types.ts |
+| `CreateSubscriptionData` | features/subscriptions/types/subscription-types.ts |
+| `UpdateSubscriptionData` | features/subscriptions/types/subscription-types.ts |
+| `ChangePlanData` | features/subscriptions/types/subscription-types.ts |
+| `ConsumeHoursData` | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionPlanListResponse` | features/subscriptions/types/subscription-types.ts |
+| `SubscriptionListResponse` | features/subscriptions/types/subscription-types.ts |
+| `DataTableRowActionsProps` | features/tags/components/data-table-row-actions.tsx |
+| `CreateTagData` | features/tags/data/schema.ts |
+| `UpdateTagData` | features/tags/data/schema.ts |
+| `AiSuggestionResponse` | features/tasks/components/tasks-list-view.tsx |
+| `DataTableProps` | features/tasks/components/tasks-table.tsx |
+| `TaskFormData` | features/tasks/data/schema.ts |
+| `TaskFormData` | features/tasks/hooks/useTaskFormValidation.ts |
+| `DataTableRowActionsProps` | features/users/components/data-table-row-actions.tsx |
+| `DataTableProps` | features/users/components/users-table.tsx |
+| `LeadResponseTime` | hooks/use-crm-reports.ts |
+| `HealthResponse` | hooks/use-service-health.ts |
+| `SidebarData` | hooks/use-sidebar-data.ts |
+| `SidebarData` | hooks/useCalendar.ts |
+| `UseFeatureFlagResult` | hooks/useFeatureFlag.ts |
+| `FinancialOverviewData` | hooks/useFinance.ts |
+| `HRAnalyticsDashboardData` | hooks/useHrAnalytics.ts |
+| `UseImagesLoaderResult` | hooks/useImageLoader.ts |
+| `NitaqatResult` | hooks/useSaudiBanking.ts |
+| `MinimumWageResult` | hooks/useSaudiBanking.ts |
+| `SmartButtonCountsResult` | hooks/useSmartButtonCounts.ts |
+| `UseSmartButtonsResult` | hooks/useSmartButtons.ts |
+| `UseSmartButtonsBatchResult` | hooks/useSmartButtons.ts |
+| `CreateStaffData` | hooks/useStaff.ts |
+| `InviteStaffData` | hooks/useStaff.ts |
+| `AdminDashboardData` | hooks/useUIAccess.ts |
+| `RetainedDataItem` | lib/data-retention.ts |
+| `ValidationResult` | lib/file-validation.ts |
+| `SmartPreviewResult` | lib/file-viewer.ts |
+| `IbanValidationResult` | lib/saudi-banking-validation.ts |
+| `SaudiIdValidationResult` | lib/saudi-banking-validation.ts |
+| `SalaryValidationResult` | lib/saudi-banking-validation.ts |
+| `WPSValidationResult` | lib/wps-file-generator.ts |
+| `RegisterData` | sdk/core/src/types.ts |
+| `AuthResult` | sdk/core/src/types.ts |
+| `MfaSetupResult` | sdk/core/src/types.ts |
+| `MfaVerifyResult` | sdk/core/src/types.ts |
+| `MfaChallengeData` | sdk/core/src/types.ts |
+| `GoogleOneTapResponse` | sdk/core/src/types.ts |
+| `SSODetectionResult` | sdk/core/src/types.ts |
+| `ForgotPasswordData` | sdk/core/src/types.ts |
+| `ResetPasswordData` | sdk/core/src/types.ts |
+| `ChangePasswordData` | sdk/core/src/types.ts |
+| `SendOtpData` | sdk/core/src/types.ts |
+| `VerifyOtpData` | sdk/core/src/types.ts |
+| `OtpResult` | sdk/core/src/types.ts |
+| `MagicLinkData` | sdk/core/src/types.ts |
+| `MagicLinkResult` | sdk/core/src/types.ts |
+| `GoogleCredentialResponse` | sdk/integrations/google-onetap/types.ts |
+| `GoogleOneTapResult` | sdk/integrations/google-onetap/types.ts |
+| `SSODetectionResult` | sdk/integrations/sso-detection/types.ts |
+| `ConvertToAccountData` | sdk/react/src/hooks/useAnonymousSession.ts |
+| `CreateApiKeyData` | sdk/react/src/hooks/useApiKeys.ts |
+| `CreateWebhookData` | sdk/react/src/hooks/useWebhooks.ts |
+| `CreateApiKeyData` | sdk/react-ui/src/components/ApiKeyManager.tsx |
+| `SignupFormData` | sdk/react-ui/src/components/SignupForm.tsx |
+| `UserProfileData` | sdk/react-ui/src/components/UserProfile.tsx |
+| `ValidationResult` | sdk/react-ui/src/utils/validation.ts |
+| `AccountBalanceData` | services/accountService.ts |
+| `CreateAccountData` | services/accountService.ts |
+| `AccountTypesResponse` | services/accountingService.ts |
+| `CreateJournalEntryData` | services/accountingService.ts |
+| `SimpleJournalEntryData` | services/accountingService.ts |
+| `CanPostResponse` | services/accountingService.ts |
+| `CreateRecurringTransactionData` | services/accountingService.ts |
+| `CreatePriceLevelData` | services/accountingService.ts |
 
 ---
 
 ## Pages
 
-| Page | Route Path | Hooks Used |
-|------|------------|------------|
+| Page | Route | Hooks Used |
+|------|-------|------------|
 | __root | `/--root` |  |
 | index | `/-authenticated` |  |
 | index | `/-authenticated/apps` |  |
@@ -1687,882 +3847,6 @@
 
 ---
 
-## Shared Components
-
-### __demo__
-
-- **currency-input-demo**
-- **date-range-picker-demo**
-- **plan-gating-demo**
-
-### __tests__
-
-- **empty-state.test**
-- **error-boundary.test** - Props: `TestProps`
-- **password-strength.test**
-
-### admin
-
-- **AccessMatrixManager** - Props: `AccessMatrixManagerProps`
-- **cache-stats** - Props: `CacheStatsProps`
-- **index**
-- **service-health** - Props: `ServiceHealthProps`
-- **UserOverrideManager** - Props: `UserOverrideManagerProps`
-
-### auth
-
-- **account-lockout-warning** - Props: `AccountLockoutWarningProps`
-- **auth-footer**
-- **auth-header**
-- **captcha-challenge** - Props: `CaptchaChallengeProps`
-- **captcha-config**
-- **guest-banner** - Props: `GuestBannerProps`
-- **index**
-- **ldap-login-button** - Props: `LDAPLoginButtonProps`
-- **PageAccessGuard** - Props: `PageAccessGuardProps`
-- **password-breach-warning** - Props: `PasswordBreachWarningProps`
-- **password-change-guard** - Props: `PasswordChangeGuardProps`
-- **password-strength-indicator** - Props: `PasswordStrengthIndicatorProps`
-- **progressive-delay** - Props: `ProgressiveDelayProps`
-- **reauth-modal** - Props: `ReauthModalProps`
-- **social-login-buttons** - Props: `SocialLoginButtonsProps`
-- **SoloLawyerLockScreen** - Props: `SoloLawyerLockScreenProps`
-- **sso-login-buttons** - Props: `SSOLoginButtonsProps`
-
-### chatter
-
-- **activity-scheduler** - Props: `ActivitySchedulerProps`
-- **chatter-followers** - Props: `ChatterFollowersProps`
-- **chatter-input** - Props: `ChatterInputProps`
-- **chatter-thread** - Props: `ChatterThreadProps`
-
-### data-table
-
-- **bulk-actions**
-- **column-header**
-- **data-table**
-- **faceted-filter**
-- **index**
-- **pagination**
-- **toolbar**
-- **view-options**
-
-### error-display
-
-- **ErrorDisplay** - Props: `ErrorDisplayProps`
-- **index**
-- **ValidationErrors** - Props: `ValidationErrorsProps`
-
-### hr
-
-- **BulkActionBar** - Props: `BulkActionBarProps`
-- **BulkIncentiveDialog** - Props: `BulkIncentiveDialogProps`
-- **CompensatoryLeaveDialog** - Props: `CompensatoryLeaveDialogProps`
-- **CompensatoryLeaveFilters** - Props: `CompensatoryLeaveFiltersProps`
-- **CompensatoryLeaveStats** - Props: `CompensatoryLeaveStatsProps`
-- **CompensatoryLeaveTable** - Props: `CompensatoryLeaveTableProps`
-- **EducationDialog** - Props: `EducationDialogProps`
-- **EducationSection** - Props: `EducationSectionProps`
-- **EmployeeIncentiveDialog** - Props: `EmployeeIncentiveDialogProps`
-- **IncentiveFilters** - Props: `IncentiveFiltersProps`
-- **IncentivesTable** - Props: `IncentivesTableProps`
-- **IncentiveStats** - Props: `IncentiveStatsProps`
-- **LeaveEncashmentDialog** - Props: `LeaveEncashmentDialogProps`
-- **LeavePeriodDialog** - Props: `LeavePeriodDialogProps`
-- **RetentionBonusDialog** - Props: `RetentionBonusDialogProps`
-- **SalaryComponentDialog** - Props: `SalaryComponentDialogProps`
-- **ShiftAssignmentDialog** - Props: `ShiftAssignmentDialogProps`
-- **ShiftRequestDialog** - Props: `ShiftRequestDialogProps`
-- **SkillDialog** - Props: `SkillDialogProps`
-- **SkillEvaluationDialog** - Props: `SkillEvaluationDialogProps`
-- **StaffingPlanDetailDialog** - Props: `StaffingPlanDetailDialogProps`
-- **StaffingPlanDialog** - Props: `StaffingPlanDialogProps`
-- **TrainingDialogs** - Props: `ApproveTrainingDialogProps`
-- **VehicleDialog** - Props: `VehicleDialogProps`
-- **VehicleLogDialog** - Props: `VehicleLogDialogProps`
-- **WorkHistoryDialog** - Props: `WorkHistoryDialogProps`
-- **WorkHistorySection** - Props: `WorkHistorySectionProps`
-
-### index.ts
-
-- **index**
-
-### kanban
-
-- **index**
-- **kanban-board** - Props: `KanbanBoardProps`
-- **kanban-card** - Props: `KanbanCardProps`
-- **kanban-column** - Props: `KanbanColumnProps`
-- **kanban-quick-create** - Props: `KanbanQuickCreateProps`
-
-### layout
-
-- **app-sidebar**
-- **app-title**
-- **authenticated-layout**
-- **header**
-- **main**
-- **nav-group**
-- **nav-user**
-- **sidebar-data**
-- **team-switcher**
-- **top-nav**
-- **types**
-
-### mfa
-
-- **backup-codes-modal** - Props: `BackupCodesModalProps`
-- **index**
-- **mfa-setup-wizard** - Props: `MFASetupWizardProps`
-- **mfa-verification-modal** - Props: `MFAVerificationModalProps`
-
-### notifications
-
-- **index**
-- **notification-bell-new**
-- **notification-dropdown** - Props: `NotificationDropdownProps`
-- **notification-item** - Props: `NotificationItemProps`
-
-### permissions
-
-- **DecisionLogs** - Props: `DecisionLogsProps`
-- **index**
-- **PermissionGuard** - Props: `BasePermissionGuardProps`
-- **PolicyManager** - Props: `PolicyManagerProps`
-- **ResourceAccessManager** - Props: `ResourceAccessManagerProps`
-
-### root
-
-- **activity-feed** - Props: `ActivityFeedProps`
-- **activity-timeline** - Props: `ActivityTimelineProps`
-- **activity-timeline-example**
-- **api-key-display** - Props: `ApiKeyDisplayProps`
-- **arabic-name-input** - Props: `ArabicNameInputProps`
-- **breadcrumb** - Props: `BreadcrumbProps`
-- **CasesDashboard**
-- **coming-soon**
-- **command-menu**
-- **config-drawer**
-- **confirm-dialog**
-- **crm-sidebar** - Props: `CrmSidebarProps`
-- **currency-input** - Props: `CurrencyInputProps`
-- **date-picker**
-- **date-range-picker** - Props: `DateRangePickerProps`
-- **deal-health-indicator** - Props: `DealHealthIndicatorProps`
-- **deal-health-indicator-example**
-- **dynamic-island** - Props: `DynamicIslandProps`
-- **email-verification-banner** - Props: `EmailVerificationBannerProps`
-- **empty-state** - Props: `EmptyStateProps`
-- **error-boundary** - Props: `ErrorBoundaryProps`
-- **error-modal** - Props: `ErrorModalProps`
-- **feature-error-boundary**
-- **generic-form-dialog**
-- **language-switch**
-- **language-switcher**
-- **learn-more**
-- **loading-button**
-- **loading-overlay** - Props: `LoadingOverlayProps`
-- **long-text**
-- **national-address-input** - Props: `NationalAddressInputProps`
-- **navigation-progress**
-- **notification-bell** - Props: `NotificationItemProps`
-- **offline-indicator**
-- **optimized-image** - Props: `OptimizedImageProps`
-- **otp-input** - Props: `OtpInputProps`
-- **password-input**
-- **password-requirements** - Props: `PasswordRequirementsProps`
-- **password-strength** - Props: `PasswordStrengthProps`
-- **permission-gate** - Props: `PermissionGateProps`
-- **plan-badge** - Props: `PlanBadgeProps`
-- **plan-gate** - Props: `PlanGateProps`
-- **plan-gate-examples**
-- **productivity-hero** - Props: `ProductivityHeroProps`
-- **profile-dropdown**
-- **push-notification-settings**
-- **rate-limit-badge** - Props: `RateLimitBadgeProps`
-- **route-prefetch-loader**
-- **search**
-- **search-rate-indicator** - Props: `SearchRateIndicatorProps`
-- **select-dropdown**
-- **session-warning-modal** - Props: `SessionWarningModalProps`
-- **sign-out-dialog** - Props: `SignOutDialogProps`
-- **skeleton-loader** - Props: `SkeletonTextProps`
-- **skip-to-main**
-- **stat-card** - Props: `StatCardProps`
-- **status-badge** - Props: `StatusBadgeProps`
-- **status-badge-examples**
-- **suspense-fallback** - Props: `SuspenseFallbackProps`
-- **theme-switch**
-- **tiptap-editor** - Props: `TipTapEditorProps`
-- **upgrade-prompt** - Props: `UpgradePromptProps`
-- **user-picker** - Props: `UserPickerProps`
-- **validation-errors** - Props: `ValidationErrorsProps`
-- **virtual-list** - Props: `VirtualTableRowProps`
-
-### smart-button
-
-- **index**
-- **smart-button** - Props: `SmartButtonProps`
-- **smart-button-config**
-- **smart-button-group** - Props: `SmartButtonGroupProps`
-
-### ui
-
-- **accordion**
-- **alert**
-- **alert-dialog**
-- **avatar**
-- **badge**
-- **button**
-- **calendar**
-- **card**
-- **character-count** - Props: `CharacterCountProps`
-- **checkbox**
-- **collapsible**
-- **command**
-- **dialog**
-- **dropdown-menu**
-- **feature-status-badge** - Props: `FeatureStatusBadgeProps`
-- **field-tooltip** - Props: `FieldTooltipProps`
-- **form**
-- **gosi-ui**
-- **input**
-- **input-otp**
-- **label**
-- **popover**
-- **progress**
-- **radio-group**
-- **scroll-area**
-- **select**
-- **separator**
-- **sheet**
-- **sidebar**
-- **skeleton**
-- **slider**
-- **sonner**
-- **switch**
-- **table**
-- **tabs**
-- **textarea**
-- **tooltip**
-
-### uncategorized
-
-- **account-activity-dashboard**
-- **account-form-dialog** - Props: `AccountFormDialogProps`
-- **account-statement-dashboard**
-- **accounts-aging-report**
-- **accounts-dashboard** - Props: `AccountsDashboardProps`
-- **activities-view**
-- **activity-analytics-report**
-- **activity-bell** - Props: `ActivityBellProps`
-- **activity-details-view**
-- **activity-details-view**
-- **activity-list** - Props: `ActivityListProps`
-- **activity-plan-builder** - Props: `ActivityPlanBuilderProps`
-- **activity-scheduler** - Props: `ActivitySchedulerProps`
-- **activity-stats** - Props: `StatCardProps`
-- **advances-create-view**
-- **advances-details-view**
-- **advances-list-view**
-- **analytics**
-- **analytics-chart**
-- **analytics-tab** - Props: `CaseOverviewChartProps`
-- **api-keys-settings**
-- **applicant-create-view**
-- **applicant-details-view**
-- **applicants-list-view**
-- **appointment-detail-dialog** - Props: `AppointmentDetailDialogProps`
-- **appointments-view**
-- **asset-assignment-create-view**
-- **asset-assignment-details-view**
-- **asset-assignment-list-view**
-- **asset-details-view**
-- **assets-list-view**
-- **assets-settings-view**
-- **assets-sidebar**
-- **attachment-versions-dialog** - Props: `AttachmentVersionsDialogProps`
-- **attendance-record-create-view**
-- **attendance-record-details-view**
-- **attendance-records-list-view**
-- **audit-log-viewer**
-- **automated-action-list** - Props: `AutomatedActionListProps`
-- **badges-view**
-- **benefits-create-view**
-- **benefits-details-view**
-- **benefits-list-view**
-- **bill-details-view**
-- **billing-history**
-- **billing-settings** - Props: `UsageMetricCardProps`
-- **bills-dashboard**
-- **biometric-create-view**
-- **biometric-dashboard**
-- **biometric-details-view**
-- **biometric-list-view**
-- **block-connections** - Props: `BlockConnectionsProps`
-- **block-detail-panel** - Props: `BlockDetailPanelProps`
-- **block-editor** - Props: `BlockEditorProps`
-- **browse-jobs**
-- **budget-check-dialog** - Props: `BudgetCheckDialogProps`
-- **budgets-dashboard**
-- **bulk-leave-allocation-dialog** - Props: `BulkLeaveAllocationDialogProps`
-- **buying-list-view**
-- **buying-settings-view**
-- **buying-sidebar**
-- **calendar-sync-dialog** - Props: `CalendarSyncDialogProps`
-- **calendar-view**
-- **campaign-efficiency-report**
-- **captcha-settings**
-- **card-reconciliation-view**
-- **case-details-view**
-- **case-info-sidebar** - Props: `CaseInfoSidebarProps`
-- **case-notion-list-view**
-- **case-notion-sidebar** - Props: `CaseNotionSidebarProps`
-- **case-pipeline-board-view**
-- **case-pipeline-detail-view**
-- **case-pipeline-list-view**
-- **case-pipeline-sidebar** - Props: `CasePipelineSidebarProps`
-- **case-pipeline-view**
-- **cases-kanban-view**
-- **cases-list-view**
-- **cases-view**
-- **category-list-view**
-- **chart-of-accounts-view**
-- **chat-view**
-- **chatter** - Props: `ChatterProps`
-- **clients-action-dialog**
-- **clients-columns**
-- **clients-delete-dialog**
-- **clients-dialogs**
-- **clients-primary-buttons**
-- **clients-provider**
-- **clients-sidebar** - Props: `ClientsSidebarProps`
-- **clients-table**
-- **clients-view-dialog**
-- **commission-settings-section** - Props: `CommissionSettingsSectionProps`
-- **company-comparison-chart** - Props: `CompanyComparisonChartProps`
-- **company-management-page**
-- **company-settings**
-- **company-switcher** - Props: `CompanySwitcherProps`
-- **company-tree-view** - Props: `CompanyTreeViewProps`
-- **compensation-create-view**
-- **compensation-details-view**
-- **compensation-list-view**
-- **compliance-dashboard-view**
-- **consolidated-financial-report** - Props: `ConsolidatedFinancialReportProps`
-- **consolidated-report**
-- **contact-details-view**
-- **contacts-action-dialog**
-- **contacts-columns**
-- **contacts-delete-dialog**
-- **contacts-dialogs**
-- **contacts-primary-buttons**
-- **contacts-provider**
-- **contacts-table** - Props: `ContactsTableProps`
-- **contacts-view-dialog**
-- **content-section**
-- **corporate-cards-dashboard**
-- **create-account-activity-view**
-- **create-activity-view**
-- **create-api-key-dialog** - Props: `CreateApiKeyDialogProps`
-- **create-asset-view**
-- **create-bill-view** - Props: `CreateBillViewProps`
-- **create-case-form** - Props: `CreateCaseFormProps`
-- **create-case-view**
-- **create-category-view**
-- **create-client-view**
-- **create-contact-view**
-- **create-credit-note-view**
-- **create-event-view**
-- **create-expense-view**
-- **create-invoice-view**
-- **create-item-view**
-- **create-journal-entry-view**
-- **create-lead-view**
-- **create-lead-view**
-- **create-lead-view** - Props: `CreateLeadViewProps`
-- **create-maintenance-view**
-- **create-organization-view**
-- **create-payment-view**
-- **create-purchase-order-view**
-- **create-quote-view**
-- **create-recurring-view** - Props: `CreateRecurringViewProps`
-- **create-referral-view**
-- **create-reminder-view**
-- **create-retainer-view**
-- **create-sla-view**
-- **create-staff-view**
-- **create-statement-view**
-- **create-supplier-view**
-- **create-task-view**
-- **create-ticket-view**
-- **create-time-entry-view**
-- **create-vendor-view** - Props: `CreateVendorViewProps`
-- **create-warehouse-view**
-- **credit-note-details-view**
-- **credit-notes-dashboard**
-- **crm-reports-create-view**
-- **crm-reports-details-view**
-- **crm-reports-list-view**
-- **crm-settings**
-- **crm-setup-wizard**
-- **crm-sidebar** - Props: `CrmSidebarProps`
-- **csv-import-dialog** - Props: `CSVImportDialogProps`
-- **currency-create-view**
-- **currency-details-view**
-- **currency-list-view**
-- **data-export-sidebar** - Props: `DataExportSidebarProps`
-- **data-table-bulk-actions**
-- **data-table-bulk-actions** - Props: `ContactsBulkActionsProps`
-- **data-table-bulk-actions**
-- **data-table-bulk-actions**
-- **data-table-bulk-actions** - Props: `OrganizationsBulkActionsProps`
-- **data-table-bulk-actions**
-- **data-table-bulk-actions**
-- **data-table-bulk-actions**
-- **data-table-bulk-actions**
-- **data-table-row-actions** - Props: `DataTableRowActionsProps`
-- **data-table-row-actions**
-- **data-table-row-actions** - Props: `ContactsRowActionsProps`
-- **data-table-row-actions** - Props: `DataTableRowActionsProps`
-- **data-table-row-actions** - Props: `DataTableRowActionsProps`
-- **data-table-row-actions** - Props: `OrganizationsRowActionsProps`
-- **data-table-row-actions**
-- **data-table-row-actions** - Props: `DataTableRowActionsProps`
-- **data-table-row-actions**
-- **data-table-row-actions**
-- **data-table-toolbar** - Props: `DataTableToolbarProps`
-- **data-table-toolbar**
-- **data-table-toolbar**
-- **data-table-toolbar**
-- **date-locked-warning** - Props: `DateLockedWarningProps`
-- **deal-aging-report**
-- **debit-notes-dashboard**
-- **delivery-settings-section** - Props: `DeliverySettingsSectionProps`
-- **discount-settings-section** - Props: `DiscountSettingsSectionProps`
-- **document-editor-dialog** - Props: `DocumentEditorDialogProps`
-- **document-settings-section** - Props: `DocumentSettingsSectionProps`
-- **document-versions** - Props: `DocumentVersionsProps`
-- **documents-columns**
-- **documents-delete-dialog** - Props: `DocumentsDeleteDialogProps`
-- **documents-dialogs**
-- **documents-edit-dialog** - Props: `DocumentsEditDialogProps`
-- **documents-primary-buttons**
-- **documents-provider**
-- **documents-share-dialog** - Props: `DocumentsShareDialogProps`
-- **documents-table** - Props: `DocumentsTableProps`
-- **documents-upload-dialog** - Props: `DocumentsUploadDialogProps`
-- **documents-versions-dialog** - Props: `DocumentsVersionsDialogProps`
-- **documents-view-dialog** - Props: `DocumentsViewDialogProps`
-- **domain-builder** - Props: `DomainBuilderProps`
-- **duplicate-detection-panel** - Props: `DuplicateDetectionPanelProps`
-- **edit-account-activity-view**
-- **edit-expense-view**
-- **edit-invoice-view**
-- **edit-statement-view**
-- **edit-time-entry-view**
-- **email-campaign-create-view**
-- **email-campaign-details-view**
-- **email-marketing-list-view**
-- **email-settings**
-- **email-signatures-manager**
-- **email-templates-list**
-- **email-view**
-- **employee-create-view**
-- **employee-details-view**
-- **employee-promotions-list-view**
-- **employee-transfer-create-view**
-- **employee-transfer-details-view**
-- **employee-transfers-list-view**
-- **employees-list-view**
-- **enterprise-settings**
-- **event-details-view**
-- **events-view**
-- **expense-budget-integration-example**
-- **expense-claims-create-view**
-- **expense-claims-details-view**
-- **expense-claims-list-view**
-- **expense-details-view**
-- **expense-policies-settings**
-- **expenses-dashboard**
-- **export-dialog** - Props: `ExportDialogProps`
-- **feature-tour**
-- **finance-reports-create-view**
-- **finance-reports-details-view**
-- **finance-reports-list-view**
-- **finance-settings** - Props: `AccountsListProps`
-- **finance-setup-wizard**
-- **finance-sidebar** - Props: `FinanceSidebarProps`
-- **financial-reports-dashboard**
-- **first-response-time-report**
-- **fiscal-periods-dashboard**
-- **fiscal-periods-view**
-- **followups-action-dialog** - Props: `FollowupsActionDialogProps`
-- **followups-columns**
-- **followups-complete-dialog** - Props: `FollowupsCompleteDialogProps`
-- **followups-delete-dialog** - Props: `FollowupsDeleteDialogProps`
-- **followups-dialogs**
-- **followups-primary-buttons**
-- **followups-provider**
-- **followups-reschedule-dialog** - Props: `FollowupsRescheduleDialogProps`
-- **followups-table** - Props: `FollowupsTableProps`
-- **followups-view-dialog** - Props: `FollowupsViewDialogProps`
-- **forms-view**
-- **frame-renderer** - Props: `FrameRendererProps`
-- **full-reports-view**
-- **fullcalendar-view**
-- **gantt-view**
-- **general-ledger-view**
-- **general-settings-section** - Props: `GeneralSettingsSectionProps`
-- **geofencing-create-view**
-- **geofencing-details-view**
-- **geofencing-interactive-map** - Props: `GeofencingCreateMapProps`
-- **geofencing-list-view**
-- **geofencing-map** - Props: `GeofencingMapProps`
-- **gl-transactions-view** - Props: `GLTransactionsViewProps`
-- **gl-transactions-view.example**
-- **gosi-calculator-view**
-- **gosi-dashboard-view**
-- **grievances-create-view**
-- **grievances-details-view**
-- **grievances-list-view**
-- **group-action-dialog** - Props: `GroupActionDialogProps`
-- **group-delete-dialog** - Props: `GroupDeleteDialogProps`
-- **group-view-dialog** - Props: `GroupViewDialogProps`
-- **groups-columns**
-- **groups-row-actions** - Props: `GroupsRowActionsProps`
-- **groups-table** - Props: `GroupsTableProps`
-- **help-sidebar** - Props: `HelpSidebarProps`
-- **hero-banner**
-- **hr-analytics-dashboard**
-- **hr-predictions-dashboard**
-- **hr-setup-wizard**
-- **hr-sidebar** - Props: `HRSidebarProps`
-- **import-dialog** - Props: `ImportDialogProps`
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **index**
-- **initial-setup-wizard**
-- **integration-card** - Props: `IntegrationCardProps`
-- **integrations-settings**
-- **inter-company-balances**
-- **inter-company-dashboard**
-- **inter-company-elimination** - Props: `InterCompanyEliminationProps`
-- **inter-company-reconciliation** - Props: `InterCompanyReconciliationProps`
-- **inter-company-transaction** - Props: `InterCompanyTransactionFormProps`
-- **inventory-list-view**
-- **inventory-settings-view**
-- **inventory-sidebar** - Props: `InventorySidebarProps`
-- **invoice-approvals-view**
-- **invoice-dashboard**
-- **invoice-details-view**
-- **invoices-dashboard**
-- **iqama-alerts-view**
-- **item-details-view**
-- **job-history**
-- **job-positions-create-view**
-- **job-positions-details-view**
-- **job-positions-list-view**
-- **job-posting-create-view**
-- **job-posting-details-view**
-- **job-postings-list-view**
-- **jobs-sidebar** - Props: `JobsSidebarProps`
-- **journal-entries-dashboard**
-- **journal-entry-details-view**
-- **judgments-view**
-- **knowledge-sidebar** - Props: `KnowledgeSidebarProps`
-- **kpi-metrics** - Props: `MetricCardProps`
-- **laws-view**
-- **ldap-config-form** - Props: `LDAPConfigFormProps`
-- **ldap-settings**
-- **ldap-test-dialog** - Props: `LDAPTestDialogProps`
-- **lead-conversion-time-report**
-- **lead-details-view**
-- **lead-details-view**
-- **lead-owner-efficiency-report**
-- **lead-scoring-dashboard**
-- **leads-by-source-report**
-- **leads-dashboard** - Props: `LeadCardProps`
-- **leads-list-view**
-- **leads-page-example**
-- **leave-allocation-create-view** - Props: `LeaveAllocationCreateViewProps`
-- **leave-allocations-list-view**
-- **leave-periods-list-view**
-- **leave-policies-list-view**
-- **leave-policy-action-dialog**
-- **leave-policy-assign-dialog**
-- **leave-policy-assignments-list-view**
-- **leave-request-create-view**
-- **leave-request-details-view**
-- **leave-requests-list-view**
-- **loans-create-view**
-- **loans-details-view**
-- **loans-list-view**
-- **lock-date-settings** - Props: `LockDateSettingsProps`
-- **lost-opportunity-report**
-- **maintenance-list-view**
-- **manage-availability-dialog** - Props: `ManageAvailabilityDialogProps`
-- **ml-score-card** - Props: `MLScoreCardProps`
-- **month-calendar-view**
-- **new-chat**
-- **notifications-tab**
-- **notion-page-view** - Props: `NotionPageViewProps`
-- **notion-sidebar** - Props: `NotionSidebarProps`
-- **offboarding-create-view**
-- **offboarding-details-view**
-- **offboarding-list-view**
-- **office-type-selector** - Props: `OfficeTypeSelectorProps`
-- **onboarding-create-view**
-- **onboarding-details-view**
-- **onboarding-list-view**
-- **opening-balances-view**
-- **order-settings-section** - Props: `OrderSettingsSectionProps`
-- **organization-details-view**
-- **organizational-structure-create-view**
-- **organizational-structure-details-view**
-- **organizational-structure-list-view**
-- **organizations-action-dialog**
-- **organizations-columns**
-- **organizations-delete-dialog**
-- **organizations-dialogs**
-- **organizations-primary-buttons**
-- **organizations-provider** - Props: `OrganizationsProviderProps`
-- **organizations-table** - Props: `OrganizationsTableProps`
-- **organizations-view-dialog**
-- **outstanding-invoices-report**
-- **overview**
-- **overview-chart** - Props: `OverviewChartProps`
-- **overview-stats** - Props: `OverviewStatsProps`
-- **overview-tab** - Props: `ScheduleCardProps`
-- **payment-details-view**
-- **payment-method-settings** - Props: `PaymentMethodCardProps`
-- **payment-modes-settings**
-- **payment-receipt-template** - Props: `PaymentReceiptTemplateProps`
-- **payment-terms-settings** - Props: `PaymentTermCardProps`
-- **payments-dashboard**
-- **payroll-create-view**
-- **payroll-details-view**
-- **payroll-list-view**
-- **payroll-run-create-view**
-- **payroll-run-details-view**
-- **payroll-runs-list-view**
-- **pending-approvals-badge** - Props: `PendingApprovalsBadgeProps`
-- **performance-review-create-view**
-- **performance-review-details-view**
-- **performance-reviews-list-view**
-- **pipeline-automation-dialog** - Props: `PipelineAutomationDialogProps`
-- **pipeline-view**
-- **plan-comparison** - Props: `PlanComparisonProps`
-- **plan-upgrade-example**
-- **plan-upgrade-modal** - Props: `PlanUpgradeModalProps`
-- **practice-sidebar** - Props: `PracticeSidebarProps`
-- **pricing-settings-section** - Props: `PricingSettingsSectionProps`
-- **pricing-table** - Props: `PricingTableProps`
-- **priority-queue** - Props: `PriorityQueueProps`
-- **promotion-create-view**
-- **promotion-details-view**
-- **prospects-engaged-report**
-- **purchase-order-details-view**
-- **purchase-order-list-view**
-- **quick-start-checklist** - Props: `QuickStartChecklistProps`
-- **quota-progress-widget** - Props: `QuotaProgressWidgetProps`
-- **quote-details-view**
-- **quote-settings-section** - Props: `QuoteSettingsSectionProps`
-- **quotes-dashboard**
-- **rate-action-dialog** - Props: `RateActionDialogProps`
-- **rate-delete-dialog** - Props: `RateDeleteDialogProps`
-- **rate-view-dialog** - Props: `RateViewDialogProps`
-- **rates-columns**
-- **rates-provider** - Props: `RatesProviderProps`
-- **rates-row-actions** - Props: `RatesRowActionsProps`
-- **rates-table** - Props: `RatesTableProps`
-- **recent-sales**
-- **reconciliation-create-view**
-- **reconciliation-details-view**
-- **reconciliation-list-view**
-- **recurring-details-view**
-- **recurring-invoice-details** - Props: `RecurringInvoiceDetailsProps`
-- **recurring-invoice-form** - Props: `RecurringInvoiceFormProps`
-- **recurring-invoices-list**
-- **recurring-transactions-dashboard**
-- **referral-details-view**
-- **referrals-list-view**
-- **reminder-details-view**
-- **reminders-view**
-- **report-config-dialog** - Props: `ReportConfigDialogProps`
-- **report-viewer** - Props: `ReportViewerProps`
-- **reports-create-view**
-- **reports-dashboard**
-- **reports-details-view**
-- **reports-list-view**
-- **reports-sidebar** - Props: `ReportsSidebarProps`
-- **reports-tab** - Props: `CasesChartCardProps`
-- **reputation-sidebar** - Props: `ReputationSidebarProps`
-- **retainer-details-view**
-- **retainers-dashboard**
-- **return-settings-section** - Props: `ReturnSettingsSectionProps`
-- **revenue-by-client-report**
-- **revenue-forecast-chart** - Props: `RevenueForecastChartProps`
-- **revenue-forecast-report**
-- **rich-document-form** - Props: `RichDocumentFormProps`
-- **rich-document-view** - Props: `RichDocumentViewProps`
-- **rich-documents-list** - Props: `RichDocumentsListProps`
-- **sales-funnel-report**
-- **sales-pipeline-analytics-report**
-- **sales-reports-create-view**
-- **sales-reports-details-view**
-- **sales-reports-list-view**
-- **sales-settings-page**
-- **sales-sidebar** - Props: `SalesSidebarProps`
-- **saudi-banking-lean-view**
-- **saudi-banking-list-view**
-- **saudi-banking-mudad-view**
-- **saudi-banking-sadad-pay-view**
-- **saudi-banking-sadad-view**
-- **saudi-banking-wps-create-view**
-- **saudi-banking-wps-view**
-- **saved-reports-list** - Props: `SavedReportsListProps`
-- **score-explanation** - Props: `ScoreExplanationProps`
-- **sequence-settings-section** - Props: `SequenceSettingsSectionProps`
-- **settings-field** - Props: `SettingsFieldProps`
-- **settings-sidebar** - Props: `SettingsSidebarProps`
-- **setup-celebration** - Props: `SetupCelebrationProps`
-- **setup-orchestrator** - Props: `SetupOrchestratorProps`
-- **setup-progress-sidebar** - Props: `SetupProgressSidebarProps`
-- **setup-reminder-banner**
-- **shape-renderer** - Props: `ShapeRendererProps`
-- **shape-selector** - Props: `ShapeSelectorProps`
-- **shift-assignments-list-view**
-- **shift-types-list-view**
-- **sidebar-nav**
-- **sla-dashboard** - Props: `SLADashboardProps`
-- **sla-list-view**
-- **smtp-config-form**
-- **sso-provider-card** - Props: `SSOProviderCardProps`
-- **sso-settings**
-- **staff-action-dialog**
-- **staff-columns**
-- **staff-delete-dialog**
-- **staff-departure-dialog**
-- **staff-details-view**
-- **staff-dialogs**
-- **staff-primary-buttons**
-- **staff-provider**
-- **staff-reinstate-dialog**
-- **staff-table**
-- **staff-view-dialog**
-- **stale-lead-indicator** - Props: `StaleLeadIndicatorProps`
-- **statement-details-view**
-- **statements-history-dashboard**
-- **subscription-create-view**
-- **subscription-detail-view**
-- **subscription-plan-form-view**
-- **subscription-plans-list-view**
-- **subscriptions-list-view** - Props: `SubscriptionCardProps`
-- **succession-planning-create-view**
-- **succession-planning-details-view**
-- **succession-planning-list-view**
-- **supplier-details-view**
-- **support-list-view**
-- **support-settings-view**
-- **support-sidebar**
-- **tag-input** - Props: `TagInputProps`
-- **tags-action-dialog** - Props: `TagsActionDialogProps`
-- **tags-columns**
-- **tags-delete-dialog** - Props: `TagsDeleteDialogProps`
-- **tags-dialogs**
-- **tags-primary-buttons**
-- **tags-provider**
-- **tags-table** - Props: `TagsTableProps`
-- **tags-view-dialog** - Props: `TagsViewDialogProps`
-- **task-details-view**
-- **task-report-template** - Props: `TaskReportTemplateProps`
-- **tasks-columns**
-- **tasks-dialogs**
-- **tasks-import-dialog**
-- **tasks-list-view**
-- **tasks-multi-delete-dialog**
-- **tasks-mutate-drawer**
-- **tasks-primary-buttons**
-- **tasks-provider**
-- **tasks-reports-create-view**
-- **tasks-reports-details-view**
-- **tasks-reports-list-view**
-- **tasks-sidebar** - Props: `TasksSidebarProps`
-- **tasks-table**
-- **tasks-timeline-view**
-- **tax-settings**
-- **tax-settings-section** - Props: `TaxSettingsSectionProps`
-- **template-action-dialog** - Props: `TemplateActionDialogProps`
-- **template-delete-dialog** - Props: `TemplateDeleteDialogProps`
-- **template-duplicate-dialog** - Props: `TemplateDuplicateDialogProps`
-- **template-view-dialog** - Props: `TemplateViewDialogProps`
-- **templates-columns**
-- **templates-provider**
-- **templates-row-actions** - Props: `TemplatesRowActionsProps`
-- **templates-table** - Props: `TemplatesTableProps`
-- **ticket-details-view**
-- **time-entries-dashboard**
-- **time-entries-report**
-- **time-entry-approvals-view**
-- **time-entry-details-view**
-- **training-create-view**
-- **training-details-view**
-- **training-list-view**
-- **transactions-dashboard**
-- **users-action-dialog**
-- **users-columns**
-- **users-delete-dialog**
-- **users-dialogs**
-- **users-invite-dialog**
-- **users-multi-delete-dialog**
-- **users-primary-buttons**
-- **users-provider**
-- **users-table**
-- **vendor-details-view**
-- **vendors-action-dialog**
-- **vendors-dashboard**
-- **vendors-delete-dialog**
-- **version-compare** - Props: `VersionCompareProps`
-- **version-upload-dialog** - Props: `VersionUploadDialogProps`
-- **voice-memo-recorder** - Props: `VoiceMemoRecorderProps`
-- **warehouse-details-view**
-- **warehouse-list-view**
-- **webhook-dialog** - Props: `WebhookDialogProps`
-- **webhook-logs** - Props: `WebhookLogsProps`
-- **webhooks-settings**
-- **weekly-time-entries-view**
-- **welcome-modal** - Props: `WelcomeModalProps`
-- **welcome-screen** - Props: `WelcomeScreenProps`
-- **whatsapp-conversation-view**
-- **whatsapp-list-view**
-- **whatsapp-new-conversation**
-- **whatsapp-start-conversation**
-- **whiteboard-block** - Props: `WhiteboardBlockProps`
-- **whiteboard-canvas** - Props: `WhiteboardCanvasProps`
-- **whiteboard-view** - Props: `WhiteboardViewProps`
-- **win-loss-analysis-report**
-- **workflows-action-dialog** - Props: `WorkflowsActionDialogProps`
-- **workflows-columns**
-- **workflows-delete-dialog** - Props: `WorkflowsDeleteDialogProps`
-- **workflows-dialogs**
-- **workflows-duplicate-dialog** - Props: `WorkflowsDuplicateDialogProps`
-- **workflows-primary-buttons**
-- **workflows-provider** - Props: `WorkflowsProviderProps`
-- **workflows-stages-dialog** - Props: `WorkflowsStagesDialogProps`
-- **workflows-table** - Props: `WorkflowsTableProps`
-- **workflows-view-dialog** - Props: `WorkflowsViewDialogProps`
-- **wps-generator-view**
-
----
-
 ## Hooks
 
 | Hook | Returns | API Calls |
@@ -2618,7 +3902,7 @@
 | `useChatter` | - | 0 |
 | `useClients` | ...old, data, ...old.data] | 0 |
 | `useCompanies` | - | 0 |
-| `useCompensation` | - | 0 |
+| `useCompensation` | - | 1 |
 | `useCompensatoryLeave` | - | 0 |
 | `useConsolidatedReport` | - | 0 |
 | `useContacts` | ...old, data, ...old.data] | 0 |
@@ -2694,11 +3978,11 @@
 | `useReceipt` | isLoading, error, downloadReceipt | 0 |
 | `useRecruitment` | - | 0 |
 | `useRemindersAndEvents` | ...old, data, ...old.data] | 2 |
-| `useReports` | data, total | 0 |
-| `useRetentionBonus` | - | 0 |
+| `useReports` | data, total | 1 |
+| `useRetentionBonus` | - | 1 |
 | `useSalaryComponent` | - | 0 |
 | `useSalesSettings` | - | 0 |
-| `useSaudiBanking` | - | 33 |
+| `useSaudiBanking` | - | 43 |
 | `useSearchCache` | size, hitRate, avgAge | 0 |
 | `useSessions` | - | 0 |
 | `useSessionTimeout` | remainingTime, isWarning, resetTimer | 0 |
@@ -2715,7 +3999,7 @@
 | `useStaffingPlan` | - | 0 |
 | `useStepUpAuth` | showReauthModal, setShowReauthModal, executeWithReauth | 0 |
 | `useSubscriptions` | - | 0 |
-| `useSuccessionPlanning` | - | 0 |
+| `useSuccessionPlanning` | - | 1 |
 | `useTags` | - | 0 |
 | `useTasks` | ...old, tasks, ...old.tasks] | 1 |
 | `useTraining` | - | 0 |
@@ -2726,4059 +4010,6 @@
 | `useWebhooks` | - | 0 |
 | `useWelcome` | - | 0 |
 | `useWindowSize` | - | 0 |
-
----
-
-## Services/API
-
-### accountingService.ts
-
-**Path:** `services/accountingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/accounts/types` |
-| GET | `/accounts` |
-| GET | `/accounts/${id}` |
-| POST | `/accounts` |
-| PATCH | `/accounts/${id}` |
-| DELETE | `/accounts/${id}` |
-| GET | `/general-ledger/entries` |
-| GET | `/general-ledger/${id}` |
-| POST | `/general-ledger/${id}/void` |
-| GET | `/general-ledger/account-balance/${accountId}` |
-| GET | `/general-ledger/trial-balance` |
-| GET | `/general-ledger/profit-loss` |
-| GET | `/general-ledger/balance-sheet` |
-| GET | `/general-ledger/reference/${model}/${id}` |
-| GET | `/general-ledger/summary` |
-| GET | `/general-ledger/stats` |
-| GET | `/journal-entries` |
-| GET | `/journal-entries/${id}` |
-| POST | `/journal-entries` |
-| POST | `/journal-entries/simple` |
-| PATCH | `/journal-entries/${id}` |
-| POST | `/journal-entries/${id}/post` |
-| POST | `/journal-entries/${id}/void` |
-| DELETE | `/journal-entries/${id}` |
-| GET | `/fiscal-periods` |
-| GET | `/fiscal-periods/current` |
-| GET | `/fiscal-periods/can-post` |
-| GET | `/fiscal-periods/years-summary` |
-| POST | `/fiscal-periods/create-year` |
-| GET | `/fiscal-periods/${id}` |
-| GET | `/fiscal-periods/${id}/balances` |
-| POST | `/fiscal-periods/${id}/open` |
-| POST | `/fiscal-periods/${id}/close` |
-| POST | `/fiscal-periods/${id}/reopen` |
-| POST | `/fiscal-periods/${id}/lock` |
-| POST | `/fiscal-periods/${id}/year-end-closing` |
-| GET | `/recurring-transactions` |
-| GET | `/recurring-transactions/upcoming` |
-| GET | `/recurring-transactions/${id}` |
-| POST | `/recurring-transactions` |
-| PUT | `/recurring-transactions/${id}` |
-| POST | `/recurring-transactions/${id}/pause` |
-| POST | `/recurring-transactions/${id}/resume` |
-| POST | `/recurring-transactions/${id}/cancel` |
-| POST | `/recurring-transactions/${id}/generate` |
-| POST | `/recurring-transactions/process-due` |
-| DELETE | `/recurring-transactions/${id}` |
-| GET | `/price-levels` |
-| GET | `/price-levels/client-rate` |
-| GET | `/price-levels/${id}` |
-| POST | `/price-levels` |
-| PUT | `/price-levels/${id}` |
-| DELETE | `/price-levels/${id}` |
-| POST | `/price-levels/${id}/set-default` |
-| GET | `/bills` |
-| GET | `/bills/${id}` |
-| POST | `/bills` |
-| PUT | `/bills/${id}` |
-| POST | `/bills/${id}/approve` |
-| POST | `/bills/${id}/pay` |
-| POST | `/bills/${id}/post-to-gl` |
-| DELETE | `/bills/${id}` |
-| POST | `/bills/${id}/receive` |
-| POST | `/bills/${id}/cancel` |
-| POST | `/bills/${id}/duplicate` |
-| POST | `/bills/${id}/attachments` |
-| DELETE | `/bills/${id}/attachments/${attachmentId}` |
-| GET | `/bills/overdue` |
-| GET | `/bills/summary` |
-| GET | `/bills/recurring` |
-| POST | `/bills/${id}/stop-recurring` |
-| POST | `/bills/${id}/generate-next` |
-| GET | `/bills/reports/aging` |
-| GET | `/bills/export` |
-| GET | `/debit-notes` |
-| GET | `/debit-notes/${id}` |
-| GET | `/bills/${billId}/debit-notes` |
-| POST | `/debit-notes` |
-| PUT | `/debit-notes/${id}` |
-| POST | `/debit-notes/${id}/approve` |
-| POST | `/debit-notes/${id}/apply` |
-| POST | `/debit-notes/${id}/cancel` |
-| DELETE | `/debit-notes/${id}` |
-| GET | `/debit-notes/export` |
-| GET | `/vendors` |
-| GET | `/vendors/${id}` |
-| POST | `/vendors` |
-| PUT | `/vendors/${id}` |
-| DELETE | `/vendors/${id}` |
-| GET | `/retainers` |
-| GET | `/retainers/${id}` |
-| POST | `/retainers` |
-| POST | `/retainers/${id}/replenish` |
-| POST | `/retainers/${id}/consume` |
-| GET | `/retainers/${id}/history` |
-| GET | `/reports/profit-loss` |
-| GET | `/reports/balance-sheet` |
-| GET | `/reports/trial-balance` |
-| GET | `/reports/ar-aging` |
-| GET | `/reports/case-profitability` |
-| GET | `/leads` |
-| GET | `/leads/${id}` |
-| POST | `/leads` |
-| PUT | `/leads/${id}` |
-| DELETE | `/leads/${id}` |
-| POST | `/leads/${id}/convert` |
-| PATCH | `/leads/${id}/stage` |
-| POST | `/leads/${id}/activity` |
-| GET | `/leads/stats` |
-| POST | `/invoices/${invoiceId}/post-to-gl` |
-| POST | `/invoices/${invoiceId}/record-payment` |
-
-### accountService.ts
-
-**Path:** `services/accountService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/accounts` |
-| GET | `/accounts/${id}` |
-| GET | `/accounts/${id}/balance` |
-| GET | `/accounts/types` |
-| POST | `/accounts` |
-| PATCH | `/accounts/${id}` |
-| DELETE | `/accounts/${id}` |
-
-### activityService.ts
-
-**Path:** `services/activityService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/activities` |
-| GET | `/activities?${params.toString()}` |
-| GET | `/activities/${id}` |
-| GET | `/activities/summary` |
-| GET | `/activities/overview` |
-| GET | `/activities/entity/${entityType}/${entityId}?limit=${limit}` |
-
-### advancesService.ts
-
-**Path:** `services/advancesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/advances?${params.toString()}` |
-| GET | `/hr/advances/${advanceId}` |
-| POST | `/hr/advances` |
-| PATCH | `/hr/advances/${advanceId}` |
-| DELETE | `/hr/advances/${advanceId}` |
-| GET | `/hr/advances/stats` |
-| POST | `/hr/advances/check-eligibility` |
-| POST | `/hr/advances/${advanceId}/cancel` |
-| POST | `/hr/advances/${advanceId}/approve` |
-| POST | `/hr/advances/${advanceId}/reject` |
-| POST | `/hr/advances/${advanceId}/disburse` |
-| POST | `/hr/advances/${advanceId}/recover` |
-| POST | `/hr/advances/${advanceId}/payroll-deduction` |
-| POST | `/hr/advances/${advanceId}/early-recovery` |
-| POST | `/hr/advances/${advanceId}/write-off` |
-| POST | `/hr/advances/${advanceId}/issue-clearance` |
-| POST | `/hr/advances/${advanceId}/documents` |
-| POST | `/hr/advances/${advanceId}/communications` |
-| POST | `/hr/advances/bulk-delete` |
-| GET | `/hr/advances/by-employee/${employeeId}` |
-| GET | `/hr/advances/pending-approvals` |
-| GET | `/hr/advances/overdue-recoveries` |
-| GET | `/hr/advances/emergency` |
-
-### ai.service.ts
-
-**Path:** `services/ai.service.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| UNKNOWN | `/api/ai` |
-
-### anonymousAuthService.ts
-
-**Path:** `services/anonymousAuthService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/auth/anonymous` |
-
-### answerService.ts
-
-**Path:** `services/answerService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/answers` |
-| GET | `/answers/${questionId}` |
-| PATCH | `/answers/${id}` |
-| DELETE | `/answers/${id}` |
-| POST | `/answers/like/${id}` |
-| PATCH | `/answers/verify/${id}` |
-
-### api-debug.ts
-
-**Path:** `lib/api-debug.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| UNKNOWN | `/api/auth/me` |
-| UNKNOWN | `/api/v1/dashboard/summary` |
-| UNKNOWN | `/api/v1/tasks/upcoming?days=14` |
-| UNKNOWN | `/api/v1/tasks/overdue` |
-| UNKNOWN | `/api/v1/tasks/due-today` |
-| UNKNOWN | `/api/v1/tasks/stats` |
-| UNKNOWN | `/api/v1/dashboard/today-events` |
-| UNKNOWN | `/api/v1/dashboard/financial-summary` |
-
-### api.ts
-
-**Path:** `lib/api.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `${API_BASE_URL_NO_VERSION}/auth/refresh` |
-| GET | `${API_BASE_URL_NO_VERSION}/auth/csrf` |
-| UNKNOWN | `/api/auth/refresh` |
-
-### apiKeysService.ts
-
-**Path:** `services/apiKeysService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/api-keys` |
-| POST | `/api-keys` |
-| DELETE | `/api-keys/${keyId}` |
-| PATCH | `/api-keys/${keyId}` |
-| GET | `/api-keys/stats` |
-
-### appointmentsService.ts
-
-**Path:** `services/appointmentsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/appointments/${id}/calendar.ics` |
-
-### approvalService.ts
-
-**Path:** `services/approvalService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/approvals/rules` |
-| PUT | `/approvals/rules` |
-| POST | `/approvals/rules` |
-| DELETE | `/approvals/rules/${ruleId}` |
-| GET | `/approvals/templates` |
-| GET | `/approvals/pending` |
-| GET | `/approvals/my-requests` |
-| GET | `/approvals/stats` |
-| POST | `/approvals/check` |
-| GET | `/approvals/${id}` |
-| POST | `/approvals/${id}/approve` |
-| POST | `/approvals/${id}/reject` |
-| POST | `/approvals/${id}/cancel` |
-
-### appsService.ts
-
-**Path:** `services/appsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/apps` |
-| GET | `/apps/${appId}` |
-| POST | `/apps/${appId}/connect` |
-| POST | `/apps/${appId}/disconnect` |
-
-### assetAssignmentService.ts
-
-**Path:** `services/assetAssignmentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/asset-assignments?${params.toString()}` |
-| GET | `/hr/asset-assignments/${assignmentId}` |
-| POST | `/hr/asset-assignments` |
-| PATCH | `/hr/asset-assignments/${assignmentId}` |
-| DELETE | `/hr/asset-assignments/${assignmentId}` |
-| GET | `/hr/asset-assignments/stats` |
-| POST | `/hr/asset-assignments/${assignmentId}/acknowledge` |
-| POST | `/hr/asset-assignments/${assignmentId}/return/initiate` |
-| POST | `/hr/asset-assignments/${assignmentId}/return/complete` |
-| POST | `/hr/asset-assignments/${assignmentId}/maintenance` |
-| POST | `/hr/asset-assignments/${assignmentId}/incident` |
-| POST | `/hr/asset-assignments/${assignmentId}/incidents/${incidentId}/resolve` |
-| PUT | `/hr/asset-assignments/${assignmentId}/status` |
-| POST | `/hr/asset-assignments/bulk-delete` |
-| GET | `/hr/asset-assignments/by-employee/${employeeId}` |
-| GET | `/hr/asset-assignments/overdue` |
-| GET | `/hr/asset-assignments/maintenance-due` |
-| GET | `/hr/asset-assignments/export?${params.toString()}` |
-| POST | `/hr/asset-assignments/${assignmentId}/clearance` |
-| POST | `/hr/asset-assignments/${assignmentId}/transfer` |
-| POST | `/hr/asset-assignments/${assignmentId}/repair` |
-| PUT | `/hr/asset-assignments/${assignmentId}/repair/${repairId}` |
-| GET | `/hr/asset-assignments/warranty-expiring` |
-| GET | `/hr/asset-assignments/policies` |
-
-### assetsService.ts
-
-**Path:** `services/assetsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/assets/${id}` |
-| DELETE | `/assets/categories/${id}` |
-
-### attendanceService.ts
-
-**Path:** `services/attendanceService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/attendance?${params.toString()}` |
-| GET | `/attendance/${recordId}` |
-| POST | `/attendance` |
-| PUT | `/attendance/${recordId}` |
-| DELETE | `/attendance/${recordId}` |
-| POST | `/attendance/check-in` |
-| POST | `/attendance/check-out` |
-| POST | `/attendance/${recordId}/breaks` |
-| POST | `/attendance/${recordId}/corrections` |
-| PUT | `/attendance/${recordId}/corrections/${correctionId}` |
-| PUT | `/attendance/${recordId}/corrections/${correctionId}` |
-| POST | `/attendance/${recordId}/excuse-late` |
-| POST | `/attendance/${recordId}/approve-early-departure` |
-| POST | `/attendance/${recordId}/approve-timesheet` |
-| POST | `/attendance/${recordId}/reject-timesheet` |
-| POST | `/attendance/${recordId}/approve-overtime` |
-| GET | `/attendance/daily-summary?${params.toString()}` |
-| GET | `/attendance/employee-summary/${employeeId}?${params.toString()}` |
-| GET | `/attendance/stats?${params.toString()}` |
-| GET | `/attendance/today?${params.toString()}` |
-| GET | `/attendance/corrections/pending` |
-| GET | `/attendance/today?${params.toString()}` |
-| GET | `/attendance/violations` |
-| GET | `/attendance/report/monthly?${params.toString()}` |
-| GET | `/attendance/stats/department?${params.toString()}` |
-| GET | `/attendance/status/${employeeId}` |
-| GET | `/attendance/summary/${employeeId}?${params.toString()}` |
-| GET | `/attendance/employee/${employeeId}/date/${date}` |
-| POST | `/attendance/mark-absences` |
-| POST | `/attendance/import` |
-| POST | `/attendance/${recordId}/break/start` |
-| POST | `/attendance/${recordId}/break/end` |
-| GET | `/attendance/${recordId}/breaks` |
-| POST | `/attendance/${recordId}/corrections` |
-| PUT | `/attendance/${recordId}/corrections/${correctionId}` |
-| POST | `/attendance/${recordId}/approve` |
-| POST | `/attendance/${recordId}/reject` |
-| POST | `/attendance/${recordId}/violations` |
-| PUT | `/attendance/${recordId}/violations/${violationIndex}/resolve` |
-| POST | `/attendance/${recordId}/violations/${violationIndex}/appeal` |
-| POST | `/attendance/${recordId}/overtime/approve` |
-| POST | `/attendance/bulk` |
-| POST | `/attendance/lock-for-payroll` |
-| GET | `/attendance/${recordId}/violations` |
-| POST | `/attendance/${recordId}/violations/${violationId}/confirm` |
-| POST | `/attendance/${recordId}/violations/${violationId}/dismiss` |
-| GET | `/attendance/compliance-report?${params.toString()}` |
-
-### auditLogService.ts
-
-**Path:** `services/auditLogService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/audit-logs` |
-| GET | `/audit-logs/entity/${type}/${id}` |
-| GET | `/audit-logs/user/${id}` |
-| GET | `/audit-logs/security` |
-| GET | `/audit-logs/export` |
-| GET | `/audit-logs/failed-logins` |
-| GET | `/audit-logs/suspicious` |
-| POST | `/audit-logs/check-brute-force` |
-
-### auditService.ts
-
-**Path:** `services/auditService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/audit-logs` |
-| POST | `/audit-logs/batch` |
-| GET | `/audit-logs` |
-| GET | `/audit-logs/resource/${resource}/${resourceId}` |
-| GET | `/audit-logs/user/${userId}` |
-| GET | `/audit-logs/stats` |
-| GET | `/audit-logs/security` |
-| GET | `/audit-logs/export` |
-| GET | `/audit-logs/failed-logins` |
-| GET | `/audit-logs/suspicious` |
-
-### authService.ts
-
-**Path:** `services/authService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/auth/logout` |
-
-### automatedActionService.ts
-
-**Path:** `services/automatedActionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/automated-actions?${params.toString()}` |
-| GET | `/automated-actions/${id}` |
-| POST | `/automated-actions` |
-| PUT | `/automated-actions/${id}` |
-| DELETE | `/automated-actions/${id}` |
-| POST | `/automated-actions/${id}/toggle` |
-| POST | `/automated-actions/${id}/test` |
-| POST | `/automated-actions/${id}/duplicate` |
-| GET | `/automated-actions/${actionId}/logs?${params.toString()}` |
-| GET | `/automated-actions/logs?${params.toString()}` |
-| GET | `/automated-actions/models` |
-| GET | `/automated-actions/models/${modelName}/fields` |
-| POST | `/automated-actions/bulk/enable` |
-| POST | `/automated-actions/bulk/disable` |
-| DELETE | `/automated-actions/bulk` |
-
-### bankAccountService.ts
-
-**Path:** `services/bankAccountService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/bank-accounts` |
-| GET | `/bank-accounts` |
-| GET | `/bank-accounts/summary` |
-| GET | `/bank-accounts/${id}` |
-| PUT | `/bank-accounts/${id}` |
-| DELETE | `/bank-accounts/${id}` |
-| POST | `/bank-accounts/${id}/set-default` |
-| GET | `/bank-accounts/${id}/balance-history` |
-| POST | `/bank-accounts/${id}/sync` |
-| POST | `/bank-accounts/${id}/disconnect` |
-
-### bankReconciliationService.ts
-
-**Path:** `services/bankReconciliationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/bank-reconciliation/feeds` |
-| POST | `/bank-reconciliation/feeds` |
-| PUT | `/bank-reconciliation/feeds/${id}` |
-| DELETE | `/bank-reconciliation/feeds/${id}` |
-| POST | `/bank-reconciliation/import/csv` |
-| POST | `/bank-reconciliation/import/ofx` |
-| GET | `/bank-reconciliation/import/template` |
-| GET | `/bank-reconciliation/suggestions/${accountId}` |
-| POST | `/bank-reconciliation/auto-match/${accountId}` |
-| POST | `/bank-reconciliation/match/confirm/${id}` |
-| POST | `/bank-reconciliation/match/reject/${id}` |
-| POST | `/bank-reconciliation/match/split` |
-| DELETE | `/bank-reconciliation/match/${id}` |
-| POST | `/bank-reconciliation/rules` |
-| GET | `/bank-reconciliation/rules` |
-| PUT | `/bank-reconciliation/rules/${id}` |
-| DELETE | `/bank-reconciliation/rules/${id}` |
-| POST | `/bank-reconciliation` |
-| GET | `/bank-reconciliation` |
-| GET | `/bank-reconciliation/${id}` |
-| POST | `/bank-reconciliation/${id}/clear` |
-| POST | `/bank-reconciliation/${id}/unclear` |
-| POST | `/bank-reconciliation/${id}/complete` |
-| POST | `/bank-reconciliation/${id}/cancel` |
-| GET | `/bank-reconciliation/status/${accountId}` |
-| GET | `/bank-reconciliation/unmatched/${accountId}` |
-| GET | `/bank-reconciliation/statistics/matches` |
-| GET | `/bank-reconciliation/statistics/rules` |
-| GET | `/bank-reconciliation/currency/rates` |
-| POST | `/bank-reconciliation/currency/convert` |
-| POST | `/bank-reconciliation/currency/rates` |
-| GET | `/bank-reconciliation/currency/supported` |
-| POST | `/bank-reconciliation/currency/update` |
-
-### bankTransactionService.ts
-
-**Path:** `services/bankTransactionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/bank-transactions` |
-| GET | `/bank-transactions` |
-| GET | `/bank-transactions/${id}` |
-| POST | `/bank-transactions/${transactionId}/match` |
-| POST | `/bank-transactions/${transactionId}/unmatch` |
-| POST | `/bank-transactions/import/${accountId}` |
-
-### bankTransferService.ts
-
-**Path:** `services/bankTransferService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/bank-transfers` |
-| GET | `/bank-transfers` |
-| GET | `/bank-transfers/${id}` |
-| POST | `/bank-transfers/${id}/cancel` |
-
-### benefitsService.ts
-
-**Path:** `services/benefitsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/employee-benefits/${benefitId}` |
-| POST | `/hr/employee-benefits/bulk-delete` |
-| GET | `/hr/employee-benefits/export` |
-
-### billingRatesService.ts
-
-**Path:** `services/billingRatesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/billing/rates/${id}` |
-| DELETE | `/billing/groups/${id}` |
-| DELETE | `/rate-cards/${id}` |
-| DELETE | `/billing/time-entries/${id}` |
-
-### billingService.ts
-
-**Path:** `services/billingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/billing/subscription` |
-| GET | `/billing/usage` |
-| POST | `/billing/subscription/change-plan` |
-| POST | `/billing/subscription/cancel` |
-| POST | `/billing/subscription/reactivate` |
-| GET | `/billing/subscription/upcoming-invoice` |
-| GET | `/billing/payment-methods` |
-| POST | `/billing/payment-methods` |
-| PATCH | `/billing/payment-methods/${id}/set-default` |
-| DELETE | `/billing/payment-methods/${id}` |
-| POST | `/billing/payment-methods/setup-intent` |
-| GET | `/billing/invoices` |
-| GET | `/billing/invoices/${id}` |
-| GET | `/billing/invoices/${id}/download` |
-| POST | `/billing/invoices/${id}/pay` |
-
-### billingSettingsService.ts
-
-**Path:** `services/billingSettingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/firms/my` |
-| GET | `/firms/my` |
-| PUT | `/firms/${cachedFirmId}` |
-| GET | `/firms/my` |
-| POST | `/firms/${cachedFirmId}/logo` |
-| PATCH | `/firms/${cachedFirmId}` |
-| GET | `/settings/taxes` |
-| POST | `/settings/taxes` |
-| PUT | `/settings/taxes/${id}` |
-| DELETE | `/settings/taxes/${id}` |
-| PATCH | `/settings/taxes/${id}/default` |
-| GET | `/settings/payment-modes` |
-| POST | `/settings/payment-modes` |
-| PUT | `/settings/payment-modes/${id}` |
-| DELETE | `/settings/payment-modes/${id}` |
-| PATCH | `/settings/payment-modes/${id}/default` |
-| GET | `/settings/finance` |
-| PUT | `/settings/finance` |
-
-### billPaymentService.ts
-
-**Path:** `services/billPaymentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/bill-payments` |
-| GET | `/bill-payments` |
-| GET | `/bill-payments/${id}` |
-| POST | `/bill-payments/${id}/cancel` |
-
-### billService.ts
-
-**Path:** `services/billService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/bills` |
-| GET | `/bills` |
-| GET | `/bills/${id}` |
-| PUT | `/bills/${id}` |
-| DELETE | `/bills/${id}` |
-| GET | `/bills/overdue` |
-| GET | `/bills/summary` |
-| GET | `/bills/recurring` |
-| GET | `/bills/reports/aging` |
-| GET | `/bills/export` |
-| POST | `/bills/${id}/receive` |
-| POST | `/bills/${id}/cancel` |
-| POST | `/bills/${id}/duplicate` |
-| POST | `/bills/${id}/stop-recurring` |
-| POST | `/bills/${id}/generate-next` |
-| POST | `/bills/${id}/attachments` |
-| DELETE | `/bills/${id}/attachments/${attachmentId}` |
-| POST | `/bills/${id}/approve` |
-| POST | `/bills/${id}/pay` |
-| POST | `/bills/${id}/post-to-gl` |
-| POST | `/debit-notes` |
-| GET | `/debit-notes` |
-| GET | `/debit-notes/${id}` |
-| GET | `/bills/${billId}/debit-notes` |
-| PUT | `/debit-notes/${id}` |
-| POST | `/debit-notes/${id}/approve` |
-| POST | `/debit-notes/${id}/apply` |
-| POST | `/debit-notes/${id}/cancel` |
-| DELETE | `/debit-notes/${id}` |
-| GET | `/debit-notes/export` |
-
-### biometricService.ts
-
-**Path:** `services/biometricService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/biometric/devices` |
-| GET | `/biometric/devices/${id}` |
-| POST | `/biometric/devices` |
-| PUT | `/biometric/devices/${id}` |
-| DELETE | `/biometric/devices/${id}` |
-| POST | `/biometric/devices/${id}/sync` |
-| POST | `/biometric/devices/${id}/heartbeat` |
-| GET | `/biometric/enrollments` |
-| GET | `/biometric/enrollments/${id}` |
-| GET | `/biometric/enrollments/employee/${employeeId}` |
-| POST | `/biometric/enrollments` |
-| POST | `/biometric/enrollments/${enrollmentId}/fingerprint` |
-| POST | `/biometric/enrollments/${enrollmentId}/facial` |
-| POST | `/biometric/enrollments/${enrollmentId}/card` |
-| POST | `/biometric/enrollments/${enrollmentId}/pin` |
-| POST | `/biometric/enrollments/${id}/revoke` |
-| GET | `/biometric/enrollments/stats` |
-| POST | `/biometric/verify` |
-| POST | `/biometric/identify` |
-| POST | `/biometric/checkin-gps` |
-| GET | `/biometric/logs` |
-| GET | `/biometric/logs/stats` |
-| GET | `/biometric/logs/failed` |
-| GET | `/biometric/logs/spoofing` |
-| GET | `/biometric/logs/daily-summary` |
-| POST | `/biometric/logs/process` |
-| GET | `/biometric/geofence` |
-| GET | `/biometric/geofence/${id}` |
-| POST | `/biometric/geofence` |
-| PUT | `/biometric/geofence/${id}` |
-| DELETE | `/biometric/geofence/${id}` |
-| POST | `/biometric/geofence/validate` |
-
-### brokersService.ts
-
-**Path:** `services/brokersService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/brokers` |
-| GET | `/brokers/${id}` |
-| POST | `/brokers` |
-| PATCH | `/brokers/${id}` |
-| DELETE | `/brokers/${id}` |
-| POST | `/brokers/${id}/set-default` |
-
-### budgetService.ts
-
-**Path:** `services/budgetService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/budgets` |
-| GET | `/budgets/${id}` |
-| POST | `/budgets` |
-| PATCH | `/budgets/${id}` |
-| DELETE | `/budgets/${id}` |
-| POST | `/budgets/${id}/submit` |
-| POST | `/budgets/${id}/approve` |
-| POST | `/budgets/${id}/reject` |
-| POST | `/budgets/${id}/close` |
-| GET | `/budgets/${budgetId}/lines` |
-| PATCH | `/budgets/${budgetId}/lines/${lineId}` |
-| GET | `/budgets/stats` |
-| GET | `/budgets/${budgetId}/vs-actual` |
-| POST | `/budgets/check` |
-| POST | `/budgets/${budgetId}/distribution` |
-| POST | `/budgets/${id}/duplicate` |
-
-### buyingService.ts
-
-**Path:** `services/buyingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/buying/suppliers` |
-| GET | `/buying/suppliers/${id}` |
-| POST | `/buying/suppliers` |
-| PUT | `/buying/suppliers/${id}` |
-| DELETE | `/buying/suppliers/${id}` |
-| GET | `/buying/supplier-groups` |
-| GET | `/buying/purchase-orders` |
-| GET | `/buying/purchase-orders/${id}` |
-| POST | `/buying/purchase-orders` |
-| POST | `/buying/purchase-orders/${id}/submit` |
-| POST | `/buying/purchase-orders/${id}/approve` |
-| POST | `/buying/purchase-orders/${id}/cancel` |
-| DELETE | `/buying/purchase-orders/${id}` |
-| GET | `/buying/purchase-receipts` |
-| GET | `/buying/purchase-receipts/${id}` |
-| POST | `/buying/purchase-receipts` |
-| POST | `/buying/purchase-receipts/${id}/submit` |
-| GET | `/buying/purchase-invoices` |
-| GET | `/buying/purchase-invoices/${id}` |
-| POST | `/buying/purchase-invoices` |
-| POST | `/buying/purchase-invoices/${id}/submit` |
-| GET | `/buying/material-requests` |
-| GET | `/buying/material-requests/${id}` |
-| POST | `/buying/material-requests` |
-| GET | `/buying/rfqs` |
-| GET | `/buying/rfqs/${id}` |
-| POST | `/buying/rfqs` |
-| PUT | `/buying/rfqs/${id}` |
-| POST | `/buying/rfqs/${id}/submit` |
-| DELETE | `/buying/rfqs/${id}` |
-| GET | `/buying/stats` |
-| GET | `/buying/settings` |
-| PUT | `/buying/settings` |
-
-### calendarService.ts
-
-**Path:** `services/calendarService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/calendar/stats` |
-
-### campaignService.ts
-
-**Path:** `services/campaignService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/campaigns` |
-| GET | `/campaigns/${campaignId}` |
-| POST | `/campaigns` |
-| PUT | `/campaigns/${campaignId}` |
-| DELETE | `/campaigns/${campaignId}` |
-| POST | `/campaigns/${campaignId}/duplicate` |
-| POST | `/campaigns/${campaignId}/pause` |
-| POST | `/campaigns/${campaignId}/resume` |
-| POST | `/campaigns/${campaignId}/complete` |
-| GET | `/campaigns/${campaignId}/leads` |
-| GET | `/campaigns/${campaignId}/stats` |
-| GET | `/campaigns/${campaignId}/analytics` |
-
-### caseNotionService.ts
-
-**Path:** `services/caseNotionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/cases/${caseId}/notion/pages/${pageId}` |
-| DELETE | `/cases/${caseId}/notion/blocks/${blockId}` |
-| DELETE | `/cases/${caseId}/notion/comments/${commentId}` |
-| GET | `/cases/${caseId}/notion/pages/${pageId}/export/pdf` |
-
-### caseRichDocumentService.ts
-
-**Path:** `services/caseRichDocumentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/cases/${caseId}/rich-documents/${docId}` |
-
-### casesService.ts
-
-**Path:** `services/casesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/cases/${caseId}/documents/${docId}` |
-
-### caseWorkflowService.ts
-
-**Path:** `services/caseWorkflowService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/cases/${caseId}/workflow/cancel` |
-
-### caseWorkflowsService.ts
-
-**Path:** `services/caseWorkflowsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/case-workflows/${id}` |
-
-### chatterService.ts
-
-**Path:** `services/chatterService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/chatter/followers/${resModel}/${resId}` |
-| POST | `/chatter/followers` |
-| DELETE | `/chatter/followers/${followerId}` |
-| PATCH | `/chatter/followers/${followerId}/preferences` |
-| GET | `/chatter/followers/${resModel}/${resId}/me` |
-| POST | `/chatter/followers/${resModel}/${resId}/toggle` |
-| GET | `/chatter/activity-types` |
-| GET | `/chatter/activities/${resModel}/${resId}?${params.toString()}` |
-| GET | `/chatter/activities/me?${params.toString()}` |
-| POST | `/chatter/activities` |
-| PATCH | `/chatter/activities/${activityId}` |
-| POST | `/chatter/activities/${activityId}/done` |
-| DELETE | `/chatter/activities/${activityId}` |
-| POST | `/chatter/attachments` |
-| POST | `/chatter/attachments/bulk` |
-| GET | `/chatter/attachments/${resModel}/${resId}` |
-| DELETE | `/chatter/attachments/${attachmentId}` |
-
-### clientService.ts
-
-**Path:** `services/clientService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/clients` |
-| GET | `/clients/${clientId}` |
-| POST | `/clients` |
-| PUT | `/clients/${clientId}` |
-| DELETE | `/clients/${clientId}` |
-| GET | `/clients/${clientId}/cases` |
-| GET | `/clients/${clientId}/invoices` |
-| GET | `/clients/${clientId}/quotes` |
-| GET | `/clients/${clientId}/activities` |
-| GET | `/clients/${clientId}/payments` |
-| POST | `/clients/${clientId}/credit-status` |
-| POST | `/leads/${leadId}/convert` |
-
-### clientsService.ts
-
-**Path:** `services/clientsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/clients` |
-| GET | `/clients/${id}` |
-| POST | `/clients` |
-| PUT | `/clients/${id}` |
-| DELETE | `/clients/${id}` |
-| GET | `/clients/search` |
-| GET | `/clients/stats` |
-| GET | `/clients/top-revenue` |
-| DELETE | `/clients/bulk` |
-| GET | `/clients/${id}/cases` |
-| GET | `/clients/${id}/invoices` |
-| GET | `/clients/${id}/payments` |
-| GET | `/clients/${id}/billing-info` |
-| POST | `/clients/${id}/verify/wathq` |
-| GET | `/clients/${id}/wathq/${dataType}` |
-| POST | `/clients/${id}/verify/absher` |
-| POST | `/clients/${id}/verify/address` |
-| POST | `/clients/${id}/attachments` |
-| DELETE | `/clients/${id}/attachments/${attachmentId}` |
-| POST | `/clients/${id}/conflict-check` |
-| PATCH | `/clients/${id}/status` |
-| PATCH | `/clients/${id}/flags` |
-| GET | `/clients/regions` |
-
-### companyService.ts
-
-**Path:** `services/companyService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/firms/${id}` |
-| DELETE | `/firms/${firmId}/access/${userId}` |
-| UNKNOWN | `/api/firms/*` |
-
-### compensationService.ts
-
-**Path:** `services/compensationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/compensation-rewards/${id}` |
-| GET | `/hr/compensation-rewards/employee/${employeeId}` |
-| POST | `/hr/compensation-rewards` |
-| PATCH | `/hr/compensation-rewards/${id}` |
-| DELETE | `/hr/compensation-rewards/${id}` |
-| POST | `/hr/compensation-rewards/bulk-delete` |
-| POST | `/hr/compensation-rewards/${id}/salary-increase` |
-| POST | `/hr/compensation-rewards/${id}/allowances` |
-| PATCH | `/hr/compensation-rewards/${id}/allowances/${allowanceId}` |
-| DELETE | `/hr/compensation-rewards/${id}/allowances/${allowanceId}` |
-| POST | `/hr/compensation-rewards/${id}/bonus` |
-| POST | `/hr/compensation-rewards/${id}/submit-review` |
-| POST | `/hr/compensation-rewards/${id}/approve-review` |
-| POST | `/hr/compensation-rewards/${id}/decline-review` |
-| POST | `/hr/compensation-rewards/${id}/recognition` |
-| GET | `/hr/compensation-rewards/pending-reviews` |
-| GET | `/hr/compensation-rewards/pay-grade-analysis/${payGrade}` |
-| POST | `/hr/compensation-rewards/${id}/total-rewards-statement` |
-
-### compensatoryLeaveService.ts
-
-**Path:** `services/compensatoryLeaveService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/compensatory-leave-requests?${params.toString()}` |
-| GET | `/compensatory-leave-requests/${id}` |
-| POST | `/compensatory-leave-requests` |
-| PATCH | `/compensatory-leave-requests/${id}` |
-| DELETE | `/compensatory-leave-requests/${id}` |
-| POST | `/compensatory-leave-requests/${id}/submit` |
-| POST | `/compensatory-leave-requests/calculate-days` |
-| POST | `/compensatory-leave-requests/${id}/approve` |
-| POST | `/compensatory-leave-requests/${id}/reject` |
-| POST | `/compensatory-leave-requests/${id}/cancel` |
-| GET | `/compensatory-leave-requests/balance/${employeeId}` |
-| POST | `/compensatory-leave-requests/expire-unused?${params.toString()}` |
-| GET | `/compensatory-leave-requests/holiday-work-records?${params.toString()}` |
-| GET | `/compensatory-leave-requests/stats?${params.toString()}` |
-| GET | `/compensatory-leave-requests/pending-approvals` |
-| GET | `/compensatory-leave-requests/expiring?${params.toString()}` |
-| POST | `/compensatory-leave-requests/${requestId}/documents` |
-| GET | `/compensatory-leave-requests/export?${params.toString()}` |
-| POST | `/compensatory-leave-requests/bulk-approve` |
-| POST | `/compensatory-leave-requests/bulk-reject` |
-| GET | `/compensatory-leave-requests/policy` |
-
-### conflictCheckService.ts
-
-**Path:** `services/conflictCheckService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/conflict-checks` |
-| GET | `/conflict-checks/${id}` |
-| GET | `/conflict-checks` |
-| PATCH | `/conflict-checks/${id}` |
-| DELETE | `/conflict-checks/${id}` |
-| POST | `/conflict-checks/${checkId}/matches/${matchIndex}/resolve` |
-| POST | `/conflict-checks/quick` |
-| GET | `/conflict-checks/stats` |
-
-### consent.service.ts
-
-**Path:** `services/consent.service.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/consent` |
-| POST | `/consent` |
-| PUT | `/consent/${category}` |
-| DELETE | `/consent` |
-| POST | `/consent/export` |
-| GET | `/consent/export/${requestId}` |
-| GET | `/consent/history` |
-
-### consolidatedReportService.ts
-
-**Path:** `services/consolidatedReportService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/reports/consolidated/elimination-rules/${id}` |
-| POST | `/reports/consolidated/export` |
-| GET | `/consolidated-reports/auto-eliminations?${params.toString()}` |
-| GET | `/consolidated-reports/full-statement?${queryParams.toString()}` |
-| UNKNOWN | `/api/reports/consolidated` |
-
-### contactService.ts
-
-**Path:** `services/contactService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/contacts` |
-| GET | `/contacts/${contactId}` |
-| POST | `/contacts` |
-| PUT | `/contacts/${contactId}` |
-| DELETE | `/contacts/${contactId}` |
-| GET | `/contacts/${contactId}/cases` |
-| GET | `/contacts/${contactId}/activities` |
-| POST | `/contacts/${contactId}/conflict-check` |
-| POST | `/contacts/${contactId}/conflict-status` |
-| POST | `/contacts/${contactId}/link-case` |
-| DELETE | `/contacts/${contactId}/unlink-case/${caseId}` |
-| POST | `/contacts/${primaryId}/merge` |
-| GET | `/contacts/${contactId}/stakeholder/${leadId}` |
-
-### contactsService.ts
-
-**Path:** `services/contactsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/contacts?${params.toString()}` |
-| GET | `/contacts/${id}` |
-| POST | `/contacts` |
-| PATCH | `/contacts/${id}` |
-| DELETE | `/contacts/${id}` |
-| DELETE | `/contacts/bulk` |
-| GET | `/contacts/search?q=${encodeURIComponent(query)}` |
-| GET | `/contacts/case/${caseId}` |
-| GET | `/contacts/client/${clientId}` |
-| POST | `/contacts/${contactId}/link-case` |
-| DELETE | `/contacts/${contactId}/unlink-case/${caseId}` |
-| POST | `/contacts/${contactId}/link-client` |
-| DELETE | `/contacts/${contactId}/unlink-client/${clientId}` |
-
-### conversationsService.ts
-
-**Path:** `services/conversationsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/conversations` |
-| GET | `/conversations/single/${sellerID}/${buyerID}` |
-| POST | `/conversations` |
-| GET | `/messages/${conversationId}` |
-| POST | `/messages` |
-| PATCH | `/conversations/${conversationId}` |
-| PATCH | `/messages/${conversationId}/read` |
-
-### corporateCardService.ts
-
-**Path:** `services/corporateCardService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/corporate-cards` |
-| GET | `/corporate-cards/${id}` |
-| POST | `/corporate-cards` |
-| PATCH | `/corporate-cards/${id}` |
-| DELETE | `/corporate-cards/${id}` |
-| POST | `/corporate-cards/${id}/block` |
-| POST | `/corporate-cards/${id}/unblock` |
-| GET | `/corporate-cards/transactions` |
-| GET | `/corporate-cards/transactions/${id}` |
-| POST | `/corporate-cards/transactions` |
-| PATCH | `/corporate-cards/transactions/${id}` |
-| DELETE | `/corporate-cards/transactions/${id}` |
-| GET | `/corporate-cards/transactions` |
-| GET | `/corporate-cards/transactions` |
-| POST | `/corporate-cards/transactions/${data.transactionId}/reconcile` |
-| POST | `/corporate-cards/transactions/bulk-reconcile` |
-| POST | `/corporate-cards/transactions/${transactionId}/match` |
-| GET | `/corporate-cards/transactions/${transactionId}/potential-matches` |
-| POST | `/corporate-cards/transactions/${transactionId}/dispute` |
-| POST | `/corporate-cards/transactions/${transactionId}/resolve-dispute` |
-| POST | `/corporate-cards/transactions/import` |
-| GET | `/corporate-cards/transactions/csv-template` |
-| GET | `/corporate-cards/statistics` |
-| GET | `/corporate-cards/reports/reconciliation` |
-| GET | `/corporate-cards/reports/reconciliation/export` |
-| GET | `/corporate-cards/analytics/spending-by-category` |
-| GET | `/corporate-cards/analytics/spending-by-card` |
-| GET | `/corporate-cards/analytics/monthly-trend` |
-
-### crmAdvancedService.ts
-
-**Path:** `services/crmAdvancedService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/email-marketing/templates` |
-| GET | `/email-marketing/templates/${id}` |
-| POST | `/email-marketing/templates` |
-| PUT | `/email-marketing/templates/${id}` |
-| DELETE | `/email-marketing/templates/${id}` |
-| POST | `/email-marketing/templates/${id}/preview` |
-| POST | `/email-marketing/templates/${id}/duplicate` |
-| GET | `/email-marketing/campaigns` |
-| GET | `/email-marketing/campaigns/${id}` |
-| POST | `/email-marketing/campaigns` |
-| PUT | `/email-marketing/campaigns/${id}` |
-| DELETE | `/email-marketing/campaigns/${id}` |
-| POST | `/email-marketing/campaigns/${id}/send` |
-| POST | `/email-marketing/campaigns/${id}/schedule` |
-| POST | `/email-marketing/campaigns/${id}/pause` |
-| POST | `/email-marketing/campaigns/${id}/resume` |
-| GET | `/email-marketing/campaigns/${id}/analytics` |
-| POST | `/email-marketing/campaigns/${id}/ab-test` |
-| GET | `/email-marketing/campaigns/${id}/ab-test/results` |
-| POST | `/email-marketing/campaigns/${id}/ab-test/pick-winner` |
-| GET | `/email-marketing/drip-campaigns` |
-| GET | `/email-marketing/drip-campaigns/${id}` |
-| POST | `/email-marketing/drip-campaigns` |
-| PUT | `/email-marketing/drip-campaigns/${id}` |
-| DELETE | `/email-marketing/drip-campaigns/${id}` |
-| POST | `/email-marketing/drip-campaigns/${id}/activate` |
-| POST | `/email-marketing/drip-campaigns/${id}/pause` |
-| POST | `/email-marketing/drip-campaigns/${id}/enroll` |
-| POST | `/email-marketing/drip-campaigns/${id}/remove` |
-| GET | `/email-marketing/subscribers` |
-| GET | `/email-marketing/subscribers/${id}` |
-| POST | `/email-marketing/subscribers` |
-| POST | `/email-marketing/subscribers/import` |
-| POST | `/email-marketing/subscribers/${id}/unsubscribe` |
-| POST | `/email-marketing/subscribers/${id}/tags` |
-| DELETE | `/email-marketing/subscribers/${id}/tags` |
-| GET | `/email-marketing/segments` |
-| GET | `/email-marketing/segments/${id}` |
-| POST | `/email-marketing/segments` |
-| PUT | `/email-marketing/segments/${id}` |
-| DELETE | `/email-marketing/segments/${id}` |
-| GET | `/email-marketing/segments/${id}/preview` |
-| POST | `/email-marketing/segments/${id}/refresh` |
-| GET | `/lead-scoring/config` |
-| PUT | `/lead-scoring/config` |
-| POST | `/lead-scoring/calculate/${leadId}` |
-| POST | `/lead-scoring/calculate-all` |
-| POST | `/lead-scoring/calculate-batch` |
-| GET | `/lead-scoring/scores` |
-| GET | `/lead-scoring/leaderboard` |
-| GET | `/lead-scoring/distribution` |
-| GET | `/lead-scoring/top-leads` |
-| GET | `/lead-scoring/by-grade/${grade}` |
-| GET | `/lead-scoring/insights/${leadId}` |
-| GET | `/lead-scoring/trends` |
-| GET | `/lead-scoring/conversion-analysis` |
-| POST | `/lead-scoring/track/email-open` |
-| POST | `/lead-scoring/track/email-click` |
-| POST | `/lead-scoring/track/document-view` |
-| POST | `/lead-scoring/track/website-visit` |
-| POST | `/lead-scoring/track/form-submit` |
-| POST | `/lead-scoring/track/meeting` |
-| POST | `/lead-scoring/track/call` |
-| POST | `/lead-scoring/process-decay` |
-| GET | `/whatsapp/conversations` |
-| GET | `/whatsapp/conversations/${id}` |
-| POST | `/whatsapp/messages/send` |
-| POST | `/whatsapp/send/template` |
-| POST | `/whatsapp/conversations/${conversationId}/read` |
-| POST | `/whatsapp/conversations/${conversationId}/assign` |
-| POST | `/whatsapp/conversations/${conversationId}/close` |
-| GET | `/whatsapp/templates` |
-| POST | `/whatsapp/templates` |
-| GET | `/whatsapp/templates/${id}/status` |
-| POST | `/whatsapp/broadcasts` |
-| GET | `/whatsapp/broadcasts` |
-| POST | `/whatsapp/broadcasts/${id}/send` |
-
-### crmAnalyticsService.ts
-
-**Path:** `services/crmAnalyticsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/crm-analytics/dashboard` |
-| GET | `/crm-analytics/revenue` |
-| GET | `/crm-analytics/sales-funnel` |
-| GET | `/crm-analytics/leads` |
-| GET | `/crm-analytics/pipeline` |
-| GET | `/crm-analytics/team-performance` |
-| GET | `/crm-analytics/activities` |
-| GET | `/crm-analytics/win-loss` |
-
-### crmReportsService.ts
-
-**Path:** `services/crmReportsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/crm/reports/pipeline/overview` |
-| GET | `/crm/reports/pipeline/velocity` |
-| GET | `/crm/reports/pipeline/stage-duration` |
-| GET | `/crm/reports/pipeline/deal-aging` |
-| GET | `/crm/reports/pipeline/movement` |
-| GET | `/crm/reports/leads/by-source` |
-| GET | `/crm/reports/leads/conversion-funnel` |
-| GET | `/crm/reports/leads/response-time` |
-| GET | `/crm/reports/leads/velocity` |
-| GET | `/crm/reports/leads/distribution` |
-| GET | `/crm/reports/activity/summary` |
-| GET | `/crm/reports/activity/calls` |
-| GET | `/crm/reports/activity/emails` |
-| GET | `/crm/reports/activity/meetings` |
-| GET | `/crm/reports/activity/tasks` |
-| GET | `/crm/reports/revenue/forecast` |
-| GET | `/crm/reports/revenue/analysis` |
-| GET | `/crm/reports/revenue/quota-attainment` |
-| GET | `/crm/reports/revenue/win-rate` |
-| GET | `/crm/reports/revenue/deal-size` |
-| GET | `/crm/reports/performance/leaderboard` |
-| GET | `/crm/reports/performance/team` |
-| GET | `/crm/reports/performance/rep-scorecard/${userId}` |
-| GET | `/crm/reports/performance/activity-metrics` |
-| GET | `/crm/reports/customer/lifetime-value` |
-| GET | `/crm/reports/customer/churn` |
-| GET | `/crm/reports/customer/health-score` |
-| GET | `/crm/reports/customer/engagement` |
-| GET | `/crm/reports/win-loss/analysis` |
-| GET | `/crm/reports/win-loss/lost-deals` |
-| GET | `/crm/reports/win-loss/competitors` |
-| GET | `/crm/reports/territory/performance` |
-| GET | `/crm/reports/territory/regional-sales` |
-| GET | `/crm/reports/territory/geographic-pipeline` |
-| GET | `/crm/reports/transactions` |
-| GET | `/crm/reports/transactions/summary` |
-| GET | `/crm/reports/transactions/export` |
-| GET | `/crm/reports/${reportType}/export` |
-| POST | `/crm/reports/schedule` |
-| GET | `/crm/reports/${reportType}/metadata` |
-
-### crmService.ts
-
-**Path:** `services/crmService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/leads` |
-| GET | `/leads/${id}` |
-| POST | `/leads` |
-| PUT | `/leads/${id}` |
-| DELETE | `/leads/${id}` |
-| POST | `/leads/${id}/status` |
-| POST | `/leads/${id}/move` |
-| GET | `/leads/${id}/conversion-preview` |
-| POST | `/leads/${id}/convert` |
-| GET | `/leads/stats` |
-| GET | `/leads/follow-up` |
-| GET | `/leads/${id}/activities` |
-| POST | `/leads/${id}/activities` |
-| POST | `/leads/${id}/follow-up` |
-| POST | `/leads/${id}/verify/wathq` |
-| POST | `/leads/${id}/verify/absher` |
-| POST | `/leads/${id}/verify/address` |
-| POST | `/leads/${id}/conflict-check` |
-| GET | `/crm-pipelines` |
-| GET | `/crm-pipelines/${id}` |
-| POST | `/crm-pipelines` |
-| PUT | `/crm-pipelines/${id}` |
-| DELETE | `/crm-pipelines/${id}` |
-| POST | `/crm-pipelines/${id}/stages` |
-| PUT | `/crm-pipelines/${id}/stages/${stageId}` |
-| DELETE | `/crm-pipelines/${id}/stages/${stageId}` |
-| POST | `/crm-pipelines/${id}/stages/reorder` |
-| GET | `/crm-pipelines/${id}/stats` |
-| POST | `/crm-pipelines/${id}/default` |
-| POST | `/crm-pipelines/${id}/duplicate` |
-| GET | `/referrals` |
-| GET | `/referrals/${id}` |
-| POST | `/referrals` |
-| PUT | `/referrals/${id}` |
-| DELETE | `/referrals/${id}` |
-| GET | `/referrals/stats` |
-| GET | `/referrals/top` |
-| POST | `/referrals/${id}/leads` |
-| POST | `/referrals/${id}/leads/${leadId}/convert` |
-| POST | `/referrals/${id}/payments` |
-| GET | `/referrals/${id}/calculate-fee` |
-| GET | `/crm-activities` |
-| GET | `/crm-activities/${id}` |
-| POST | `/crm-activities` |
-| PUT | `/crm-activities/${id}` |
-| DELETE | `/crm-activities/${id}` |
-| GET | `/crm-activities/timeline` |
-| GET | `/crm-activities/stats` |
-| GET | `/crm-activities/entity/${entityType}/${entityId}` |
-| GET | `/crm-activities/tasks/upcoming` |
-| POST | `/crm-activities/${id}/complete` |
-| POST | `/crm-activities/log/call` |
-| POST | `/crm-activities/log/email` |
-| POST | `/crm-activities/log/meeting` |
-| POST | `/crm-activities/log/note` |
-
-### crmSettingsService.ts
-
-**Path:** `services/crmSettingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/sales-teams` |
-| GET | `/sales-teams/${id}` |
-| POST | `/sales-teams` |
-| PUT | `/sales-teams/${id}` |
-| DELETE | `/sales-teams/${id}` |
-| POST | `/sales-teams/${id}/members` |
-| DELETE | `/sales-teams/${id}/members/${userId}` |
-| PUT | `/sales-teams/${id}/members/${userId}` |
-| GET | `/territories` |
-| GET | `/territories/${id}` |
-| POST | `/territories` |
-| PUT | `/territories/${id}` |
-| DELETE | `/territories/${id}` |
-| POST | `/territories/reorder` |
-| POST | `/territories/${id}/users` |
-| POST | `/territories/${id}/teams` |
-| GET | `/lost-reasons` |
-| POST | `/lost-reasons` |
-| PUT | `/lost-reasons/${id}` |
-| DELETE | `/lost-reasons/${id}` |
-| POST | `/lost-reasons/reorder` |
-| GET | `/crm-tags` |
-| POST | `/crm-tags` |
-| PUT | `/crm-tags/${id}` |
-| DELETE | `/crm-tags/${id}` |
-| POST | `/crm-tags/merge` |
-| GET | `/email-templates` |
-| GET | `/email-templates/${id}` |
-| POST | `/email-templates` |
-| PUT | `/email-templates/${id}` |
-| DELETE | `/email-templates/${id}` |
-| POST | `/email-templates/${id}/duplicate` |
-| POST | `/email-templates/preview` |
-| GET | `/competitors` |
-| POST | `/competitors` |
-| PUT | `/competitors/${id}` |
-| DELETE | `/competitors/${id}` |
-| GET | `/competitors/stats` |
-| GET | `/crm-settings` |
-| PUT | `/crm-settings` |
-| GET | `/crm-settings/lead` |
-| PUT | `/crm-settings/lead` |
-| GET | `/crm-settings/opportunity` |
-| PUT | `/crm-settings/opportunity` |
-| GET | `/crm-settings/quote` |
-| PUT | `/crm-settings/quote` |
-| GET | `/crm-settings` |
-| PUT | `/crm-settings` |
-| PUT | `/crm-settings` |
-| DELETE | `/crm-settings/reset` |
-
-### currencyService.ts
-
-**Path:** `services/currencyService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/currency/settings` |
-| GET | `/currency/rates` |
-| POST | `/currency/convert` |
-| POST | `/currency/rates` |
-| GET | `/currency/supported` |
-| POST | `/currency/update` |
-
-### dataExportService.ts
-
-**Path:** `services/dataExportService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/data-export/export` |
-| GET | `/data-export/jobs/${jobId}` |
-| GET | `/data-export/jobs` |
-| GET | `/data-export/jobs/${jobId}/download` |
-| POST | `/data-export/jobs/${jobId}/cancel` |
-| DELETE | `/data-export/jobs/${jobId}` |
-| POST | `/data-export/import` |
-| POST | `/data-export/import/${jobId}/start` |
-| POST | `/data-export/import/${jobId}/validate` |
-| GET | `/data-export/import/${jobId}` |
-| GET | `/data-export/imports` |
-| POST | `/data-export/import/${jobId}/cancel` |
-| POST | `/data-export/import` |
-| POST | `/data-export/import/${job._id}/validate` |
-| GET | `/data-export/templates` |
-| POST | `/data-export/templates` |
-| PATCH | `/data-export/templates/${id}` |
-| DELETE | `/data-export/templates/${id}` |
-
-### documentAnalysisService.ts
-
-**Path:** `services/documentAnalysisService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/document-analysis/${documentId}` |
-| GET | `/document-analysis/${documentId}` |
-| DELETE | `/document-analysis/${documentId}` |
-| POST | `/document-analysis/${documentId}/reanalyze` |
-| GET | `/document-analysis/${documentId}/status` |
-| GET | `/document-analysis/${documentId}/history` |
-| POST | `/document-analysis/batch` |
-| GET | `/document-analysis/search` |
-| GET | `/document-analysis/${documentId}/similar` |
-| GET | `/document-analysis/${documentId}/report` |
-| GET | `/document-analysis/stats` |
-
-### documentsService.ts
-
-**Path:** `services/documentsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/documents?${params.toString()}` |
-| GET | `/documents/${id}` |
-| POST | `/documents/upload` |
-| POST | `/documents/confirm` |
-| POST | `/documents/upload` |
-| PATCH | `/documents/${id}` |
-| DELETE | `/documents/${id}` |
-| GET | `/documents/case/${caseId}` |
-| GET | `/documents/client/${clientId}` |
-| GET | `/documents/stats` |
-| GET | `/documents/${id}/download` |
-| POST | `/documents/${id}/share` |
-| POST | `/documents/${id}/revoke-share` |
-| POST | `/documents/${id}/versions` |
-| GET | `/documents/${id}/versions` |
-| POST | `/documents/${documentId}/versions/${versionId}/restore` |
-| GET | `/documents/search?q=${encodeURIComponent(query)}` |
-| GET | `/documents/recent?limit=${limit}` |
-| POST | `/documents/bulk-delete` |
-| POST | `/documents/${documentId}/move` |
-| GET | `/documents?${params.toString()}` |
-| GET | `/documents/${id}/preview-url` |
-| GET | `/documents/${id}/download-url?disposition=${disposition}` |
-| POST | `/documents/${id}/encrypt` |
-| POST | `/documents/${id}/decrypt` |
-
-### documentVersionService.ts
-
-**Path:** `services/documentVersionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/documents/${documentId}/versions` |
-| GET | `/documents/${documentId}/versions/${versionId}` |
-| POST | `/documents/${documentId}/versions` |
-| GET | `/documents/${documentId}/versions/${versionId}/download` |
-| GET | `/documents/${documentId}/versions/${versionId}/download-url` |
-| GET | `/documents/${documentId}/versions/${versionId}/preview-url` |
-| POST | `/documents/${documentId}/versions/${versionId}/restore` |
-| DELETE | `/documents/${documentId}/versions/${versionId}` |
-| POST | `/documents/${documentId}/versions/cleanup` |
-| GET | `/documents/${documentId}/versions/compare?v1=${versionId1}&v2=${versionId2}` |
-| GET | `/documents/${documentId}/versions/statistics` |
-| GET | `/documents/${documentId}/versions/diff?v1=${versionId1}&v2=${versionId2}` |
-| GET | `/documents/${documentId}/versions/${versionId}/content` |
-| PATCH | `/documents/${documentId}/versions/${versionId}` |
-
-### emailMarketingService.ts
-
-**Path:** `services/emailMarketingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/email-marketing/campaigns` |
-| GET | `/email-marketing/campaigns` |
-| GET | `/email-marketing/campaigns/${id}` |
-| PUT | `/email-marketing/campaigns/${id}` |
-| DELETE | `/email-marketing/campaigns/${id}` |
-| POST | `/email-marketing/campaigns/${id}/duplicate` |
-| POST | `/email-marketing/campaigns/${id}/schedule` |
-| POST | `/email-marketing/campaigns/${id}/send` |
-| POST | `/email-marketing/campaigns/${id}/pause` |
-| POST | `/email-marketing/campaigns/${id}/resume` |
-| POST | `/email-marketing/campaigns/${id}/cancel` |
-| POST | `/email-marketing/campaigns/${id}/test` |
-| GET | `/email-marketing/campaigns/${id}/analytics` |
-| POST | `/email-marketing/templates` |
-| GET | `/email-marketing/templates` |
-| GET | `/email-marketing/templates/public` |
-| GET | `/email-marketing/templates/${id}` |
-| PUT | `/email-marketing/templates/${id}` |
-| DELETE | `/email-marketing/templates/${id}` |
-| POST | `/email-marketing/templates/${id}/preview` |
-| POST | `/email-marketing/subscribers` |
-| GET | `/email-marketing/subscribers` |
-| PUT | `/email-marketing/subscribers/${id}` |
-| DELETE | `/email-marketing/subscribers/${id}` |
-| POST | `/email-marketing/subscribers/import` |
-| POST | `/email-marketing/subscribers/export` |
-
-### emailSettingsService.ts
-
-**Path:** `services/emailSettingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/settings/email/smtp` |
-| PUT | `/settings/email/smtp` |
-| POST | `/settings/email/smtp/test-connection` |
-| POST | `/settings/email/smtp/send-test` |
-| GET | `/settings/email/signatures` |
-| POST | `/settings/email/signatures` |
-| PUT | `/settings/email/signatures/${id}` |
-| DELETE | `/settings/email/signatures/${id}` |
-| PATCH | `/settings/email/signatures/${id}/default` |
-| GET | `/settings/email/templates` |
-| GET | `/settings/email/templates/${id}` |
-| POST | `/settings/email/templates` |
-| PUT | `/settings/email/templates/${id}` |
-| DELETE | `/settings/email/templates/${id}` |
-| PATCH | `/settings/email/templates/${id}/toggle` |
-
-### employeeIncentiveService.ts
-
-**Path:** `services/employeeIncentiveService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/employee-incentives/${id}` |
-| POST | `/hr/employee-incentives` |
-| PATCH | `/hr/employee-incentives/${id}` |
-| DELETE | `/hr/employee-incentives/${id}` |
-| POST | `/hr/employee-incentives/bulk-delete` |
-| POST | `/hr/employee-incentives/${id}/submit` |
-| POST | `/hr/employee-incentives/${id}/approve` |
-| POST | `/hr/employee-incentives/${id}/reject` |
-| GET | `/hr/employee-incentives/payroll/${payrollDate}` |
-| POST | `/hr/employee-incentives/${id}/process` |
-| GET | `/hr/employee-incentives/employee/${employeeId}/history` |
-| POST | `/hr/employee-incentives/bulk-create` |
-| POST | `/hr/employee-incentives/bulk-approve` |
-| GET | `/hr/employee-incentives/pending` |
-| GET | `/hr/employee-incentives/awaiting-processing` |
-
-### employeePromotionService.ts
-
-**Path:** `services/employeePromotionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/employee-promotions/${id}` |
-| POST | `/hr/employee-promotions` |
-| PATCH | `/hr/employee-promotions/${id}` |
-| DELETE | `/hr/employee-promotions/${id}` |
-| POST | `/hr/employee-promotions/bulk-delete` |
-| POST | `/hr/employee-promotions/${id}/submit` |
-| POST | `/hr/employee-promotions/${id}/approve` |
-| POST | `/hr/employee-promotions/${id}/reject` |
-| POST | `/hr/employee-promotions/${id}/cancel` |
-| POST | `/hr/employee-promotions/${id}/apply` |
-| GET | `/hr/employee-promotions/employee/${employeeId}/history` |
-| GET | `/hr/employee-promotions/pending` |
-| GET | `/hr/employee-promotions/awaiting-application` |
-| POST | `/hr/employee-promotions/${id}/notify` |
-| POST | `/hr/employee-promotions/${id}/acknowledge` |
-
-### employeeSkillMapService.ts
-
-**Path:** `services/employeeSkillMapService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/skill-maps?${params.toString()}` |
-| GET | `/hr/skill-maps/${employeeId}` |
-| PUT | `/hr/skill-maps/${employeeId}/skills` |
-| POST | `/hr/skill-maps/${employeeId}/skills` |
-| PATCH | `/hr/skill-maps/${employeeId}/skills/${skillId}` |
-| DELETE | `/hr/skill-maps/${employeeId}/skills/${skillId}` |
-| POST | `/hr/skill-maps/${employeeId}/skills/${skillId}/evaluate` |
-| GET | `/hr/skill-maps/matrix${params}` |
-| POST | `/hr/skill-maps/${employeeId}/skill-gaps` |
-| POST | `/hr/skill-maps/department/${departmentId}/skill-gaps` |
-| GET | `/hr/skill-maps/find-by-skill/${skillId}${params}` |
-| GET | `/hr/skill-maps/distribution/${skillId}` |
-| GET | `/hr/skill-maps/${employeeId}/training-recommendations` |
-| GET | `/hr/skill-maps/department/${departmentId}/summary` |
-| POST | `/hr/skill-maps/compare` |
-| POST | `/hr/skill-maps/${employeeId}/trainings` |
-| GET | `/hr/skill-maps/matrix/export${params}` |
-| GET | `/hr/skill-maps/skill-gaps/export${params}` |
-| GET | `/hr/skill-maps/${employeeId}/skills/${skillId}/trends` |
-| POST | `/hr/skill-maps/bulk-update` |
-
-### employeeTransferService.ts
-
-**Path:** `services/employeeTransferService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/transfers?${params.toString()}` |
-| GET | `/hr/transfers/${id}` |
-| POST | `/hr/transfers` |
-| PUT | `/hr/transfers/${id}` |
-| DELETE | `/hr/transfers/${id}` |
-| POST | `/hr/transfers/bulk-delete` |
-| POST | `/hr/transfers/${id}/apply` |
-| POST | `/hr/transfers/${id}/approve` |
-| POST | `/hr/transfers/${id}/reject` |
-| PATCH | `/hr/transfers/${id}/status` |
-| PATCH | `/hr/transfers/${id}/handover/${itemIndex}` |
-| POST | `/hr/transfers/${id}/handover` |
-| GET | `/hr/transfers/pending-handovers` |
-| GET | `/hr/transfers/history/${employeeId}` |
-| GET | `/hr/transfers/stats` |
-| POST | `/hr/transfers/${id}/approvals` |
-| PATCH | `/hr/transfers/${id}/approvals/${stepIndex}` |
-| GET | `/hr/transfers/pending-approvals?${params.toString()}` |
-| POST | `/hr/transfers/${id}/notify` |
-
-### eventsService.ts
-
-**Path:** `services/eventsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/events` |
-| GET | `/events/calendar` |
-| GET | `/events/${id}` |
-| POST | `/events` |
-| PUT | `/events/${id}` |
-| DELETE | `/events/${id}` |
-| POST | `/events/${id}/complete` |
-| POST | `/events/${id}/cancel` |
-| POST | `/events/${id}/postpone` |
-| POST | `/events/${id}/reschedule` |
-| POST | `/events/${id}/start` |
-| POST | `/events/${eventId}/attendees` |
-| PATCH | `/events/${eventId}/attendees/${attendeeId}` |
-| DELETE | `/events/${eventId}/attendees/${attendeeId}` |
-| POST | `/events/${eventId}/rsvp` |
-| POST | `/events/${eventId}/send-invitations` |
-| POST | `/events/${eventId}/attendees/${attendeeId}/check-in` |
-| POST | `/events/${eventId}/attendees/${attendeeId}/check-out` |
-| POST | `/events/${eventId}/agenda` |
-| PUT | `/events/${eventId}/agenda/${agendaId}` |
-| DELETE | `/events/${eventId}/agenda/${agendaId}` |
-| PATCH | `/events/${eventId}/notes` |
-| POST | `/events/${eventId}/action-items` |
-| PUT | `/events/${eventId}/action-items/${itemId}` |
-| POST | `/events/${eventId}/action-items/${actionItemId}/toggle` |
-| POST | `/events/${eventId}/attachments` |
-| DELETE | `/events/${eventId}/attachments/${attachmentId}` |
-| POST | `/events/${eventId}/comments` |
-| PATCH | `/events/${eventId}/comments/${commentId}` |
-| DELETE | `/events/${eventId}/comments/${commentId}` |
-| GET | `/events/upcoming` |
-| GET | `/events/today` |
-| GET | `/events/date/${date}` |
-| GET | `/events/month/${year}/${month}` |
-| GET | `/events/my-events` |
-| GET | `/events/pending-rsvp` |
-| GET | `/events/stats` |
-| POST | `/events/${eventId}/recurring/skip` |
-| POST | `/events/${eventId}/recurring/stop` |
-| GET | `/events/${eventId}/recurring/instances` |
-| PUT | `/events/${eventId}/recurring/instance/${instanceDate}` |
-| POST | `/events/${eventId}/calendar-sync` |
-| GET | `/events/${eventId}/export/ics` |
-| POST | `/events/import/ics` |
-| PUT | `/events/bulk` |
-| DELETE | `/events/bulk` |
-| POST | `/events/bulk/cancel` |
-| POST | `/events/bulk/complete` |
-| POST | `/events/bulk/archive` |
-| POST | `/events/bulk/unarchive` |
-| POST | `/events/${id}/archive` |
-| POST | `/events/${id}/unarchive` |
-| GET | `/events/archived` |
-| GET | `/events/ids` |
-| GET | `/events/templates` |
-| POST | `/events/templates/${templateId}/create` |
-| POST | `/events/${eventId}/save-as-template` |
-| POST | `/events/check-availability` |
-| POST | `/events/find-slots` |
-
-### exchangeRateRevaluationService.ts
-
-**Path:** `services/exchangeRateRevaluationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/exchange-rate-revaluation?${params.toString()}` |
-| GET | `/exchange-rate-revaluation/${id}` |
-| GET | `/exchange-rate-revaluation/accounts` |
-| POST | `/exchange-rate-revaluation/preview` |
-| POST | `/exchange-rate-revaluation/run` |
-| POST | `/exchange-rate-revaluation/${id}/post` |
-| POST | `/exchange-rate-revaluation/${id}/reverse` |
-| GET | `/exchange-rate-revaluation/report?${params.toString()}` |
-
-### expenseClaimsService.ts
-
-**Path:** `services/expenseClaimsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/expense-claims?${params.toString()}` |
-| GET | `/hr/expense-claims/${claimId}` |
-| POST | `/hr/expense-claims` |
-| PATCH | `/hr/expense-claims/${claimId}` |
-| DELETE | `/hr/expense-claims/${claimId}` |
-| GET | `/hr/expense-claims/stats` |
-| POST | `/hr/expense-claims/${claimId}/submit` |
-| POST | `/hr/expense-claims/${claimId}/approve` |
-| POST | `/hr/expense-claims/${claimId}/reject` |
-| POST | `/hr/expense-claims/${claimId}/request-changes` |
-| POST | `/hr/expense-claims/${claimId}/process-payment` |
-| POST | `/hr/expense-claims/${claimId}/confirm-payment` |
-| POST | `/hr/expense-claims/${claimId}/line-items` |
-| PATCH | `/hr/expense-claims/${claimId}/line-items/${lineItemId}` |
-| DELETE | `/hr/expense-claims/${claimId}/line-items/${lineItemId}` |
-| POST | `/hr/expense-claims/${claimId}/receipts` |
-| DELETE | `/hr/expense-claims/${claimId}/receipts/${receiptId}` |
-| POST | `/hr/expense-claims/${claimId}/receipts/${receiptId}/verify` |
-| POST | `/hr/expense-claims/${claimId}/reconcile-card` |
-| POST | `/hr/expense-claims/${claimId}/check-compliance` |
-| POST | `/hr/expense-claims/${claimId}/approve-exception` |
-| POST | `/hr/expense-claims/${claimId}/mark-billable` |
-| POST | `/hr/expense-claims/${claimId}/create-invoice` |
-| POST | `/hr/expense-claims/bulk-delete` |
-| GET | `/hr/expense-claims/by-employee/${employeeId}` |
-| GET | `/hr/expense-claims/pending-approvals` |
-| GET | `/hr/expense-claims/pending-payments` |
-| GET | `/hr/expense-claims/mileage-rates` |
-| GET | `/hr/expense-claims/policies` |
-| GET | `/hr/expense-claims/corporate-card/${employeeId}?${params.toString()}` |
-| POST | `/hr/expense-claims/${claimId}/duplicate` |
-| GET | `/hr/expense-claims/export?${params.toString()}` |
-
-### expensePoliciesService.ts
-
-**Path:** `services/expensePoliciesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/expense-policies` |
-| GET | `/hr/expense-policies/${id}` |
-| GET | `/hr/expense-policies/default` |
-| POST | `/hr/expense-policies` |
-| PUT | `/hr/expense-policies/${id}` |
-| DELETE | `/hr/expense-policies/${id}` |
-| PATCH | `/hr/expense-policies/${id}/default` |
-| PATCH | `/hr/expense-policies/${id}/toggle-status` |
-| POST | `/hr/expense-claims/${claimId}/check-compliance` |
-| POST | `/hr/expense-policies/${id}/duplicate` |
-
-### expenseService.ts
-
-**Path:** `services/expenseService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/expenses` |
-| GET | `/expenses/${id}` |
-| POST | `/expenses` |
-| PUT | `/expenses/${id}` |
-| DELETE | `/expenses/${id}` |
-| POST | `/expenses/${id}/reimburse` |
-| POST | `/expenses/${id}/receipt` |
-| GET | `/expenses/stats` |
-| GET | `/expenses/by-category` |
-| POST | `/expenses/${id}/submit` |
-| POST | `/expenses/${id}/approve` |
-| POST | `/expenses/${id}/reject` |
-| POST | `/expenses/bulk-approve` |
-| POST | `/expenses/bulk-delete` |
-| POST | `/expenses/suggest-category` |
-| GET | `/expenses/categories` |
-| GET | `/expenses/new` |
-
-### financeAdvancedService.ts
-
-**Path:** `services/financeAdvancedService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/bank-reconciliation/feeds` |
-| GET | `/bank-reconciliation/feeds/${id}` |
-| POST | `/bank-reconciliation/feeds` |
-| PUT | `/bank-reconciliation/feeds/${id}` |
-| DELETE | `/bank-reconciliation/feeds/${id}` |
-| POST | `/bank-reconciliation/feeds/${id}/fetch` |
-| POST | `/bank-reconciliation/import/csv` |
-| POST | `/bank-reconciliation/import/ofx` |
-| GET | `/bank-reconciliation/feeds/${id}/transactions` |
-| GET | `/bank-reconciliation/suggestions/${accountId}` |
-| POST | `/bank-reconciliation/match/split` |
-| POST | `/bank-reconciliation/auto-match/${accountId}` |
-| POST | `/bank-reconciliation/match/confirm/${matchId}` |
-| POST | `/bank-reconciliation/match/reject/${matchId}` |
-| DELETE | `/bank-reconciliation/match/${matchId}` |
-| GET | `/bank-reconciliation/rules` |
-| POST | `/bank-reconciliation/rules` |
-| PUT | `/bank-reconciliation/rules/${id}` |
-| DELETE | `/bank-reconciliation/rules/${id}` |
-| GET | `/bank-reconciliation/status/${accountId}` |
-
-### financeService.approval-methods.ts
-
-**Path:** `services/financeService.approval-methods.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/time-tracking/entries/${id}/submit` |
-| POST | `/time-tracking/entries/bulk-submit` |
-| POST | `/time-tracking/entries/bulk-reject` |
-| GET | `/time-tracking/entries/pending` |
-| POST | `/time-tracking/entries/${id}/request-changes` |
-
-### financeService.ts
-
-**Path:** `services/financeService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/invoices` |
-| GET | `/invoices/${id}` |
-| POST | `/invoices` |
-| PATCH | `/invoices/${id}` |
-| POST | `/invoices/${id}/send` |
-| DELETE | `/invoices/${id}` |
-| GET | `/invoices/overdue` |
-| GET | `/invoices/stats` |
-| GET | `/invoices/billable-items` |
-| POST | `/invoices/${id}/record-payment` |
-| POST | `/invoices/${id}/void` |
-| POST | `/invoices/${id}/duplicate` |
-| POST | `/invoices/${id}/send-reminder` |
-| POST | `/invoices/${id}/convert-to-credit-note` |
-| POST | `/invoices/${id}/apply-retainer` |
-| POST | `/invoices/${id}/submit-for-approval` |
-| POST | `/invoices/${id}/approve` |
-| POST | `/invoices/${id}/reject` |
-| POST | `/invoices/${id}/zatca/submit` |
-| GET | `/invoices/${id}/zatca/status` |
-| GET | `/invoices/open/${clientId}` |
-| GET | `/invoices/${id}/xml` |
-| POST | `/invoices/${id}/payment` |
-| PATCH | `/invoices/confirm-payment` |
-| GET | `/invoices/${id}/pdf` |
-| GET | `/credit-notes` |
-| GET | `/credit-notes/${id}` |
-| POST | `/credit-notes` |
-| PATCH | `/credit-notes/${id}` |
-| DELETE | `/credit-notes/${id}` |
-| POST | `/credit-notes/${id}/issue` |
-| POST | `/credit-notes/${id}/apply` |
-| POST | `/credit-notes/${id}/void` |
-| GET | `/credit-notes/invoice/${invoiceId}` |
-| POST | `/credit-notes/${id}/zatca/submit` |
-| GET | `/credit-notes/${id}/zatca/status` |
-| GET | `/credit-notes/${id}/pdf` |
-| GET | `/credit-notes/${id}/xml` |
-| GET | `/expenses` |
-| GET | `/expenses/${id}` |
-| POST | `/expenses` |
-| PUT | `/expenses/${id}` |
-| POST | `/expenses/${id}/receipt` |
-| GET | `/expenses/stats` |
-| DELETE | `/expenses/${id}` |
-| GET | `/expenses/new` |
-| GET | `/expenses/categories` |
-| GET | `/expenses/by-category` |
-| POST | `/expenses/suggest-category` |
-| POST | `/expenses/${id}/submit` |
-| POST | `/expenses/${id}/approve` |
-| POST | `/expenses/${id}/reject` |
-| POST | `/expenses/${id}/reimburse` |
-| POST | `/expenses/bulk-approve` |
-| POST | `/time-tracking/timer/start` |
-| POST | `/time-tracking/timer/pause` |
-| POST | `/time-tracking/timer/resume` |
-| POST | `/time-tracking/timer/stop` |
-| GET | `/time-tracking/timer/status` |
-| POST | `/time-tracking/entries` |
-| GET | `/time-tracking/entries` |
-| GET | `/time-tracking/entries/${id}` |
-| GET | `/time-tracking/stats` |
-| PUT | `/time-tracking/entries/${id}` |
-| DELETE | `/time-tracking/entries/${id}` |
-| GET | `/time-tracking/unbilled` |
-| GET | `/time-tracking/activity-codes` |
-| DELETE | `/time-tracking/entries/bulk` |
-| POST | `/time-tracking/entries/bulk-approve` |
-| POST | `/time-tracking/entries/${id}/write-off` |
-| POST | `/time-tracking/entries/${id}/write-down` |
-| POST | `/time-tracking/entries/${id}/approve` |
-| POST | `/time-tracking/entries/${id}/reject` |
-| POST | `/time-tracking/entries/${id}/lock` |
-| POST | `/time-tracking/entries/${id}/unlock` |
-| POST | `/time-tracking/entries/bulk-lock` |
-| GET | `/time-tracking/entries/${id}/lock-status` |
-| POST | `/time-tracking/entries/lock-by-date-range` |
-| GET | `/payments` |
-| POST | `/payments` |
-| GET | `/payments/${id}` |
-| POST | `/payments/${id}/complete` |
-| POST | `/invoices/${invoiceId}/payments` |
-| GET | `/payments/summary` |
-| GET | `/payments/new` |
-| GET | `/payments/stats` |
-| GET | `/payments/unreconciled` |
-| GET | `/payments/pending-checks` |
-| PUT | `/payments/${id}` |
-| DELETE | `/payments/${id}` |
-| DELETE | `/payments/bulk` |
-| POST | `/payments/${id}/fail` |
-| POST | `/payments/${id}/refund` |
-| POST | `/payments/${id}/reconcile` |
-| PUT | `/payments/${id}/apply` |
-| DELETE | `/payments/${id}/unapply/${invoiceId}` |
-| PUT | `/payments/${id}/check-status` |
-| POST | `/payments/${id}/send-receipt` |
-| POST | `/payments/${id}/generate-receipt` |
-| GET | `/payments/${id}/receipt/download` |
-| GET | `/payments/${id}/receipt` |
-| POST | `/payments/${id}/receipt/send` |
-| GET | `/transactions` |
-| GET | `/transactions/${id}` |
-| POST | `/transactions` |
-| GET | `/transactions/balance` |
-| GET | `/transactions/summary` |
-| PATCH | `/transactions/${id}` |
-| DELETE | `/transactions/${id}` |
-| GET | `/statements` |
-| GET | `/statements/${id}` |
-| POST | `/statements` |
-| PUT | `/statements/${id}` |
-| DELETE | `/statements/${id}` |
-| POST | `/statements/${id}/send` |
-| GET | `/statements/${id}/download` |
-| GET | `/activities` |
-| GET | `/activities/${id}` |
-| POST | `/activities` |
-| PATCH | `/activities/${id}` |
-| DELETE | `/activities/${id}` |
-| GET | `/reports/accounts-aging` |
-| GET | `/reports/revenue-by-client` |
-| GET | `/reports/outstanding-invoices` |
-| GET | `/reports/time-entries` |
-| GET | `/reports/${reportType}/export` |
-| GET | `/time-tracking/weekly` |
-| GET | `/invoices/pending-approval` |
-| POST | `/invoices/${invoiceId}/submit-for-approval` |
-| POST | `/invoices/${invoiceId}/request-changes` |
-| POST | `/invoices/${invoiceId}/escalate` |
-| POST | `/invoices/bulk-approve` |
-| GET | `/invoices/approval-config` |
-| PUT | `/invoices/approval-config` |
-| GET | `/invoices/pending-approvals-count` |
-
-### firmService.ts
-
-**Path:** `services/firmService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/firms/${firmId}/members/${memberId}` |
-| POST | `/firms/${firmId}/leave` |
-| POST | `/firms/${firmId}/transfer-ownership` |
-| DELETE | `/firms/${firmId}/invitations/${invitationId}` |
-| POST | `/firms/${firmId}/invitations/${invitationId}/resend` |
-| POST | `/firms/lawyer/add` |
-| POST | `/firms/lawyer/remove` |
-| UNKNOWN | `/api/firms/*` |
-
-### fiscalPeriodService.ts
-
-**Path:** `services/fiscalPeriodService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/fiscal-periods` |
-| GET | `/fiscal-periods/current` |
-| GET | `/fiscal-periods/can-post` |
-| GET | `/fiscal-periods/years-summary` |
-| POST | `/fiscal-periods/create-year` |
-| GET | `/fiscal-periods/${id}` |
-| GET | `/fiscal-periods/${id}/balances` |
-| POST | `/fiscal-periods/${id}/open` |
-| POST | `/fiscal-periods/${id}/close` |
-| POST | `/fiscal-periods/${id}/reopen` |
-| POST | `/fiscal-periods/${id}/lock` |
-| POST | `/fiscal-periods/${id}/year-end-closing` |
-
-### followupsService.ts
-
-**Path:** `services/followupsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/followups?${params.toString()}` |
-| GET | `/followups/${id}` |
-| POST | `/followups` |
-| PATCH | `/followups/${id}` |
-| DELETE | `/followups/${id}` |
-| GET | `/followups/entity/${entityType}/${entityId}` |
-| GET | `/followups/stats` |
-| GET | `/followups/overdue` |
-| GET | `/followups/upcoming?days=${days}` |
-| GET | `/followups/today` |
-| POST | `/followups/${id}/complete` |
-| POST | `/followups/${id}/cancel` |
-| POST | `/followups/${id}/reschedule` |
-| POST | `/followups/${id}/notes` |
-| POST | `/followups/bulk-complete` |
-| POST | `/followups/bulk-delete` |
-
-### ganttService.ts
-
-**Path:** `services/ganttService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/gantt/data/case/${caseId}` |
-| GET | `/gantt/data` |
-| GET | `/gantt/data/assigned/${userId}` |
-| POST | `/gantt/data/filter` |
-| GET | `/gantt/hierarchy/${taskId}` |
-| GET | `/gantt/productivity?${params}` |
-| PUT | `/gantt/task/${taskId}/dates` |
-| PUT | `/gantt/task/${taskId}/progress` |
-| PUT | `/gantt/task/${taskId}/duration` |
-| PUT | `/gantt/task/${taskId}/parent` |
-| POST | `/gantt/task/reorder` |
-| POST | `/gantt/link` |
-| DELETE | `/gantt/link/${sourceTaskId}/${targetTaskId}` |
-| GET | `/gantt/dependencies/${taskId}` |
-| GET | `/gantt/critical-path/${projectId}` |
-| GET | `/gantt/slack/${taskId}` |
-| GET | `/gantt/bottlenecks/${projectId}` |
-| GET | `/gantt/timeline/${projectId}` |
-| POST | `/gantt/auto-schedule/${projectId}` |
-| GET | `/gantt/milestones/${projectId}` |
-| POST | `/gantt/milestone` |
-| POST | `/gantt/baseline/${projectId}` |
-| GET | `/gantt/baseline/${projectId}` |
-| GET | `/gantt/baseline/${projectId}/compare` |
-| GET | `/gantt/resources` |
-| GET | `/gantt/resources/conflicts` |
-| POST | `/gantt/resources/suggest` |
-| GET | `/gantt/resources/${userId}/workload` |
-| POST | `/gantt/level-resources/${projectId}` |
-| GET | `/gantt/export/${projectId}/msproject` |
-| GET | `/gantt/export/${projectId}/pdf` |
-| GET | `/gantt/export/${projectId}/excel` |
-| GET | `/gantt/collaboration/presence/${resourceId}` |
-| POST | `/gantt/collaboration/presence` |
-| GET | `/gantt/collaboration/activities/${firmId}` |
-| GET | `/gantt/collaboration/stats` |
-
-### generalLedgerService.ts
-
-**Path:** `services/generalLedgerService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/general-ledger/stats` |
-| GET | `/general-ledger/summary` |
-| GET | `/general-ledger/trial-balance` |
-| GET | `/general-ledger/profit-loss` |
-| GET | `/general-ledger/balance-sheet` |
-| GET | `/general-ledger/account-balance/${accountId}` |
-| GET | `/general-ledger/reference/${model}/${id}` |
-| GET | `/general-ledger/entries` |
-| GET | `/general-ledger/${id}` |
-| POST | `/general-ledger/${id}/void` |
-| GET | `/general-ledger` |
-| POST | `/general-ledger/void/${id}` |
-
-### grievancesService.ts
-
-**Path:** `services/grievancesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/grievances/${grievanceId}` |
-| POST | `/hr/grievances/bulk-delete` |
-| GET | `/hr/grievances/export` |
-
-### health.service.ts
-
-**Path:** `services/health.service.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/health` |
-| GET | `/health/circuits` |
-| GET | `/health/cache` |
-
-### hrAnalyticsService.ts
-
-**Path:** `services/hrAnalyticsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr-analytics/dashboard` |
-| GET | `/hr-analytics/demographics` |
-| GET | `/hr-analytics/turnover` |
-| GET | `/hr-analytics/absenteeism` |
-| GET | `/hr-analytics/attendance` |
-| GET | `/hr-analytics/performance` |
-| GET | `/hr-analytics/recruitment` |
-| GET | `/hr-analytics/compensation` |
-| GET | `/hr-analytics/training` |
-| GET | `/hr-analytics/leave` |
-| GET | `/hr-analytics/saudization` |
-| POST | `/hr-analytics/snapshot` |
-| GET | `/hr-analytics/trends` |
-| GET | `/hr-analytics/export` |
-| GET | `/hr-analytics/predictions/attrition` |
-| GET | `/hr-analytics/predictions/attrition/${employeeId}` |
-| GET | `/hr-analytics/predictions/workforce` |
-| GET | `/hr-analytics/predictions/high-potential` |
-| GET | `/hr-analytics/predictions/flight-risk` |
-| GET | `/hr-analytics/predictions/absence` |
-| GET | `/hr-analytics/predictions/engagement` |
-| GET | `/hr-analytics/predictions/workforce` |
-| GET | `/hr-analytics/predictions/high-potential` |
-| POST | `/hr-analytics/snapshot` |
-
-### hrService.ts
-
-**Path:** `services/hrService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/employees?${params.toString()}` |
-| GET | `/hr/employees/${id}` |
-| POST | `/hr/employees` |
-| PUT | `/hr/employees/${id}` |
-| DELETE | `/hr/employees/${id}` |
-| GET | `/hr/employees/stats` |
-| POST | `/hr/employees/bulk-delete` |
-| GET | `/hr/options` |
-| POST | `/hr/employees/${id}/allowances` |
-| DELETE | `/hr/employees/${id}/allowances/${allowanceId}` |
-| GET | `/hr/employees/${employeeId}/documents` |
-| POST | `/hr/employees/${employeeId}/documents` |
-| DELETE | `/hr/employees/${employeeId}/documents/${documentId}` |
-| POST | `/hr/employees/${employeeId}/documents/${documentId}/verify` |
-
-### hrSettingsService.ts
-
-**Path:** `services/hrSettingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/settings/hr` |
-| PATCH | `/settings/hr` |
-| PATCH | `/settings/hr/employee` |
-| PATCH | `/settings/hr/leave` |
-| PATCH | `/settings/hr/attendance` |
-| PATCH | `/settings/hr/payroll` |
-| PATCH | `/settings/hr/expense` |
-| GET | `/hr/employees` |
-
-### hrSetupWizardService.ts
-
-**Path:** `services/hrSetupWizardService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| PUT | `/hr/settings/company` |
-| POST | `/hr/settings/company/logo` |
-| POST | `/hr/departments/bulk` |
-| GET | `/hr/departments` |
-| POST | `/hr/designations/bulk` |
-| GET | `/hr/designations` |
-| POST | `/hr/leave-types/bulk` |
-| GET | `/hr/leave-types` |
-| POST | `/hr/leave-policies/bulk` |
-| GET | `/hr/leave-policies` |
-| POST | `/hr/shift-types/bulk` |
-| GET | `/hr/shift-types` |
-| POST | `/hr/attendance-rules/bulk` |
-| GET | `/hr/attendance-rules` |
-| POST | `/hr/salary-components/bulk` |
-| GET | `/hr/salary-components` |
-| PUT | `/hr/settings/gosi` |
-| PUT | `/hr/settings/wps` |
-| POST | `/hr/email-templates/bulk` |
-| GET | `/hr/email-templates` |
-| POST | `/hr/setup/complete` |
-
-### incomeTaxSlabsService.ts
-
-**Path:** `services/incomeTaxSlabsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/income-tax-slabs?${params.toString()}` |
-| GET | `/income-tax-slabs/${id}` |
-| POST | `/income-tax-slabs` |
-| PUT | `/income-tax-slabs/${id}` |
-| DELETE | `/income-tax-slabs/${id}` |
-| POST | `/income-tax-slabs/${slabId}/calculate` |
-| POST | `/income-tax-slabs/${id}/clone` |
-| GET | `/income-tax-slabs/countries` |
-| POST | `/income-tax-slabs/initialize-defaults` |
-
-### integrationsService.ts
-
-**Path:** `services/integrationsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/integrations` |
-| GET | `/integrations?category=${category}` |
-| GET | `/integrations/${id}` |
-| GET | `/integrations/${id}/status` |
-| POST | `/integrations/${data.integrationId}/connect` |
-| POST | `/integrations/${id}/disconnect` |
-| PUT | `/integrations/${id}/settings` |
-| POST | `/integrations/${id}/test` |
-
-### interCompanyService.ts
-
-**Path:** `services/interCompanyService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/api/inter-company/transactions` |
-| GET | `/api/inter-company/transactions/${id}` |
-| POST | `/api/inter-company/transactions` |
-| PUT | `/api/inter-company/transactions/${id}` |
-| DELETE | `/api/inter-company/transactions/${id}` |
-| POST | `/api/inter-company/transactions/${id}/post` |
-| POST | `/api/inter-company/transactions/${id}/cancel` |
-| GET | `/api/inter-company/balances` |
-| GET | `/api/inter-company/balances/between` |
-| GET | `/api/inter-company/transactions/between` |
-| GET | `/api/inter-company/reconciliations` |
-| GET | `/api/inter-company/reconciliations/${id}` |
-| POST | `/api/inter-company/reconciliations` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/auto-match` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/manual-match` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/unmatch` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/adjustments` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/complete` |
-| POST | `/api/inter-company/reconciliations/${reconciliationId}/approve` |
-| GET | `/api/inter-company/firms` |
-| GET | `/api/inter-company/exchange-rate` |
-| GET | `/api/inter-company/reports/summary` |
-| POST | `/api/inter-company/reports/export` |
-
-### inventoryService.ts
-
-**Path:** `services/inventoryService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/inventory/items` |
-| GET | `/inventory/items/${id}` |
-| POST | `/inventory/items` |
-| PUT | `/inventory/items/${id}` |
-| DELETE | `/inventory/items/${id}` |
-| GET | `/inventory/items/${itemId}/stock` |
-| GET | `/inventory/warehouses` |
-| GET | `/inventory/warehouses/${id}` |
-| POST | `/inventory/warehouses` |
-| PUT | `/inventory/warehouses/${id}` |
-| DELETE | `/inventory/warehouses/${id}` |
-| GET | `/inventory/warehouses/${warehouseId}/stock` |
-| GET | `/inventory/stock-entries` |
-| GET | `/inventory/stock-entries/${id}` |
-| POST | `/inventory/stock-entries` |
-| POST | `/inventory/stock-entries/${id}/submit` |
-| POST | `/inventory/stock-entries/${id}/cancel` |
-| DELETE | `/inventory/stock-entries/${id}` |
-| GET | `/inventory/stock-ledger` |
-| GET | `/inventory/batches` |
-| POST | `/inventory/batches` |
-| GET | `/inventory/serial-numbers` |
-| POST | `/inventory/serial-numbers` |
-| GET | `/inventory/reconciliations` |
-| POST | `/inventory/reconciliations` |
-| POST | `/inventory/reconciliations/${id}/submit` |
-| GET | `/inventory/item-groups` |
-| POST | `/inventory/item-groups` |
-| GET | `/inventory/uom` |
-| POST | `/inventory/uom` |
-| GET | `/inventory/price-lists` |
-| GET | `/inventory/item-prices` |
-| GET | `/inventory/stats` |
-| GET | `/inventory/reports/stock-balance` |
-| GET | `/inventory/reports/low-stock` |
-| GET | `/inventory/reports/stock-movement` |
-| GET | `/inventory/settings` |
-| PUT | `/inventory/settings` |
-
-### investmentSearchService.ts
-
-**Path:** `services/investmentSearchService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/investment-search/symbols` |
-| GET | `/investment-search/quote` |
-| POST | `/investment-search/quotes` |
-| GET | `/investment-search/markets` |
-| GET | `/investment-search/types` |
-| GET | `/investment-search/sectors` |
-| GET | `/investment-search/market/${market}` |
-| GET | `/investment-search/type/${type}` |
-| GET | `/investment-search/symbol/${symbol}` |
-
-### investmentsService.ts
-
-**Path:** `services/investmentsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/investments/summary` |
-| POST | `/investments/refresh-all` |
-| POST | `/investments` |
-| GET | `/investments` |
-| GET | `/investments/${id}` |
-| PUT | `/investments/${id}` |
-| DELETE | `/investments/${id}` |
-| POST | `/investments/${id}/refresh-price` |
-| POST | `/investments/${id}/transactions` |
-| GET | `/investments/${id}/transactions` |
-| DELETE | `/investments/${id}/transactions/${transactionId}` |
-
-### invoiceService.ts
-
-**Path:** `services/invoiceService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/invoices/${id}` |
-| POST | `/invoices/${id}/zatca/submit` |
-| GET | `/invoices/${id}/zatca/status` |
-| GET | `/invoices/${id}/pdf` |
-| GET | `/invoices/${id}/xml` |
-| POST | `/invoices/confirm-payment` |
-| POST | `/invoices/${id}/payment` |
-| POST | `/invoices/bulk-approve` |
-| GET | `/invoices/approval-config` |
-| PUT | `/invoices/approval-config` |
-
-### invoiceTemplatesService.ts
-
-**Path:** `services/invoiceTemplatesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/invoice-templates` |
-| GET | `/invoice-templates/${id}` |
-| GET | `/invoice-templates/default` |
-| POST | `/invoice-templates` |
-| PATCH | `/invoice-templates/${id}` |
-| DELETE | `/invoice-templates/${id}` |
-| POST | `/invoice-templates/${id}/duplicate` |
-| POST | `/invoice-templates/${id}/set-default` |
-| GET | `/invoice-templates/${id}/preview` |
-| GET | `/invoice-templates/${id}/export` |
-| POST | `/invoice-templates/import` |
-
-### jobPositionsService.ts
-
-**Path:** `services/jobPositionsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/job-positions/${positionId}` |
-| POST | `/hr/job-positions/bulk-delete` |
-| GET | `/hr/job-positions/export` |
-
-### jobsService.ts
-
-**Path:** `services/jobsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/jobs` |
-| GET | `/jobs/my-jobs` |
-| GET | `/jobs/${id}` |
-| POST | `/jobs` |
-| PATCH | `/jobs/${id}` |
-| DELETE | `/jobs/${id}` |
-
-### journalEntryService.ts
-
-**Path:** `services/journalEntryService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/journal-entries/simple` |
-| GET | `/journal-entries` |
-| GET | `/journal-entries/${id}` |
-| POST | `/journal-entries` |
-| PATCH | `/journal-entries/${id}` |
-| POST | `/journal-entries/${id}/post` |
-| POST | `/journal-entries/${id}/void` |
-| DELETE | `/journal-entries/${id}` |
-| POST | `/journal-entries/${id}/attachments` |
-| DELETE | `/journal-entries/${id}/attachments/${attachmentId}` |
-| GET | `/journal-entries/stats` |
-| POST | `/journal-entries/validate` |
-| GET | `/journal-entries/recent` |
-| POST | `/journal-entries/${id}/duplicate` |
-| GET | `/journal-entries/templates` |
-| POST | `/journal-entries/from-template/${templateId}` |
-
-### ldapService.ts
-
-**Path:** `services/ldapService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/ldap/config` |
-| GET | `/ldap/config` |
-| POST | `/ldap/config` |
-| PUT | `/ldap/config` |
-| POST | `/ldap/test-connection` |
-| POST | `/ldap/test-user-lookup` |
-| POST | `/ldap/sync` |
-| GET | `/ldap/sync-status` |
-| DELETE | `/ldap/config` |
-| POST | `/ldap/login` |
-| UNKNOWN | `/api/ldap/*` |
-
-### leaveAllocationService.ts
-
-**Path:** `services/leaveAllocationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/leave-allocations?${params.toString()}` |
-| GET | `/leave-allocations/${allocationId}` |
-| POST | `/leave-allocations` |
-| PATCH | `/leave-allocations/${allocationId}` |
-| DELETE | `/leave-allocations/${allocationId}` |
-| GET | `/leave-allocations/balance/${employeeId}?${params.toString()}` |
-| GET | `/leave-allocations/employee/${employeeId}/all` |
-| POST | `/leave-allocations/bulk` |
-| POST | `/leave-allocations/carry-forward` |
-| POST | `/leave-allocations/carry-forward/process-all` |
-| POST | `/leave-allocations/carry-forward/expire?${params.toString()}` |
-| PATCH | `/leave-allocations/${allocationId}/update-balance` |
-| POST | `/leave-allocations/${allocationId}/encash` |
-| GET | `/leave-allocations/summary/${leavePeriodId}?${params.toString()}` |
-| GET | `/leave-allocations/carry-forward/summary?${params.toString()}` |
-| GET | `/leave-allocations/low-balance?${params.toString()}` |
-| GET | `/leave-allocations/expiring-carry-forward?${params.toString()}` |
-| POST | `/leave-allocations/${allocationId}/adjust` |
-| GET | `/leave-allocations/history/${employeeId}?${params.toString()}` |
-| GET | `/leave-allocations/statistics?${params.toString()}` |
-
-### leaveEncashmentService.ts
-
-**Path:** `services/leaveEncashmentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/leave-encashments?${params.toString()}` |
-| GET | `/leave-encashments/${id}` |
-| POST | `/leave-encashments` |
-| PATCH | `/leave-encashments/${id}` |
-| DELETE | `/leave-encashments/${id}` |
-| POST | `/leave-encashments/${id}/submit` |
-| POST | `/leave-encashments/calculate` |
-| GET | `/leave-encashments/eligibility/${employeeId}` |
-| POST | `/leave-encashments/${id}/approve` |
-| POST | `/leave-encashments/${id}/reject` |
-| POST | `/leave-encashments/${id}/mark-paid` |
-| POST | `/leave-encashments/${id}/process` |
-| POST | `/leave-encashments/${id}/cancel` |
-| GET | `/leave-encashments/stats?${params.toString()}` |
-| GET | `/leave-encashments/pending-approvals` |
-| GET | `/leave-encashments/employee/${employeeId}` |
-| POST | `/leave-encashments/bulk-approve` |
-| POST | `/leave-encashments/bulk-reject` |
-| GET | `/leave-encashments/export?${params.toString()}` |
-| GET | `/leave-encashments/policy` |
-
-### leavePeriodService.ts
-
-**Path:** `services/leavePeriodService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/leave-periods?${params.toString()}` |
-| GET | `/leave-periods/${id}` |
-| POST | `/leave-periods` |
-| PATCH | `/leave-periods/${id}` |
-| DELETE | `/leave-periods/${id}` |
-| GET | `/leave-periods/active` |
-| POST | `/leave-periods/${periodId}/allocate` |
-| GET | `/leave-periods/${periodId}/statistics` |
-| POST | `/leave-periods/${id}/activate` |
-| POST | `/leave-periods/${id}/deactivate` |
-| GET | `/leave-periods/year/${year}` |
-| GET | `/leave-periods/check-date` |
-| GET | `/leave-periods/${periodId}/allocation-summary` |
-
-### leavePolicyService.ts
-
-**Path:** `services/leavePolicyService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/leave-policies?${params.toString()}` |
-| GET | `/hr/leave-policies/${policyId}` |
-| POST | `/hr/leave-policies` |
-| PATCH | `/hr/leave-policies/${policyId}` |
-| DELETE | `/hr/leave-policies/${policyId}` |
-| POST | `/hr/leave-policies/${policyId}/set-default` |
-| PATCH | `/hr/leave-policies/${policyId}/status` |
-| POST | `/hr/leave-policies/${policyId}/duplicate` |
-| GET | `/hr/leave-policy-assignments?${params.toString()}` |
-| GET | `/hr/leave-policy-assignments/${assignmentId}` |
-| POST | `/hr/leave-policy-assignments` |
-| POST | `/hr/leave-policy-assignments/bulk` |
-| GET | `/hr/leave-policy-assignments/employee/${employeeId}/current` |
-| GET | `/hr/leave-policy-assignments/employee/${employeeId}/history` |
-| POST | `/hr/leave-policy-assignments/${assignmentId}/cancel` |
-| PATCH | `/hr/leave-policy-assignments/${assignmentId}/dates` |
-| GET | `/hr/leave-policies/stats` |
-| GET | `/hr/leave-policy-assignments/unassigned-employees` |
-| GET | `/hr/leave-policy-assignments/employee/${employeeId}/allocation-summary?${params.toString()}` |
-| POST | `/hr/leave-policy-assignments/preview` |
-| POST | `/hr/leave-policies/compare` |
-
-### leaveService.ts
-
-**Path:** `services/leaveService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/leave-requests?${params.toString()}` |
-| GET | `/leave-requests/${requestId}` |
-| POST | `/leave-requests` |
-| PATCH | `/leave-requests/${requestId}` |
-| DELETE | `/leave-requests/${requestId}` |
-| POST | `/leave-requests/${requestId}/submit` |
-| POST | `/leave-requests/${requestId}/approve` |
-| POST | `/leave-requests/${requestId}/reject` |
-| POST | `/leave-requests/${requestId}/cancel` |
-| POST | `/leave-requests/${requestId}/confirm-return` |
-| POST | `/leave-requests/${requestId}/request-extension` |
-| GET | `/leave-requests/balance/${employeeId}` |
-| GET | `/leave-requests/stats?${params.toString()}` |
-| GET | `/leave-requests/calendar?${params.toString()}` |
-| POST | `/leave-requests/check-conflicts` |
-| POST | `/leave-requests/${requestId}/documents` |
-| POST | `/leave-requests/${requestId}/complete-handover` |
-| GET | `/leave-requests/pending-approvals` |
-| GET | `/leave-requests/types` |
-
-### legalDocumentService.ts
-
-**Path:** `services/legalDocumentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/legal-documents` |
-| GET | `/legal-documents/${id}` |
-| POST | `/legal-documents` |
-| PATCH | `/legal-documents/${id}` |
-| DELETE | `/legal-documents/${id}` |
-| POST | `/legal-documents/${id}/download` |
-| POST | `/legal-documents/${id}/upload` |
-| GET | `/legal-documents/search` |
-| GET | `/legal-documents/category/${category}` |
-| GET | `/legal-documents/categories` |
-| POST | `/legal-documents/${id}/duplicate` |
-| GET | `/legal-documents/${id}/export` |
-
-### loansService.ts
-
-**Path:** `services/loansService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/employee-loans?${params.toString()}` |
-| GET | `/hr/employee-loans/${loanId}` |
-| POST | `/hr/employee-loans` |
-| PATCH | `/hr/employee-loans/${loanId}` |
-| DELETE | `/hr/employee-loans/${loanId}` |
-| GET | `/hr/employee-loans/stats` |
-| POST | `/hr/employee-loans/check-eligibility` |
-| POST | `/hr/employee-loans/${loanId}/submit` |
-| POST | `/hr/employee-loans/${loanId}/approve` |
-| POST | `/hr/employee-loans/${loanId}/reject` |
-| POST | `/hr/employee-loans/${loanId}/disburse` |
-| POST | `/hr/employee-loans/${loanId}/payments` |
-| POST | `/hr/employee-loans/${loanId}/payroll-deduction` |
-| GET | `/hr/employee-loans/${loanId}/early-settlement-calculation` |
-| POST | `/hr/employee-loans/${loanId}/early-settlement` |
-| POST | `/hr/employee-loans/${loanId}/default` |
-| POST | `/hr/employee-loans/${loanId}/restructure` |
-| POST | `/hr/employee-loans/${loanId}/issue-clearance` |
-| POST | `/hr/employee-loans/${loanId}/documents` |
-| POST | `/hr/employee-loans/${loanId}/communications` |
-| POST | `/hr/employee-loans/bulk-delete` |
-| GET | `/hr/employee-loans/by-employee/${employeeId}` |
-| GET | `/hr/employee-loans/pending-approvals` |
-| GET | `/hr/employee-loans/overdue-installments` |
-
-### logger.ts
-
-**Path:** `lib/logger.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| UNKNOWN | `/api/users` |
-
-### matterBudgetService.ts
-
-**Path:** `services/matterBudgetService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/matter-budgets` |
-| GET | `/matter-budgets/${id}` |
-| GET | `/matter-budgets/case/${caseId}` |
-| POST | `/matter-budgets` |
-| PATCH | `/matter-budgets/${id}` |
-| DELETE | `/matter-budgets/${id}` |
-| GET | `/matter-budgets/${id}/analysis` |
-| GET | `/matter-budgets/alerts` |
-| POST | `/matter-budgets/${budgetId}/phases` |
-| PATCH | `/matter-budgets/${budgetId}/phases/${phaseId}` |
-| DELETE | `/matter-budgets/${budgetId}/phases/${phaseId}` |
-| GET | `/matter-budgets/${budgetId}/entries` |
-| POST | `/matter-budgets/${budgetId}/entries` |
-| PATCH | `/matter-budgets/${budgetId}/entries/${entryId}` |
-| DELETE | `/matter-budgets/${budgetId}/entries/${entryId}` |
-| GET | `/matter-budgets/templates` |
-| POST | `/matter-budgets/templates` |
-| PATCH | `/matter-budgets/templates/${id}` |
-| DELETE | `/matter-budgets/templates/${id}` |
-
-### messageService.ts
-
-**Path:** `services/messageService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/messages` |
-| POST | `/messages/note` |
-| GET | `/messages?${params.toString()}` |
-| GET | `/messages/thread/${resModel}/${resId}` |
-| GET | `/messages/mentions?${params.toString()}` |
-| GET | `/messages/starred?${params.toString()}` |
-| GET | `/messages/search?${params.toString()}` |
-| GET | `/messages/${id}` |
-| POST | `/messages/${id}/star` |
-| DELETE | `/messages/${id}` |
-| PATCH | `/messages/${id}` |
-
-### messagesService.ts
-
-**Path:** `services/messagesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/messages/${conversationId}` |
-| POST | `/messages` |
-| PATCH | `/messages/${conversationId}/read` |
-
-### notificationService.ts
-
-**Path:** `services/notificationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/notifications` |
-| GET | `/notifications/${id}` |
-| GET | `/notifications/unread-count` |
-| PATCH | `/notifications/${id}/read` |
-| PATCH | `/notifications/mark-multiple-read` |
-| PATCH | `/notifications/mark-all-read` |
-| DELETE | `/notifications/${id}` |
-| DELETE | `/notifications/bulk-delete` |
-| DELETE | `/notifications/clear-read` |
-| GET | `/notifications/settings` |
-| PATCH | `/notifications/settings` |
-| POST | `/notifications` |
-| GET | `/notifications/by-type/${type}` |
-
-### oauthService.ts
-
-**Path:** `services/oauthService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/auth/sso/unlink/${provider}` |
-
-### odooActivityService.ts
-
-**Path:** `services/odooActivityService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/activities/types` |
-| POST | `/activities/types` |
-| PATCH | `/activities/types/${id}` |
-| DELETE | `/activities/types/${id}` |
-| POST | `/activities` |
-| GET | `/activities?${params.toString()}` |
-| GET | `/activities/my?${params.toString()}` |
-| GET | `/activities/stats` |
-| GET | `/activities/${id}` |
-| GET | `/activities?${params.toString()}` |
-| PATCH | `/activities/${id}` |
-| POST | `/activities/${id}/done` |
-| POST | `/activities/${id}/cancel` |
-| PATCH | `/activities/${id}/reschedule` |
-| PATCH | `/activities/${id}/reassign` |
-| DELETE | `/activities/${id}` |
-
-### offboardingService.ts
-
-**Path:** `services/offboardingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/offboarding?${params.toString()}` |
-| GET | `/hr/offboarding/${offboardingId}` |
-| POST | `/hr/offboarding` |
-| PATCH | `/hr/offboarding/${offboardingId}` |
-| DELETE | `/hr/offboarding/${offboardingId}` |
-| GET | `/hr/offboarding/stats` |
-| PATCH | `/hr/offboarding/${offboardingId}/status` |
-| POST | `/hr/offboarding/${offboardingId}/exit-interview` |
-| POST | `/hr/offboarding/${offboardingId}/clearance/items` |
-| PATCH | `/hr/offboarding/${offboardingId}/clearance/items/${itemId}` |
-| POST | `/hr/offboarding/${offboardingId}/clearance/${section}/complete` |
-| POST | `/hr/offboarding/${offboardingId}/calculate-settlement` |
-| POST | `/hr/offboarding/${offboardingId}/approve-settlement` |
-| POST | `/hr/offboarding/${offboardingId}/process-payment` |
-| POST | `/hr/offboarding/${offboardingId}/issue-experience-certificate` |
-| POST | `/hr/offboarding/${offboardingId}/complete` |
-| POST | `/hr/offboarding/bulk-delete` |
-| GET | `/hr/offboarding/by-employee/${employeeId}` |
-| GET | `/hr/offboarding/pending-clearances` |
-| GET | `/hr/offboarding/pending-settlements` |
-| PATCH | `/hr/offboarding/${offboardingId}/rehire-eligibility` |
-
-### offboardingWorkflowService.ts
-
-**Path:** `services/offboardingWorkflowService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/employees/${employeeId}/offboarding/cancel` |
-
-### onboardingService.ts
-
-**Path:** `services/onboardingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/onboarding?${params.toString()}` |
-| GET | `/hr/onboarding/${onboardingId}` |
-| POST | `/hr/onboarding` |
-| PATCH | `/hr/onboarding/${onboardingId}` |
-| DELETE | `/hr/onboarding/${onboardingId}` |
-| GET | `/hr/onboarding/stats` |
-| PATCH | `/hr/onboarding/${onboardingId}/status` |
-| POST | `/hr/onboarding/${onboardingId}/tasks/${taskId}/complete` |
-| POST | `/hr/onboarding/${onboardingId}/probation-reviews` |
-| POST | `/hr/onboarding/${onboardingId}/complete-probation` |
-| POST | `/hr/onboarding/${onboardingId}/documents` |
-| POST | `/hr/onboarding/${onboardingId}/documents/${documentType}/verify` |
-| POST | `/hr/onboarding/${onboardingId}/complete-first-day` |
-| POST | `/hr/onboarding/${onboardingId}/complete-first-week` |
-| POST | `/hr/onboarding/${onboardingId}/complete-first-month` |
-| POST | `/hr/onboarding/${onboardingId}/complete` |
-| POST | `/hr/onboarding/bulk-delete` |
-| GET | `/hr/onboarding/by-employee/${employeeId}` |
-| GET | `/hr/onboarding/upcoming-reviews?${params.toString()}` |
-| POST | `/hr/onboarding/${onboardingId}/checklist/categories` |
-| POST | `/hr/onboarding/${onboardingId}/checklist/categories/${categoryId}/tasks` |
-| POST | `/hr/onboarding/${onboardingId}/feedback` |
-
-### onboardingWizardService.ts
-
-**Path:** `services/onboardingWizardService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/auth/onboarding-status` |
-| POST | `/auth/onboarding-progress` |
-| POST | `/auth/onboarding/company-info` |
-| POST | `/auth/onboarding/company-logo` |
-| POST | `/auth/onboarding/user-profile` |
-| POST | `/auth/onboarding/user-avatar` |
-| POST | `/auth/onboarding/modules` |
-| POST | `/auth/onboarding/complete` |
-| POST | `/auth/onboarding/skip` |
-
-### onboardingWorkflowService.ts
-
-**Path:** `services/onboardingWorkflowService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/employees/${employeeId}/onboarding/cancel` |
-
-### organizationalStructureService.ts
-
-**Path:** `services/organizationalStructureService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/organizational-structure/${unitId}` |
-| POST | `/hr/organizational-structure/bulk-delete` |
-| GET | `/hr/organizational-structure/export` |
-
-### organizationsService.ts
-
-**Path:** `services/organizationsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/organizations?${params.toString()}` |
-| GET | `/organizations/${id}` |
-| POST | `/organizations` |
-| PATCH | `/organizations/${id}` |
-| DELETE | `/organizations/${id}` |
-| DELETE | `/organizations/bulk` |
-| GET | `/organizations/search?q=${encodeURIComponent(query)}` |
-| GET | `/organizations/client/${clientId}` |
-| POST | `/organizations/${organizationId}/link-case` |
-| POST | `/organizations/${organizationId}/link-client` |
-| POST | `/organizations/${organizationId}/link-contact` |
-
-### paymentTermsService.ts
-
-**Path:** `services/paymentTermsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/settings/payment-terms` |
-| GET | `/settings/payment-terms/${id}` |
-| POST | `/settings/payment-terms` |
-| PUT | `/settings/payment-terms/${id}` |
-| DELETE | `/settings/payment-terms/${id}` |
-| PATCH | `/settings/payment-terms/${id}/default` |
-| POST | `/settings/payment-terms/initialize` |
-
-### payrollRunService.ts
-
-**Path:** `services/payrollRunService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/payroll-runs?${params.toString()}` |
-| GET | `/payroll-runs/${runId}` |
-| POST | `/payroll-runs` |
-| PATCH | `/payroll-runs/${runId}` |
-| DELETE | `/payroll-runs/${runId}` |
-| POST | `/payroll-runs/${runId}/calculate` |
-| POST | `/payroll-runs/${runId}/validate` |
-| POST | `/payroll-runs/${runId}/approve` |
-| POST | `/payroll-runs/${runId}/process-payments` |
-| POST | `/payroll-runs/${runId}/generate-wps` |
-| POST | `/payroll-runs/${runId}/generate-wps` |
-| POST | `/payroll-runs/${runId}/cancel` |
-| POST | `/payroll-runs/${runId}/send-notifications` |
-| GET | `/payroll-runs/stats` |
-| POST | `/payroll-runs/${runId}/employees/${empId}/hold` |
-| POST | `/payroll-runs/${runId}/employees/${empId}/unhold` |
-
-### payrollService.ts
-
-**Path:** `services/payrollService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/payroll?${params.toString()}` |
-| GET | `/payroll/${id}` |
-| GET | `/payroll?employeeId=${employeeId}` |
-| POST | `/payroll` |
-| PUT | `/payroll/${id}` |
-| DELETE | `/payroll/${id}` |
-| POST | `/payroll/${id}/approve` |
-| POST | `/payroll/${id}/pay` |
-| GET | `/payroll/stats?${params.toString()}` |
-| POST | `/payroll/generate` |
-| POST | `/payroll/approve` |
-| POST | `/payroll/pay` |
-| POST | `/payroll/wps/submit` |
-| POST | `/hr/payroll-runs/${runId}/employees/${employeeId}/exclude` |
-| POST | `/hr/payroll-runs/${runId}/employees/${employeeId}/include` |
-| POST | `/hr/payroll-runs/${runId}/employees/${employeeId}/recalculate` |
-| GET | `/hr/payroll-runs/${runId}/export` |
-
-### performanceReviewService.ts
-
-**Path:** `services/performanceReviewService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/performance-reviews/${reviewId}` |
-| POST | `/hr/performance-reviews/${reviewId}/reminder` |
-
-### permissionService.ts
-
-**Path:** `services/permissionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/permissions/policies` |
-| GET | `/permissions/policies/${policyId}` |
-| POST | `/permissions/policies` |
-| PUT | `/permissions/policies/${policyId}` |
-| DELETE | `/permissions/policies/${policyId}` |
-| PATCH | `/permissions/policies/${policyId}/toggle` |
-| GET | `/permissions/config` |
-| PUT | `/permissions/config` |
-| GET | `/permissions/relations/stats` |
-| POST | `/permissions/relations` |
-| DELETE | `/permissions/relations` |
-| GET | `/permissions/relations/${namespace}/${object}` |
-| GET | `/permissions/relations` |
-| POST | `/permissions/relations` |
-| DELETE | `/permissions/relations/${relationId}` |
-| POST | `/permissions/relations/bulk` |
-| DELETE | `/permissions/relations/bulk` |
-| POST | `/permissions/check` |
-| POST | `/permissions/check-batch` |
-| GET | `/permissions/my-permissions` |
-| POST | `/permissions/relations/check` |
-| GET | `/permissions/expand/${namespace}/${resourceId}/${relation}` |
-| GET | `/permissions/user-resources/${userId}` |
-| GET | `/permissions/decisions` |
-| GET | `/permissions/decisions/${decisionId}` |
-| GET | `/permissions/decisions/stats` |
-| GET | `/permissions/decisions/denied` |
-| GET | `/permissions/decisions/compliance-report` |
-| GET | `/permissions/resources/${resourceType}/${resourceId}/access` |
-| POST | `/permissions/resources/${resourceType}/${resourceId}/access` |
-| DELETE | `/permissions/resources/${resourceType}/${resourceId}/access/${userId}` |
-| GET | `/permissions/users/${userId}/resources` |
-| GET | `/permissions/cache/stats` |
-| POST | `/permissions/cache/clear` |
-| GET | `/permissions/ui/sidebar` |
-| GET | `/permissions/ui/sidebar/all` |
-| PUT | `/permissions/ui/sidebar/${itemId}/visibility` |
-| POST | `/permissions/ui/check-page` |
-| GET | `/permissions/ui/pages/all` |
-| PUT | `/permissions/ui/pages/${pageId}/access` |
-| GET | `/permissions/ui/config` |
-| PUT | `/permissions/ui/config` |
-| GET | `/permissions/ui/matrix` |
-| PUT | `/permissions/ui/roles/${role}/bulk` |
-| POST | `/permissions/ui/overrides` |
-| DELETE | `/permissions/ui/overrides/${userId}` |
-
-### preparedReportsService.ts
-
-**Path:** `services/preparedReportsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/prepared-reports?${params.toString()}` |
-| GET | `/prepared-reports/${id}` |
-| POST | `/prepared-reports` |
-| POST | `/prepared-reports/${id}/refresh` |
-| DELETE | `/prepared-reports/${id}` |
-| GET | `/prepared-reports/stats` |
-
-### priceLevelService.ts
-
-**Path:** `services/priceLevelService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/price-levels` |
-| GET | `/price-levels/${id}` |
-| POST | `/price-levels` |
-| PUT | `/price-levels/${id}` |
-| DELETE | `/price-levels/${id}` |
-| GET | `/price-levels/client-rate` |
-| POST | `/price-levels/${id}/set-default` |
-| GET | `/price-levels/default` |
-| POST | `/price-levels/${id}/calculate` |
-| POST | `/price-levels/${id}/assign` |
-| GET | `/price-levels/${id}/clients` |
-| POST | `/price-levels/${id}/duplicate` |
-| POST | `/price-levels/${id}/archive` |
-| POST | `/price-levels/${id}/restore` |
-
-### productEnhancedService.ts
-
-**Path:** `services/productEnhancedService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/products/enhanced` |
-| GET | `/products/enhanced/${productId}` |
-| POST | `/products/enhanced` |
-| PUT | `/products/enhanced/${productId}` |
-| DELETE | `/products/enhanced/${productId}` |
-| PATCH | `/products/enhanced/${productId}/cost-price` |
-| GET | `/products/enhanced/${productId}/margin` |
-| POST | `/products/enhanced/bulk-update-prices` |
-| GET | `/products/enhanced/${productId}/variants` |
-| GET | `/products/enhanced/${productId}/variants/${variantId}` |
-| POST | `/products/enhanced/${productId}/variants` |
-| PUT | `/products/enhanced/${productId}/variants/${variantId}` |
-| DELETE | `/products/enhanced/${productId}/variants/${variantId}` |
-| POST | `/products/enhanced/${productId}/variants/generate` |
-| GET | `/products/enhanced/${productId}/barcodes` |
-| POST | `/products/enhanced/${productId}/barcodes` |
-| DELETE | `/products/enhanced/${productId}/barcodes/${barcodeId}` |
-| GET | `/products/enhanced/lookup/barcode` |
-| GET | `/uom` |
-| GET | `/uom/${uomId}` |
-| POST | `/uom` |
-| PUT | `/uom/${uomId}` |
-| DELETE | `/uom/${uomId}` |
-| GET | `/brands` |
-| GET | `/brands/${brandId}` |
-| POST | `/brands` |
-| PUT | `/brands/${brandId}` |
-| DELETE | `/brands/${brandId}` |
-
-### productService.ts
-
-**Path:** `services/productService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/products` |
-| GET | `/products/${productId}` |
-| POST | `/products` |
-| PUT | `/products/${productId}` |
-| DELETE | `/products/${productId}` |
-| POST | `/products/${productId}/duplicate` |
-| POST | `/products/${productId}/toggle-active` |
-| GET | `/products/categories` |
-| GET | `/products/${productId}/stats` |
-| GET | `/products/stats` |
-
-### proposalService.ts
-
-**Path:** `services/proposalService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/proposals` |
-| GET | `/proposals/job/${jobId}` |
-| GET | `/proposals/my-proposals` |
-| PATCH | `/proposals/accept/${proposalId}` |
-| PATCH | `/proposals/reject/${proposalId}` |
-| PATCH | `/proposals/withdraw/${proposalId}` |
-
-### push-notifications.ts
-
-**Path:** `lib/push-notifications.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/users/push-subscription` |
-| DELETE | `/users/push-subscription` |
-
-### queueService.ts
-
-**Path:** `services/queueService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/queues` |
-| GET | `/queues/${name}` |
-| GET | `/queues/${name}/jobs` |
-| GET | `/queues/${name}/jobs/${jobId}` |
-| GET | `/queues/${name}/counts` |
-| POST | `/queues/${name}/retry/${jobId}` |
-| DELETE | `/queues/${name}/jobs/${jobId}` |
-| POST | `/queues/${name}/pause` |
-| POST | `/queues/${name}/resume` |
-| POST | `/queues/${name}/clean` |
-| POST | `/queues/${name}/empty` |
-| POST | `/queues/${name}/jobs` |
-| POST | `/queues/${name}/jobs/bulk` |
-
-### quoteService.ts
-
-**Path:** `services/quoteService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/quotes` |
-| GET | `/quotes/${quoteId}` |
-| POST | `/quotes` |
-| PUT | `/quotes/${quoteId}` |
-| DELETE | `/quotes/${quoteId}` |
-| POST | `/quotes/${quoteId}/duplicate` |
-| POST | `/quotes/${quoteId}/send` |
-| POST | `/quotes/${quoteId}/view` |
-| POST | `/quotes/${quoteId}/accept` |
-| POST | `/quotes/${quoteId}/reject` |
-| POST | `/quotes/${quoteId}/convert-to-invoice` |
-| GET | `/quotes/${quoteId}/pdf` |
-| GET | `/quotes/${quoteId}/history` |
-| PATCH | `/quotes/${quoteId}/status` |
-| GET | `/quotes/summary` |
-
-### rateLimitService.ts
-
-**Path:** `services/rateLimitService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/audit-logs` |
-| POST | `/audit-logs` |
-
-### recruitmentService.ts
-
-**Path:** `services/recruitmentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/recruitment/jobs/${jobId}` |
-| GET | `/hr/recruitment/applicants/export` |
-
-### recurringInvoiceService.ts
-
-**Path:** `services/recurringInvoiceService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/recurring-invoices` |
-| GET | `/recurring-invoices/${id}` |
-| POST | `/recurring-invoices` |
-| PATCH | `/recurring-invoices/${id}` |
-| DELETE | `/recurring-invoices/${id}` |
-| POST | `/recurring-invoices/${id}/pause` |
-| POST | `/recurring-invoices/${id}/resume` |
-| POST | `/recurring-invoices/${id}/cancel` |
-| POST | `/recurring-invoices/${id}/generate` |
-| GET | `/recurring-invoices/${id}/preview` |
-| GET | `/recurring-invoices/${id}/history` |
-| GET | `/recurring-invoices/stats` |
-| POST | `/recurring-invoices/${id}/duplicate` |
-
-### remindersService.ts
-
-**Path:** `services/remindersService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/reminders` |
-| GET | `/reminders/${id}` |
-| POST | `/reminders` |
-| PUT | `/reminders/${id}` |
-| DELETE | `/reminders/${id}` |
-| POST | `/reminders/${id}/complete` |
-| POST | `/reminders/${id}/dismiss` |
-| POST | `/reminders/${id}/reopen` |
-| POST | `/reminders/${id}/snooze` |
-| POST | `/reminders/${id}/cancel-snooze` |
-| POST | `/reminders/${id}/delegate` |
-| GET | `/reminders/upcoming` |
-| GET | `/reminders/overdue` |
-| GET | `/reminders/today` |
-| GET | `/reminders/snoozed` |
-| GET | `/reminders/snoozed-due` |
-| GET | `/reminders/delegated` |
-| GET | `/reminders/my-reminders` |
-| GET | `/reminders/stats` |
-| POST | `/reminders/${id}/recurring/skip` |
-| POST | `/reminders/${id}/recurring/stop` |
-| GET | `/reminders/${id}/recurring/history` |
-| PATCH | `/reminders/${id}/notification` |
-| POST | `/reminders/${id}/notification/test` |
-| POST | `/reminders/${id}/acknowledge` |
-| PUT | `/reminders/bulk` |
-| DELETE | `/reminders/bulk` |
-| POST | `/reminders/bulk/complete` |
-| POST | `/reminders/bulk/snooze` |
-| POST | `/reminders/bulk/dismiss` |
-| POST | `/reminders/bulk/archive` |
-| POST | `/reminders/bulk/unarchive` |
-| POST | `/reminders/${id}/archive` |
-| POST | `/reminders/${id}/unarchive` |
-| GET | `/reminders/archived` |
-| GET | `/reminders/ids` |
-| POST | `/reminders/import` |
-| GET | `/reminders/export` |
-| GET | `/reminders/templates` |
-| POST | `/reminders/templates/${templateId}/create` |
-| POST | `/reminders/${id}/save-as-template` |
-
-### reportsService.ts
-
-**Path:** `services/reportsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/reports?${params.toString()}` |
-| GET | `/reports/${id}` |
-| GET | `/reports/templates` |
-| POST | `/reports/generate` |
-| DELETE | `/reports/${id}` |
-| POST | `/reports/${id}/schedule` |
-| DELETE | `/reports/${id}/schedule` |
-| GET | `/reports/profit-loss` |
-| GET | `/reports/balance-sheet` |
-| GET | `/reports/case-profitability` |
-| GET | `/reports/ar-aging` |
-| GET | `/reports/trial-balance` |
-| GET | `/reports/accounts-aging` |
-| GET | `/reports/revenue-by-client` |
-| GET | `/reports/outstanding-invoices` |
-| GET | `/reports/time-entries` |
-| POST | `/reports/export` |
-| GET | `/analytics-reports/stats` |
-| GET | `/analytics-reports/favorites` |
-| GET | `/analytics-reports/pinned` |
-| GET | `/analytics-reports/templates` |
-| GET | `/analytics-reports/section/${section}` |
-| POST | `/analytics-reports/from-template/${templateId}` |
-| GET | `/analytics-reports?${params.toString()}` |
-| POST | `/analytics-reports` |
-| POST | `/analytics-reports/bulk-delete` |
-| GET | `/analytics-reports/${id}` |
-| PATCH | `/analytics-reports/${id}` |
-| PUT | `/analytics-reports/${id}` |
-| DELETE | `/analytics-reports/${id}` |
-| POST | `/analytics-reports/${id}/run` |
-| POST | `/analytics-reports/${id}/clone` |
-| POST | `/analytics-reports/${id}/export` |
-| POST | `/analytics-reports/${id}/favorite` |
-| POST | `/analytics-reports/${id}/pin` |
-| POST | `/analytics-reports/${id}/schedule` |
-| DELETE | `/analytics-reports/${id}/schedule` |
-| GET | `/saved-reports/reports?${params.toString()}` |
-| POST | `/saved-reports/reports` |
-| GET | `/saved-reports/reports/${id}` |
-| PATCH | `/saved-reports/reports/${id}` |
-| DELETE | `/saved-reports/reports/${id}` |
-| POST | `/saved-reports/reports/${id}/run` |
-| POST | `/saved-reports/reports/${id}/duplicate` |
-| GET | `/saved-reports/widgets/defaults` |
-| PATCH | `/saved-reports/widgets/layout` |
-| GET | `/saved-reports/widgets` |
-| POST | `/saved-reports/widgets` |
-| GET | `/saved-reports/widgets/${id}` |
-| PATCH | `/saved-reports/widgets/${id}` |
-| DELETE | `/saved-reports/widgets/${id}` |
-| GET | `/saved-reports/widgets/${id}/data` |
-| GET | `/metrics` |
-| GET | `/metrics/json` |
-| GET | `/metrics/performance` |
-| POST | `/metrics/reset` |
-
-### retentionBonusService.ts
-
-**Path:** `services/retentionBonusService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/retention-bonuses/${id}` |
-| POST | `/hr/retention-bonuses` |
-| PATCH | `/hr/retention-bonuses/${id}` |
-| DELETE | `/hr/retention-bonuses/${id}` |
-| POST | `/hr/retention-bonuses/bulk-delete` |
-| POST | `/hr/retention-bonuses/${id}/approve` |
-| POST | `/hr/retention-bonuses/${id}/reject` |
-| POST | `/hr/retention-bonuses/${id}/mark-paid` |
-| POST | `/hr/retention-bonuses/${id}/clawback` |
-| GET | `/hr/retention-bonuses/employee/${employeeId}/history` |
-| GET | `/hr/retention-bonuses/${id}/vesting-status` |
-| GET | `/hr/retention-bonuses/pending-approvals` |
-| POST | `/hr/retention-bonuses/${id}/cancel` |
-| POST | `/hr/retention-bonuses/${id}/submit` |
-
-### salaryComponentService.ts
-
-**Path:** `services/salaryComponentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/salary-components?${params.toString()}` |
-| GET | `/hr/salary-components/${id}` |
-| POST | `/hr/salary-components` |
-| PUT | `/hr/salary-components/${id}` |
-| DELETE | `/hr/salary-components/${id}` |
-| POST | `/hr/salary-components/bulk-delete` |
-| GET | `/hr/salary-components?type=earning&isActive=true` |
-| GET | `/hr/salary-components?type=deduction&isActive=true` |
-| POST | `/hr/salary-components/calculate` |
-| POST | `/hr/salary-components/seed-defaults` |
-| POST | `/hr/salary-components/${id}/duplicate` |
-| POST | `/hr/salary-components/validate-formula` |
-| GET | `/hr/salary-components/${id}/usage` |
-| PATCH | `/hr/salary-components/${id}/toggle-status` |
-| GET | `/hr/salary-components?type=${type}&isActive=true` |
-| GET | `/hr/salary-components/stats` |
-
-### salesSettingsService.ts
-
-**Path:** `services/salesSettingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| UNKNOWN | `/api/settings/sales` |
-| UNKNOWN | `/api/settings/sales/reset/${section}` |
-| UNKNOWN | `/api/settings/sales/history?limit=${limit}` |
-| UNKNOWN | `/api/settings/sales/export` |
-| UNKNOWN | `/api/settings/sales/import` |
-| UNKNOWN | `/api/settings/sales/validate` |
-
-### saudiBankingService.ts
-
-**Path:** `services/saudiBankingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/saudi-banking/lean/banks` |
-| GET | `/saudi-banking/lean/customers` |
-| POST | `/saudi-banking/lean/customers` |
-| GET | `/saudi-banking/lean/customers/${customerId}/token` |
-| GET | `/saudi-banking/lean/customers/${customerId}/entities` |
-| GET | `/saudi-banking/lean/entities/${entityId}/accounts` |
-| GET | `/saudi-banking/lean/accounts/${accountId}/balance` |
-| GET | `/saudi-banking/lean/accounts/${accountId}/transactions` |
-| GET | `/saudi-banking/lean/entities/${entityId}/identity` |
-| POST | `/saudi-banking/lean/payments` |
-| DELETE | `/saudi-banking/lean/entities/${entityId}` |
-| POST | `/saudi-banking/wps/generate` |
-| POST | `/saudi-banking/wps/download` |
-| POST | `/saudi-banking/wps/validate` |
-| GET | `/saudi-banking/wps/files` |
-| GET | `/saudi-banking/wps/sarie-banks` |
-| GET | `/saudi-banking/sadad/billers` |
-| GET | `/saudi-banking/sadad/billers/search` |
-| POST | `/saudi-banking/sadad/bills/inquiry` |
-| POST | `/saudi-banking/sadad/bills/pay` |
-| GET | `/saudi-banking/sadad/payments/${transactionId}/status` |
-| GET | `/saudi-banking/sadad/payments/history` |
-| POST | `/saudi-banking/mudad/payroll/calculate` |
-| POST | `/saudi-banking/mudad/gosi/calculate` |
-| POST | `/saudi-banking/mudad/wps/generate` |
-| POST | `/saudi-banking/mudad/payroll/submit` |
-| GET | `/saudi-banking/mudad/submissions/${submissionId}/status` |
-| GET | `/saudi-banking/mudad/submissions` |
-| POST | `/saudi-banking/mudad/gosi/report` |
-| POST | `/saudi-banking/mudad/compliance/nitaqat` |
-| POST | `/saudi-banking/mudad/compliance/minimum-wage` |
-| GET | `/saudi-banking/compliance/deadlines` |
-| GET | `/saudi-banking/compliance/status` |
-| GET | `/saudi-banking/compliance/deadlines/upcoming` |
-
-### secure-auth.ts
-
-**Path:** `lib/secure-auth.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| UNKNOWN | `/api/auth/refresh` |
-
-### security-incident.service.ts
-
-**Path:** `services/security-incident.service.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/security-incidents` |
-| GET | `/security-incidents/${incidentId}` |
-
-### sessionService.ts
-
-**Path:** `services/sessionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/auth/sessions/${sessionId}` |
-| POST | `/auth/sessions/${sessionId}/report` |
-
-### settingsService.ts
-
-**Path:** `services/settingsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/settings` |
-| PATCH | `/settings/account` |
-| PATCH | `/settings/appearance` |
-| PATCH | `/settings/display` |
-| PATCH | `/settings/notifications` |
-
-### setupOrchestrationService.ts
-
-**Path:** `services/setupOrchestrationService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/setup-orchestration/modules/${module}/complete` |
-| POST | `/setup-orchestration/modules/${module}/skip` |
-| POST | `/setup-orchestration/modules/${progress.module}/progress` |
-| POST | `/setup-orchestration/reset` |
-
-### shiftAssignmentService.ts
-
-**Path:** `services/shiftAssignmentService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/shift-assignments?${params.toString()}` |
-| GET | `/shift-assignments/${assignmentId}` |
-| GET | `/shift-assignments/employee/${employeeId}/current?${params.toString()}` |
-| GET | `/shift-assignments/employee/${employeeId}/active` |
-| POST | `/shift-assignments` |
-| PUT | `/shift-assignments/${assignmentId}` |
-| DELETE | `/shift-assignments/${assignmentId}` |
-| POST | `/shift-assignments/bulk` |
-| POST | `/shift-assignments/${assignmentId}/activate` |
-| POST | `/shift-assignments/${assignmentId}/deactivate` |
-| GET | `/shift-assignments/stats?${params.toString()}` |
-| GET | `/shift-requests?${params.toString()}` |
-| GET | `/shift-requests/${requestId}` |
-| POST | `/shift-requests` |
-| PUT | `/shift-requests/${requestId}` |
-| DELETE | `/shift-requests/${requestId}` |
-| POST | `/shift-requests/${requestId}/approve` |
-| POST | `/shift-requests/${requestId}/reject` |
-| GET | `/shift-requests/pending-approvals` |
-| GET | `/shift-requests/stats?${params.toString()}` |
-| POST | `/shift-requests/check-conflicts` |
-| GET | `/shift-assignments/coverage-report?${params.toString()}` |
-| POST | `/shift-assignments/import` |
-| GET | `/shift-assignments/export?${params.toString()}` |
-
-### shiftTypeService.ts
-
-**Path:** `services/shiftTypeService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/shift-types/${shiftTypeId}` |
-| POST | `/hr/shift-types/bulk-delete` |
-| GET | `/hr/shift-types/export` |
-
-### skillService.ts
-
-**Path:** `services/skillService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/skills?${params.toString()}` |
-| GET | `/hr/skills/${skillId}` |
-| POST | `/hr/skills` |
-| PATCH | `/hr/skills/${skillId}` |
-| DELETE | `/hr/skills/${skillId}` |
-| GET | `/hr/skills/by-category/${category}` |
-| GET | `/hr/skills/stats` |
-| POST | `/hr/skills/bulk-delete` |
-| GET | `/hr/skills?isActive=true` |
-| GET | `/hr/skills/export?${params.toString()}` |
-
-### ssoService.ts
-
-**Path:** `services/ssoService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/settings/sso` |
-| PATCH | `/settings/sso` |
-| GET | `/settings/sso/providers/available` |
-| GET | `/settings/sso/providers/${providerId}` |
-| POST | `/settings/sso/providers` |
-| PATCH | `/settings/sso/providers/${providerId}` |
-| DELETE | `/settings/sso/providers/${providerId}` |
-| POST | `/settings/sso/test-connection` |
-
-### staffingPlanService.ts
-
-**Path:** `services/staffingPlanService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/hr/staffing-plans/${planId}` |
-| GET | `/hr/staffing-plans/export` |
-| GET | `/hr/staffing-plans/vacancies-report` |
-
-### staffService.ts
-
-**Path:** `services/staffService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/staff/${id}` |
-
-### statementService.ts
-
-**Path:** `services/statementService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/statements/${id}` |
-| GET | `/statements/${id}/download` |
-| POST | `/statements/${id}/send` |
-
-### storageService.ts
-
-**Path:** `services/storageService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/cases/${caseId}/documents/confirm-upload` |
-| DELETE | `/cases/${caseId}/documents/${documentId}` |
-| POST | `/tasks/${taskId}/attachments` |
-| DELETE | `/tasks/${taskId}/attachments/${attachmentId}` |
-| POST | `/tasks/${taskId}/voice-memos` |
-| POST | `/clients/${clientId}/attachments` |
-| DELETE | `/clients/${clientId}/attachments/${attachmentId}` |
-| POST | `/hr/employees/${employeeId}/documents` |
-| DELETE | `/hr/employees/${employeeId}/documents/${documentId}` |
-| POST | `/bank-reconciliation/import/csv` |
-| POST | `/bank-reconciliation/import/ofx` |
-| POST | `/bank-transactions/import/${accountId}` |
-| POST | `/storage/r2/files` |
-
-### subscriptionService.ts
-
-**Path:** `services/subscriptionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/subscription-plans` |
-| GET | `/subscription-plans/${id}` |
-| POST | `/subscription-plans` |
-| PATCH | `/subscription-plans/${id}` |
-| DELETE | `/subscription-plans/${id}` |
-| POST | `/subscription-plans/${id}/duplicate` |
-| POST | `/subscription-plans/${id}/toggle-active` |
-| GET | `/subscriptions` |
-| GET | `/subscriptions/${id}` |
-| POST | `/subscriptions` |
-| PATCH | `/subscriptions/${id}` |
-| DELETE | `/subscriptions/${id}` |
-| POST | `/subscriptions/${id}/activate` |
-| POST | `/subscriptions/${id}/pause` |
-| POST | `/subscriptions/${id}/resume` |
-| POST | `/subscriptions/${id}/cancel` |
-| POST | `/subscriptions/${id}/renew` |
-| POST | `/subscriptions/${id}/change-plan` |
-| POST | `/subscriptions/${id}/consume-hours` |
-| GET | `/subscriptions/${id}/hours-usage` |
-| POST | `/subscriptions/${id}/reset-hours` |
-| GET | `/subscriptions/${id}/invoices` |
-| POST | `/subscriptions/${id}/generate-invoice` |
-| GET | `/subscriptions/${id}/upcoming-invoice` |
-| GET | `/subscriptions/${id}/renewal-preview` |
-| GET | `/subscriptions/stats` |
-| GET | `/subscriptions/upcoming-renewals` |
-| GET | `/subscriptions/past-due` |
-| GET | `/subscriptions` |
-| GET | `/subscriptions` |
-
-### successionPlanningService.ts
-
-**Path:** `services/successionPlanningService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/succession-plans/${id}` |
-| POST | `/succession-plans` |
-| PATCH | `/succession-plans/${id}` |
-| DELETE | `/succession-plans/${id}` |
-| POST | `/succession-plans/bulk-delete` |
-| GET | `/succession-plans/by-position/${positionId}` |
-| GET | `/succession-plans/by-incumbent/${incumbentId}` |
-| GET | `/succession-plans/review-due` |
-| GET | `/succession-plans/high-risk` |
-| GET | `/succession-plans/critical-without-successors` |
-| POST | `/succession-plans/${planId}/successors` |
-| PATCH | `/succession-plans/${planId}/successors/${successorId}` |
-| DELETE | `/succession-plans/${planId}/successors/${successorId}` |
-| POST | `/succession-plans/${id}/submit-for-approval` |
-| POST | `/succession-plans/${id}/approve` |
-| POST | `/succession-plans/${id}/reject` |
-| POST | `/succession-plans/${id}/activate` |
-| POST | `/succession-plans/${id}/archive` |
-| PATCH | `/succession-plans/${planId}/successors/${successorId}/readiness` |
-| PATCH | `/succession-plans/${planId}/successors/${successorId}/development` |
-| POST | `/succession-plans/${planId}/reviews` |
-| POST | `/succession-plans/${planId}/actions` |
-| PATCH | `/succession-plans/${planId}/actions/${actionId}` |
-| POST | `/succession-plans/${planId}/documents` |
-
-### supportService.ts
-
-**Path:** `services/supportService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| DELETE | `/support/tickets/${id}` |
-| DELETE | `/support/slas/${id}` |
-
-### tagsService.ts
-
-**Path:** `services/tagsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/tags?${params.toString()}` |
-| GET | `/tags/${id}` |
-| POST | `/tags` |
-| PUT | `/tags/${id}` |
-| DELETE | `/tags/${id}` |
-| GET | `/tags?${params.toString()}` |
-| GET | `/tags/popular?${params.toString()}` |
-| POST | `/tags/${tagId}/attach` |
-| POST | `/tags/${tagId}/detach` |
-| GET | `/tags/entity/${entityType}` |
-| POST | `/tags/merge` |
-| POST | `/tags/bulk` |
-
-### tasksService.ts
-
-**Path:** `services/tasksService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/tasks` |
-| GET | `/tasks/${id}` |
-| POST | `/tasks` |
-| PUT | `/tasks/${id}` |
-| DELETE | `/tasks/${id}` |
-| PATCH | `/tasks/${id}/status` |
-| PATCH | `/tasks/${id}/progress` |
-| POST | `/tasks/${id}/complete` |
-| POST | `/tasks/${id}/reopen` |
-| POST | `/tasks/${taskId}/subtasks` |
-| PATCH | `/tasks/${taskId}/subtasks/${subtaskId}` |
-| PATCH | `/tasks/${taskId}/subtasks/${subtaskId}/toggle` |
-| POST | `/tasks/${taskId}/subtasks/${subtaskId}/toggle` |
-| DELETE | `/tasks/${taskId}/subtasks/${subtaskId}` |
-| PATCH | `/tasks/${taskId}/subtasks/reorder` |
-| POST | `/tasks/${taskId}/timer/start` |
-| POST | `/tasks/${taskId}/time-tracking/start` |
-| POST | `/tasks/${taskId}/timer/stop` |
-| POST | `/tasks/${taskId}/time-tracking/stop` |
-| POST | `/tasks/${taskId}/time` |
-| POST | `/tasks/${taskId}/time-tracking/manual` |
-| GET | `/tasks/${taskId}/time-tracking/summary` |
-| GET | `/tasks/${taskId}/time-tracking` |
-| DELETE | `/tasks/${taskId}/time-tracking/reset` |
-| POST | `/tasks/${taskId}/comments` |
-| PUT | `/tasks/${taskId}/comments/${commentId}` |
-| DELETE | `/tasks/${taskId}/comments/${commentId}` |
-| POST | `/tasks/${taskId}/attachments` |
-| GET | `/tasks/${taskId}/attachments/${attachmentId}/download-url` |
-| GET | `/tasks/${taskId}/attachments/${attachmentId}/download-url` |
-| DELETE | `/tasks/${taskId}/attachments/${attachmentId}` |
-| GET | `/tasks/${taskId}/attachments/${attachmentId}/versions` |
-| GET | `/tasks/${taskId}/attachments/${attachmentId}/download-url` |
-| POST | `/tasks/${taskId}/dependencies` |
-| DELETE | `/tasks/${taskId}/dependencies/${dependencyTaskId}` |
-| GET | `/tasks/${taskId}/available-dependencies` |
-| POST | `/tasks/${taskId}/workflow-rules` |
-| PATCH | `/tasks/${taskId}/workflow-rules/${ruleId}` |
-| DELETE | `/tasks/${taskId}/workflow-rules/${ruleId}` |
-| POST | `/tasks/${taskId}/workflow-rules/${ruleId}/toggle` |
-| PATCH | `/tasks/${taskId}/outcome` |
-| PATCH | `/tasks/${taskId}/estimate` |
-| GET | `/tasks/${taskId}/time-tracking/summary` |
-| GET | `/tasks/upcoming` |
-| GET | `/tasks/overdue` |
-| GET | `/tasks/due-today` |
-| GET | `/tasks/case/${caseId}` |
-| GET | `/tasks/my-tasks` |
-| GET | `/tasks/stats` |
-| GET | `/tasks/templates` |
-| GET | `/tasks/templates/${templateId}` |
-| POST | `/tasks/templates` |
-| PUT | `/tasks/templates/${templateId}` |
-| DELETE | `/tasks/templates/${templateId}` |
-| POST | `/tasks/templates/${templateId}/create` |
-| POST | `/tasks/${taskId}/save-as-template` |
-| PUT | `/tasks/bulk` |
-| DELETE | `/tasks/bulk` |
-| POST | `/tasks/bulk/complete` |
-| POST | `/tasks/bulk/assign` |
-| POST | `/tasks/import` |
-| GET | `/tasks/export` |
-| POST | `/tasks/${taskId}/recurring/skip` |
-| POST | `/tasks/${taskId}/recurring/stop` |
-| GET | `/tasks/${taskId}/recurring/history` |
-| POST | `/tasks/${taskId}/documents` |
-| GET | `/tasks/${taskId}/documents/${documentId}` |
-| PATCH | `/tasks/${taskId}/documents/${documentId}` |
-| DELETE | `/tasks/${taskId}/attachments/${documentId}` |
-| GET | `/tasks/${taskId}/documents` |
-| POST | `/tasks/${taskId}/voice-memos` |
-| PATCH | `/tasks/${taskId}/voice-memos/${memoId}/transcription` |
-| DELETE | `/tasks/${taskId}/voice-memos/${memoId}` |
-| POST | `/tasks/${taskId}/clone` |
-| POST | `/tasks/${taskId}/archive` |
-| POST | `/tasks/${taskId}/unarchive` |
-| POST | `/tasks/bulk/archive` |
-| POST | `/tasks/bulk/unarchive` |
-| POST | `/tasks/${taskId}/reschedule` |
-| POST | `/tasks/reorder` |
-| GET | `/tasks/ids` |
-| GET | `/tasks/export` |
-
-### teamService.ts
-
-**Path:** `services/teamService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/team/${id}/resend-invite` |
-| DELETE | `/team/${id}/revoke-invite` |
-| DELETE | `/team/${id}` |
-
-### timeEntryService.ts
-
-**Path:** `services/timeEntryService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/time-tracking/timer/start` |
-| POST | `/time-tracking/timer/pause` |
-| POST | `/time-tracking/timer/resume` |
-| POST | `/time-tracking/timer/stop` |
-| GET | `/time-tracking/timer/status` |
-| POST | `/time-tracking/entries` |
-| GET | `/time-tracking/entries` |
-| GET | `/time-tracking/entries/${id}` |
-| PUT | `/time-tracking/entries/${id}` |
-| DELETE | `/time-tracking/entries/${id}` |
-| POST | `/time-tracking/entries/${id}/approve` |
-| POST | `/time-tracking/entries/${id}/reject` |
-| GET | `/time-tracking/stats` |
-| DELETE | `/time-tracking/entries/bulk` |
-| POST | `/time-tracking/entries/bulk-approve` |
-| GET | `/time-tracking/unbilled` |
-| GET | `/time-tracking/activity-codes` |
-| POST | `/time-tracking/entries/${id}/write-off` |
-| POST | `/time-tracking/entries/${id}/write-down` |
-| POST | `/time-tracking/entries/${id}/lock` |
-| POST | `/time-tracking/entries/${id}/unlock` |
-| POST | `/time-tracking/entries/bulk-lock` |
-| GET | `/time-tracking/entries/${id}/lock-status` |
-| POST | `/time-tracking/entries/lock-by-date-range` |
-
-### timeTrackingService.ts
-
-**Path:** `services/timeTrackingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/time-tracking/entries/pending-approval?${params.toString()}` |
-| POST | `/time-tracking/entries/${entryId}/submit` |
-| POST | `/time-tracking/entries/bulk-submit` |
-| POST | `/time-tracking/entries/${entryId}/request-changes` |
-| POST | `/time-tracking/entries/bulk-reject` |
-| POST | `/time-tracking/entries/${entryId}/approve` |
-| POST | `/time-tracking/entries/bulk-approve` |
-
-### tradesService.ts
-
-**Path:** `services/tradesService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/trades` |
-| GET | `/trades/${id}` |
-| POST | `/trades` |
-| PATCH | `/trades/${id}` |
-| DELETE | `/trades/${id}` |
-| POST | `/trades/${id}/close` |
-| GET | `/trades/stats` |
-| GET | `/trades/stats/chart` |
-| DELETE | `/trades/bulk` |
-| POST | `/trades/import/csv` |
-
-### tradingAccountsService.ts
-
-**Path:** `services/tradingAccountsService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/trading-accounts` |
-| GET | `/trading-accounts/${id}` |
-| POST | `/trading-accounts` |
-| PATCH | `/trading-accounts/${id}` |
-| DELETE | `/trading-accounts/${id}` |
-| GET | `/trading-accounts/${id}/balance` |
-| POST | `/trading-accounts/${id}/set-default` |
-| POST | `/trading-accounts/${id}/transaction` |
-
-### trainingService.ts
-
-**Path:** `services/trainingService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/trainings?${params.toString()}` |
-| GET | `/hr/trainings/${trainingId}` |
-| POST | `/hr/trainings` |
-| PATCH | `/hr/trainings/${trainingId}` |
-| DELETE | `/hr/trainings/${trainingId}` |
-| GET | `/hr/trainings/stats` |
-| POST | `/hr/trainings/${trainingId}/submit` |
-| POST | `/hr/trainings/${trainingId}/approve` |
-| POST | `/hr/trainings/${trainingId}/reject` |
-| POST | `/hr/trainings/${trainingId}/enroll` |
-| POST | `/hr/trainings/${trainingId}/start` |
-| POST | `/hr/trainings/${trainingId}/attendance` |
-| POST | `/hr/trainings/${trainingId}/progress` |
-| POST | `/hr/trainings/${trainingId}/assessments` |
-| POST | `/hr/trainings/${trainingId}/complete` |
-| POST | `/hr/trainings/${trainingId}/issue-certificate` |
-| POST | `/hr/trainings/${trainingId}/evaluation` |
-| POST | `/hr/trainings/${trainingId}/payment` |
-| POST | `/hr/trainings/${trainingId}/cancel` |
-| POST | `/hr/trainings/bulk-delete` |
-| GET | `/hr/trainings/by-employee/${employeeId}` |
-| GET | `/hr/trainings/pending-approvals` |
-| GET | `/hr/trainings/upcoming` |
-| GET | `/hr/trainings/overdue-compliance` |
-| GET | `/hr/trainings/cle-summary/${employeeId}` |
-| GET | `/hr/trainings/calendar?month=${month}&year=${year}` |
-| GET | `/hr/trainings/providers` |
-| GET | `/hr/trainings/export?${params.toString()}` |
-| GET | `/hr/trainings/policies` |
-
-### transactionService.ts
-
-**Path:** `services/transactionService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/transactions` |
-| GET | `/transactions/${id}` |
-| POST | `/transactions` |
-| PUT | `/transactions/${id}` |
-| DELETE | `/transactions/${id}` |
-| GET | `/transactions/balance` |
-| GET | `/transactions/summary` |
-| GET | `/transactions/by-category` |
-| POST | `/transactions/${id}/cancel` |
-| DELETE | `/transactions/bulk` |
-| POST | `/transactions/${id}/reconcile` |
-| POST | `/transactions/${id}/unreconcile` |
-| POST | `/transactions/${id}/attachments` |
-| DELETE | `/transactions/${id}/attachments/${attachmentId}` |
-| GET | `/transactions/categories` |
-| GET | `/transactions/export` |
-| GET | `/transactions/pending` |
-| GET | `/transactions/unreconciled` |
-| GET | `/transactions/search` |
-| GET | `/transactions/stats` |
-
-### trustAccountService.ts
-
-**Path:** `services/trustAccountService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/trust-accounts` |
-| GET | `/trust-accounts/${id}` |
-| POST | `/trust-accounts` |
-| PATCH | `/trust-accounts/${id}` |
-| PATCH | `/trust-accounts/${id}` |
-| DELETE | `/trust-accounts/${id}` |
-| GET | `/trust-accounts/${accountId}/balances` |
-| GET | `/trust-accounts/${accountId}/balances/${clientId}` |
-| GET | `/trust-accounts/${accountId}/transactions` |
-| GET | `/trust-accounts/${accountId}/transactions/${transactionId}` |
-| POST | `/trust-accounts/${accountId}/transactions` |
-| POST | `/trust-accounts/${accountId}/transactions` |
-| POST | `/trust-accounts/${fromAccountId}/transfer` |
-| POST | `/trust-accounts/${accountId}/transactions/${transactionId}/void` |
-| GET | `/trust-accounts/${accountId}/reconciliations` |
-| GET | `/trust-accounts/${accountId}/reconciliations` |
-| POST | `/trust-accounts/${accountId}/reconciliations` |
-| POST | `/trust-accounts/${accountId}/three-way-reconciliations` |
-| GET | `/trust-accounts/${accountId}/three-way-reconciliations` |
-| GET | `/trust-accounts/${id}/summary` |
-
-### uiAccessService.ts
-
-**Path:** `services/uiAccessService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/permissions/ui/sidebar` |
-| GET | `/permissions/ui/sidebar/all` |
-| PUT | `/permissions/ui/sidebar/${itemId}/visibility` |
-| POST | `/permissions/ui/check-page` |
-| GET | `/permissions/ui/pages/all` |
-| PUT | `/permissions/ui/pages/${pageId}/access` |
-| GET | `/permissions/ui/config` |
-| PUT | `/permissions/ui/config` |
-| GET | `/permissions/ui/matrix` |
-| PUT | `/permissions/ui/roles/${role}/bulk` |
-| POST | `/permissions/ui/overrides` |
-| DELETE | `/permissions/ui/overrides/${userId}` |
-| GET | `/permissions/ui/overrides` |
-
-### usersService.ts
-
-**Path:** `services/usersService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/users/team` |
-| GET | `/users/lawyers` |
-| GET | `/users/team` |
-| GET | `/users/${userId}` |
-| GET | `/users/lawyer/${username}` |
-| PATCH | `/users/${userId}` |
-| DELETE | `/users/${userId}` |
-| GET | `/users/vapid-public-key` |
-| GET | `/users/push-subscription` |
-| POST | `/users/push-subscription` |
-| DELETE | `/users/push-subscription` |
-| GET | `/users/notification-preferences` |
-| PUT | `/users/notification-preferences` |
-| POST | `/users/convert-to-firm` |
-
-### vehicleService.ts
-
-**Path:** `services/vehicleService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/hr/vehicles?${params.toString()}` |
-| GET | `/hr/vehicles/${vehicleId}` |
-| POST | `/hr/vehicles` |
-| PATCH | `/hr/vehicles/${vehicleId}` |
-| DELETE | `/hr/vehicles/${vehicleId}` |
-| POST | `/hr/vehicles/${vehicleId}/assign` |
-| POST | `/hr/vehicles/${vehicleId}/unassign` |
-| GET | `/hr/vehicle-logs?${params.toString()}` |
-| POST | `/hr/vehicle-logs` |
-| GET | `/hr/vehicles/${vehicleId}/expenses?${params.toString()}` |
-| GET | `/hr/vehicles/service-due` |
-| GET | `/hr/vehicles/${vehicleId}/utilization?${params.toString()}` |
-| GET | `/hr/vehicles/fleet-summary` |
-| GET | `/hr/vehicles/stats` |
-| PATCH | `/hr/vehicle-logs/${logId}/reimbursement` |
-| POST | `/hr/vehicles/bulk-delete` |
-| GET | `/hr/vehicles/export?${params.toString()}` |
-| GET | `/hr/vehicle-logs/export?${params.toString()}` |
-
-### vendorService.ts
-
-**Path:** `services/vendorService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/vendors` |
-| GET | `/vendors/${id}` |
-| POST | `/vendors` |
-| PUT | `/vendors/${id}` |
-| DELETE | `/vendors/${id}` |
-| GET | `/vendors/${id}/summary` |
-
-### webhookService.ts
-
-**Path:** `services/webhookService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/webhooks/stats` |
-| GET | `/webhooks/events` |
-| POST | `/webhooks` |
-| GET | `/webhooks` |
-| GET | `/webhooks/${id}` |
-| PUT | `/webhooks/${id}` |
-| PATCH | `/webhooks/${id}` |
-| DELETE | `/webhooks/${id}` |
-| POST | `/webhooks/${id}/test` |
-| POST | `/webhooks/${id}/enable` |
-| POST | `/webhooks/${id}/disable` |
-| GET | `/webhooks/${id}/secret` |
-| POST | `/webhooks/${id}/regenerate-secret` |
-| GET | `/webhooks/${id}/deliveries` |
-| GET | `/webhooks/${id}/deliveries/${deliveryId}` |
-| POST | `/webhooks/${id}/deliveries/${deliveryId}/retry` |
-
-### whatsappService.ts
-
-**Path:** `services/whatsappService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| POST | `/whatsapp/send/template` |
-| POST | `/whatsapp/send/text` |
-| POST | `/whatsapp/send/media` |
-| POST | `/whatsapp/send/location` |
-| GET | `/whatsapp/conversations` |
-| GET | `/whatsapp/conversations/${id}` |
-| GET | `/whatsapp/conversations/${id}/messages` |
-| POST | `/whatsapp/conversations/${id}/read` |
-| PUT | `/whatsapp/conversations/${id}/assign` |
-| POST | `/whatsapp/conversations/${id}/link-lead` |
-| POST | `/whatsapp/conversations/${id}/create-lead` |
-| GET | `/whatsapp/templates` |
-| POST | `/whatsapp/templates` |
-| POST | `/whatsapp/templates/${id}/submit` |
-| GET | `/whatsapp/analytics` |
-| GET | `/whatsapp/stats` |
-
-### workflowService.ts
-
-**Path:** `services/workflowService.ts`
-
-| Method | Endpoint |
-|--------|----------|
-| GET | `/workflow/templates` |
-| POST | `/workflow/templates` |
-| GET | `/workflow/templates/${id}` |
-| PUT | `/workflow/templates/${id}` |
-| DELETE | `/workflow/templates/${id}` |
-| GET | `/workflow/instances` |
-| POST | `/workflow/instances` |
-| GET | `/workflow/instances/${id}` |
-| POST | `/workflow/instances/${id}/pause` |
-| POST | `/workflow/instances/${id}/resume` |
-| POST | `/workflow/instances/${id}/cancel` |
-| POST | `/workflow/instances/${id}/advance` |
-| GET | `/workflow/entity/${entityType}/${entityId}` |
-| GET | `/workflows/presets` |
-| POST | `/workflows/presets/${presetType}` |
-| GET | `/workflows/stats` |
-| GET | `/workflows/category/${category}` |
-| GET | `/workflows` |
-| POST | `/workflows` |
-| GET | `/workflows/${id}` |
-| PATCH | `/workflows/${id}` |
-| DELETE | `/workflows/${id}` |
-| POST | `/workflows/${id}/duplicate` |
-| POST | `/workflows/${id}/stages` |
-| PATCH | `/workflows/${id}/stages/${stageId}` |
-| DELETE | `/workflows/${id}/stages/${stageId}` |
-| POST | `/workflows/${id}/stages/reorder` |
-| POST | `/workflows/${id}/transitions` |
-| POST | `/workflows/cases/${caseId}/initialize` |
-| GET | `/workflows/cases/${caseId}/progress` |
-| POST | `/workflows/cases/${caseId}/move` |
-| POST | `/workflows/cases/${caseId}/requirements/${requirementId}/complete` |
 
 ---
 
@@ -7298,3 +4529,211 @@
 | detail | `/dashboard/jobs/${jobId}` | ✓ |
 | detail | `/dashboard/documents/${documentId}` | ✓ |
 | custom | `/errors/${error}` | ✓ |
+
+---
+
+## Query Keys
+
+| Key | Definition |
+|-----|------------|
+| all | `() => ['tasks']` |
+| lists | `() => [...QueryKeys.tasks.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.tasks.lists...` |
+| details | `() => [...QueryKeys.tasks.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.tasks.details(), id]` |
+| upcoming | `(days: number) => [...QueryKeys.tasks.all(), 'upcoming', day...` |
+| overdue | `() => [...QueryKeys.tasks.all(), 'overdue']` |
+| dueToday | `() => [...QueryKeys.tasks.all(), 'due-today']` |
+| myTasks | `(filters?: Record<string, any>) => [...QueryKeys.tasks.all()...` |
+| stats | `(filters?: Record<string, any>) => [...QueryKeys.tasks.all()...` |
+| templates | `() => [...QueryKeys.tasks.all(), 'templates']` |
+| timeTracking | `(taskId: string) => [...QueryKeys.tasks.all(), taskId, 'time...` |
+| recurrenceHistory | `(taskId: string) => [...QueryKeys.tasks.all(), taskId, 'recu...` |
+| attachmentVersions | `(taskId: string, attachmentId: string) => ['task-attachment-...` |
+| all | `() => ['cases']` |
+| lists | `() => [...QueryKeys.cases.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.cases.lists...` |
+| details | `() => [...QueryKeys.cases.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.cases.details(), id]` |
+| stats | `() => [...QueryKeys.cases.all(), 'stats']` |
+| pipeline | `() => [...QueryKeys.cases.all(), 'pipeline']` |
+| pipelineByStage | `(stageId?: string) => [...QueryKeys.cases.pipeline(), stageI...` |
+| all | `() => ['clients']` |
+| lists | `() => [...QueryKeys.clients.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.clients.lis...` |
+| details | `() => [...QueryKeys.clients.all(), 'detail']` |
+| detail | `(clientId: string) => [...QueryKeys.clients.details(), clien...` |
+| search | `(query: string) => [...QueryKeys.clients.all(), 'search', qu...` |
+| stats | `() => [...QueryKeys.clients.all(), 'stats']` |
+| topRevenue | `(limit: number) => [...QueryKeys.clients.all(), 'top-revenue...` |
+| cases | `(clientId: string, params?: Record<string, any>) => [...Quer...` |
+| invoices | `(clientId: string, params?: Record<string, any>) => [...Quer...` |
+| quotes | `(clientId: string, params?: Record<string, any>) => [...Quer...` |
+| activities | `(clientId: string, params?: Record<string, any>) => [...Quer...` |
+| payments | `(clientId: string, params?: Record<string, any>) => [...Quer...` |
+| billingInfo | `(clientId: string) => [...QueryKeys.clients.all(), clientId,...` |
+| wathq | `(clientId: string, dataType: string) => [...QueryKeys.client...` |
+| all | `() => ['contacts']` |
+| lists | `() => [...QueryKeys.contacts.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.contacts.li...` |
+| details | `() => [...QueryKeys.contacts.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.contacts.details(), id]` |
+| stats | `() => [...QueryKeys.contacts.all(), 'stats']` |
+| search | `(query: string) => [...QueryKeys.contacts.all(), 'search', q...` |
+| recent | `() => [...QueryKeys.contacts.all(), 'recent']` |
+| favorites | `() => [...QueryKeys.contacts.all(), 'favorites']` |
+| all | `() => ['invoices']` |
+| lists | `() => [...QueryKeys.invoices.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.invoices.li...` |
+| details | `() => [...QueryKeys.invoices.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.invoices.details(), id]` |
+| stats | `() => [...QueryKeys.invoices.all(), 'stats']` |
+| recurring | `() => [...QueryKeys.invoices.all(), 'recurring']` |
+| overdue | `() => [...QueryKeys.invoices.all(), 'overdue']` |
+| draft | `() => [...QueryKeys.invoices.all(), 'draft']` |
+| all | `() => ['invoice-templates']` |
+| lists | `() => [...QueryKeys.invoiceTemplates.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.invoiceTemp...` |
+| details | `() => [...QueryKeys.invoiceTemplates.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.invoiceTemplates.details(), id...` |
+| default | `() => [...QueryKeys.invoiceTemplates.all(), 'default']` |
+| preview | `(id: string) => [...QueryKeys.invoiceTemplates.detail(id), '...` |
+| all | `() => ['payments']` |
+| lists | `() => [...QueryKeys.payments.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.payments.li...` |
+| details | `() => [...QueryKeys.payments.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.payments.details(), id]` |
+| stats | `() => [...QueryKeys.payments.all(), 'stats']` |
+| methods | `() => ['payment-methods']` |
+| modes | `() => ['payment-modes']` |
+| terms | `() => ['payment-terms']` |
+| term | `(id: string) => [...QueryKeys.payments.terms(), id]` |
+| all | `() => ['expenses']` |
+| lists | `() => [...QueryKeys.expenses.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.expenses.li...` |
+| details | `() => [...QueryKeys.expenses.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.expenses.details(), id]` |
+| stats | `() => [...QueryKeys.expenses.all(), 'stats']` |
+| categories | `() => [...QueryKeys.expenses.all(), 'categories']` |
+| all | `() => ['expense-claims']` |
+| lists | `() => [...QueryKeys.expenseClaims.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.expenseClai...` |
+| details | `() => [...QueryKeys.expenseClaims.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.expenseClaims.details(), id]` |
+| stats | `() => [...QueryKeys.expenseClaims.all(), 'stats']` |
+| pendingApprovals | `() => [...QueryKeys.expenseClaims.all(), 'pending-approvals'...` |
+| pendingPayments | `() => [...QueryKeys.expenseClaims.all(), 'pending-payments']` |
+| employeeClaims | `(employeeId: string) => [...QueryKeys.expenseClaims.all(), '...` |
+| mileageRates | `() => [...QueryKeys.expenseClaims.all(), 'mileage-rates']` |
+| corporateCard | `(employeeId: string) => [...QueryKeys.expenseClaims.all(), '...` |
+| all | `() => ['expense-policies']` |
+| lists | `() => [...QueryKeys.expensePolicies.all(), 'list']` |
+| list | `() => [...QueryKeys.expensePolicies.lists()]` |
+| details | `() => [...QueryKeys.expensePolicies.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.expensePolicies.details(), id]` |
+| default | `() => [...QueryKeys.expensePolicies.all(), 'default']` |
+| all | `() => ['quotes']` |
+| lists | `() => [...QueryKeys.quotes.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.quotes.list...` |
+| details | `() => [...QueryKeys.quotes.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.quotes.details(), id]` |
+| history | `(id: string) => [...QueryKeys.quotes.detail(id), 'history']` |
+| stats | `() => [...QueryKeys.quotes.all(), 'stats']` |
+| summary | `(filters?: Record<string, any>) => [...QueryKeys.quotes.all(...` |
+| all | `() => ['creditNotes']` |
+| lists | `() => [...QueryKeys.creditNotes.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.creditNotes...` |
+| details | `() => [...QueryKeys.creditNotes.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.creditNotes.details(), id]` |
+| all | `() => ['accounting']` |
+| accounts | `() => [...QueryKeys.accounting.all(), 'accounts']` |
+| accountsList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| account | `(id: string) => [...QueryKeys.accounting.accounts(), id]` |
+| accountTypes | `() => [...QueryKeys.accounting.accounts(), 'types']` |
+| glEntries | `() => [...QueryKeys.accounting.all(), 'gl-entries']` |
+| glEntriesList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| glEntry | `(id: string) => [...QueryKeys.accounting.glEntries(), id]` |
+| journalEntries | `() => [...QueryKeys.accounting.all(), 'journal-entries']` |
+| journalEntriesList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| journalEntry | `(id: string) => [...QueryKeys.accounting.journalEntries(), i...` |
+| fiscalPeriods | `() => [...QueryKeys.accounting.all(), 'fiscal-periods']` |
+| fiscalPeriodsList | `() => [...QueryKeys.accounting.fiscalPeriods(), 'list']` |
+| fiscalPeriod | `(id: string) => [...QueryKeys.accounting.fiscalPeriods(), id...` |
+| fiscalPeriodBalances | `(id: string) => [...QueryKeys.accounting.fiscalPeriods(), id...` |
+| currentFiscalPeriod | `() => [...QueryKeys.accounting.fiscalPeriods(), 'current']` |
+| fiscalYearsSummary | `() => [...QueryKeys.accounting.fiscalPeriods(), 'years-summa...` |
+| canPost | `(date: string) => [...QueryKeys.accounting.fiscalPeriods(), ...` |
+| recurring | `() => [...QueryKeys.accounting.all(), 'recurring']` |
+| recurringList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| recurringItem | `(id: string) => [...QueryKeys.accounting.recurring(), id]` |
+| recurringUpcoming | `() => [...QueryKeys.accounting.recurring(), 'upcoming']` |
+| priceLevels | `() => [...QueryKeys.accounting.all(), 'price-levels']` |
+| priceLevelsList | `() => [...QueryKeys.accounting.priceLevels(), 'list']` |
+| priceLevel | `(id: string) => [...QueryKeys.accounting.priceLevels(), id]` |
+| clientRate | `(clientId: string, baseRate: number, serviceType?: string) =...` |
+| bills | `() => [...QueryKeys.accounting.all(), 'bills']` |
+| billsList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| bill | `(id: string) => [...QueryKeys.accounting.bills(), id]` |
+| debitNotes | `() => [...QueryKeys.accounting.all(), 'debit-notes']` |
+| debitNotesList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| debitNote | `(id: string) => [...QueryKeys.accounting.debitNotes(), id]` |
+| billDebitNotes | `(billId: string) => [...QueryKeys.accounting.bills(), billId...` |
+| vendors | `() => [...QueryKeys.accounting.all(), 'vendors']` |
+| vendorsList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| vendor | `(id: string) => [...QueryKeys.accounting.vendors(), id]` |
+| retainers | `() => [...QueryKeys.accounting.all(), 'retainers']` |
+| retainersList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| retainer | `(id: string) => [...QueryKeys.accounting.retainers(), id]` |
+| retainerTransactions | `(id: string) => [...QueryKeys.accounting.retainers(), id, 't...` |
+| leads | `() => [...QueryKeys.accounting.all(), 'leads']` |
+| leadsList | `(filters?: Record<string, any>) => [...QueryKeys.accounting....` |
+| lead | `(id: string) => [...QueryKeys.accounting.leads(), id]` |
+| leadStats | `() => [...QueryKeys.accounting.leads(), 'stats']` |
+| reports | `() => [...QueryKeys.accounting.all(), 'reports']` |
+| profitLoss | `(startDate: string, endDate: string) => [...QueryKeys.accoun...` |
+| balanceSheet | `(asOfDate?: string) => [...QueryKeys.accounting.reports(), '...` |
+| trialBalance | `(asOfDate?: string) => [...QueryKeys.accounting.reports(), '...` |
+| arAging | `() => [...QueryKeys.accounting.reports(), 'ar-aging']` |
+| caseProfitability | `(startDate: string, endDate: string) => [...QueryKeys.accoun...` |
+| all | `() => ['finance-advanced']` |
+| bankFeeds | `() => ['bank-feeds']` |
+| bankFeed | `(id: string) => ['bank-feed', id]` |
+| bankFeedList | `(filters?: Record<string, any>) => ['bank-feeds', filters]` |
+| bankTransactions | `() => ['bank-transactions']` |
+| bankTransactionsList | `(id: string, filters?: Record<string, any>) => ['bank-transa...` |
+| matchSuggestions | `(accountId: string) => ['match-suggestions', accountId]` |
+| matchingRules | `() => ['matching-rules']` |
+| reconciliationReport | `(accountId: string, params?: Record<string, any>) => ['recon...` |
+| exchangeRates | `() => ['exchange-rates']` |
+| exchangeRate | `(fromCurrency: string, toCurrency: string) => ['exchange-rat...` |
+| rateHistory | `(fromCurrency: string, toCurrency: string, params?: Record<s...` |
+| currencySettings | `() => ['currency-settings']` |
+| all | `() => ['billing']` |
+| rates | `() => [...QueryKeys.billing.all(), 'rates']` |
+| ratesList | `(filters?: Record<string, any>) => [...QueryKeys.billing.rat...` |
+| rateDetail | `(id: string) => [...QueryKeys.billing.rates(), 'detail', id]` |
+| groups | `() => [...QueryKeys.billing.all(), 'groups']` |
+| groupsList | `(filters?: Record<string, any>) => [...QueryKeys.billing.gro...` |
+| groupDetail | `(id: string) => [...QueryKeys.billing.groups(), 'detail', id...` |
+| rateCards | `() => [...QueryKeys.billing.all(), 'rate-cards']` |
+| rateCardsList | `(filters?: Record<string, any>) => [...QueryKeys.billing.rat...` |
+| rateCardForEntity | `(entityType: string, entityId: string) =>
+      [...QueryKey...` |
+| timeEntries | `() => [...QueryKeys.billing.all(), 'time-entries']` |
+| timeEntriesList | `(filters?: Record<string, any>) => [...QueryKeys.billing.tim...` |
+| pendingTimeEntries | `() => ['pendingTimeEntries']` |
+| timer | `() => ['timer']` |
+| statistics | `() => [...QueryKeys.billing.all(), 'statistics']` |
+| settings | `() => ['company-settings']` |
+| taxes | `() => ['taxes']` |
+| financeSettings | `() => ['finance-settings']` |
+| all | `() => ['trust-accounts']` |
+| lists | `() => [...QueryKeys.trustAccounts.all(), 'list']` |
+| list | `(filters?: Record<string, any>) => [...QueryKeys.trustAccoun...` |
+| details | `() => [...QueryKeys.trustAccounts.all(), 'detail']` |
+| detail | `(id: string) => [...QueryKeys.trustAccounts.details(), id]` |
+| clientBalances | `(params?: Record<string, any>) => [...QueryKeys.trustAccount...` |
+| clientLedger | `(accountId: string, clientId: string, params?: Record<string...` |
+| reconciliation | `(id: string) => [...QueryKeys.trustAccounts.all(), id, 'reco...` |
+| stats | `() => [...QueryKeys.trustAccounts.all(), 'stats']` |
+| all | `() => ['inter-company']` |
