@@ -749,6 +749,423 @@ useEffect(() => {
 
 ---
 
+## 11. HERO CARD (ProductivityHero)
+
+The hero card appears at the top of every list and detail page.
+
+### Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#022c22]` |
+| Border Radius | `rounded-3xl` |
+| Padding | `p-6` |
+| Min Height | `min-h-[140px] lg:min-h-[160px] xl:min-h-[180px]` |
+| Max Height | `max-h-[180px] lg:max-h-[190px] xl:max-h-[220px]` |
+| Shadow | `shadow-xl shadow-emerald-900/20` |
+| Position | `relative overflow-hidden` |
+
+### Background Effects
+```tsx
+{/* Animated Gradient Background */}
+<div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 opacity-20" style={{
+        background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
+        backgroundSize: '400% 400%',
+        animation: 'gradientShift 20s ease infinite'
+    }} />
+</div>
+{/* Pattern Overlay */}
+<div className="absolute inset-0 z-0">
+    <img src="/images/hero-wave.png" className="w-full h-full object-cover opacity-25 mix-blend-overlay" />
+</div>
+{/* Accent Glow */}
+<div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
+```
+
+### Layout Grid
+| Property | Value |
+|----------|-------|
+| Container | `grid grid-cols-1 xl:grid-cols-12 gap-6 items-center` |
+| Left Column | `xl:col-span-4 space-y-6` (Title & Actions) |
+| Right Column | `xl:col-span-8` (Stats Grid) |
+| Stats Grid | `grid grid-cols-2 lg:grid-cols-4 gap-3` |
+
+### Badge
+| Property | Value |
+|----------|-------|
+| Container | `inline-flex items-center gap-2 px-3 py-1 rounded-full` |
+| Background | `bg-white/5` |
+| Border | `border border-white/10` |
+| Text | `text-white text-xs font-medium` |
+| Icon | `w-3 h-3` |
+
+### Title
+| Property | Value |
+|----------|-------|
+| Size | `text-2xl lg:text-3xl` |
+| Weight | `font-bold` |
+| Color | `text-white` |
+| Tracking | `tracking-tight` |
+
+### Icon Container (beside title)
+| Property | Value |
+|----------|-------|
+| Padding | `p-2` |
+| Background | `bg-white/10` |
+| Radius | `rounded-xl` |
+| Icon Size | `w-6 h-6` |
+| Icon Color | `text-emerald-400 fill-emerald-400/20` |
+
+### Primary Action Button
+| Property | Value |
+|----------|-------|
+| Height | `h-10` |
+| Padding | `px-5` |
+| Background | `bg-emerald-500 hover:bg-emerald-600` |
+| Text | `text-white text-sm font-bold` |
+| Radius | `rounded-xl` |
+| Shadow | `shadow-lg shadow-emerald-500/20` |
+| Border | `border-0` |
+
+### Secondary Action Button
+| Property | Value |
+|----------|-------|
+| Height | `h-10` |
+| Padding | `px-5` |
+| Background | `bg-transparent hover:bg-white/10` |
+| Border | `border-white/10` |
+| Text | `text-white text-sm font-bold` |
+| Radius | `rounded-xl` |
+
+### Stat Card (inside Hero)
+| Property | Value |
+|----------|-------|
+| Padding | `py-3 px-4` |
+| Background | Semi-transparent glass |
+| Count | 4 cards in grid |
+
+---
+
+## 12. CREATE/EDIT FORM PAGE
+
+Standard form page layout for creating or editing entities.
+
+### Page Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#f8f9fa]` |
+| Padding | `p-6 lg:p-8` |
+| Spacing | `space-y-8` |
+| Border Radius | `rounded-tr-3xl` |
+| Shadow | `shadow-inner` |
+| Border | `border-e border-white/5` |
+
+### Grid Layout
+| Property | Value |
+|----------|-------|
+| Container | `grid grid-cols-1 lg:grid-cols-3 gap-8` |
+| Form Column | `lg:col-span-2 space-y-8` |
+| Sidebar Column | `lg:col-span-1` |
+
+### Form Card Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-white` |
+| Border Radius | `rounded-3xl` |
+| Padding | `p-8` |
+| Shadow | `shadow-sm` |
+| Border | `border border-slate-100` |
+
+### Form Mode Toggle (Basic/Advanced)
+| Property | Value |
+|----------|-------|
+| Container | `inline-flex p-1 bg-slate-100/80 rounded-full` |
+| Button Padding | `px-4 py-2` |
+| Button Text | `text-sm font-medium` |
+| Active State | `text-emerald-600` with white bg slider |
+| Inactive State | `text-slate-500 hover:text-slate-600` |
+| Slider | `bg-white rounded-full shadow-sm border border-slate-200/50` |
+| Transition | `transition-all duration-300 ease-out` |
+| Icon Size | `w-4 h-4` |
+
+### Form Field Label
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-2` |
+| Text Size | `text-sm` |
+| Weight | `font-medium` |
+| Color | `text-slate-700` |
+| Icon Size | `w-4 h-4` |
+| Icon Color | `text-emerald-500` |
+
+### Text Input
+| Property | Value |
+|----------|-------|
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus Border | `focus:border-emerald-500` |
+| Focus Ring | `focus:ring-emerald-500` |
+| Error Border | `border-red-500 focus:border-red-500 focus:ring-red-500/20` |
+
+### Select Dropdown
+| Property | Value |
+|----------|-------|
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus Ring | `focus:ring-emerald-500` |
+
+### Textarea
+| Property | Value |
+|----------|-------|
+| Min Height | `min-h-[100px]` |
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus | `focus:border-emerald-500 focus:ring-emerald-500` |
+
+### Form Grid Layouts
+```tsx
+{/* Standard 3-column: Wide, Wide, Narrow */}
+<div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
+    {/* 1fr = Status/Category (wide) */}
+    {/* 1fr = Priority/Estimated (wide) */}
+    {/* 0.5fr = Due Date/Time (narrow) */}
+</div>
+
+{/* Full width field */}
+<div className="space-y-2">
+    <label>...</label>
+    <Input />
+</div>
+```
+
+### Collapsible Section
+| Property | Value |
+|----------|-------|
+| Header | `flex items-center justify-between` |
+| Title | `text-lg font-semibold text-slate-800` |
+| Title Icon | `w-5 h-5 text-emerald-500` |
+| Chevron | `w-5 h-5` |
+| Content BG | `bg-slate-50` |
+| Content Radius | `rounded-xl` |
+| Content Padding | `p-4` |
+
+### Subtask Item
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 bg-slate-50 rounded-xl` |
+| Text | `flex-1 text-slate-700` |
+| Remove Button | `text-red-500 hover:text-red-600 hover:bg-red-50` |
+
+### Tag Badge
+| Property | Value |
+|----------|-------|
+| Component | `Badge variant="secondary"` |
+| Layout | `flex flex-wrap gap-2` |
+| Remove Icon | `w-3 h-3 hover:text-red-500` |
+
+### Form Footer
+| Property | Value |
+|----------|-------|
+| Layout | `flex items-center justify-end gap-4` |
+| Padding | `pt-6` |
+| Border | `border-t border-slate-100` |
+
+### Submit Button
+| Property | Value |
+|----------|-------|
+| Min Width | `min-w-[140px]` |
+| Background | `bg-emerald-500 hover:bg-emerald-600` |
+| Text | `text-white` |
+| Radius | `rounded-xl` |
+| Shadow | `shadow-lg shadow-emerald-500/20` |
+
+### Cancel Button
+| Property | Value |
+|----------|-------|
+| Variant | `ghost` |
+| Color | `text-slate-500 hover:text-navy` |
+
+---
+
+## 13. UNIVERSAL KEYBOARD SHORTCUTS
+
+**⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages for consistency.**
+
+### List View Shortcuts
+| Key | Action | Condition |
+|-----|--------|-----------|
+| `N` | Navigate to create page | Always |
+| `S` | Toggle selection mode | Always |
+| `D` | Delete selected items | Selection mode + has selection |
+| `A` | Archive selected items | Selection mode + has selection |
+| `C` | Complete selected items | Selection mode + has selection (tasks) |
+| `L` | Select/Deselect all | Selection mode |
+| `/` | Focus search input | Always |
+| `Escape` | Exit selection mode | Selection mode |
+
+### Detail View Shortcuts
+| Key | Action | Condition |
+|-----|--------|-----------|
+| `E` | Edit current item | Always |
+| `V` | Return to list view | Always |
+| `D` | Delete current item | Always (with confirm) |
+| `Escape` | Close modal/Return to list | Always |
+
+### Create/Edit View Shortcuts
+| Key | Action | Condition |
+|-----|--------|-----------|
+| `Ctrl+S` | Save form | Always |
+| `Escape` | Cancel and return | Always |
+| `V` | Return to list view | Always |
+
+### Implementation Pattern (MANDATORY)
+```tsx
+useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        // Skip if user is typing in input/textarea
+        const target = e.target as HTMLElement
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            return
+        }
+
+        switch (e.key.toLowerCase()) {
+            case 'n':
+                e.preventDefault()
+                navigate({ to: ROUTES.dashboard.{module}.new })
+                break
+            case 's':
+                e.preventDefault()
+                setIsSelectionMode(!isSelectionMode)
+                break
+            case 'd':
+                if (isSelectionMode && selectedIds.length > 0) {
+                    e.preventDefault()
+                    handleBulkDelete()
+                }
+                break
+            case 'a':
+                if (isSelectionMode && selectedIds.length > 0) {
+                    e.preventDefault()
+                    handleBulkArchive()
+                }
+                break
+            case 'c':
+                if (isSelectionMode && selectedIds.length > 0) {
+                    e.preventDefault()
+                    handleBulkComplete()
+                }
+                break
+            case 'l':
+                if (isSelectionMode) {
+                    e.preventDefault()
+                    handleSelectAll()
+                }
+                break
+            case '/':
+                e.preventDefault()
+                searchInputRef.current?.focus()
+                break
+            case 'escape':
+                e.preventDefault()
+                setIsSelectionMode(false)
+                setSelectedIds([])
+                break
+        }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+}, [isSelectionMode, selectedIds, navigate])
+```
+
+### Keyboard Badge UI
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-1.5` |
+| Label | `text-sm font-bold` |
+| Kbd Size | `text-[10px]` |
+| Kbd Font | `font-mono` |
+| Kbd Padding | `px-1.5 py-0.5` |
+| Kbd Radius | `rounded` |
+| Kbd BG | varies by action (see Quick Actions) |
+
+---
+
+## 14. AI SUGGESTION CARD (Optional)
+
+For pages with AI-powered suggestions.
+
+### Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-gradient-to-r from-purple-50 to-indigo-50` |
+| Border | `border border-purple-100` |
+| Radius | `rounded-2xl` |
+| Padding | `p-4` |
+
+### Header
+| Property | Value |
+|----------|-------|
+| Icon | Sparkles `w-5 h-5 text-purple-500` |
+| Title | `text-sm font-bold text-purple-900` |
+| Refresh Button | Ghost, `text-purple-500` |
+| Dismiss Button | Ghost, X icon |
+
+### Content
+| Property | Value |
+|----------|-------|
+| Text | `text-sm text-purple-800` |
+| Icon | Lightbulb `w-4 h-4 text-purple-400` |
+
+### Loading State
+| Property | Value |
+|----------|-------|
+| Spinner | `w-4 h-4 animate-spin text-purple-500` |
+| Background | Same container with `animate-pulse` |
+
+### Error State
+| Property | Value |
+|----------|-------|
+| Background | `bg-red-50` |
+| Border | `border-red-100` |
+| Text | `text-red-700` |
+| Retry Button | `text-red-600` |
+
+---
+
+## 15. DETAIL VIEW PAGE
+
+Standard layout for viewing entity details.
+
+### Page Layout
+Same as Create/Edit with:
+- Hero card with `listMode={true}` and `backUrl`
+- 2-column grid (content + sidebar)
+
+### Detail Card Sections
+| Property | Value |
+|----------|-------|
+| Container | `bg-white rounded-3xl p-6 shadow-sm border border-slate-100` |
+| Section Title | `text-lg font-semibold text-slate-800 mb-4` |
+| Section Spacing | `space-y-6` |
+
+### Info Row
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3` |
+| Label | `text-sm text-slate-500` |
+| Value | `text-sm text-slate-900 font-medium` |
+| Icon | `w-4 h-4 text-slate-400` |
+
+### Action Buttons (Detail View)
+| Property | Value |
+|----------|-------|
+| Edit | `bg-blue-500 hover:bg-blue-600 text-white` |
+| Delete | `bg-red-500 hover:bg-red-600 text-white` |
+| Archive | `bg-slate-500 hover:bg-slate-600 text-white` |
+
+---
+
 ## USAGE INSTRUCTIONS
 
 When creating or updating a list page:
@@ -772,5 +1189,148 @@ import { useAdaptiveSearchDebounce } from '@/hooks/useAdaptiveDebounce'
 
 ### Files to Reference
 - **List View**: `src/features/tasks/components/tasks-list-view.tsx`
+- **Create View**: `src/features/tasks/components/create-task-view.tsx`
+- **Detail View**: `src/features/tasks/components/task-details-view.tsx`
 - **Sidebar**: `src/features/tasks/components/tasks-sidebar.tsx`
 - **Schema**: `src/features/tasks/data/schema.ts`
+- **Constants**: `src/features/tasks/constants/task-options.ts`
+- **Hero Component**: `src/components/productivity-hero.tsx`
+
+---
+
+## 16. MODULE REPLICATION GUIDE
+
+When creating a new module (HR, Finance, etc.), follow this structure:
+
+### Folder Structure
+```
+src/features/{module}/
+├── components/
+│   ├── {module}-list-view.tsx      # Main list page (copy tasks-list-view.tsx)
+│   ├── create-{entity}-view.tsx    # Create form (copy create-task-view.tsx)
+│   ├── {entity}-details-view.tsx   # Detail view (copy task-details-view.tsx)
+│   ├── {module}-sidebar.tsx        # Sidebar widget (copy tasks-sidebar.tsx)
+│   ├── {module}-columns.tsx        # Table columns (copy tasks-columns.tsx)
+│   └── {module}-dialogs.tsx        # Modals/dialogs
+├── constants/
+│   └── {module}-options.ts         # Dropdown options, status/priority maps
+├── data/
+│   └── schema.ts                   # Zod schemas
+├── hooks/
+│   └── use{Module}.ts              # Custom hooks (if not in src/hooks/)
+└── index.tsx                       # Route exports
+```
+
+### Step-by-Step Module Creation
+
+1. **Copy Tasks Module Structure**
+   ```bash
+   cp -r src/features/tasks src/features/{new-module}
+   ```
+
+2. **Rename Files**
+   - `tasks-list-view.tsx` → `{module}-list-view.tsx`
+   - `create-task-view.tsx` → `create-{entity}-view.tsx`
+   - etc.
+
+3. **Search and Replace**
+   - `tasks` → `{module}` (lowercase)
+   - `Tasks` → `{Module}` (PascalCase)
+   - `task` → `{entity}` (singular)
+   - `Task` → `{Entity}` (PascalCase singular)
+
+4. **Update Constants**
+   - Add routes to `src/constants/routes.ts`
+   - Add query keys to `src/lib/query-keys.ts`
+   - Add cache invalidation to `src/lib/cache-invalidation.ts`
+
+5. **Create Hook** (in `src/hooks/use{Module}.ts`)
+   - Copy `useTasks.ts` pattern
+   - Update API endpoints
+   - Update query keys
+   - Update cache times
+
+6. **Update Sidebar Navigation**
+   - Add to sidebar menu
+   - Add icon
+
+7. **Update Hero Component**
+   - Add type config in `buttonConfig`
+   - Add type config in `listButtonConfig`
+
+### Checklist for New Module
+- [ ] List view with all 15 sections from planform.md
+- [ ] Create view with Basic/Advanced mode toggle
+- [ ] Detail view with back navigation
+- [ ] Sidebar with Quick Actions
+- [ ] Keyboard shortcuts (same keys as tasks)
+- [ ] Hero card with stats
+- [ ] Loading skeletons
+- [ ] Empty/Error states
+- [ ] RTL support tested
+- [ ] Translations in AR/EN
+
+### Module-Specific Adaptations
+
+| Module | Entity | Special Features |
+|--------|--------|------------------|
+| Tasks | Task | Subtasks, recurring, AI suggestions |
+| HR | Employee | Leave balances, org chart |
+| Finance | Invoice | Line items, payments, totals |
+| CRM | Lead | Pipeline stages, scoring |
+| Cases | Case | Documents, timeline, parties |
+
+### Do NOT Change
+These patterns MUST stay consistent across ALL modules:
+- ❌ Keyboard shortcuts (N, S, D, A, C, L, /, Escape)
+- ❌ Filter card dimensions (h-14 inputs, rounded-2xl)
+- ❌ List item card structure
+- ❌ Quick Actions sidebar layout
+- ❌ Hero card structure
+- ❌ Color palette (priority, status colors)
+- ❌ Animation timings
+
+### DO Customize
+These CAN vary per module:
+- ✅ Status options (todo/done vs pending/approved)
+- ✅ Priority labels
+- ✅ Filter dropdown options
+- ✅ Stat cards in hero
+- ✅ Quick action buttons (Complete vs Approve)
+- ✅ Form fields in create/edit
+- ✅ Column definitions in list
+
+---
+
+## QUICK REFERENCE CARD
+
+### Dimensions Cheat Sheet
+| Component | Dimension |
+|-----------|-----------|
+| Input height | `h-14` |
+| Button height (primary) | `h-14` (filter) / `h-10` (hero) / `h-12` (load more) |
+| Card radius | `rounded-2xl` |
+| Container radius | `rounded-[2rem]` / `rounded-3xl` |
+| Icon (small) | `w-4 h-4` / `w-5 h-5` |
+| Icon (medium) | `w-6 h-6` / `w-7 w-7` |
+| Badge text | `text-[10px]` |
+
+### Spacing Cheat Sheet
+| Context | Value |
+|---------|-------|
+| Page padding | `p-6 lg:p-8` |
+| Card padding | `p-4` / `p-6` / `p-8` |
+| Grid gap | `gap-4` / `gap-6` / `gap-8` |
+| Item spacing | `space-y-6` |
+
+### Color Cheat Sheet
+| Use Case | Color |
+|----------|-------|
+| Primary action | `emerald-500/600` |
+| Secondary action | `navy` |
+| Danger | `red-500/600` |
+| Warning | `amber-400/500` |
+| Info | `blue-500/600` |
+| Neutral | `slate-400/500` |
+| Background light | `bg-[#f8f9fa]` |
+| Background dark | `bg-[#022c22]` |
