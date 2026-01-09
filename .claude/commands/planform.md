@@ -991,8 +991,10 @@ Standard form page layout for creating or editing entities.
 
 **⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages and ALL modules for consistency.**
 
-Keyboard shortcuts are centrally handled in **TasksSidebar** component (or equivalent `{Module}Sidebar`).
-The sidebar receives `mode` and `taskId` props to determine which shortcuts to activate.
+### Centralized Hook (MANDATORY)
+**Location:** `src/hooks/useKeyboardShortcuts.ts`
+
+**ALL modules MUST use this hook instead of implementing keyboard shortcuts directly.** This ensures 100% consistency across Tasks, HR, Finance, CRM, and all other modules.
 
 ### List View Shortcuts (mode='list', no taskId)
 | Key | Action | Condition | Arabic Label |
@@ -1042,71 +1044,82 @@ The Quick Actions sidebar has TWO tabs in list view:
 | Archive | `A` | Archive / ArchiveRestore | `text-slate-600` / `text-emerald-600` |
 
 ### Implementation Pattern (MANDATORY)
+
+**Import the centralized hook:**
 ```tsx
-// In {Module}Sidebar component - handle all keyboard shortcuts centrally
-useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-        // Skip if user is typing in an input, textarea, or contenteditable
-        const target = e.target as HTMLElement
-        if (
-            target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable
-        ) {
-            return
-        }
+import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS, KBD_COLORS } from '@/hooks/useKeyboardShortcuts'
+```
 
-        // Handle shortcuts based on view mode
-        if (mode === 'create') {
-            // Create Page shortcuts
-            switch (e.key.toLowerCase()) {
-                case 'n': e.preventDefault(); navigate({ to: currentLinks.create }); break
-                case 'c': e.preventDefault(); onClearForm?.(); break
-                case 'd': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
-                case 's': e.preventDefault(); onSaveForm?.(); break
-            }
-        } else if (taskId) {
-            // Detail View shortcuts
-            switch (e.key.toLowerCase()) {
-                case 'c': e.preventDefault(); onCompleteTask?.(); break
-                case 'e': e.preventDefault(); navigate({ to: ROUTES.dashboard.{module}.new, search: { editId: taskId } }); break
-                case 'd': e.preventDefault(); onDeleteTask?.(); break
-                case 'v': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
-            }
-        } else {
-            // List View shortcuts
-            switch (e.key.toLowerCase()) {
-                case 'n': e.preventDefault(); navigate({ to: currentLinks.create }); break
-                case 's': e.preventDefault(); onToggleSelectionMode?.(); break
-                case 'd':
-                    if (isSelectionMode && selectedCount > 0) {
-                        e.preventDefault(); onDeleteSelected?.()
-                    }
-                    break
-                case 'a':
-                    if (isSelectionMode && selectedCount > 0) {
-                        e.preventDefault()
-                        isViewingArchived ? onBulkUnarchive?.() : onBulkArchive?.()
-                    }
-                    break
-                case 'c':
-                    if (isSelectionMode && selectedCount > 0) {
-                        e.preventDefault(); onBulkComplete?.()
-                    }
-                    break
-                case 'l':
-                    if (isSelectionMode && totalTaskCount > 0) {
-                        e.preventDefault(); onSelectAll?.()
-                    }
-                    break
-                case 'v': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
-            }
-        }
+**List View Usage:**
+```tsx
+// In {Module}Sidebar component or directly in list page
+useKeyboardShortcuts({
+    mode: 'list',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    listCallbacks: {
+        onToggleSelectionMode,
+        onDeleteSelected,
+        onBulkArchive,
+        onBulkUnarchive,
+        onBulkComplete,
+        onSelectAll,
+        isSelectionMode,
+        selectedCount,
+        totalCount,
+        isViewingArchived,
     }
+})
+```
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-}, [mode, taskId, currentLinks, navigate, ...dependencies])
+**Detail View Usage:**
+```tsx
+useKeyboardShortcuts({
+    mode: 'detail',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    entityId: itemId,
+    editRoute: ROUTES.dashboard.{module}.new, // Route with ?editId param
+    detailCallbacks: {
+        onComplete,
+        onDelete,
+    }
+})
+```
+
+**Create/Edit View Usage:**
+```tsx
+useKeyboardShortcuts({
+    mode: 'create',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    createCallbacks: {
+        onClear,
+        onSave,
+    }
+})
+```
+
+### Hook Types Reference
+```tsx
+import {
+    useKeyboardShortcuts,    // Main hook
+    KEYBOARD_SHORTCUTS,       // Shortcut definitions for UI
+    KBD_COLORS,              // Kbd color classes
+    getShortcutInfo,         // Get shortcut by action name
+    getShortcutsForMode,     // Get all shortcuts for a mode
+    type ViewMode,           // 'list' | 'detail' | 'create'
+    type ModuleLinks,        // { create: string, viewAll: string }
+    type ListCallbacks,      // List view callback props
+    type DetailCallbacks,    // Detail view callback props
+    type CreateCallbacks,    // Create view callback props
+} from '@/hooks/useKeyboardShortcuts'
 ```
 
 ### Sidebar Props for Keyboard Handling
