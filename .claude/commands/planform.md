@@ -439,6 +439,82 @@ This document contains the complete design specifications from the Tasks List pa
 
 ## 4. QUICK ACTIONS SIDEBAR
 
+**⚠️ CRITICAL: Quick Actions widget shows DIFFERENT buttons for each view mode. NO tabs in detail/create views.**
+
+### Quick Actions by View Mode
+
+#### List View (mode='list', no entityId)
+Shows **TWO TABS**: Main (أساسي) and Bulk (جماعي)
+
+| Tab | Buttons | Icons |
+|-----|---------|-------|
+| **Main** | Create, Select, Delete, Archive | Plus, CheckSquare/X, Trash2, Archive |
+| **Bulk** | Select All, Complete, Delete, Archive | CheckCheck, CheckCircle, Trash2, Archive |
+
+```tsx
+// Only show tabs for list mode
+{mode === 'list' && !taskId && (
+    <div className="flex bg-[#033a2d] p-1 rounded-xl">
+        <button onClick={() => setQuickActionsTab('main')}>أساسي</button>
+        <button onClick={() => setQuickActionsTab('bulk')}>جماعي</button>
+    </div>
+)}
+```
+
+#### Detail View (entityId exists)
+**NO TABS** - Shows 4 action buttons directly
+
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Complete/Reopen | `C` | CheckSquare | `text-emerald-600` / `text-amber-600` |
+| Edit | `E` | Edit3 | `text-blue-600` |
+| Delete | `D` | Trash2 | `text-red-500` |
+| View All | `V` | List | `text-emerald-950` |
+
+#### Create/Edit View (mode='create')
+**NO TABS** - Shows 4 action buttons directly
+
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Create | `N` | Plus | `text-emerald-600` |
+| Clear | `C` | Eraser | `text-amber-600` |
+| Cancel | `D` | Trash2 | `text-slate-600 hover:text-red-600` |
+| Save | `S` | Save | `text-blue-600` |
+
+### View Mode Rendering Logic
+```tsx
+<div className="grid grid-cols-2 gap-4">
+    {mode === 'create' ? (
+        // Create View: Create, Clear, Cancel, Save
+        <>
+            <Link to={currentLinks.create}>Create</Link>
+            <button onClick={onClearForm}>Clear</button>
+            <Link to={currentLinks.viewAll}>Cancel</Link>
+            <button onClick={onSaveForm}>Save</button>
+        </>
+    ) : taskId ? (
+        // Detail View: Complete, Edit, Delete, View All
+        <>
+            <Button onClick={onCompleteTask}>Complete</Button>
+            <Link to={editRoute} search={{ editId: taskId }}>Edit</Link>
+            <Button onClick={onDeleteTask}>Delete</Button>
+            <Link to={currentLinks.viewAll}>View All</Link>
+        </>
+    ) : (
+        // List View: Tabbed (Main/Bulk)
+        <>
+            {quickActionsTab === 'main' ? (
+                // Main: Create, Select, Delete, Archive
+            ) : (
+                // Bulk: Select All, Complete, Delete, Archive
+            )}
+        </>
+    )}
+</div>
+```
+
+---
+
 ### Widget Container
 | Property | Value |
 |----------|-------|
