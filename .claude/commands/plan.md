@@ -9,6 +9,50 @@ Transform the user's feature request into structured requirements using EARS for
 
 ---
 
+## 🔬 PRE-PLANNING WORKFLOW (Recommended)
+
+Before creating requirements, consider running these commands for better planning:
+
+### Research Phase (Optional but Recommended for Enterprise features)
+```bash
+/research {topic}    # Enterprise patterns, competitors, standards
+```
+Check `.research/{topic}/` for:
+- Enterprise patterns (AWS, Google, Microsoft, Salesforce)
+- Open source implementations
+- Industry standards (OWASP, WCAG)
+- Legal tech competitors (Clio, PracticePanther)
+- Actionable recommendations
+
+### Discovery Phase (MANDATORY for Standard/Enterprise)
+```bash
+/discover {topic}    # Analyze existing codebase
+```
+This will identify:
+- Existing components to reuse
+- Hooks and services available
+- API endpoints (existing vs needed)
+- Patterns to follow (gold standard: Tasks list)
+
+### Design Phase (Recommended for UI features)
+```bash
+/design-concept {topic}    # UI/UX specifications
+```
+Creates:
+- Visual direction and typography
+- Component specifications
+- Interaction patterns
+- RTL/LTR considerations
+
+### Integration with Research
+If `.research/{topic}/` exists, incorporate:
+- P0 recommendations into Must Have requirements
+- P1 recommendations into Should Have requirements
+- Anti-patterns into "Out of Scope" or constraints
+- Enterprise patterns into architecture decisions
+
+---
+
 ## 📏 SCALE ASSESSMENT (Do This First)
 
 Before deep planning, determine the scope:
@@ -523,3 +567,42 @@ Requirements are now frozen. To make changes:
 - [ ] Security review for any data handling
 - [ ] Performance targets defined for all features
 - [ ] Accessibility requirements specified
+
+---
+
+## 🔄 Complete Workflow Reference
+
+The full enterprise workflow for feature development:
+
+```
+1. /research {topic}      → Enterprise patterns & competitor analysis
+                           Output: .research/{topic}/
+
+2. /discover {topic}      → Codebase analysis & gap identification
+                           Output: Discovery report in chat
+
+3. /design-concept {topic} → UI/UX specifications
+                           Output: Design concept in chat
+
+4. /plan {topic}          → Requirements with EARS format (THIS COMMAND)
+                           Output: .claude/specs/{topic}/requirements.md
+
+5. /implementation {topic} → Technical architecture & task breakdown
+                           Output: .claude/specs/{topic}/design.md
+                                   .claude/specs/{topic}/tasks.md
+
+6. /complete-phase        → Execute implementation tasks
+                           Output: Code changes
+
+7. /verify {topic}        → Post-implementation verification
+                           Output: Verification report
+
+8. /design-review         → UI/RTL/Accessibility review
+                           Output: Design review report
+```
+
+### Gold Standard References
+- **Tasks List**: `src/features/tasks/` - List view patterns
+- **useTasks Hook**: `src/hooks/useTasks.ts` - TanStack Query patterns
+- **Design Specs**: `.claude/commands/planform.md` - UI specifications
+- **Design Principles**: `context/design-principles.md` - System rules
