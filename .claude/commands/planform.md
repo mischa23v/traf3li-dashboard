@@ -1135,34 +1135,284 @@ For pages with AI-powered suggestions.
 
 ## 15. DETAIL VIEW PAGE
 
-Standard layout for viewing entity details.
+Comprehensive specifications for entity detail pages.
 
-### Page Layout
-Same as Create/Edit with:
-- Hero card with `listMode={true}` and `backUrl`
-- 2-column grid (content + sidebar)
+### Page Layout Structure
+```tsx
+<Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+    {/* Loading State */}
+    {isLoading && <DetailSkeleton />}
 
-### Detail Card Sections
+    {/* Error State */}
+    {isError && <ErrorCard />}
+
+    {/* Empty State */}
+    {!isLoading && !isError && !data && <NotFoundCard />}
+
+    {/* Success State */}
+    {!isLoading && !isError && data && (
+        <>
+            <ProductivityHero badge="إدارة المهام" title={data.title} type="tasks" listMode={true} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Main Content Card with Tabs */}
+                </div>
+                <TasksSidebar context="tasks" taskId={id} ... />
+            </div>
+        </>
+    )}
+</Main>
+```
+
+### Loading Skeleton
+```tsx
+<div className="space-y-6">
+    <Skeleton className="h-48 w-full rounded-3xl" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+            <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+        <div>
+            <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+    </div>
+</div>
+```
+
+### Error State Card
 | Property | Value |
 |----------|-------|
-| Container | `bg-white rounded-3xl p-6 shadow-sm border border-slate-100` |
-| Section Title | `text-lg font-semibold text-slate-800 mb-4` |
-| Section Spacing | `space-y-6` |
+| Container | `bg-white rounded-2xl p-12 border border-slate-100 text-center` |
+| Icon Container | `w-16 h-16 rounded-full bg-red-50 flex items-center justify-center` |
+| Icon | `w-8 h-8 text-red-500` |
+| Title | `text-lg font-bold text-slate-900 mb-2` |
+| Message | `text-slate-500 mb-4` |
+| Retry Button | `bg-emerald-500 hover:bg-emerald-600` |
 
-### Info Row
+### Empty/Not Found State
 | Property | Value |
 |----------|-------|
-| Container | `flex items-center gap-3` |
-| Label | `text-sm text-slate-500` |
-| Value | `text-sm text-slate-900 font-medium` |
-| Icon | `w-4 h-4 text-slate-400` |
+| Container | `bg-white rounded-2xl p-12 border border-slate-100 text-center` |
+| Icon Container | `w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center` |
+| Icon | `w-8 h-8 text-emerald-500` |
+| Title | `text-lg font-bold text-slate-900 mb-2` |
+| Message | `text-slate-500 mb-4` |
+| Back Button | `bg-emerald-500 hover:bg-emerald-600` |
 
-### Action Buttons (Detail View)
+### Main Content Card (GosiCard with Tabs)
 | Property | Value |
 |----------|-------|
-| Edit | `bg-blue-500 hover:bg-blue-600 text-white` |
-| Delete | `bg-red-500 hover:bg-red-600 text-white` |
-| Archive | `bg-slate-500 hover:bg-slate-600 text-white` |
+| Container | `GosiCard className="min-h-[600px] p-0"` |
+| Tab Header | `px-4 sm:px-6 pt-4 flex items-center justify-between gap-4` |
+| Tab Content BG | `bg-slate-50/50 min-h-[400px] sm:min-h-[500px]` |
+| Tab Content Padding | `p-4 sm:p-6` |
+
+### Tab Navigation
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-2 border-b border-slate-200 pb-0 flex-1` |
+| Tab Button | `px-4 py-2 text-sm font-medium rounded-t-xl transition-colors relative` |
+| Active Tab | `bg-emerald-500 text-white` |
+| Inactive Tab | `text-slate-600 hover:text-slate-900 hover:bg-slate-100` |
+
+### Standard Detail Tabs
+```tsx
+const tabs = [
+    { id: 'overview', label: 'نظرة عامة' },
+    { id: 'time-tracking', label: 'تتبع الوقت' },
+    { id: 'files', label: 'المرفقات' },
+    { id: 'comments', label: 'التعليقات' }
+]
+```
+
+### Export Button (Header)
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#022c22] hover:bg-[#064e3b]` |
+| Text | `text-white` |
+| Radius | `rounded-xl` |
+| Padding | `px-3 py-2` |
+| Icon | `h-4 w-4` |
+
+### Description Card
+| Property | Value |
+|----------|-------|
+| Container | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Header Title | `text-lg font-bold text-navy` |
+| Description Text | `text-slate-600 leading-relaxed` |
+
+### Compact Info Row (Inside Description)
+```tsx
+<div className="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100">
+    {/* Info Item */}
+    <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-{color}-50 flex items-center justify-center">
+            <Icon className="w-4 h-4 text-{color}-600" />
+        </div>
+        <div>
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-sm font-semibold text-navy">{value}</p>
+        </div>
+    </div>
+    {/* Divider */}
+    <div className="h-8 w-px bg-slate-200" />
+</div>
+```
+
+### Info Item Colors
+| Type | BG | Icon Color |
+|------|----|-----------|
+| Date | `blue-50` | `blue-600` |
+| Assignee | `emerald-50` | `emerald-600` |
+| Progress | `purple-50` | `purple-600` |
+| Status | `amber-50` | `amber-600` |
+
+### Progress Bar (in info row)
+| Property | Value |
+|----------|-------|
+| Track | `h-2 bg-slate-100 rounded-full overflow-hidden` |
+| Fill | `h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500` |
+| Label | `text-xs text-slate-500` |
+| Value | `text-sm font-bold text-navy` |
+
+### Section Card (Generic)
+| Property | Value |
+|----------|-------|
+| Container | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Padding | `p-5` |
+| Header | `flex items-center gap-3 mb-4` |
+| Icon Box | `w-10 h-10 rounded-xl bg-{color}-100 text-{color}-600 flex items-center justify-center` |
+| Title | `text-sm font-bold text-navy` |
+| Subtitle | `text-xs text-slate-500` |
+
+### Two-Column Info Cards
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="pb-3">
+            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                <Icon className="w-4 h-4 text-{color}-600" />
+                {title}
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+            {/* Info rows */}
+        </CardContent>
+    </Card>
+</div>
+```
+
+### Info Row (Inside Cards)
+| Property | Value |
+|----------|-------|
+| Container | `flex justify-between text-sm` |
+| Label | `text-slate-500` |
+| Value | `font-medium text-slate-900` |
+
+### Link Row
+| Property | Value |
+|----------|-------|
+| Text | `text-blue-600 text-sm hover:underline inline-flex items-center gap-1` |
+| Icon | `h-3 w-3` |
+
+### Subtask Section
+| Property | Value |
+|----------|-------|
+| Card | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Header | `CardHeader className="pb-3"` |
+| Title | `text-base font-bold text-navy flex items-center gap-2` |
+| Badge | `Badge variant="secondary" className="me-2 bg-slate-100 text-slate-600"` |
+
+### Subtask Item
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all` |
+| Checkbox (unchecked) | `w-5 h-5 rounded-md border border-slate-300 hover:border-emerald-500 cursor-pointer` |
+| Checkbox (checked) | `bg-emerald-600 border-emerald-600 text-white` |
+| Title (incomplete) | `flex-1 font-medium text-navy` |
+| Title (complete) | `flex-1 font-medium text-slate-500 line-through` |
+
+### Add Subtask Form
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100` |
+| Input | `flex-1 h-8 border-0 bg-transparent focus-visible:ring-0 text-navy` |
+| Add Button | `h-8 bg-emerald-600 hover:bg-emerald-700` |
+| Cancel Button | `h-8 w-8 p-0 variant="ghost"` |
+
+### Add Button (Ghost)
+| Property | Value |
+|----------|-------|
+| Style | `variant="ghost" w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl` |
+| Icon | `w-5 h-5 ms-2` |
+
+### Comments Section
+| Property | Value |
+|----------|-------|
+| Card | `border-none shadow-sm bg-white rounded-2xl` |
+| ScrollArea | `h-[300px]` |
+| Empty State Icon | `w-10 h-10 mx-auto mb-2 opacity-30` |
+
+### Comment Item
+| Property | Value |
+|----------|-------|
+| Container | `flex gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors` |
+| Avatar | `w-9 h-9` |
+| Avatar BG | `bg-emerald-100 text-emerald-700 text-sm font-bold` |
+| Username | `text-sm font-semibold text-navy` |
+| Time | `text-xs text-slate-400` |
+| Text | `text-sm text-slate-600 mt-1` |
+
+### Comment Input
+| Property | Value |
+|----------|-------|
+| Container | `flex gap-3 pt-4 border-t border-slate-100` |
+| Input | `flex-1 rounded-xl resize-none border-slate-200 focus:border-emerald-500` |
+| Button | `rounded-xl bg-emerald-500 hover:bg-emerald-600 p-3` |
+
+### Attachments/Files Section
+| Property | Value |
+|----------|-------|
+| Grid | `grid gap-3` |
+| File Card | `flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group` |
+
+### File Item
+| Property | Value |
+|----------|-------|
+| Icon Container | `w-10 h-10 rounded-xl flex items-center justify-center` |
+| PDF Icon BG | `bg-red-100 text-red-600` |
+| DOC Icon BG | `bg-blue-100 text-blue-600` |
+| XLS Icon BG | `bg-emerald-100 text-emerald-600` |
+| IMG Icon BG | `bg-purple-100 text-purple-600` |
+| File Name | `text-sm font-medium text-navy` |
+| File Info | `text-xs text-slate-400` |
+| Actions | `opacity-0 group-hover:opacity-100 transition-opacity flex gap-1` |
+
+### Delete Confirmation Dialog
+| Property | Value |
+|----------|-------|
+| Overlay | `fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4` |
+| Card | `GosiCard className="p-8 max-w-md w-full"` |
+| Icon Box | `GosiIconBox variant="soft" size="lg" className="bg-red-50 text-red-500"` |
+| Icon | `w-8 h-8` |
+| Title | `text-xl font-bold text-slate-900 text-center mb-2` |
+| Message | `text-slate-500 text-center mb-8` |
+| Buttons | `flex gap-3 justify-center` |
+| Cancel | `GosiButton variant="ghost"` |
+| Confirm | `GosiButton variant="danger"` |
+
+### Sidebar Props for Detail View
+```tsx
+<TasksSidebar
+    context="tasks"
+    taskId={id}
+    isTaskCompleted={data.status === 'done'}
+    onCompleteTask={handleComplete}
+    onDeleteTask={() => setShowDeleteConfirm(true)}
+    isCompletePending={completeMutation.isPending || reopenMutation.isPending}
+    isDeletePending={deleteMutation.isPending}
+/>
+```
 
 ---
 
