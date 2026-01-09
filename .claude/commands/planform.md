@@ -989,96 +989,163 @@ Standard form page layout for creating or editing entities.
 
 ## 13. UNIVERSAL KEYBOARD SHORTCUTS
 
-**⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages for consistency.**
+**⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages and ALL modules for consistency.**
 
-### List View Shortcuts
-| Key | Action | Condition |
-|-----|--------|-----------|
-| `N` | Navigate to create page | Always |
-| `S` | Toggle selection mode | Always |
-| `D` | Delete selected items | Selection mode + has selection |
-| `A` | Archive selected items | Selection mode + has selection |
-| `C` | Complete selected items | Selection mode + has selection (tasks) |
-| `L` | Select/Deselect all | Selection mode |
-| `/` | Focus search input | Always |
-| `Escape` | Exit selection mode | Selection mode |
+Keyboard shortcuts are centrally handled in **TasksSidebar** component (or equivalent `{Module}Sidebar`).
+The sidebar receives `mode` and `taskId` props to determine which shortcuts to activate.
 
-### Detail View Shortcuts
-| Key | Action | Condition |
-|-----|--------|-----------|
-| `E` | Edit current item | Always |
-| `V` | Return to list view | Always |
-| `D` | Delete current item | Always (with confirm) |
-| `Escape` | Close modal/Return to list | Always |
+### List View Shortcuts (mode='list', no taskId)
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `N` | Navigate to create page | Always | إنشاء |
+| `S` | Toggle selection mode | Always | تحديد / إلغاء |
+| `D` | Delete selected | Selection mode + has selection | حذف |
+| `A` | Archive/Unarchive selected | Selection mode + has selection | أرشفة / إلغاء أرشفة |
+| `C` | Complete selected | Selection mode + has selection | إكمال |
+| `L` | Select/Deselect all | Selection mode | تحديد الكل / إلغاء الكل |
+| `V` | Navigate to list view | Always | عرض جميع |
 
-### Create/Edit View Shortcuts
-| Key | Action | Condition |
-|-----|--------|-----------|
-| `Ctrl+S` | Save form | Always |
-| `Escape` | Cancel and return | Always |
-| `V` | Return to list view | Always |
+### Detail View Shortcuts (taskId exists)
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `C` | Complete/Reopen item | Always | إكمال / إعادة فتح |
+| `E` | Edit item | Always | تعديل |
+| `D` | Delete item | Always (with confirm) | حذف |
+| `V` | Navigate to list view | Always | عرض جميع |
+
+### Create/Edit View Shortcuts (mode='create')
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `N` | Navigate to create (refresh) | Always | إنشاء |
+| `C` | Clear form | Always | مسح |
+| `D` | Cancel and return to list | Always | إلغاء |
+| `S` | Save form | Always | حفظ |
+
+### Quick Actions Widget - Tabs
+
+The Quick Actions sidebar has TWO tabs in list view:
+
+**Main Tab (أساسي)**:
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Create | `N` | Plus | `text-emerald-600` |
+| Select | `S` | CheckSquare / X | `text-slate-700` / `text-emerald-800` (active) |
+| Delete | `D` | Trash2 | `text-slate-600 hover:text-red-600` |
+| Archive | `A` | Archive / ArchiveRestore | `text-slate-600` / `text-emerald-600` |
+
+**Bulk Tab (جماعي)** - Shows selected count badge:
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Select All | `L` | CheckCheck | `text-blue-600` |
+| Complete | `C` | CheckCircle | `text-emerald-600` |
+| Delete | `D` | Trash2 | `text-slate-600 hover:text-red-600` |
+| Archive | `A` | Archive / ArchiveRestore | `text-slate-600` / `text-emerald-600` |
 
 ### Implementation Pattern (MANDATORY)
 ```tsx
+// In {Module}Sidebar component - handle all keyboard shortcuts centrally
 useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-        // Skip if user is typing in input/textarea
+        // Skip if user is typing in an input, textarea, or contenteditable
         const target = e.target as HTMLElement
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        if (
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable
+        ) {
             return
         }
 
-        switch (e.key.toLowerCase()) {
-            case 'n':
-                e.preventDefault()
-                navigate({ to: ROUTES.dashboard.{module}.new })
-                break
-            case 's':
-                e.preventDefault()
-                setIsSelectionMode(!isSelectionMode)
-                break
-            case 'd':
-                if (isSelectionMode && selectedIds.length > 0) {
-                    e.preventDefault()
-                    handleBulkDelete()
-                }
-                break
-            case 'a':
-                if (isSelectionMode && selectedIds.length > 0) {
-                    e.preventDefault()
-                    handleBulkArchive()
-                }
-                break
-            case 'c':
-                if (isSelectionMode && selectedIds.length > 0) {
-                    e.preventDefault()
-                    handleBulkComplete()
-                }
-                break
-            case 'l':
-                if (isSelectionMode) {
-                    e.preventDefault()
-                    handleSelectAll()
-                }
-                break
-            case '/':
-                e.preventDefault()
-                searchInputRef.current?.focus()
-                break
-            case 'escape':
-                e.preventDefault()
-                setIsSelectionMode(false)
-                setSelectedIds([])
-                break
+        // Handle shortcuts based on view mode
+        if (mode === 'create') {
+            // Create Page shortcuts
+            switch (e.key.toLowerCase()) {
+                case 'n': e.preventDefault(); navigate({ to: currentLinks.create }); break
+                case 'c': e.preventDefault(); onClearForm?.(); break
+                case 'd': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
+                case 's': e.preventDefault(); onSaveForm?.(); break
+            }
+        } else if (taskId) {
+            // Detail View shortcuts
+            switch (e.key.toLowerCase()) {
+                case 'c': e.preventDefault(); onCompleteTask?.(); break
+                case 'e': e.preventDefault(); navigate({ to: ROUTES.dashboard.{module}.new, search: { editId: taskId } }); break
+                case 'd': e.preventDefault(); onDeleteTask?.(); break
+                case 'v': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
+            }
+        } else {
+            // List View shortcuts
+            switch (e.key.toLowerCase()) {
+                case 'n': e.preventDefault(); navigate({ to: currentLinks.create }); break
+                case 's': e.preventDefault(); onToggleSelectionMode?.(); break
+                case 'd':
+                    if (isSelectionMode && selectedCount > 0) {
+                        e.preventDefault(); onDeleteSelected?.()
+                    }
+                    break
+                case 'a':
+                    if (isSelectionMode && selectedCount > 0) {
+                        e.preventDefault()
+                        isViewingArchived ? onBulkUnarchive?.() : onBulkArchive?.()
+                    }
+                    break
+                case 'c':
+                    if (isSelectionMode && selectedCount > 0) {
+                        e.preventDefault(); onBulkComplete?.()
+                    }
+                    break
+                case 'l':
+                    if (isSelectionMode && totalTaskCount > 0) {
+                        e.preventDefault(); onSelectAll?.()
+                    }
+                    break
+                case 'v': e.preventDefault(); navigate({ to: currentLinks.viewAll }); break
+            }
         }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-}, [isSelectionMode, selectedIds, navigate])
+}, [mode, taskId, currentLinks, navigate, ...dependencies])
 ```
 
-### Keyboard Badge UI
+### Sidebar Props for Keyboard Handling
+```tsx
+interface {Module}SidebarProps {
+    context?: 'tasks' | 'reminders' | 'events' | 'reports'
+    mode?: 'list' | 'create' | 'details'  // Determines which shortcuts
+
+    // List view props
+    isSelectionMode?: boolean
+    onToggleSelectionMode?: () => void
+    selectedCount?: number
+    onDeleteSelected?: () => void
+    onBulkComplete?: () => void
+    onBulkArchive?: () => void
+    onBulkUnarchive?: () => void
+    onSelectAll?: () => void
+    totalTaskCount?: number
+    isViewingArchived?: boolean
+    isBulkCompletePending?: boolean
+    isBulkArchivePending?: boolean
+    isBulkUnarchivePending?: boolean
+
+    // Detail view props
+    taskId?: string
+    isTaskCompleted?: boolean
+    onCompleteTask?: () => void
+    onDeleteTask?: () => void
+    isCompletePending?: boolean
+    isDeletePending?: boolean
+
+    // Create page props
+    onClearForm?: () => void
+    onSaveForm?: () => void
+    isSaving?: boolean
+}
+```
+
+### Keyboard Badge UI Specifications
 | Property | Value |
 |----------|-------|
 | Container | `flex items-center gap-1.5` |
@@ -1087,7 +1154,30 @@ useEffect(() => {
 | Kbd Font | `font-mono` |
 | Kbd Padding | `px-1.5 py-0.5` |
 | Kbd Radius | `rounded` |
-| Kbd BG | varies by action (see Quick Actions) |
+
+### Kbd Background Colors by Action
+| Action | Kbd BG | Kbd Text |
+|--------|--------|----------|
+| Create (N) | `bg-emerald-100` | `text-emerald-600` |
+| Select (S) | `bg-slate-100` / `bg-emerald-200` (active) | `text-slate-500` / `text-emerald-700` |
+| Delete (D) | `bg-red-100` / `bg-slate-100` | `text-red-500` / `text-slate-500` |
+| Archive (A) | `bg-slate-100` / `bg-emerald-100` (unarchive) | `text-slate-500` / `text-emerald-600` |
+| Complete (C) | `bg-emerald-100` / `bg-amber-100` (reopen) | `text-emerald-600` / `text-amber-600` |
+| Select All (L) | `bg-blue-100` | `text-blue-600` |
+| Edit (E) | `bg-blue-100` | `text-blue-600` |
+| View All (V) | `bg-slate-100` | `text-slate-500` |
+| Clear (C) | `bg-amber-100` | `text-amber-600` |
+| Save (S) | `bg-blue-100` | `text-blue-600` |
+
+### Quick Action Button Styling
+| Property | Value |
+|----------|-------|
+| Container | `h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]` |
+| Background | `bg-white` |
+| Hover | `hover:bg-{color}-50` |
+| Icon Size | `h-6 w-6` / `h-7 w-7` |
+| Disabled | `disabled:opacity-50 disabled:cursor-not-allowed` |
+| Active State | `ring-2 ring-{color}-400` |
 
 ---
 
