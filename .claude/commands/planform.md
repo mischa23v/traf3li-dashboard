@@ -749,6 +749,776 @@ useEffect(() => {
 
 ---
 
+## 11. HERO CARD (ProductivityHero)
+
+The hero card appears at the top of every list and detail page.
+
+### Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#022c22]` |
+| Border Radius | `rounded-3xl` |
+| Padding | `p-6` |
+| Min Height | `min-h-[140px] lg:min-h-[160px] xl:min-h-[180px]` |
+| Max Height | `max-h-[180px] lg:max-h-[190px] xl:max-h-[220px]` |
+| Shadow | `shadow-xl shadow-emerald-900/20` |
+| Position | `relative overflow-hidden` |
+
+### Background Effects
+```tsx
+{/* Animated Gradient Background */}
+<div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 opacity-20" style={{
+        background: 'linear-gradient(-45deg, #022c22, #064e3b, #022c22, #0f766e)',
+        backgroundSize: '400% 400%',
+        animation: 'gradientShift 20s ease infinite'
+    }} />
+</div>
+{/* Pattern Overlay */}
+<div className="absolute inset-0 z-0">
+    <img src="/images/hero-wave.png" className="w-full h-full object-cover opacity-25 mix-blend-overlay" />
+</div>
+{/* Accent Glow */}
+<div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl -me-32 -mt-32 pointer-events-none" />
+```
+
+### Layout Grid
+| Property | Value |
+|----------|-------|
+| Container | `grid grid-cols-1 xl:grid-cols-12 gap-6 items-center` |
+| Left Column | `xl:col-span-4 space-y-6` (Title & Actions) |
+| Right Column | `xl:col-span-8` (Stats Grid) |
+| Stats Grid | `grid grid-cols-2 lg:grid-cols-4 gap-3` |
+
+### Badge
+| Property | Value |
+|----------|-------|
+| Container | `inline-flex items-center gap-2 px-3 py-1 rounded-full` |
+| Background | `bg-white/5` |
+| Border | `border border-white/10` |
+| Text | `text-white text-xs font-medium` |
+| Icon | `w-3 h-3` |
+
+### Title
+| Property | Value |
+|----------|-------|
+| Size | `text-2xl lg:text-3xl` |
+| Weight | `font-bold` |
+| Color | `text-white` |
+| Tracking | `tracking-tight` |
+
+### Icon Container (beside title)
+| Property | Value |
+|----------|-------|
+| Padding | `p-2` |
+| Background | `bg-white/10` |
+| Radius | `rounded-xl` |
+| Icon Size | `w-6 h-6` |
+| Icon Color | `text-emerald-400 fill-emerald-400/20` |
+
+### Primary Action Button
+| Property | Value |
+|----------|-------|
+| Height | `h-10` |
+| Padding | `px-5` |
+| Background | `bg-emerald-500 hover:bg-emerald-600` |
+| Text | `text-white text-sm font-bold` |
+| Radius | `rounded-xl` |
+| Shadow | `shadow-lg shadow-emerald-500/20` |
+| Border | `border-0` |
+
+### Secondary Action Button
+| Property | Value |
+|----------|-------|
+| Height | `h-10` |
+| Padding | `px-5` |
+| Background | `bg-transparent hover:bg-white/10` |
+| Border | `border-white/10` |
+| Text | `text-white text-sm font-bold` |
+| Radius | `rounded-xl` |
+
+### Stat Card (inside Hero)
+| Property | Value |
+|----------|-------|
+| Padding | `py-3 px-4` |
+| Background | Semi-transparent glass |
+| Count | 4 cards in grid |
+
+---
+
+## 12. CREATE/EDIT FORM PAGE
+
+Standard form page layout for creating or editing entities.
+
+### Page Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#f8f9fa]` |
+| Padding | `p-6 lg:p-8` |
+| Spacing | `space-y-8` |
+| Border Radius | `rounded-tr-3xl` |
+| Shadow | `shadow-inner` |
+| Border | `border-e border-white/5` |
+
+### Grid Layout
+| Property | Value |
+|----------|-------|
+| Container | `grid grid-cols-1 lg:grid-cols-3 gap-8` |
+| Form Column | `lg:col-span-2 space-y-8` |
+| Sidebar Column | `lg:col-span-1` |
+
+### Form Card Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-white` |
+| Border Radius | `rounded-3xl` |
+| Padding | `p-8` |
+| Shadow | `shadow-sm` |
+| Border | `border border-slate-100` |
+
+### Form Mode Toggle (Basic/Advanced)
+| Property | Value |
+|----------|-------|
+| Container | `inline-flex p-1 bg-slate-100/80 rounded-full` |
+| Button Padding | `px-4 py-2` |
+| Button Text | `text-sm font-medium` |
+| Active State | `text-emerald-600` with white bg slider |
+| Inactive State | `text-slate-500 hover:text-slate-600` |
+| Slider | `bg-white rounded-full shadow-sm border border-slate-200/50` |
+| Transition | `transition-all duration-300 ease-out` |
+| Icon Size | `w-4 h-4` |
+
+### Form Field Label
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-2` |
+| Text Size | `text-sm` |
+| Weight | `font-medium` |
+| Color | `text-slate-700` |
+| Icon Size | `w-4 h-4` |
+| Icon Color | `text-emerald-500` |
+
+### Text Input
+| Property | Value |
+|----------|-------|
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus Border | `focus:border-emerald-500` |
+| Focus Ring | `focus:ring-emerald-500` |
+| Error Border | `border-red-500 focus:border-red-500 focus:ring-red-500/20` |
+
+### Select Dropdown
+| Property | Value |
+|----------|-------|
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus Ring | `focus:ring-emerald-500` |
+
+### Textarea
+| Property | Value |
+|----------|-------|
+| Min Height | `min-h-[100px]` |
+| Border Radius | `rounded-xl` |
+| Border | `border-slate-200` |
+| Focus | `focus:border-emerald-500 focus:ring-emerald-500` |
+
+### Form Grid Layouts
+```tsx
+{/* Standard 3-column: Wide, Wide, Narrow */}
+<div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
+    {/* 1fr = Status/Category (wide) */}
+    {/* 1fr = Priority/Estimated (wide) */}
+    {/* 0.5fr = Due Date/Time (narrow) */}
+</div>
+
+{/* Full width field */}
+<div className="space-y-2">
+    <label>...</label>
+    <Input />
+</div>
+```
+
+### Collapsible Section
+| Property | Value |
+|----------|-------|
+| Header | `flex items-center justify-between` |
+| Title | `text-lg font-semibold text-slate-800` |
+| Title Icon | `w-5 h-5 text-emerald-500` |
+| Chevron | `w-5 h-5` |
+| Content BG | `bg-slate-50` |
+| Content Radius | `rounded-xl` |
+| Content Padding | `p-4` |
+
+### Subtask Item
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 bg-slate-50 rounded-xl` |
+| Text | `flex-1 text-slate-700` |
+| Remove Button | `text-red-500 hover:text-red-600 hover:bg-red-50` |
+
+### Tag Badge
+| Property | Value |
+|----------|-------|
+| Component | `Badge variant="secondary"` |
+| Layout | `flex flex-wrap gap-2` |
+| Remove Icon | `w-3 h-3 hover:text-red-500` |
+
+### Form Footer
+| Property | Value |
+|----------|-------|
+| Layout | `flex items-center justify-end gap-4` |
+| Padding | `pt-6` |
+| Border | `border-t border-slate-100` |
+
+### Submit Button
+| Property | Value |
+|----------|-------|
+| Min Width | `min-w-[140px]` |
+| Background | `bg-emerald-500 hover:bg-emerald-600` |
+| Text | `text-white` |
+| Radius | `rounded-xl` |
+| Shadow | `shadow-lg shadow-emerald-500/20` |
+
+### Cancel Button
+| Property | Value |
+|----------|-------|
+| Variant | `ghost` |
+| Color | `text-slate-500 hover:text-navy` |
+
+---
+
+## 13. UNIVERSAL KEYBOARD SHORTCUTS
+
+**⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages and ALL modules for consistency.**
+
+### Centralized Hook (MANDATORY)
+**Location:** `src/hooks/useKeyboardShortcuts.ts`
+
+**ALL modules MUST use this hook instead of implementing keyboard shortcuts directly.** This ensures 100% consistency across Tasks, HR, Finance, CRM, and all other modules.
+
+### List View Shortcuts (mode='list', no taskId)
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `N` | Navigate to create page | Always | إنشاء |
+| `S` | Toggle selection mode | Always | تحديد / إلغاء |
+| `D` | Delete selected | Selection mode + has selection | حذف |
+| `A` | Archive/Unarchive selected | Selection mode + has selection | أرشفة / إلغاء أرشفة |
+| `C` | Complete selected | Selection mode + has selection | إكمال |
+| `L` | Select/Deselect all | Selection mode | تحديد الكل / إلغاء الكل |
+| `V` | Navigate to list view | Always | عرض جميع |
+
+### Detail View Shortcuts (taskId exists)
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `C` | Complete/Reopen item | Always | إكمال / إعادة فتح |
+| `E` | Edit item | Always | تعديل |
+| `D` | Delete item | Always (with confirm) | حذف |
+| `V` | Navigate to list view | Always | عرض جميع |
+
+### Create/Edit View Shortcuts (mode='create')
+| Key | Action | Condition | Arabic Label |
+|-----|--------|-----------|--------------|
+| `N` | Navigate to create (refresh) | Always | إنشاء |
+| `C` | Clear form | Always | مسح |
+| `D` | Cancel and return to list | Always | إلغاء |
+| `S` | Save form | Always | حفظ |
+
+### Quick Actions Widget - Tabs
+
+The Quick Actions sidebar has TWO tabs in list view:
+
+**Main Tab (أساسي)**:
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Create | `N` | Plus | `text-emerald-600` |
+| Select | `S` | CheckSquare / X | `text-slate-700` / `text-emerald-800` (active) |
+| Delete | `D` | Trash2 | `text-slate-600 hover:text-red-600` |
+| Archive | `A` | Archive / ArchiveRestore | `text-slate-600` / `text-emerald-600` |
+
+**Bulk Tab (جماعي)** - Shows selected count badge:
+| Button | Key | Icon | Color |
+|--------|-----|------|-------|
+| Select All | `L` | CheckCheck | `text-blue-600` |
+| Complete | `C` | CheckCircle | `text-emerald-600` |
+| Delete | `D` | Trash2 | `text-slate-600 hover:text-red-600` |
+| Archive | `A` | Archive / ArchiveRestore | `text-slate-600` / `text-emerald-600` |
+
+### Implementation Pattern (MANDATORY)
+
+**Import the centralized hook:**
+```tsx
+import { useKeyboardShortcuts, KEYBOARD_SHORTCUTS, KBD_COLORS } from '@/hooks/useKeyboardShortcuts'
+```
+
+**List View Usage:**
+```tsx
+// In {Module}Sidebar component or directly in list page
+useKeyboardShortcuts({
+    mode: 'list',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    listCallbacks: {
+        onToggleSelectionMode,
+        onDeleteSelected,
+        onBulkArchive,
+        onBulkUnarchive,
+        onBulkComplete,
+        onSelectAll,
+        isSelectionMode,
+        selectedCount,
+        totalCount,
+        isViewingArchived,
+    }
+})
+```
+
+**Detail View Usage:**
+```tsx
+useKeyboardShortcuts({
+    mode: 'detail',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    entityId: itemId,
+    editRoute: ROUTES.dashboard.{module}.new, // Route with ?editId param
+    detailCallbacks: {
+        onComplete,
+        onDelete,
+    }
+})
+```
+
+**Create/Edit View Usage:**
+```tsx
+useKeyboardShortcuts({
+    mode: 'create',
+    links: {
+        create: ROUTES.dashboard.{module}.new,
+        viewAll: ROUTES.dashboard.{module}.list
+    },
+    createCallbacks: {
+        onClear,
+        onSave,
+    }
+})
+```
+
+### Hook Types Reference
+```tsx
+import {
+    useKeyboardShortcuts,    // Main hook
+    KEYBOARD_SHORTCUTS,       // Shortcut definitions for UI
+    KBD_COLORS,              // Kbd color classes
+    getShortcutInfo,         // Get shortcut by action name
+    getShortcutsForMode,     // Get all shortcuts for a mode
+    type ViewMode,           // 'list' | 'detail' | 'create'
+    type ModuleLinks,        // { create: string, viewAll: string }
+    type ListCallbacks,      // List view callback props
+    type DetailCallbacks,    // Detail view callback props
+    type CreateCallbacks,    // Create view callback props
+} from '@/hooks/useKeyboardShortcuts'
+```
+
+### Sidebar Props for Keyboard Handling
+```tsx
+interface {Module}SidebarProps {
+    context?: 'tasks' | 'reminders' | 'events' | 'reports'
+    mode?: 'list' | 'create' | 'details'  // Determines which shortcuts
+
+    // List view props
+    isSelectionMode?: boolean
+    onToggleSelectionMode?: () => void
+    selectedCount?: number
+    onDeleteSelected?: () => void
+    onBulkComplete?: () => void
+    onBulkArchive?: () => void
+    onBulkUnarchive?: () => void
+    onSelectAll?: () => void
+    totalTaskCount?: number
+    isViewingArchived?: boolean
+    isBulkCompletePending?: boolean
+    isBulkArchivePending?: boolean
+    isBulkUnarchivePending?: boolean
+
+    // Detail view props
+    taskId?: string
+    isTaskCompleted?: boolean
+    onCompleteTask?: () => void
+    onDeleteTask?: () => void
+    isCompletePending?: boolean
+    isDeletePending?: boolean
+
+    // Create page props
+    onClearForm?: () => void
+    onSaveForm?: () => void
+    isSaving?: boolean
+}
+```
+
+### Keyboard Badge UI Specifications
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-1.5` |
+| Label | `text-sm font-bold` |
+| Kbd Size | `text-[10px]` |
+| Kbd Font | `font-mono` |
+| Kbd Padding | `px-1.5 py-0.5` |
+| Kbd Radius | `rounded` |
+
+### Kbd Background Colors by Action
+| Action | Kbd BG | Kbd Text |
+|--------|--------|----------|
+| Create (N) | `bg-emerald-100` | `text-emerald-600` |
+| Select (S) | `bg-slate-100` / `bg-emerald-200` (active) | `text-slate-500` / `text-emerald-700` |
+| Delete (D) | `bg-red-100` / `bg-slate-100` | `text-red-500` / `text-slate-500` |
+| Archive (A) | `bg-slate-100` / `bg-emerald-100` (unarchive) | `text-slate-500` / `text-emerald-600` |
+| Complete (C) | `bg-emerald-100` / `bg-amber-100` (reopen) | `text-emerald-600` / `text-amber-600` |
+| Select All (L) | `bg-blue-100` | `text-blue-600` |
+| Edit (E) | `bg-blue-100` | `text-blue-600` |
+| View All (V) | `bg-slate-100` | `text-slate-500` |
+| Clear (C) | `bg-amber-100` | `text-amber-600` |
+| Save (S) | `bg-blue-100` | `text-blue-600` |
+
+### Quick Action Button Styling
+| Property | Value |
+|----------|-------|
+| Container | `h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg transition-all duration-300 hover:scale-[1.02]` |
+| Background | `bg-white` |
+| Hover | `hover:bg-{color}-50` |
+| Icon Size | `h-6 w-6` / `h-7 w-7` |
+| Disabled | `disabled:opacity-50 disabled:cursor-not-allowed` |
+| Active State | `ring-2 ring-{color}-400` |
+
+---
+
+## 14. AI SUGGESTION CARD (Optional)
+
+For pages with AI-powered suggestions.
+
+### Container
+| Property | Value |
+|----------|-------|
+| Background | `bg-gradient-to-r from-purple-50 to-indigo-50` |
+| Border | `border border-purple-100` |
+| Radius | `rounded-2xl` |
+| Padding | `p-4` |
+
+### Header
+| Property | Value |
+|----------|-------|
+| Icon | Sparkles `w-5 h-5 text-purple-500` |
+| Title | `text-sm font-bold text-purple-900` |
+| Refresh Button | Ghost, `text-purple-500` |
+| Dismiss Button | Ghost, X icon |
+
+### Content
+| Property | Value |
+|----------|-------|
+| Text | `text-sm text-purple-800` |
+| Icon | Lightbulb `w-4 h-4 text-purple-400` |
+
+### Loading State
+| Property | Value |
+|----------|-------|
+| Spinner | `w-4 h-4 animate-spin text-purple-500` |
+| Background | Same container with `animate-pulse` |
+
+### Error State
+| Property | Value |
+|----------|-------|
+| Background | `bg-red-50` |
+| Border | `border-red-100` |
+| Text | `text-red-700` |
+| Retry Button | `text-red-600` |
+
+---
+
+## 15. DETAIL VIEW PAGE
+
+Comprehensive specifications for entity detail pages.
+
+### Page Layout Structure
+```tsx
+<Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+    {/* Loading State */}
+    {isLoading && <DetailSkeleton />}
+
+    {/* Error State */}
+    {isError && <ErrorCard />}
+
+    {/* Empty State */}
+    {!isLoading && !isError && !data && <NotFoundCard />}
+
+    {/* Success State */}
+    {!isLoading && !isError && data && (
+        <>
+            <ProductivityHero badge="إدارة المهام" title={data.title} type="tasks" listMode={true} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Main Content Card with Tabs */}
+                </div>
+                <TasksSidebar context="tasks" taskId={id} ... />
+            </div>
+        </>
+    )}
+</Main>
+```
+
+### Loading Skeleton
+```tsx
+<div className="space-y-6">
+    <Skeleton className="h-48 w-full rounded-3xl" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+            <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+        <div>
+            <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+    </div>
+</div>
+```
+
+### Error State Card
+| Property | Value |
+|----------|-------|
+| Container | `bg-white rounded-2xl p-12 border border-slate-100 text-center` |
+| Icon Container | `w-16 h-16 rounded-full bg-red-50 flex items-center justify-center` |
+| Icon | `w-8 h-8 text-red-500` |
+| Title | `text-lg font-bold text-slate-900 mb-2` |
+| Message | `text-slate-500 mb-4` |
+| Retry Button | `bg-emerald-500 hover:bg-emerald-600` |
+
+### Empty/Not Found State
+| Property | Value |
+|----------|-------|
+| Container | `bg-white rounded-2xl p-12 border border-slate-100 text-center` |
+| Icon Container | `w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center` |
+| Icon | `w-8 h-8 text-emerald-500` |
+| Title | `text-lg font-bold text-slate-900 mb-2` |
+| Message | `text-slate-500 mb-4` |
+| Back Button | `bg-emerald-500 hover:bg-emerald-600` |
+
+### Main Content Card (GosiCard with Tabs)
+| Property | Value |
+|----------|-------|
+| Container | `GosiCard className="min-h-[600px] p-0"` |
+| Tab Header | `px-4 sm:px-6 pt-4 flex items-center justify-between gap-4` |
+| Tab Content BG | `bg-slate-50/50 min-h-[400px] sm:min-h-[500px]` |
+| Tab Content Padding | `p-4 sm:p-6` |
+
+### Tab Navigation
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-2 border-b border-slate-200 pb-0 flex-1` |
+| Tab Button | `px-4 py-2 text-sm font-medium rounded-t-xl transition-colors relative` |
+| Active Tab | `bg-emerald-500 text-white` |
+| Inactive Tab | `text-slate-600 hover:text-slate-900 hover:bg-slate-100` |
+
+### Standard Detail Tabs
+```tsx
+const tabs = [
+    { id: 'overview', label: 'نظرة عامة' },
+    { id: 'time-tracking', label: 'تتبع الوقت' },
+    { id: 'files', label: 'المرفقات' },
+    { id: 'comments', label: 'التعليقات' }
+]
+```
+
+### Export Button (Header)
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#022c22] hover:bg-[#064e3b]` |
+| Text | `text-white` |
+| Radius | `rounded-xl` |
+| Padding | `px-3 py-2` |
+| Icon | `h-4 w-4` |
+
+### Description Card
+| Property | Value |
+|----------|-------|
+| Container | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Header Title | `text-lg font-bold text-navy` |
+| Description Text | `text-slate-600 leading-relaxed` |
+
+### Compact Info Row (Inside Description)
+```tsx
+<div className="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100">
+    {/* Info Item */}
+    <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-{color}-50 flex items-center justify-center">
+            <Icon className="w-4 h-4 text-{color}-600" />
+        </div>
+        <div>
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-sm font-semibold text-navy">{value}</p>
+        </div>
+    </div>
+    {/* Divider */}
+    <div className="h-8 w-px bg-slate-200" />
+</div>
+```
+
+### Info Item Colors
+| Type | BG | Icon Color |
+|------|----|-----------|
+| Date | `blue-50` | `blue-600` |
+| Assignee | `emerald-50` | `emerald-600` |
+| Progress | `purple-50` | `purple-600` |
+| Status | `amber-50` | `amber-600` |
+
+### Progress Bar (in info row)
+| Property | Value |
+|----------|-------|
+| Track | `h-2 bg-slate-100 rounded-full overflow-hidden` |
+| Fill | `h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500` |
+| Label | `text-xs text-slate-500` |
+| Value | `text-sm font-bold text-navy` |
+
+### Section Card (Generic)
+| Property | Value |
+|----------|-------|
+| Container | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Padding | `p-5` |
+| Header | `flex items-center gap-3 mb-4` |
+| Icon Box | `w-10 h-10 rounded-xl bg-{color}-100 text-{color}-600 flex items-center justify-center` |
+| Title | `text-sm font-bold text-navy` |
+| Subtitle | `text-xs text-slate-500` |
+
+### Two-Column Info Cards
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="pb-3">
+            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                <Icon className="w-4 h-4 text-{color}-600" />
+                {title}
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+            {/* Info rows */}
+        </CardContent>
+    </Card>
+</div>
+```
+
+### Info Row (Inside Cards)
+| Property | Value |
+|----------|-------|
+| Container | `flex justify-between text-sm` |
+| Label | `text-slate-500` |
+| Value | `font-medium text-slate-900` |
+
+### Link Row
+| Property | Value |
+|----------|-------|
+| Text | `text-blue-600 text-sm hover:underline inline-flex items-center gap-1` |
+| Icon | `h-3 w-3` |
+
+### Subtask Section
+| Property | Value |
+|----------|-------|
+| Card | `border-none shadow-sm bg-white rounded-2xl overflow-hidden` |
+| Header | `CardHeader className="pb-3"` |
+| Title | `text-base font-bold text-navy flex items-center gap-2` |
+| Badge | `Badge variant="secondary" className="me-2 bg-slate-100 text-slate-600"` |
+
+### Subtask Item
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all` |
+| Checkbox (unchecked) | `w-5 h-5 rounded-md border border-slate-300 hover:border-emerald-500 cursor-pointer` |
+| Checkbox (checked) | `bg-emerald-600 border-emerald-600 text-white` |
+| Title (incomplete) | `flex-1 font-medium text-navy` |
+| Title (complete) | `flex-1 font-medium text-slate-500 line-through` |
+
+### Add Subtask Form
+| Property | Value |
+|----------|-------|
+| Container | `flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100` |
+| Input | `flex-1 h-8 border-0 bg-transparent focus-visible:ring-0 text-navy` |
+| Add Button | `h-8 bg-emerald-600 hover:bg-emerald-700` |
+| Cancel Button | `h-8 w-8 p-0 variant="ghost"` |
+
+### Add Button (Ghost)
+| Property | Value |
+|----------|-------|
+| Style | `variant="ghost" w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl` |
+| Icon | `w-5 h-5 ms-2` |
+
+### Comments Section
+| Property | Value |
+|----------|-------|
+| Card | `border-none shadow-sm bg-white rounded-2xl` |
+| ScrollArea | `h-[300px]` |
+| Empty State Icon | `w-10 h-10 mx-auto mb-2 opacity-30` |
+
+### Comment Item
+| Property | Value |
+|----------|-------|
+| Container | `flex gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors` |
+| Avatar | `w-9 h-9` |
+| Avatar BG | `bg-emerald-100 text-emerald-700 text-sm font-bold` |
+| Username | `text-sm font-semibold text-navy` |
+| Time | `text-xs text-slate-400` |
+| Text | `text-sm text-slate-600 mt-1` |
+
+### Comment Input
+| Property | Value |
+|----------|-------|
+| Container | `flex gap-3 pt-4 border-t border-slate-100` |
+| Input | `flex-1 rounded-xl resize-none border-slate-200 focus:border-emerald-500` |
+| Button | `rounded-xl bg-emerald-500 hover:bg-emerald-600 p-3` |
+
+### Attachments/Files Section
+| Property | Value |
+|----------|-------|
+| Grid | `grid gap-3` |
+| File Card | `flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group` |
+
+### File Item
+| Property | Value |
+|----------|-------|
+| Icon Container | `w-10 h-10 rounded-xl flex items-center justify-center` |
+| PDF Icon BG | `bg-red-100 text-red-600` |
+| DOC Icon BG | `bg-blue-100 text-blue-600` |
+| XLS Icon BG | `bg-emerald-100 text-emerald-600` |
+| IMG Icon BG | `bg-purple-100 text-purple-600` |
+| File Name | `text-sm font-medium text-navy` |
+| File Info | `text-xs text-slate-400` |
+| Actions | `opacity-0 group-hover:opacity-100 transition-opacity flex gap-1` |
+
+### Delete Confirmation Dialog
+| Property | Value |
+|----------|-------|
+| Overlay | `fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4` |
+| Card | `GosiCard className="p-8 max-w-md w-full"` |
+| Icon Box | `GosiIconBox variant="soft" size="lg" className="bg-red-50 text-red-500"` |
+| Icon | `w-8 h-8` |
+| Title | `text-xl font-bold text-slate-900 text-center mb-2` |
+| Message | `text-slate-500 text-center mb-8` |
+| Buttons | `flex gap-3 justify-center` |
+| Cancel | `GosiButton variant="ghost"` |
+| Confirm | `GosiButton variant="danger"` |
+
+### Sidebar Props for Detail View
+```tsx
+<TasksSidebar
+    context="tasks"
+    taskId={id}
+    isTaskCompleted={data.status === 'done'}
+    onCompleteTask={handleComplete}
+    onDeleteTask={() => setShowDeleteConfirm(true)}
+    isCompletePending={completeMutation.isPending || reopenMutation.isPending}
+    isDeletePending={deleteMutation.isPending}
+/>
+```
+
+---
+
 ## USAGE INSTRUCTIONS
 
 When creating or updating a list page:
@@ -772,5 +1542,148 @@ import { useAdaptiveSearchDebounce } from '@/hooks/useAdaptiveDebounce'
 
 ### Files to Reference
 - **List View**: `src/features/tasks/components/tasks-list-view.tsx`
+- **Create View**: `src/features/tasks/components/create-task-view.tsx`
+- **Detail View**: `src/features/tasks/components/task-details-view.tsx`
 - **Sidebar**: `src/features/tasks/components/tasks-sidebar.tsx`
 - **Schema**: `src/features/tasks/data/schema.ts`
+- **Constants**: `src/features/tasks/constants/task-options.ts`
+- **Hero Component**: `src/components/productivity-hero.tsx`
+
+---
+
+## 16. MODULE REPLICATION GUIDE
+
+When creating a new module (HR, Finance, etc.), follow this structure:
+
+### Folder Structure
+```
+src/features/{module}/
+├── components/
+│   ├── {module}-list-view.tsx      # Main list page (copy tasks-list-view.tsx)
+│   ├── create-{entity}-view.tsx    # Create form (copy create-task-view.tsx)
+│   ├── {entity}-details-view.tsx   # Detail view (copy task-details-view.tsx)
+│   ├── {module}-sidebar.tsx        # Sidebar widget (copy tasks-sidebar.tsx)
+│   ├── {module}-columns.tsx        # Table columns (copy tasks-columns.tsx)
+│   └── {module}-dialogs.tsx        # Modals/dialogs
+├── constants/
+│   └── {module}-options.ts         # Dropdown options, status/priority maps
+├── data/
+│   └── schema.ts                   # Zod schemas
+├── hooks/
+│   └── use{Module}.ts              # Custom hooks (if not in src/hooks/)
+└── index.tsx                       # Route exports
+```
+
+### Step-by-Step Module Creation
+
+1. **Copy Tasks Module Structure**
+   ```bash
+   cp -r src/features/tasks src/features/{new-module}
+   ```
+
+2. **Rename Files**
+   - `tasks-list-view.tsx` → `{module}-list-view.tsx`
+   - `create-task-view.tsx` → `create-{entity}-view.tsx`
+   - etc.
+
+3. **Search and Replace**
+   - `tasks` → `{module}` (lowercase)
+   - `Tasks` → `{Module}` (PascalCase)
+   - `task` → `{entity}` (singular)
+   - `Task` → `{Entity}` (PascalCase singular)
+
+4. **Update Constants**
+   - Add routes to `src/constants/routes.ts`
+   - Add query keys to `src/lib/query-keys.ts`
+   - Add cache invalidation to `src/lib/cache-invalidation.ts`
+
+5. **Create Hook** (in `src/hooks/use{Module}.ts`)
+   - Copy `useTasks.ts` pattern
+   - Update API endpoints
+   - Update query keys
+   - Update cache times
+
+6. **Update Sidebar Navigation**
+   - Add to sidebar menu
+   - Add icon
+
+7. **Update Hero Component**
+   - Add type config in `buttonConfig`
+   - Add type config in `listButtonConfig`
+
+### Checklist for New Module
+- [ ] List view with all 15 sections from planform.md
+- [ ] Create view with Basic/Advanced mode toggle
+- [ ] Detail view with back navigation
+- [ ] Sidebar with Quick Actions
+- [ ] Keyboard shortcuts (same keys as tasks)
+- [ ] Hero card with stats
+- [ ] Loading skeletons
+- [ ] Empty/Error states
+- [ ] RTL support tested
+- [ ] Translations in AR/EN
+
+### Module-Specific Adaptations
+
+| Module | Entity | Special Features |
+|--------|--------|------------------|
+| Tasks | Task | Subtasks, recurring, AI suggestions |
+| HR | Employee | Leave balances, org chart |
+| Finance | Invoice | Line items, payments, totals |
+| CRM | Lead | Pipeline stages, scoring |
+| Cases | Case | Documents, timeline, parties |
+
+### Do NOT Change
+These patterns MUST stay consistent across ALL modules:
+- ❌ Keyboard shortcuts (N, S, D, A, C, L, /, Escape)
+- ❌ Filter card dimensions (h-14 inputs, rounded-2xl)
+- ❌ List item card structure
+- ❌ Quick Actions sidebar layout
+- ❌ Hero card structure
+- ❌ Color palette (priority, status colors)
+- ❌ Animation timings
+
+### DO Customize
+These CAN vary per module:
+- ✅ Status options (todo/done vs pending/approved)
+- ✅ Priority labels
+- ✅ Filter dropdown options
+- ✅ Stat cards in hero
+- ✅ Quick action buttons (Complete vs Approve)
+- ✅ Form fields in create/edit
+- ✅ Column definitions in list
+
+---
+
+## QUICK REFERENCE CARD
+
+### Dimensions Cheat Sheet
+| Component | Dimension |
+|-----------|-----------|
+| Input height | `h-14` |
+| Button height (primary) | `h-14` (filter) / `h-10` (hero) / `h-12` (load more) |
+| Card radius | `rounded-2xl` |
+| Container radius | `rounded-[2rem]` / `rounded-3xl` |
+| Icon (small) | `w-4 h-4` / `w-5 h-5` |
+| Icon (medium) | `w-6 h-6` / `w-7 w-7` |
+| Badge text | `text-[10px]` |
+
+### Spacing Cheat Sheet
+| Context | Value |
+|---------|-------|
+| Page padding | `p-6 lg:p-8` |
+| Card padding | `p-4` / `p-6` / `p-8` |
+| Grid gap | `gap-4` / `gap-6` / `gap-8` |
+| Item spacing | `space-y-6` |
+
+### Color Cheat Sheet
+| Use Case | Color |
+|----------|-------|
+| Primary action | `emerald-500/600` |
+| Secondary action | `navy` |
+| Danger | `red-500/600` |
+| Warning | `amber-400/500` |
+| Info | `blue-500/600` |
+| Neutral | `slate-400/500` |
+| Background light | `bg-[#f8f9fa]` |
+| Background dark | `bg-[#022c22]` |
