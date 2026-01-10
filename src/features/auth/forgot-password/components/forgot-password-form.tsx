@@ -127,9 +127,8 @@ export function ForgotPasswordForm({
         title: t('auth.forgotPassword.emailSent'),
         description: t('auth.forgotPassword.emailSentDescription'),
       })
-
-      // Navigate to OTP page or show success
-      navigate({ to: ROUTES.auth.otp })
+      // NOTE: Do NOT navigate to OTP page. Forgot password sends an email LINK (24-hour UUID token),
+      // not an OTP code. The emailSent state will show the success UI automatically.
     } catch (error: any) {
       const errorCode = error?.response?.data?.code || error?.code
 

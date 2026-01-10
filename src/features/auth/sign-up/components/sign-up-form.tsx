@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRouteApi } from '@tanstack/react-router';
 import { apiClientNoVersion } from '@/lib/api';
+import { toast } from '@/hooks/use-toast';
 
 // Route API for accessing search params (OAuth pre-fill)
 const routeApi = getRouteApi('/(auth)/sign-up');
@@ -638,7 +639,57 @@ export function SignUpForm() {
         const response = await authApi.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
-        alert(error.response?.data?.message || t('auth.signUp.errors.generalError', 'An error occurred, please try again'));
+        const errorCode = error?.response?.data?.code
+        const errorMessage = error?.response?.data?.message || error?.message
+        const errorMessageEn = error?.response?.data?.messageEn
+        const errors = error?.response?.data?.errors // Array of specific validation errors
+
+        // Handle specific error codes from backend
+        if (errorCode === 'WEAK_PASSWORD') {
+          // Backend returns { code: 'WEAK_PASSWORD', errors: [...] }
+          const weaknessDetails = errors?.join(', ') || ''
+          toast({
+            title: isRTL ? 'كلمة المرور ضعيفة' : 'Weak Password',
+            description: weaknessDetails || (isRTL
+              ? 'يرجى اختيار كلمة مرور أقوى تحتوي على أحرف كبيرة وصغيرة وأرقام ورموز'
+              : 'Please choose a stronger password with uppercase, lowercase, numbers, and symbols'),
+            variant: 'destructive',
+          })
+        } else if (errorCode === 'PASSWORD_BREACHED') {
+          // Backend returns { code: 'PASSWORD_BREACHED' } for passwords found in data breaches
+          toast({
+            title: isRTL ? 'كلمة المرور غير آمنة' : 'Password Compromised',
+            description: isRTL
+              ? 'كلمة المرور هذه موجودة في قاعدة بيانات تسريبات. يرجى اختيار كلمة مرور مختلفة.'
+              : 'This password has been found in data breaches. Please choose a different password.',
+            variant: 'destructive',
+          })
+        } else if (errorMessage?.includes('البريد الإلكتروني مستخدم') || errorMessage?.includes('email') && errorMessage?.includes('use')) {
+          // Duplicate email
+          toast({
+            title: isRTL ? 'البريد الإلكتروني مستخدم' : 'Email Already Exists',
+            description: isRTL
+              ? 'هذا البريد الإلكتروني مسجل بالفعل. جرب تسجيل الدخول.'
+              : 'This email is already registered. Try signing in instead.',
+            variant: 'destructive',
+          })
+        } else if (errorMessage?.includes('اسم المستخدم مستخدم') || errorMessage?.includes('username') && errorMessage?.includes('use')) {
+          // Duplicate username
+          toast({
+            title: isRTL ? 'اسم المستخدم مستخدم' : 'Username Taken',
+            description: isRTL
+              ? 'اسم المستخدم هذا مستخدم بالفعل. يرجى اختيار اسم آخر.'
+              : 'This username is already taken. Please choose a different one.',
+            variant: 'destructive',
+          })
+        } else {
+          // Generic error
+          toast({
+            title: isRTL ? 'فشل التسجيل' : 'Registration Failed',
+            description: (isRTL ? errorMessage : errorMessageEn) || errorMessage || t('auth.signUp.errors.generalError', 'An error occurred, please try again'),
+            variant: 'destructive',
+          })
+        }
       } finally {
         setLoading(false);
       }

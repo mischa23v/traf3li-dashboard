@@ -60,6 +60,7 @@ export const ROUTES = {
     signUpCompleteProfile: '/sign-up/complete-profile',
     forgotPassword: '/forgot-password',
     verifyEmail: '/verify-email',
+    verifyEmailRequired: '/verify-email-required',
     magicLink: '/magic-link',
     mfaChallenge: '/mfa-challenge',
     otp: '/otp',
