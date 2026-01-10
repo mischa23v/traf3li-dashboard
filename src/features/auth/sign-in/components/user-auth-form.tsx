@@ -326,6 +326,25 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const status = error?.status || error?.response?.status
       const errorCode = error?.response?.data?.code || error?.code
 
+      // CRITICAL: Before handling any error, check if OTP was already required from a previous successful request
+      // This handles the race condition where a second request (e.g., double-click) gets 429
+      // but the first request already set otpRequired=true
+      const postErrorState = useAuthStore.getState()
+      if (postErrorState.otpRequired && postErrorState.otpData?.loginSessionToken) {
+        console.log('[SignIn] OTP already required from previous request, navigating despite error')
+        rateLimit.recordSuccess()
+        markDeviceAsRecognized()
+        navigate({
+          to: ROUTES.auth.otp,
+          search: {
+            email: postErrorState.otpData.fullEmail,
+            purpose: 'login' as const,
+            token: postErrorState.otpData.loginSessionToken,
+          },
+        })
+        return
+      }
+
       // Handle CAPTCHA_REQUIRED response from backend
       if (errorCode === 'CAPTCHA_REQUIRED') {
         setShowCaptcha(true)
