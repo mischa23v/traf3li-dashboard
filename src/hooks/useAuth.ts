@@ -28,15 +28,30 @@ export const authKeys = {
 
 /**
  * Hook to login user
+ * Handles both direct login (SSO, One-Tap) and OTP-required flow
  */
 export const useLogin = () => {
   const setUser = useAuthStore((state) => state.setUser)
+  const setEmailVerification = useAuthStore((state) => state.setEmailVerification)
 
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
-    onSuccess: (user) => {
-      setUser(user)
-      toast.success('تم تسجيل الدخول بنجاح')
+    onSuccess: (result) => {
+      // Check if this is an OTP-required response (not a user object)
+      if ('requiresOtp' in result && result.requiresOtp) {
+        // OTP required - don't set user yet, let form handle redirect
+        return
+      }
+
+      // Direct login success - result is LoginResult with user
+      if ('user' in result) {
+        setUser(result.user)
+        // Store email verification state if provided by backend
+        if (result.emailVerification) {
+          setEmailVerification(result.emailVerification)
+        }
+        toast.success('تم تسجيل الدخول بنجاح')
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل الدخول')

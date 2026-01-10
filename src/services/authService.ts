@@ -482,6 +482,9 @@ interface AuthResponse {
 
   // Security warning for OTP flow (breach detected but allowing OTP verification)
   securityWarning?: SecurityWarning
+
+  // Email verification state (returned by login, OTP verification, /auth/me)
+  emailVerification?: EmailVerificationResponse
 }
 
 /**
@@ -708,7 +711,10 @@ const authService = {
         console.warn('[AUTH] CSRF token initialization after login failed:', err)
       })
 
-      return { user, warning }
+      // Extract emailVerification from response (for SSO/One-Tap direct login)
+      const emailVerification = response.data.emailVerification
+
+      return { user, warning, emailVerification }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

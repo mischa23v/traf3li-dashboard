@@ -12,22 +12,23 @@ import { useEmailVerification } from '@/hooks/useEmailVerification'
 import { ROUTES } from '@/constants/routes'
 
 // Paths that are always allowed even when email is not verified
+// Using ROUTES constants for maintainability
 const ALWAYS_ALLOWED_PATHS = [
   // Auth pages
   ROUTES.auth.verifyEmail,
   ROUTES.auth.verifyEmailRequired,
-  '/logout',
+  '/logout', // Legacy logout paths
   '/auth/logout',
   '/sign-out',
   // Allowed dashboard paths (productivity + settings)
   ROUTES.dashboard.home,
-  '/dashboard/overview',
+  ROUTES.dashboard.overview,
   ROUTES.dashboard.calendar,
   ROUTES.dashboard.appointments,
   ROUTES.dashboard.tasks.list,
   ROUTES.dashboard.tasks.gantt,
-  '/dashboard/tasks/reminders',
-  '/dashboard/tasks/events',
+  ROUTES.dashboard.tasks.reminders.list,
+  ROUTES.dashboard.tasks.events.list,
   ROUTES.dashboard.notifications.list,
   ROUTES.dashboard.settings.profile,
   ROUTES.dashboard.settings.security,
