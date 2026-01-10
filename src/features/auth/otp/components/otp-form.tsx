@@ -180,6 +180,17 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
             ? 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.'
             : 'Verification code has expired. Please request a new code.'
         )
+      } else if (error?.response?.data?.code === 'OTP_LOCKED') {
+        // OTP locked after too many failed attempts
+        const waitTime = error?.response?.data?.waitTime || error?.response?.data?.remainingTime || 300
+        const waitMinutes = Math.ceil(waitTime / 60)
+        setErrorMessage(
+          isRTL
+            ? `تم قفل التحقق بعد محاولات فاشلة متعددة. يرجى الانتظار ${waitMinutes} دقيقة.`
+            : `Verification locked after multiple failed attempts. Please wait ${waitMinutes} minutes.`
+        )
+        // Set cooldown to prevent resend attempts
+        setCooldown(waitTime)
       } else if (error?.response?.data?.code === 'OTP_NOT_FOUND' ||
                  error?.response?.data?.code === 'OTP_INVALID' ||
                  error?.response?.data?.code === 'USER_NOT_FOUND') {

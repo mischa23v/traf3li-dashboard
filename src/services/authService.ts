@@ -228,6 +228,12 @@ export interface LoginOTPRequiredResponse {
   loginSessionToken: string     // CRITICAL: Must pass to /verify-otp
   loginSessionExpiresIn: number // Session expiry in seconds (600 = 10 min)
   securityWarning?: SecurityWarning
+
+  // Backend nested format support
+  requires?: {
+    otp?: boolean
+    mfa?: boolean
+  }
 }
 
 /**
@@ -247,8 +253,14 @@ export type LoginResponse = LoginOTPRequiredResponse | LoginResult
 
 /**
  * Type guard to check if login response requires OTP
+ * Supports both nested format (requires.otp) and flat format (requiresOtp)
  */
 export function isOTPRequired(response: LoginResponse): response is LoginOTPRequiredResponse {
+  // Check nested format first (new backend format)
+  if ('requires' in response && typeof response.requires === 'object' && response.requires?.otp === true) {
+    return true
+  }
+  // Fall back to flat format (legacy)
   return 'requiresOtp' in response && response.requiresOtp === true
 }
 
