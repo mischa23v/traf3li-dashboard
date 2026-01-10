@@ -64,6 +64,7 @@ import {
   isAbortError,
 } from './request-cancellation'
 import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint } from './device-fingerprint'
+import { ROUTES } from '@/constants/routes'
 
 // Cached device fingerprint for request headers
 let cachedDeviceFingerprint: string | null = null
@@ -977,9 +978,9 @@ apiClientNoVersion.interceptors.response.use(
           ...(blockedFeature && { blockedFeature }),
         })
 
-        // Redirect to email verification page
+        // Redirect to email verification page using centralized route constant
         if (typeof window !== 'undefined') {
-          window.location.href = `/verify-email-required?${params.toString()}`
+          window.location.href = `${ROUTES.auth.verifyEmailRequired}?${params.toString()}`
         }
 
         return Promise.reject({
@@ -1460,9 +1461,9 @@ apiClient.interceptors.response.use(
           ...(blockedFeature && { blockedFeature }),
         })
 
-        // Redirect to email verification page
+        // Redirect to email verification page using centralized route constant
         if (typeof window !== 'undefined') {
-          window.location.href = `/verify-email-required?${params.toString()}`
+          window.location.href = `${ROUTES.auth.verifyEmailRequired}?${params.toString()}`
         }
 
         return Promise.reject({
