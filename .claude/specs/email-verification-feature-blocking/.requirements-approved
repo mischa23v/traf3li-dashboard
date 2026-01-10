@@ -1,0 +1,23 @@
+# Requirements Approved
+
+**Approved by**: User
+**Approved at**: 2025-01-10T09:20:00Z
+**Requirements file**: requirements.md
+
+## Approval Confirmation
+User confirmed requirements by providing backend API details and requesting implementation.
+
+## What was approved
+- Complete feature blocking matrix (11 nav groups blocked, 4 allowed)
+- Centralized useEmailVerification hook pattern
+- Follow existing usePlanFeatures and PermissionGuard patterns
+- Backend API contract confirmed
+
+## Backend API Confirmed
+- Login returns emailVerification object with allowedFeatures/blockedFeatures
+- 403 returns EMAIL_VERIFICATION_REQUIRED code
+- /auth/verify-email endpoint for token verification
+- /auth/me returns emailVerification state
+
+## Next Step
+Create design.md
