@@ -69,9 +69,28 @@ export const useAuthStore = create<AuthState>()(
       /**
        * Login Action
        * Handles both direct login (SSO, One-Tap) and OTP-required flow (password login)
+       *
+       * RACE CONDITION FIX: We don't clear otpRequired/otpData at the start of login.
+       * If a second login request is made while OTP verification is in progress,
+       * we preserve the OTP state. This prevents the issue where:
+       * 1. First login succeeds, sets otpRequired=true
+       * 2. Navigation to OTP page starts (async)
+       * 3. User clicks login again (or double-click)
+       * 4. Second login clears otpRequired before navigation completes
+       * 5. OTP page redirects back to sign-in because loginSessionToken is missing
        */
       login: async (credentials: LoginCredentials) => {
-        set({ isLoading: true, error: null, passwordBreachWarning: null, otpRequired: false, otpData: null })
+        // SECURITY: If we already have valid OTP data, don't allow another login to interfere
+        // User should complete OTP verification or navigate away first
+        const currentState = useAuthStore.getState()
+        if (currentState.otpRequired && currentState.otpData?.loginSessionToken) {
+          console.warn('[Auth] Login attempt blocked - OTP verification already in progress. Complete OTP or navigate away first.')
+          // Don't throw - just return silently. The OTP page will be shown.
+          return
+        }
+
+        // Only clear error and loading state, preserve OTP data until we get a new response
+        set({ isLoading: true, error: null, passwordBreachWarning: null })
         try {
           const response = await authService.login(credentials)
 
@@ -143,11 +162,19 @@ export const useAuthStore = create<AuthState>()(
           }
           // Clients don't need permissions
         } catch (error: any) {
+          // Only clear OTP data on auth failures (wrong credentials), NOT on rate limits
+          // This allows the OTP flow to continue even if a duplicate request gets 429
+          const status = error?.status || error?.response?.status
+          const isAuthFailure = status === 401 || status === 400
+
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
             error: error.message || 'فشل تسجيل الدخول',
+            // Clear OTP data only on auth failures (wrong password, etc.)
+            // Preserve OTP data on rate limits (429) so user can still proceed to OTP page
+            ...(isAuthFailure ? { otpRequired: false, otpData: null } : {}),
           })
           throw error
         }
