@@ -216,17 +216,20 @@ export interface LoginCredentials {
  * Login OTP Required Response
  * Returned when password login succeeds but email OTP verification is needed
  * The loginSessionToken MUST be passed to /verify-otp to prove password was verified
+ *
+ * CRITICAL: Backend sends 'otpRequired: true', we normalize to 'requiresOtp: true' internally
  */
 export interface LoginOTPRequiredResponse {
-  requiresOtp: true
+  requiresOtp: true              // Internal normalized field
+  otpRequired?: true             // Actual backend field (for type checking)
   code: 'OTP_REQUIRED'
-  message: string               // Arabic message
-  messageEn: string             // English message
-  email: string                 // Masked email: "u***r@example.com"
-  fullEmail: string             // Full email for OTP verification (stored securely)
-  expiresIn: number             // OTP expiry in seconds (300 = 5 min)
-  loginSessionToken: string     // CRITICAL: Must pass to /verify-otp
-  loginSessionExpiresIn: number // Session expiry in seconds (600 = 10 min)
+  message: string                // Arabic message
+  messageEn: string              // English message
+  email: string                  // Masked email: "u***r@example.com"
+  fullEmail: string              // Full email for OTP verification (stored securely)
+  expiresIn: number              // OTP expiry in seconds (300 = 5 min)
+  loginSessionToken: string      // CRITICAL: Must pass to /verify-otp
+  loginSessionExpiresIn: number  // Session expiry in seconds (600 = 10 min)
   securityWarning?: SecurityWarning
 
   // Backend nested format support
@@ -266,14 +269,21 @@ export type LoginResponse = LoginOTPRequiredResponse | LoginResult
 
 /**
  * Type guard to check if login response requires OTP
- * Supports both nested format (requires.otp) and flat format (requiresOtp)
+ * CRITICAL: Supports all formats including actual backend format
+ * - Nested: { requires: { otp: true } }
+ * - Actual backend: { otpRequired: true } <-- WHAT BACKEND ACTUALLY SENDS
+ * - Legacy: { requiresOtp: true }
  */
 export function isOTPRequired(response: LoginResponse): response is LoginOTPRequiredResponse {
   // Check nested format first (new backend format)
   if ('requires' in response && typeof response.requires === 'object' && response.requires?.otp === true) {
     return true
   }
-  // Fall back to flat format (legacy)
+  // Check actual backend format - THIS IS WHAT BACKEND SENDS: { otpRequired: true }
+  if ('otpRequired' in response && (response as any).otpRequired === true) {
+    return true
+  }
+  // Fall back to legacy flat format
   return 'requiresOtp' in response && response.requiresOtp === true
 }
 
@@ -456,9 +466,11 @@ interface AuthResponse {
     mfa?: boolean
   }
 
-  // Legacy flat fields (for backwards compatibility)
-  requiresOtp?: boolean  // Legacy: prefer requires.otp
-  code?: string  // 'OTP_REQUIRED' when OTP is needed (legacy)
+  // OTP Required fields - CRITICAL: Backend sends 'otpRequired', NOT 'requiresOtp'
+  // The backend actually sends: { otpRequired: true, loginSessionToken: "..." }
+  otpRequired?: boolean   // ACTUAL backend field name
+  requiresOtp?: boolean   // Legacy alias (kept for backwards compatibility)
+  code?: string           // 'OTP_REQUIRED' when OTP is needed
 
   // OTP session fields
   email?: string  // Masked email for display
@@ -611,17 +623,33 @@ const authService = {
 
       // Check if OTP verification is required (email-based 2FA for password login)
       // This is the normal flow for password-based login: password verified, now needs OTP
-      // Backend uses nested format: { requires: { otp: true } }
-      // Also support legacy flat format for backwards compatibility: { requiresOtp: true }
-      const otpRequired = response.data.requires?.otp === true || response.data.requiresOtp === true
+      // CRITICAL: Backend sends 'otpRequired: true' (not 'requiresOtp')
+      // Check all possible formats:
+      // 1. Nested: { requires: { otp: true } }
+      // 2. Actual backend: { otpRequired: true } <-- THIS IS WHAT BACKEND ACTUALLY SENDS
+      // 3. Legacy: { requiresOtp: true }
+      const isOtpRequired = response.data.requires?.otp === true ||
+                            response.data.otpRequired === true ||  // ACTUAL BACKEND FORMAT
+                            response.data.requiresOtp === true
       const hasLoginSessionToken = !!response.data.loginSessionToken
 
-      if (otpRequired && hasLoginSessionToken) {
+      // DEBUG: Log all OTP-related fields from response
+      console.log('[AUTH-DEBUG] Login response OTP check:', {
+        'requires?.otp': response.data.requires?.otp,
+        'otpRequired': response.data.otpRequired,
+        'requiresOtp': response.data.requiresOtp,
+        'hasLoginSessionToken': hasLoginSessionToken,
+        'loginSessionToken (first 20 chars)': response.data.loginSessionToken?.substring(0, 20),
+        'isOtpRequired (computed)': isOtpRequired,
+        'allResponseKeys': Object.keys(response.data),
+      })
+
+      if (isOtpRequired && hasLoginSessionToken) {
         authLog('Password verified, OTP required for login', {
           email: response.data.email, // Masked email
           expiresIn: response.data.expiresIn,
           hasSecurityWarning: !!response.data.securityWarning,
-          format: response.data.requires ? 'nested' : 'legacy',
+          format: response.data.requires ? 'nested' : (response.data.otpRequired ? 'actual' : 'legacy'),
         })
 
         // Return OTP required response - caller must redirect to OTP page
