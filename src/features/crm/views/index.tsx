@@ -21,7 +21,7 @@ export { ProductFormView } from './product-form-view'
 export { ProductDetailView } from './product-detail-view'
 
 // CRM Transactions & Reports Views
-export { CrmTransactionsView } from './crm-transactions-view'
+export { default as CrmTransactionsView } from './crm-transactions-view'
 export { CrmReportsDashboardView } from './crm-reports-dashboard-view'
 
 // Settings Views
