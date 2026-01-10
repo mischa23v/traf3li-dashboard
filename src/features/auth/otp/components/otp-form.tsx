@@ -24,7 +24,9 @@ import {
 import { Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClientNoVersion } from '@/lib/api'
-import type { OtpPurpose } from '@/services/otpService'
+import { storeTokens } from '@/lib/api'
+import { useAuthStore } from '@/stores/auth-store'
+import type { OtpPurpose, VerifyOtpResponse } from '@/services/otpService'
 
 // Auth routes are NOT versioned - /api/auth/*, not /api/v1/auth/*
 const authApi = apiClientNoVersion
@@ -148,7 +150,23 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
               ...(loginSessionToken && { loginSessionToken }),
             }
 
-        await authApi.post('/auth/verify-otp', requestBody)
+        const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', requestBody)
+        const data = response.data
+
+        // For login purpose: Store tokens and set user in auth store
+        if (purpose === 'login' && data.accessToken && data.user) {
+          // Store tokens for API authentication
+          storeTokens(data.accessToken, data.refreshToken)
+
+          // Set user in auth store - this makes the user authenticated
+          useAuthStore.getState().setUser(data.user as any)
+
+          console.log('[OTP] Login OTP verified, tokens stored, user set:', {
+            userId: data.user._id,
+            role: data.user.role,
+          })
+        }
+
         toast.success(isRTL ? 'تم التحقق بنجاح' : 'Verification successful')
         if (onSuccess) {
           onSuccess()
@@ -247,9 +265,11 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
             <FormItem>
               <FormLabel className='sr-only'>رمز التحقق</FormLabel>
               <FormControl>
+                {/* IMPORTANT: dir="ltr" ensures numbers display left-to-right even in RTL mode */}
                 <InputOTP
                   maxLength={6}
                   {...field}
+                  dir="ltr"
                   containerClassName='justify-between sm:[&>[data-slot="input-otp-group"]>div]:w-12'
                 >
                   <InputOTPGroup>
