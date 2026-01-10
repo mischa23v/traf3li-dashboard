@@ -33,7 +33,6 @@ const Icons = {
 }
 
 export function VerifyEmailRequired() {
-  const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const isRtl = i18n.language === 'ar'
   const search = useSearch({ from: '/(auth)/verify-email-required' })
