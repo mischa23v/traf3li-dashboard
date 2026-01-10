@@ -80,22 +80,48 @@ export const useAuthStore = create<AuthState>()(
        * 5. OTP page redirects back to sign-in because loginSessionToken is missing
        */
       login: async (credentials: LoginCredentials) => {
+        console.log('[AUTH-STORE] Login called with credentials:', {
+          username: credentials.username,
+          hasPassword: !!credentials.password,
+          hasCaptcha: !!credentials.captchaToken,
+        })
+
         // SECURITY: If we already have valid OTP data, don't allow another login to interfere
         // User should complete OTP verification or navigate away first
         const currentState = useAuthStore.getState()
+        console.log('[AUTH-STORE] Current state before login:', {
+          otpRequired: currentState.otpRequired,
+          hasOtpData: !!currentState.otpData,
+          hasLoginSessionToken: !!currentState.otpData?.loginSessionToken,
+          isLoading: currentState.isLoading,
+        })
+
         if (currentState.otpRequired && currentState.otpData?.loginSessionToken) {
-          console.warn('[Auth] Login attempt blocked - OTP verification already in progress. Complete OTP or navigate away first.')
-          // Don't throw - just return silently. The OTP page will be shown.
+          console.warn('[AUTH-STORE] Login blocked - OTP verification already in progress')
           return
         }
 
         // Only clear error and loading state, preserve OTP data until we get a new response
         set({ isLoading: true, error: null, passwordBreachWarning: null })
+        console.log('[AUTH-STORE] Set isLoading=true, calling authService.login...')
+
         try {
           const response = await authService.login(credentials)
+          console.log('[AUTH-STORE] authService.login returned:', {
+            responseType: typeof response,
+            hasRequiresOtp: 'requiresOtp' in response,
+            requiresOtpValue: (response as any).requiresOtp,
+            hasOtpRequired: 'otpRequired' in response,
+            otpRequiredValue: (response as any).otpRequired,
+            hasUser: 'user' in response,
+            hasLoginSessionToken: !!(response as any).loginSessionToken,
+            isOTPRequiredCheck: isOTPRequired(response),
+            allKeys: Object.keys(response),
+          })
 
           // Check if OTP verification is required (email-based 2FA for password login)
           if (isOTPRequired(response)) {
+            console.log('[AUTH-STORE] OTP IS REQUIRED! Setting otpRequired=true and otpData')
             // Password verified, but email OTP needed - store OTP data and let form handle redirect
             set({
               isLoading: false,
@@ -103,9 +129,22 @@ export const useAuthStore = create<AuthState>()(
               otpData: response,
               // Don't set error - this is an expected flow, not an error
             })
+
+            // Verify state was set
+            const newState = useAuthStore.getState()
+            console.log('[AUTH-STORE] State AFTER setting OTP data:', {
+              otpRequired: newState.otpRequired,
+              hasOtpData: !!newState.otpData,
+              hasLoginSessionToken: !!newState.otpData?.loginSessionToken,
+              fullEmail: newState.otpData?.fullEmail,
+            })
+
             // Return early - form will redirect to OTP page
+            console.log('[AUTH-STORE] Returning from login - form should now navigate to OTP page')
             return
           }
+
+          console.log('[AUTH-STORE] OTP NOT required, proceeding with direct login')
 
           // Direct login success (SSO, One-Tap, or backend doesn't require OTP)
           const { user, warning } = response

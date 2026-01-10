@@ -246,13 +246,24 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true)
     clearError()
 
+    // DEBUG: Log form submission start
+    console.log('[SignIn] Form submit starting with:', {
+      username: data.username,
+      hasPassword: !!data.password,
+      hasCaptchaToken: !!captchaToken,
+      showCaptcha,
+      captchaEnabled: captchaConfig?.enabled,
+    })
+
     try {
       // Include CAPTCHA token in login data if available
       const loginData = captchaToken
         ? { ...data, captchaToken, captchaProvider: captchaConfig?.provider }
         : data
 
+      console.log('[SignIn] Calling login() with credentials...')
       await login(loginData)
+      console.log('[SignIn] login() returned successfully, checking state...')
 
       // Check if OTP verification is required (email-based 2FA for password login)
       // IMPORTANT: Get fresh state after login completes - Zustand updates are synchronous
