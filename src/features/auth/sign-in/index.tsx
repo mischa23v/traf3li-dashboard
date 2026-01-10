@@ -282,6 +282,21 @@ export function SignIn() {
         return;
       }
 
+      // Handle 403 EMAIL_NOT_VERIFIED - user needs to verify email before login
+      // Backend returns this for users who registered after 2025-02-01 and haven't verified
+      const errorCode = err?.response?.data?.code;
+      if (status === 403 && errorCode === 'EMAIL_NOT_VERIFIED') {
+        const responseData = err?.response?.data;
+        navigate({
+          to: ROUTES.auth.verifyEmailRequired,
+          search: {
+            email: responseData?.email || '', // Masked email from backend
+            verificationSent: responseData?.verificationResent || false,
+          },
+        });
+        return;
+      }
+
       // Only record failed attempt for actual auth failures (401, 400)
       const isAuthFailure = status === 401 || status === 400;
       if (isAuthFailure) {

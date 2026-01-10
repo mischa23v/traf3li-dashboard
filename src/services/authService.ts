@@ -1473,6 +1473,66 @@ const authService = {
     const user = authService.getCachedUser()
     return user?.isEmailVerified === true
   },
+
+  /**
+   * Request verification email - PUBLIC endpoint (NO authentication required)
+   * POST /api/auth/request-verification-email
+   *
+   * Use this when user is blocked from login due to unverified email.
+   * This solves the circular dependency where users couldn't resend
+   * verification because they weren't logged in.
+   *
+   * Note: Response is always the same regardless of email existence
+   * to prevent user enumeration attacks.
+   */
+  requestVerificationEmail: async (email: string): Promise<{
+    success: boolean
+    message: string
+    messageEn?: string
+    waitSeconds?: number
+    waitMinutes?: number
+    code?: string
+  }> => {
+    try {
+      const response = await authApi.post<{
+        error: boolean
+        message: string
+        messageEn?: string
+        email?: string
+        code?: string
+        waitSeconds?: number
+        waitMinutes?: number
+      }>('/auth/request-verification-email', { email })
+
+      return {
+        success: !response.data.error,
+        message: response.data.message,
+        messageEn: response.data.messageEn,
+        code: response.data.code,
+      }
+    } catch (error: any) {
+      // Handle rate limiting specifically
+      if (error?.response?.status === 429) {
+        const data = error.response.data
+        return {
+          success: false,
+          message: data?.message || 'يرجى الانتظار قبل إعادة الإرسال',
+          messageEn: data?.messageEn || 'Please wait before resending',
+          waitSeconds: data?.waitSeconds,
+          waitMinutes: data?.waitMinutes,
+          code: 'RATE_LIMITED',
+        }
+      }
+
+      // For other errors, still return a response (don't throw)
+      // This maintains the same UX regardless of error type
+      return {
+        success: true, // Always show success to prevent enumeration
+        message: 'إذا كان هذا البريد مسجلاً وغير مُفعّل، سيتم إرسال رابط التفعيل.',
+        messageEn: 'If this email is registered and not verified, a verification link will be sent.',
+      }
+    }
+  },
 }
 
 /**

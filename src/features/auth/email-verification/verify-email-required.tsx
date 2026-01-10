@@ -1,15 +1,19 @@
 /**
  * Verify Email Required Page
  * Shown when user tries to login with unverified email (403 EMAIL_NOT_VERIFIED)
- * Backend blocks login for users registered after 2025-02-01 without verified email
  *
- * Note: This page cannot resend verification emails because user is NOT logged in.
- * Backend may auto-resend when returning 403, indicated by verificationResent flag.
+ * Gold Standard Implementation:
+ * - Uses PUBLIC /auth/request-verification-email endpoint (no auth required)
+ * - Solves circular dependency where users couldn't resend verification
+ * - Rate limiting with cooldown timer
+ * - User enumeration prevention (same response regardless of email existence)
  */
 
+import { useState, useEffect, useRef } from 'react'
 import { Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ROUTES } from '@/constants/routes'
+import authService from '@/services/authService'
 
 // ============================================
 // SVG ICONS
@@ -30,6 +34,22 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
     </svg>
   ),
+  Spinner: () => (
+    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+  ),
+  Clock: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  AtSymbol: () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+    </svg>
+  ),
 }
 
 export function VerifyEmailRequired() {
@@ -38,12 +58,103 @@ export function VerifyEmailRequired() {
   const search = useSearch({ from: '/(auth)/verify-email-required' })
 
   // Get email and verification status from URL params
-  const email = (search as { email?: string })?.email || ''
+  const initialEmail = (search as { email?: string })?.email || ''
   const initialVerificationSent = (search as { verificationSent?: boolean })?.verificationSent || false
 
-  // Note: We cannot resend verification email from this page because user is NOT logged in.
-  // The backend may auto-resend when returning 403, indicated by verificationResent flag.
-  // If user needs another email, they should contact support or try registering again.
+  // State
+  const [email, setEmail] = useState(initialEmail)
+  const [isLoading, setIsLoading] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info')
+  const [hasSentOnce, setHasSentOnce] = useState(initialVerificationSent)
+
+  // Double-click prevention
+  const isSubmittingRef = useRef(false)
+
+  // Cooldown timer
+  useEffect(() => {
+    if (cooldown <= 0) return
+
+    const timer = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [cooldown])
+
+  // Handle resend verification email
+  const handleResend = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+
+    // Validation
+    if (!email || !email.includes('@')) {
+      setMessage(isRtl ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email address')
+      setMessageType('error')
+      return
+    }
+
+    // Prevent double-click
+    if (isSubmittingRef.current || isLoading || cooldown > 0) return
+    isSubmittingRef.current = true
+
+    setIsLoading(true)
+    setMessage('')
+
+    try {
+      const response = await authService.requestVerificationEmail(email.trim().toLowerCase())
+
+      if (response.code === 'RATE_LIMITED') {
+        // Rate limited - show cooldown
+        const waitTime = response.waitSeconds || 60
+        setCooldown(waitTime)
+        setMessage(
+          isRtl
+            ? `يرجى الانتظار ${Math.ceil(waitTime / 60)} دقيقة قبل إعادة الإرسال`
+            : `Please wait ${Math.ceil(waitTime / 60)} minute(s) before resending`
+        )
+        setMessageType('error')
+      } else {
+        // Success (always returns success for enumeration prevention)
+        setHasSentOnce(true)
+        setCooldown(60) // 1 minute cooldown after successful send
+        setMessage(
+          isRtl
+            ? 'إذا كان هذا البريد مسجلاً وغير مُفعّل، سيتم إرسال رابط التفعيل. تحقق من صندوق الوارد.'
+            : 'If this email is registered and not verified, a verification link will be sent. Check your inbox.'
+        )
+        setMessageType('success')
+      }
+    } catch {
+      // Even on error, show generic success message (enumeration prevention)
+      setHasSentOnce(true)
+      setCooldown(60)
+      setMessage(
+        isRtl
+          ? 'إذا كان هذا البريد مسجلاً وغير مُفعّل، سيتم إرسال رابط التفعيل.'
+          : 'If this email is registered and not verified, a verification link will be sent.'
+      )
+      setMessageType('success')
+    } finally {
+      setIsLoading(false)
+      isSubmittingRef.current = false
+    }
+  }
+
+  // Format cooldown time
+  const formatCooldown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    if (mins > 0) {
+      return `${mins}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${secs}s`
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -58,7 +169,7 @@ export function VerifyEmailRequired() {
 
           {/* Card */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-8 text-center">
+            <div className="p-8">
               {/* Email Icon */}
               <div className="flex justify-center mb-6">
                 <div className="w-24 h-24 rounded-full bg-amber-50 flex items-center justify-center text-amber-500">
@@ -67,30 +178,41 @@ export function VerifyEmailRequired() {
               </div>
 
               {/* Title */}
-              <h2 className="text-xl font-bold text-[#0f172a] mb-3">
+              <h2 className="text-xl font-bold text-[#0f172a] mb-3 text-center">
                 {isRtl ? 'يرجى تأكيد بريدك الإلكتروني' : 'Please Verify Your Email'}
               </h2>
 
               {/* Description */}
-              <p className="text-slate-500 mb-2">
+              <p className="text-slate-500 mb-6 text-center">
                 {isRtl
                   ? 'يجب تأكيد بريدك الإلكتروني قبل تسجيل الدخول.'
                   : 'You need to verify your email before you can log in.'}
               </p>
 
-              {/* Email display */}
-              {email && (
-                <div className="bg-slate-50 rounded-xl py-3 px-4 mb-6">
-                  <p className="text-sm text-slate-600" dir="ltr">
-                    {email}
-                  </p>
+              {/* Message Display */}
+              {message && (
+                <div
+                  className={`rounded-xl py-3 px-4 mb-6 flex items-center gap-2 ${
+                    messageType === 'success'
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                      : messageType === 'error'
+                        ? 'bg-red-50 border border-red-200 text-red-700'
+                        : 'bg-blue-50 border border-blue-200 text-blue-700'
+                  }`}
+                >
+                  {messageType === 'success' && (
+                    <span className="text-emerald-600 flex-shrink-0">
+                      <Icons.CheckCircle />
+                    </span>
+                  )}
+                  <p className="text-sm">{message}</p>
                 </div>
               )}
 
-              {/* Success message if verification was just sent by backend */}
-              {initialVerificationSent && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl py-3 px-4 mb-6 flex items-center gap-2 justify-center">
-                  <span className="text-emerald-600">
+              {/* Initial verification sent message */}
+              {initialVerificationSent && !message && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl py-3 px-4 mb-6 flex items-center gap-2">
+                  <span className="text-emerald-600 flex-shrink-0">
                     <Icons.CheckCircle />
                   </span>
                   <p className="text-sm text-emerald-700">
@@ -100,6 +222,51 @@ export function VerifyEmailRequired() {
                   </p>
                 </div>
               )}
+
+              {/* Email Input Form */}
+              <form onSubmit={handleResend} className="mb-6">
+                <label className="block text-sm font-medium text-[#0f172a] mb-2">
+                  {isRtl ? 'البريد الإلكتروني' : 'Email Address'}
+                </label>
+                <div className="relative" dir="ltr">
+                  <div className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-500">
+                    <Icons.AtSymbol />
+                  </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full h-12 ps-11 pe-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none transition-all focus:border-emerald-500 text-start"
+                    placeholder={isRtl ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                    dir="ltr"
+                    autoComplete="email"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {/* Resend Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading || cooldown > 0 || !email}
+                  className="w-full h-12 mt-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <Icons.Spinner />
+                      {isRtl ? 'جاري الإرسال...' : 'Sending...'}
+                    </>
+                  ) : cooldown > 0 ? (
+                    <>
+                      <Icons.Clock />
+                      {isRtl ? `إعادة الإرسال بعد ${formatCooldown(cooldown)}` : `Resend in ${formatCooldown(cooldown)}`}
+                    </>
+                  ) : hasSentOnce ? (
+                    isRtl ? 'إعادة إرسال رابط التفعيل' : 'Resend Verification Link'
+                  ) : (
+                    isRtl ? 'إرسال رابط التفعيل' : 'Send Verification Link'
+                  )}
+                </button>
+              </form>
 
               {/* Instructions */}
               <div className="text-start bg-slate-50 rounded-xl p-4 mb-6">
@@ -127,23 +294,13 @@ export function VerifyEmailRequired() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {/* Back to login - primary action */}
+                {/* Back to login */}
                 <Link
                   to={ROUTES.auth.signIn}
-                  className="w-full h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                  className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
                 >
                   {isRtl ? 'العودة لتسجيل الدخول' : 'Back to Login'}
                 </Link>
-
-                {/* Contact support for resend */}
-                <p className="text-sm text-slate-500 text-center">
-                  {isRtl
-                    ? 'لم تستلم الرابط؟ تحقق من مجلد الرسائل غير المرغوبة أو '
-                    : "Didn't receive the link? Check your spam folder or "}
-                  <Link to="/support" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                    {isRtl ? 'تواصل مع الدعم' : 'contact support'}
-                  </Link>
-                </p>
               </div>
             </div>
 
