@@ -219,16 +219,28 @@ export function markDeviceAsRecognized(): void {
 
 /**
  * Get CAPTCHA configuration with settings
+ *
+ * SAFETY: CAPTCHA is automatically disabled if no site key is configured
+ * to prevent "Security verification failed" errors
  */
 export async function getCaptchaConfig(): Promise<CaptchaConfig> {
   const settings = await getCaptchaSettings()
+  const siteKey = getCaptchaSiteKey(settings.provider, settings)
+
+  // SAFETY: Disable CAPTCHA if enabled but no site key is configured
+  // This prevents "Security verification failed" errors
+  const enabled = settings.enabled && siteKey.length > 0
+
+  if (settings.enabled && !siteKey) {
+    console.warn('[CAPTCHA] CAPTCHA enabled but no site key configured. CAPTCHA disabled.')
+  }
 
   return {
     provider: settings.provider,
     mode: settings.mode,
-    siteKey: getCaptchaSiteKey(settings.provider, settings),
+    siteKey,
     threshold: settings.threshold,
-    enabled: settings.enabled,
+    enabled,
     requireAfterFailedAttempts: settings.requireAfterFailedAttempts,
     alwaysForNewDevices: settings.alwaysForNewDevices,
     riskScoreThreshold: settings.riskScoreThreshold,

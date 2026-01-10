@@ -33,22 +33,58 @@ export interface CaptchaSettings {
 }
 
 /**
+ * Get the site key for the configured provider from environment
+ */
+function getDefaultSiteKey(): string {
+  const provider = (import.meta.env.VITE_CAPTCHA_PROVIDER as CaptchaProvider) || 'turnstile'
+  switch (provider) {
+    case 'turnstile':
+      return import.meta.env.VITE_TURNSTILE_SITE_KEY || ''
+    case 'recaptcha-v2':
+      return import.meta.env.VITE_RECAPTCHA_V2_SITE_KEY || ''
+    case 'recaptcha-v3':
+      return import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY || ''
+    case 'hcaptcha':
+      return import.meta.env.VITE_HCAPTCHA_SITE_KEY || ''
+    default:
+      return ''
+  }
+}
+
+/**
  * Default CAPTCHA configuration
  * Can be overridden by settings from backend or local storage
+ *
+ * SAFETY: CAPTCHA is automatically disabled if no site key is configured
+ * to prevent "Security verification failed" errors
  */
-export const defaultCaptchaConfig: CaptchaConfig = {
-  provider: (import.meta.env.VITE_CAPTCHA_PROVIDER as CaptchaProvider) || 'turnstile',
-  mode: (import.meta.env.VITE_CAPTCHA_MODE as CaptchaMode) || 'invisible',
-  siteKey: import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY || '',
-  threshold: parseFloat(import.meta.env.VITE_RECAPTCHA_THRESHOLD || '0.5'),
-  enabled: import.meta.env.VITE_CAPTCHA_ENABLED === 'true',
-  requireAfterFailedAttempts: parseInt(
-    import.meta.env.VITE_CAPTCHA_FAILED_ATTEMPTS_THRESHOLD || '3',
-    10
-  ),
-  alwaysForNewDevices: import.meta.env.VITE_CAPTCHA_NEW_DEVICES === 'true',
-  riskScoreThreshold: parseInt(import.meta.env.VITE_CAPTCHA_RISK_THRESHOLD || '50', 10),
-}
+export const defaultCaptchaConfig: CaptchaConfig = (() => {
+  const provider = (import.meta.env.VITE_CAPTCHA_PROVIDER as CaptchaProvider) || 'turnstile'
+  const siteKey = getDefaultSiteKey()
+  const envEnabled = import.meta.env.VITE_CAPTCHA_ENABLED === 'true'
+
+  // SAFETY: Disable CAPTCHA if enabled but no site key is configured
+  // This prevents "Security verification failed" errors
+  const enabled = envEnabled && siteKey.length > 0
+
+  if (envEnabled && !siteKey) {
+    console.warn('[CAPTCHA] VITE_CAPTCHA_ENABLED=true but no site key configured. CAPTCHA disabled.')
+  }
+
+  return {
+    provider,
+    mode: (import.meta.env.VITE_CAPTCHA_MODE as CaptchaMode) || 'invisible',
+    siteKey,
+    threshold: parseFloat(import.meta.env.VITE_RECAPTCHA_THRESHOLD || '0.5'),
+    enabled,
+    requireAfterFailedAttempts: parseInt(
+      import.meta.env.VITE_CAPTCHA_FAILED_ATTEMPTS_THRESHOLD || '3',
+      10
+    ),
+    alwaysForNewDevices: import.meta.env.VITE_CAPTCHA_NEW_DEVICES === 'true',
+    riskScoreThreshold: parseInt(import.meta.env.VITE_CAPTCHA_RISK_THRESHOLD || '50', 10),
+  }
+})()
 
 /**
  * Get CAPTCHA site key based on provider
