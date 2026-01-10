@@ -74,6 +74,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isLDAPLoading, setIsLDAPLoading] = useState(false)
 
+  // SECURITY: Ref-based guard to prevent double-click/double-submit attacks
+  // This is checked BEFORE any async operations to prevent race conditions
+  const isSubmittingRef = useRef(false)
+
   const formSchema = useMemo(() => createFormSchema(t), [t])
 
   const defaultValues = useMemo(() => ({
@@ -196,6 +200,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
    * Handle form submission with rate limiting and CAPTCHA
    */
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    // SECURITY: Prevent double-click/double-submit attacks
+    // This check must be FIRST before any async operations
+    if (isSubmittingRef.current) {
+      return
+    }
+    isSubmittingRef.current = true
+
     const identifier = getLoginIdentifier(data.username)
     setCurrentIdentifier(identifier)
 
@@ -203,6 +214,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const status = rateLimit.checkAllowed()
     if (!status.allowed) {
       // Rate limit UI components will show the error
+      isSubmittingRef.current = false
       return
     }
 
@@ -220,10 +232,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               description: t('auth.toast.verificationRequired.description'),
               variant: 'destructive',
             })
+            isSubmittingRef.current = false
             return
           }
         } catch (err) {
           console.error('CAPTCHA execution failed:', err)
+          isSubmittingRef.current = false
           return
         }
       }
@@ -330,6 +344,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       // For other errors (network, 500s), just let the error display without counting
     } finally {
       setIsLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
@@ -338,12 +353,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
    * Uses the same form fields but authenticates via LDAP
    */
   const handleLDAPLogin = async () => {
+    // SECURITY: Prevent double-click/double-submit attacks
+    if (isSubmittingRef.current) {
+      return
+    }
+    isSubmittingRef.current = true
+
     // Get current form values
     const values = form.getValues()
 
     // Validate form before attempting LDAP login
     const isValid = await form.trigger()
     if (!isValid) {
+      isSubmittingRef.current = false
       return
     }
 
@@ -353,6 +375,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     // Check client-side rate limiting
     const status = rateLimit.checkAllowed()
     if (!status.allowed) {
+      isSubmittingRef.current = false
       return
     }
 
@@ -418,6 +441,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       })
     } finally {
       setIsLDAPLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
