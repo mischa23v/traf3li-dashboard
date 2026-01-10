@@ -35,6 +35,7 @@ import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as authVerifyEmailRequiredRouteImport } from './routes/(auth)/verify-email-required'
 import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authTermsRouteImport } from './routes/(auth)/terms'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
@@ -563,6 +564,11 @@ const errors403Route = errors403RouteImport.update({
 const errors401Route = errors401RouteImport.update({
   id: '/(errors)/401',
   path: '/401',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authVerifyEmailRequiredRoute = authVerifyEmailRequiredRouteImport.update({
+  id: '/(auth)/verify-email-required',
+  path: '/verify-email-required',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
@@ -2985,6 +2991,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof authSignUpRouteWithChildren
   '/terms': typeof authTermsRoute
   '/verify-email': typeof authVerifyEmailRoute
+  '/verify-email-required': typeof authVerifyEmailRequiredRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
@@ -3409,6 +3416,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof authSignUpRouteWithChildren
   '/terms': typeof authTermsRoute
   '/verify-email': typeof authVerifyEmailRoute
+  '/verify-email-required': typeof authVerifyEmailRequiredRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
@@ -3831,6 +3839,7 @@ export interface FileRoutesById {
   '/(auth)/sign-up': typeof authSignUpRouteWithChildren
   '/(auth)/terms': typeof authTermsRoute
   '/(auth)/verify-email': typeof authVerifyEmailRoute
+  '/(auth)/verify-email-required': typeof authVerifyEmailRequiredRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
@@ -4258,6 +4267,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/terms'
     | '/verify-email'
+    | '/verify-email-required'
     | '/401'
     | '/403'
     | '/404'
@@ -4682,6 +4692,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/terms'
     | '/verify-email'
+    | '/verify-email-required'
     | '/401'
     | '/403'
     | '/404'
@@ -5103,6 +5114,7 @@ export interface FileRouteTypes {
     | '/(auth)/sign-up'
     | '/(auth)/terms'
     | '/(auth)/verify-email'
+    | '/(auth)/verify-email-required'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
@@ -5529,6 +5541,7 @@ export interface RootRouteChildren {
   authSignUpRoute: typeof authSignUpRouteWithChildren
   authTermsRoute: typeof authTermsRoute
   authVerifyEmailRoute: typeof authVerifyEmailRoute
+  authVerifyEmailRequiredRoute: typeof authVerifyEmailRequiredRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
@@ -5719,6 +5732,13 @@ declare module '@tanstack/react-router' {
       path: '/401'
       fullPath: '/401'
       preLoaderRoute: typeof errors401RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/verify-email-required': {
+      id: '/(auth)/verify-email-required'
+      path: '/verify-email-required'
+      fullPath: '/verify-email-required'
+      preLoaderRoute: typeof authVerifyEmailRequiredRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/verify-email': {
@@ -10070,6 +10090,7 @@ const rootRouteChildren: RootRouteChildren = {
   authSignUpRoute: authSignUpRouteWithChildren,
   authTermsRoute: authTermsRoute,
   authVerifyEmailRoute: authVerifyEmailRoute,
+  authVerifyEmailRequiredRoute: authVerifyEmailRequiredRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
