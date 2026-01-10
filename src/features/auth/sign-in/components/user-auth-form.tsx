@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
 import { cn } from '@/lib/utils'
-import { useAuthStore, selectOtpRequired, selectOtpData } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth-store'
 import { useRateLimit } from '@/hooks/useRateLimit'
 import { AccountLockoutWarning } from '@/components/auth/account-lockout-warning'
 import { ProgressiveDelay } from '@/components/auth/progressive-delay'
@@ -69,8 +69,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const clearError = useAuthStore((state) => state.clearError)
   const setUser = useAuthStore((state) => state.setUser)
   const clearOtpData = useAuthStore((state) => state.clearOtpData)
-  const otpRequired = useAuthStore(selectOtpRequired)
-  const otpData = useAuthStore(selectOtpData)
   const [isLoading, setIsLoading] = useState(false)
   const [isLDAPLoading, setIsLDAPLoading] = useState(false)
 
@@ -139,34 +137,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   }, [])
 
   /**
-   * CRITICAL: Effect-based OTP navigation
-   * This ensures navigation happens even if the async login flow has issues.
-   * Watches for otpRequired state changes and navigates when OTP is needed.
+   * REMOVED: Effect-based OTP navigation
+   *
+   * Enterprise Pattern: We now use Command-Query Separation.
+   * The login() function returns a LoginResult discriminated union,
+   * and the caller (onSubmit) handles navigation based on the result type.
+   *
+   * This is deterministic and follows patterns from Google, Microsoft, and SAP.
+   * No side effects, no race conditions, no unexpected navigations.
    */
-  useEffect(() => {
-    if (otpRequired && otpData?.loginSessionToken) {
-      console.log('[SignIn-Effect] OTP required detected via state change, navigating to OTP page')
-      console.log('[SignIn-Effect] OTP data:', {
-        hasEmail: !!otpData.fullEmail,
-        hasToken: !!otpData.loginSessionToken,
-        tokenPreview: otpData.loginSessionToken?.substring(0, 20) + '...',
-      })
-
-      // Record success and mark device before navigation
-      rateLimit.recordSuccess()
-      markDeviceAsRecognized()
-
-      // Navigate to OTP page
-      navigate({
-        to: ROUTES.auth.otp,
-        search: {
-          email: otpData.fullEmail,
-          purpose: 'login' as const,
-          token: otpData.loginSessionToken,
-        },
-      })
-    }
-  }, [otpRequired, otpData, navigate, rateLimit])
 
   // Check if CAPTCHA should be shown based on failed attempts
   const checkCaptchaRequired = useCallback(() => {
@@ -292,77 +271,90 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         : data
 
       console.log('[SignIn] Calling login() with credentials...')
-      await login(loginData)
-      console.log('[SignIn] login() returned successfully, checking state...')
 
-      // Check if OTP verification is required (email-based 2FA for password login)
-      // IMPORTANT: Get fresh state after login completes - Zustand updates are synchronous
-      const storeState = useAuthStore.getState()
-      const currentOtpRequired = storeState.otpRequired
-      const currentOtpData = storeState.otpData
-
-      // Log authentication flow state (safe for production - no sensitive data)
-      console.log('[SignIn] Post-login state:', {
-        otpRequired: currentOtpRequired,
-        hasOtpData: !!currentOtpData,
-        hasEmail: !!currentOtpData?.fullEmail,
-        hasLoginSessionToken: !!currentOtpData?.loginSessionToken,
-        hasUser: !!storeState.user,
-        isAuthenticated: storeState.isAuthenticated,
+      /**
+       * ENTERPRISE PATTERN: Command-Query Separation with Discriminated Unions
+       *
+       * Instead of relying on side effects and state polling, the login function
+       * returns an explicit result that tells us exactly what happened.
+       * This is the pattern used by Google, Microsoft, and SAP for deterministic behavior.
+       */
+      const result = await login(loginData)
+      console.log('[SignIn] login() returned result:', {
+        type: result?.type,
+        hasUser: !!(result as any)?.user,
+        hasOtpData: !!(result as any)?.otpData,
       })
 
-      if (currentOtpRequired && currentOtpData) {
-        // Password verified, OTP needed - redirect to OTP page
+      // Handle each result type explicitly - no ambiguity, no race conditions
+      if (!result) {
+        // Should never happen with proper implementation, but handle gracefully
+        console.error('[SignIn] login() returned undefined - this should not happen')
+        throw new Error(t('auth.signIn.error'))
+      }
+
+      // Handle OTP required - password verified, now need email OTP
+      if (result.type === 'otp_required') {
+        const { otpData: resultOtpData } = result
+
         // Validate that we have the required loginSessionToken before navigation
-        if (!currentOtpData.loginSessionToken) {
+        if (!resultOtpData.loginSessionToken) {
           console.error('[SignIn] OTP required but loginSessionToken is missing!')
           throw new Error(t('auth.signIn.error'))
         }
+
+        console.log('[SignIn] OTP required, navigating to OTP page')
 
         rateLimit.recordSuccess()
         markDeviceAsRecognized()
 
         // Navigate to OTP page with necessary data
-        const otpPath = ROUTES.auth.otp
-        const otpParams = {
-          email: currentOtpData.fullEmail,
-          purpose: 'login' as const,
-          token: currentOtpData.loginSessionToken,
-        }
-
-        console.log('[SignIn] Navigating to OTP page:', otpPath)
-
         navigate({
-          to: otpPath,
-          search: otpParams,
+          to: ROUTES.auth.otp,
+          search: {
+            email: resultOtpData.fullEmail,
+            purpose: 'login' as const,
+            token: resultOtpData.loginSessionToken,
+          },
         })
         return
       }
 
-      // If we get here without OTP required, check if we have a user (direct login success)
-      const user = storeState.user
+      // Handle MFA required - user authenticated but MFA verification pending
+      if (result.type === 'mfa_required') {
+        const { user } = result
+        console.log('[SignIn] MFA required, navigating to MFA verification')
 
-      if (!user) {
-        // Neither OTP required nor user present - something went wrong
-        console.error('[SignIn] Login completed but no user and no OTP required. State:', storeState)
-        throw new Error(t('auth.signIn.error'))
+        rateLimit.recordSuccess()
+        markDeviceAsRecognized()
+
+        // Navigate to MFA challenge page
+        navigate({ to: ROUTES.auth.mfaChallenge })
+        return
       }
 
-      // Record successful login - clears rate limit data
-      rateLimit.recordSuccess()
+      // Handle successful login - user is fully authenticated
+      if (result.type === 'success') {
+        const { user } = result
+        console.log('[SignIn] Login successful, redirecting user')
 
-      // Mark device as recognized
-      markDeviceAsRecognized()
+        rateLimit.recordSuccess()
+        markDeviceAsRecognized()
 
-      // Redirect based on role
-      // No firm check needed - lawyers without firm are treated as solo lawyers
-      if (user.role === 'admin') {
-        navigate({ to: '/users' })
-      } else if (user.role === 'lawyer') {
-        navigate({ to: '/' }) // Dashboard home
-      } else {
-        navigate({ to: '/' }) // Client dashboard
+        // Redirect based on role
+        if (user.role === 'admin') {
+          navigate({ to: '/users' })
+        } else if (user.role === 'lawyer') {
+          navigate({ to: '/' }) // Dashboard home
+        } else {
+          navigate({ to: '/' }) // Client dashboard
+        }
+        return
       }
+
+      // Exhaustive check - TypeScript will error if we miss a case
+      const _exhaustiveCheck: never = result
+      console.error('[SignIn] Unhandled result type:', _exhaustiveCheck)
     } catch (error: any) {
       const status = error?.status || error?.response?.status
       const errorCode = error?.response?.data?.code || error?.code

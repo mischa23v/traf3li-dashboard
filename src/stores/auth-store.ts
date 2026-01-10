@@ -22,6 +22,18 @@ export interface EmailVerificationState {
   blockedFeatures: string[]
 }
 
+/**
+ * Login Result Type (Enterprise Pattern: Discriminated Union)
+ *
+ * Instead of returning void and relying on state, we return an explicit result.
+ * This pattern is used by Google, Microsoft, and SAP for deterministic behavior.
+ * The caller can then decide what action to take based on the result type.
+ */
+export type LoginResult =
+  | { type: 'success'; user: User }
+  | { type: 'otp_required'; otpData: LoginOTPRequiredResponse }
+  | { type: 'mfa_required'; user: User }
+
 interface AuthState {
   // State
   user: User | null
@@ -38,7 +50,7 @@ interface AuthState {
   emailVerification: EmailVerificationState | null
 
   // Actions
-  login: (credentials: LoginCredentials) => Promise<void>
+  login: (credentials: LoginCredentials) => Promise<LoginResult>
   logout: () => Promise<void>
   setUser: (user: User | null) => void
   clearError: () => void
@@ -98,7 +110,8 @@ export const useAuthStore = create<AuthState>()(
 
         if (currentState.otpRequired && currentState.otpData?.loginSessionToken) {
           console.warn('[AUTH-STORE] Login blocked - OTP verification already in progress')
-          return
+          // Return the existing OTP data - don't start a new login flow
+          return { type: 'otp_required' as const, otpData: currentState.otpData }
         }
 
         // Only clear error and loading state, preserve OTP data until we get a new response
@@ -139,9 +152,9 @@ export const useAuthStore = create<AuthState>()(
               fullEmail: newState.otpData?.fullEmail,
             })
 
-            // Return early - form will redirect to OTP page
-            console.log('[AUTH-STORE] Returning from login - form should now navigate to OTP page')
-            return
+            // Return OTP required result - form will use this to redirect to OTP page
+            console.log('[AUTH-STORE] Returning otp_required result - form should now navigate to OTP page')
+            return { type: 'otp_required' as const, otpData: response }
           }
 
           console.log('[AUTH-STORE] OTP NOT required, proceeding with direct login')
@@ -200,6 +213,15 @@ export const useAuthStore = create<AuthState>()(
             }
           }
           // Clients don't need permissions
+
+          // Return appropriate result based on MFA status
+          if (mfaPending) {
+            console.log('[AUTH-STORE] Returning mfa_required result')
+            return { type: 'mfa_required' as const, user: { ...user, mfaPending } }
+          }
+
+          console.log('[AUTH-STORE] Returning success result')
+          return { type: 'success' as const, user: { ...user, mfaPending } }
         } catch (error: any) {
           // Only clear OTP data on auth failures (wrong credentials), NOT on rate limits
           // This allows the OTP flow to continue even if a duplicate request gets 429
