@@ -138,6 +138,36 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       })
   }, [])
 
+  /**
+   * CRITICAL: Effect-based OTP navigation
+   * This ensures navigation happens even if the async login flow has issues.
+   * Watches for otpRequired state changes and navigates when OTP is needed.
+   */
+  useEffect(() => {
+    if (otpRequired && otpData?.loginSessionToken) {
+      console.log('[SignIn-Effect] OTP required detected via state change, navigating to OTP page')
+      console.log('[SignIn-Effect] OTP data:', {
+        hasEmail: !!otpData.fullEmail,
+        hasToken: !!otpData.loginSessionToken,
+        tokenPreview: otpData.loginSessionToken?.substring(0, 20) + '...',
+      })
+
+      // Record success and mark device before navigation
+      rateLimit.recordSuccess()
+      markDeviceAsRecognized()
+
+      // Navigate to OTP page
+      navigate({
+        to: ROUTES.auth.otp,
+        search: {
+          email: otpData.fullEmail,
+          purpose: 'login' as const,
+          token: otpData.loginSessionToken,
+        },
+      })
+    }
+  }, [otpRequired, otpData, navigate, rateLimit])
+
   // Check if CAPTCHA should be shown based on failed attempts
   const checkCaptchaRequired = useCallback(() => {
     if (!captchaConfig || !captchaConfig.enabled) {
