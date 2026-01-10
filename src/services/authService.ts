@@ -237,6 +237,18 @@ export interface LoginOTPRequiredResponse {
 }
 
 /**
+ * Email Verification State from backend
+ * Returned in login/OTP responses to indicate feature access restrictions
+ */
+export interface EmailVerificationResponse {
+  isVerified: boolean
+  requiresVerification: boolean
+  verificationSentAt?: string
+  allowedFeatures: string[]
+  blockedFeatures: string[]
+}
+
+/**
  * Login Result Interface
  * Contains user and optional breach warning
  * Used when login completes directly (SSO, One-Tap) without requiring OTP
@@ -244,6 +256,7 @@ export interface LoginOTPRequiredResponse {
 export interface LoginResult {
   user: User
   warning?: PasswordBreachWarning
+  emailVerification?: EmailVerificationResponse
 }
 
 /**
@@ -1178,7 +1191,7 @@ const authService = {
    * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
    * =========================================================================
    */
-  verifyOTP: async (data: VerifyOTPData): Promise<User> => {
+  verifyOTP: async (data: VerifyOTPData): Promise<{ user: User; emailVerification?: EmailVerificationResponse }> => {
     try {
       // SECURITY: For login purpose, loginSessionToken is REQUIRED
       // This proves the password was verified before OTP
@@ -1247,7 +1260,10 @@ const authService = {
         console.warn('[AUTH] CSRF token initialization after OTP failed:', err)
       })
 
-      return user
+      // Extract emailVerification from response (if provided by backend)
+      const emailVerification = response.data.emailVerification as EmailVerificationResponse | undefined
+
+      return { user, emailVerification }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -10,6 +10,18 @@ import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/
 import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning, isOTPRequired, LoginOTPRequiredResponse } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
+/**
+ * Email verification state from backend
+ * Returned in login response, /auth/me, and after email verification
+ */
+export interface EmailVerificationState {
+  isVerified: boolean
+  requiresVerification: boolean
+  verificationSentAt?: string
+  allowedFeatures: string[]
+  blockedFeatures: string[]
+}
+
 interface AuthState {
   // State
   user: User | null
@@ -22,6 +34,9 @@ interface AuthState {
   otpRequired: boolean
   otpData: LoginOTPRequiredResponse | null
 
+  // Email Verification State (for feature-based blocking)
+  emailVerification: EmailVerificationState | null
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>
   logout: () => Promise<void>
@@ -29,6 +44,7 @@ interface AuthState {
   clearError: () => void
   clearPasswordBreachWarning: () => void
   clearOtpData: () => void
+  setEmailVerification: (emailVerification: EmailVerificationState | null) => void
   checkAuth: () => Promise<void>
 }
 
@@ -46,6 +62,9 @@ export const useAuthStore = create<AuthState>()(
       // OTP Login State
       otpRequired: false,
       otpData: null,
+
+      // Email Verification State
+      emailVerification: null,
 
       /**
        * Login Action
@@ -151,6 +170,7 @@ export const useAuthStore = create<AuthState>()(
           error: null,
           otpRequired: false,
           otpData: null,
+          emailVerification: null,
         })
         setSentryUser(null)
         usePermissionsStore.getState().clearPermissions()
@@ -203,6 +223,14 @@ export const useAuthStore = create<AuthState>()(
        */
       clearOtpData: () => {
         set({ otpRequired: false, otpData: null })
+      },
+
+      /**
+       * Set Email Verification State
+       * Call this after login, OTP verification, or email verification
+       */
+      setEmailVerification: (emailVerification: EmailVerificationState | null) => {
+        set({ emailVerification })
       },
 
       /**
@@ -354,6 +382,8 @@ export const selectIsEmailVerified = (state: AuthState) =>
   state.user?.isEmailVerified === true
 export const selectEmailVerifiedAt = (state: AuthState) =>
   state.user?.emailVerifiedAt
+export const selectEmailVerification = (state: AuthState) =>
+  state.emailVerification
 
 /**
  * Password breach selectors

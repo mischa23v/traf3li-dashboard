@@ -27,6 +27,7 @@ import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
 import { getLocalizedFullName } from '@/lib/arabic-names'
+import { useEmailVerification } from '@/hooks/useEmailVerification'
 
 type NavItem = {
   title: string
@@ -65,6 +66,7 @@ export function useSidebarData(): SidebarData {
   const isLoading = useAuthStore((state) => state.isLoading)
   const permissions = usePermissionsStore((state) => state.permissions)
   const isNavGroupVisible = useModuleVisibilityStore((state) => state.isNavGroupVisible)
+  const { isNavGroupBlocked } = useEmailVerification()
 
   // Build full name with locale-aware name detection
   const getFullName = () => {
@@ -115,11 +117,13 @@ export function useSidebarData(): SidebarData {
       .filter((item): item is NavItem => item !== null)
   }
 
-  // Filter navigation groups (based on permissions AND module visibility settings)
+  // Filter navigation groups (based on permissions, module visibility, AND email verification)
   const filterNavGroups = (groups: NavGroup[]): NavGroup[] => {
     return groups
       // First filter by module visibility settings
       .filter((group) => isNavGroupVisible(group.title))
+      // Then filter by email verification (hide blocked groups for unverified users)
+      .filter((group) => !isNavGroupBlocked(group.title))
       // Then filter items by permissions
       .map((group) => ({
         ...group,

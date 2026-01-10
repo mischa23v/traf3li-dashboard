@@ -137,11 +137,16 @@ export const useSendOTP = () => {
  */
 export const useVerifyOTP = () => {
   const setUser = useAuthStore((state) => state.setUser)
+  const setEmailVerification = useAuthStore((state) => state.setEmailVerification)
 
   return useMutation({
     mutationFn: (data: VerifyOTPData) => authService.verifyOTP(data),
-    onSuccess: (user) => {
-      setUser(user)
+    onSuccess: (result) => {
+      setUser(result.user)
+      // Store email verification state if provided by backend
+      if (result.emailVerification) {
+        setEmailVerification(result.emailVerification)
+      }
       toast.success('تم التحقق بنجاح')
     },
     onError: (error: Error) => {
