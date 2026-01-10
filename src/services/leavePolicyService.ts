@@ -496,3 +496,36 @@ export const comparePolicies = async (policyIds: string[]): Promise<{
   const response = await api.post('/hr/leave-policies/compare', { policyIds })
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const leavePolicyService = {
+  // List & Details
+  getLeavePolicies,
+  getLeavePolicy,
+  getLeavePolicyStats,
+  getEmployeesWithoutPolicy,
+  // CRUD
+  createLeavePolicy,
+  updateLeavePolicy,
+  deleteLeavePolicy,
+  duplicateLeavePolicy,
+  // Policy Management
+  setDefaultLeavePolicy,
+  toggleLeavePolicyStatus,
+  comparePolicies,
+  // Assignments
+  getLeavePolicyAssignments,
+  getLeavePolicyAssignment,
+  assignPolicyToEmployee,
+  assignPolicyBulk,
+  cancelPolicyAssignment,
+  updateAssignmentDates,
+  // Employee Policy
+  getEmployeeLeavePolicy,
+  getEmployeePolicyHistory,
+  getEmployeeAllocationSummary,
+  previewPolicyAllocations,
+}
+
+export default leavePolicyService

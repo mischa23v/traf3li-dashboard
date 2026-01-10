@@ -540,3 +540,33 @@ export const exportVehicleLogs = async (filters?: VehicleLogFilters): Promise<Bl
   })
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const vehicleService = {
+  // List & Details
+  getVehicles,
+  getVehicle,
+  getVehicleStats,
+  getFleetSummary,
+  getVehiclesDueForService,
+  getVehicleUtilization,
+  getVehicleExpenses,
+  // CRUD
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+  bulkDeleteVehicles,
+  // Assignment
+  assignVehicle,
+  unassignVehicle,
+  // Vehicle Logs
+  getVehicleLogs,
+  createVehicleLog,
+  updateReimbursementStatus,
+  // Export
+  exportVehicles,
+  exportVehicleLogs,
+}
+
+export default vehicleService

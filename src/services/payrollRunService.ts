@@ -564,3 +564,36 @@ export const exportPayrollRunReport = async (
   })
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const payrollRunService = {
+  // List & Details
+  getPayrollRuns,
+  getPayrollRun,
+  getPayrollRunStats,
+  // CRUD
+  createPayrollRun,
+  updatePayrollRun,
+  deletePayrollRun,
+  // Workflow
+  calculatePayrollRun,
+  validatePayrollRun,
+  approvePayrollRun,
+  cancelPayrollRun,
+  // Payments & WPS
+  processPayments,
+  generateWPSFile,
+  submitWPS,
+  sendPayslipNotifications,
+  // Employee Operations
+  holdEmployee,
+  unholdEmployee,
+  excludeEmployee,
+  includeEmployee,
+  recalculateEmployee,
+  // Export
+  exportPayrollRunReport,
+}
+
+export default payrollRunService

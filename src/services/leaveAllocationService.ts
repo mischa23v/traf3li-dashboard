@@ -604,3 +604,35 @@ export const getAllocationStatistics = async (
   const response = await api.get(`/hr/leave-allocations/statistics?${params.toString()}`)
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const leaveAllocationService = {
+  // List & Details
+  getLeaveAllocations,
+  getLeaveAllocation,
+  getAllocationSummary,
+  getAllocationStatistics,
+  getAllocationHistory,
+  getEmployeeLeaveBalance,
+  getEmployeeAllAllocations,
+  // CRUD
+  createLeaveAllocation,
+  updateLeaveAllocation,
+  deleteLeaveAllocation,
+  // Bulk operations
+  bulkAllocateLeaves,
+  // Carry forward
+  carryForwardLeaves,
+  processCarryForwardForAll,
+  expireCarryForwardedLeaves,
+  getCarryForwardSummary,
+  getExpiringCarryForward,
+  // Balance & Adjustments
+  updateLeaveBalance,
+  encashLeaves,
+  getEmployeesWithLowBalance,
+  adjustAllocation,
+}
+
+export default leaveAllocationService

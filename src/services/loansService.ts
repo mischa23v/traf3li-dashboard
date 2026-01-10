@@ -561,3 +561,42 @@ export const getOverdueInstallments = async (): Promise<Array<{
   const response = await api.get('/hr/employee-loans/overdue-installments')
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const loansService = {
+  // List & Details
+  getLoans,
+  getLoan,
+  getLoanStats,
+  getEmployeeLoans,
+  getPendingApprovals,
+  getOverdueInstallments,
+  // CRUD
+  createLoan,
+  updateLoan,
+  deleteLoan,
+  bulkDeleteLoans,
+  // Eligibility
+  checkLoanEligibility,
+  // Workflow
+  submitLoanApplication,
+  approveLoan,
+  rejectLoan,
+  disburseLoan,
+  // Payments
+  recordLoanPayment,
+  processPayrollDeduction,
+  // Early Settlement
+  calculateEarlySettlement,
+  processEarlySettlement,
+  // Status Updates
+  markLoanDefaulted,
+  restructureLoan,
+  issueClearanceLetter,
+  // Documents & Communication
+  uploadLoanDocument,
+  addCommunication,
+}
+
+export default loansService

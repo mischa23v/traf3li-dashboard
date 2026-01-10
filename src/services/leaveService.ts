@@ -721,3 +721,34 @@ export const getLeaveTypes = async (): Promise<Array<{
   const response = await api.get('/hr/leave-types')
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const leaveService = {
+  // List & Details
+  getLeaveRequests,
+  getLeaveRequest,
+  getLeaveBalance,
+  getLeaveStats,
+  getTeamCalendar,
+  getLeaveTypes,
+  getPendingApprovals,
+  // CRUD
+  createLeaveRequest,
+  updateLeaveRequest,
+  deleteLeaveRequest,
+  // Workflow
+  submitLeaveRequest,
+  approveLeaveRequest,
+  rejectLeaveRequest,
+  cancelLeaveRequest,
+  // Return & Extension
+  confirmReturn,
+  requestExtension,
+  // Conflicts & Documents
+  checkConflicts,
+  uploadLeaveDocument,
+  completeHandover,
+}
+
+export default leaveService

@@ -879,7 +879,7 @@ export const QueryKeys = {
     providers: () => [...QueryKeys.training.all(), 'providers'] as const,
   },
 
-  // ==================== SKILLS ====================
+  // ==================== SKILLS (SFIA Framework) ====================
   skills: {
     all: () => ['skills'] as const,
     lists: () => [...QueryKeys.skills.all(), 'list'] as const,
@@ -887,16 +887,108 @@ export const QueryKeys = {
     details: () => [...QueryKeys.skills.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.skills.details(), id] as const,
     categories: () => [...QueryKeys.skills.all(), 'categories'] as const,
+    stats: () => [...QueryKeys.skills.all(), 'stats'] as const,
+    // SFIA Framework
+    sfiaLevels: () => [...QueryKeys.skills.all(), 'sfia-levels'] as const,
+    byCategory: (category: string) => [...QueryKeys.skills.all(), 'by-category', category] as const,
+    byClassification: (classification: string) => [...QueryKeys.skills.all(), 'by-classification', classification] as const,
+    core: () => [...QueryKeys.skills.all(), 'core'] as const,
+    verifiable: () => [...QueryKeys.skills.all(), 'verifiable'] as const,
+    // Certifications
+    expiringCertifications: (days: number) => [...QueryKeys.skills.all(), 'expiring-certifications', days] as const,
+    cpdNonCompliant: () => [...QueryKeys.skills.all(), 'cpd-non-compliant'] as const,
+    needingReview: () => [...QueryKeys.skills.all(), 'needing-review'] as const,
+    // Related Skills
+    related: (skillId: string) => [...QueryKeys.skills.all(), skillId, 'related'] as const,
+    prerequisites: (skillId: string) => [...QueryKeys.skills.all(), skillId, 'prerequisites'] as const,
+    // Learning Resources
+    learningResources: (skillId: string) => [...QueryKeys.skills.all(), skillId, 'learning-resources'] as const,
   },
 
-  // ==================== SKILL MAP ====================
+  // ==================== SKILL TYPES (Hierarchical) ====================
+  skillTypes: {
+    all: () => ['skill-types'] as const,
+    lists: () => [...QueryKeys.skillTypes.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.skillTypes.lists(), filters] as const,
+    details: () => [...QueryKeys.skillTypes.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.skillTypes.details(), id] as const,
+    tree: () => [...QueryKeys.skillTypes.all(), 'tree'] as const,
+    flat: () => [...QueryKeys.skillTypes.all(), 'flat'] as const,
+    children: (parentId: string) => [...QueryKeys.skillTypes.all(), 'children', parentId] as const,
+    byClassification: (classification: string) => [...QueryKeys.skillTypes.all(), 'by-classification', classification] as const,
+    active: () => [...QueryKeys.skillTypes.all(), 'active'] as const,
+  },
+
+  // ==================== COMPETENCIES ====================
+  competencies: {
+    all: () => ['competencies'] as const,
+    lists: () => [...QueryKeys.competencies.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.competencies.lists(), filters] as const,
+    details: () => [...QueryKeys.competencies.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.competencies.details(), id] as const,
+    stats: () => [...QueryKeys.competencies.all(), 'stats'] as const,
+    // By Type/Cluster
+    byType: (type: string) => [...QueryKeys.competencies.all(), 'by-type', type] as const,
+    byCluster: (cluster: string) => [...QueryKeys.competencies.all(), 'by-cluster', cluster] as const,
+    mandatory: () => [...QueryKeys.competencies.all(), 'mandatory'] as const,
+    core: () => [...QueryKeys.competencies.all(), 'core'] as const,
+    leadership: () => [...QueryKeys.competencies.all(), 'leadership'] as const,
+    framework: () => [...QueryKeys.competencies.all(), 'framework'] as const,
+    // Employee Competencies
+    employee: (employeeId: string) => [...QueryKeys.competencies.all(), 'employee', employeeId] as const,
+    employeeGapAnalysis: (employeeId: string) => [...QueryKeys.competencies.all(), 'employee', employeeId, 'gap-analysis'] as const,
+  },
+
+  // ==================== SKILL ASSESSMENTS (360-Degree) ====================
+  skillAssessments: {
+    all: () => ['skill-assessments'] as const,
+    lists: () => [...QueryKeys.skillAssessments.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.skillAssessments.lists(), filters] as const,
+    details: () => [...QueryKeys.skillAssessments.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.skillAssessments.details(), id] as const,
+    stats: (filters?: Record<string, any>) => [...QueryKeys.skillAssessments.all(), 'stats', filters] as const,
+    // My Assessments
+    myPending: () => [...QueryKeys.skillAssessments.all(), 'my-pending'] as const,
+    // Employee History
+    employeeHistory: (employeeId: string) => [...QueryKeys.skillAssessments.all(), 'employee', employeeId, 'history'] as const,
+    employeeComparison: (employeeId: string) => [...QueryKeys.skillAssessments.all(), 'employee', employeeId, 'comparison'] as const,
+    // Development Plans
+    developmentPlan: (employeeId: string) => [...QueryKeys.skillAssessments.all(), 'employee', employeeId, 'development-plan'] as const,
+    // Calibration
+    calibration: (sessionId: string) => [...QueryKeys.skillAssessments.all(), 'calibration', sessionId] as const,
+    calibrationSessions: (filters?: Record<string, any>) => [...QueryKeys.skillAssessments.all(), 'calibration-sessions', filters] as const,
+  },
+
+  // ==================== SKILL MAP (Employee Skill Profiles) ====================
   skillMap: {
     all: () => ['skill-map'] as const,
+    lists: () => [...QueryKeys.skillMap.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.skillMap.lists(), filters] as const,
     employee: (employeeId: string) => [...QueryKeys.skillMap.all(), 'employee', employeeId] as const,
     department: (departmentId: string) => [...QueryKeys.skillMap.all(), 'department', departmentId] as const,
+    departmentSummary: (departmentId: string) => [...QueryKeys.skillMap.all(), 'department', departmentId, 'summary'] as const,
     skill: (skillId: string) => [...QueryKeys.skillMap.all(), 'skill', skillId] as const,
     gaps: (employeeId: string) => [...QueryKeys.skillMap.all(), 'gaps', employeeId] as const,
-    matrix: () => [...QueryKeys.skillMap.all(), 'matrix'] as const,
+    departmentGaps: (departmentId: string) => [...QueryKeys.skillMap.all(), 'department', departmentId, 'gaps'] as const,
+    matrix: (departmentId?: string) => [...QueryKeys.skillMap.all(), 'matrix', departmentId] as const,
+    distribution: (skillId: string) => [...QueryKeys.skillMap.all(), 'distribution', skillId] as const,
+    // Skill Trends
+    trends: (employeeId: string, skillId: string) => [...QueryKeys.skillMap.all(), 'trends', employeeId, skillId] as const,
+    // Training Recommendations
+    trainingRecommendations: (employeeId: string) => [...QueryKeys.skillMap.all(), 'training-recommendations', employeeId] as const,
+    // Find Employees by Skill
+    employeesWithSkill: (skillId: string, options?: Record<string, any>) =>
+      [...QueryKeys.skillMap.all(), 'employees-with-skill', skillId, options] as const,
+    // Comparison
+    compare: (employeeIds: string[]) => [...QueryKeys.skillMap.all(), 'compare', employeeIds] as const,
+    // Verification
+    pendingVerifications: (departmentId?: string) => [...QueryKeys.skillMap.all(), 'pending-verifications', departmentId] as const,
+    expiringVerifications: (days: number) => [...QueryKeys.skillMap.all(), 'expiring-verifications', days] as const,
+    // Endorsements
+    pendingEndorsements: () => [...QueryKeys.skillMap.all(), 'pending-endorsements'] as const,
+    // CPD
+    cpd: (employeeId: string) => [...QueryKeys.skillMap.all(), 'cpd', employeeId] as const,
+    cpdNonCompliant: (departmentId?: string) => [...QueryKeys.skillMap.all(), 'cpd-non-compliant', departmentId] as const,
   },
 
   // ==================== PERFORMANCE REVIEWS ====================
@@ -1928,6 +2020,391 @@ export const QueryKeys = {
     // By attendance record
     byRecord: (attendanceRecordId: string) =>
       [...QueryKeys.attendanceCorrections.all(), 'record', attendanceRecordId] as const,
+  },
+
+  // ==================== OKRs (Objectives & Key Results) - API Contract Part 6 ====================
+  okrs: {
+    all: () => ['okrs'] as const,
+    lists: () => [...QueryKeys.okrs.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.okrs.lists(), filters] as const,
+    details: () => [...QueryKeys.okrs.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.okrs.details(), id] as const,
+    // By owner
+    employee: (employeeId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'employee', employeeId, filters] as const,
+    department: (departmentId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'department', departmentId, filters] as const,
+    company: (filters?: Record<string, any>) => [...QueryKeys.okrs.all(), 'company', filters] as const,
+    // Statistics
+    stats: (filters?: Record<string, any>) => [...QueryKeys.okrs.all(), 'stats', filters] as const,
+    scoreDistribution: (filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'score-distribution', filters] as const,
+    // Hierarchy & Alignment
+    hierarchy: (okrId: string) => [...QueryKeys.okrs.all(), 'hierarchy', okrId] as const,
+    alignmentTree: (filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'alignment-tree', filters] as const,
+    // Check-ins
+    checkIns: (okrId: string) => [...QueryKeys.okrs.all(), okrId, 'check-ins'] as const,
+    pendingCheckIns: (filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'pending-check-ins', filters] as const,
+    // CFRs (Conversations, Feedback, Recognition)
+    cfrs: (okrId: string) => [...QueryKeys.okrs.all(), okrId, 'cfrs'] as const,
+    employeeCfrs: (employeeId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'cfrs', 'employee', employeeId, filters] as const,
+    publicRecognitions: (filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'cfrs', 'recognitions', 'public', filters] as const,
+    // Templates
+    templates: (filters?: Record<string, any>) => [...QueryKeys.okrs.all(), 'templates', filters] as const,
+    // Employee summary
+    employeeSummary: (employeeId: string) =>
+      [...QueryKeys.okrs.all(), 'employee', employeeId, 'summary'] as const,
+    // Department dashboard
+    departmentDashboard: (departmentId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.okrs.all(), 'department', departmentId, 'dashboard', filters] as const,
+  },
+
+  // ==================== 9-BOX GRID (Talent Assessment) - API Contract Part 6 ====================
+  nineBox: {
+    all: () => ['nine-box'] as const,
+    lists: () => [...QueryKeys.nineBox.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.nineBox.lists(), filters] as const,
+    details: () => [...QueryKeys.nineBox.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.nineBox.details(), id] as const,
+    // Grid view
+    gridView: (filters?: Record<string, any>) => [...QueryKeys.nineBox.all(), 'grid', filters] as const,
+    // By employee
+    employee: (employeeId: string) => [...QueryKeys.nineBox.all(), 'employee', employeeId] as const,
+    employeeHistory: (employeeId: string) =>
+      [...QueryKeys.nineBox.all(), 'employee', employeeId, 'history'] as const,
+    // Statistics
+    stats: (filters?: Record<string, any>) => [...QueryKeys.nineBox.all(), 'stats', filters] as const,
+    // Distribution & Trends
+    distributionTrend: (filters?: Record<string, any>) =>
+      [...QueryKeys.nineBox.all(), 'trends', filters] as const,
+    // Calibration sessions
+    calibrationSessions: (filters?: Record<string, any>) =>
+      [...QueryKeys.nineBox.all(), 'calibration-sessions', filters] as const,
+    calibrationSession: (sessionId: string) =>
+      [...QueryKeys.nineBox.all(), 'calibration-session', sessionId] as const,
+    calibrationComparison: (sessionId: string) =>
+      [...QueryKeys.nineBox.all(), 'calibration-session', sessionId, 'comparison'] as const,
+    // Criteria
+    criteria: () => [...QueryKeys.nineBox.all(), 'criteria'] as const,
+    // Succession candidates
+    successionCandidates: (filters?: Record<string, any>) =>
+      [...QueryKeys.nineBox.all(), 'succession-candidates', filters] as const,
+    // Retention risk
+    retentionRisk: (filters?: Record<string, any>) =>
+      [...QueryKeys.nineBox.all(), 'retention-risk', filters] as const,
+  },
+
+  // ==================== FIXED ASSETS (API Contract Part 10) ====================
+  fixedAssets: {
+    all: () => ['fixed-assets'] as const,
+    lists: () => [...QueryKeys.fixedAssets.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.fixedAssets.lists(), filters] as const,
+    details: () => [...QueryKeys.fixedAssets.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.fixedAssets.details(), id] as const,
+    stats: () => [...QueryKeys.fixedAssets.all(), 'stats'] as const,
+    // Depreciation
+    depreciation: (assetId: string) => [...QueryKeys.fixedAssets.all(), assetId, 'depreciation'] as const,
+    depreciationSchedule: (assetId: string) => [...QueryKeys.fixedAssets.all(), assetId, 'depreciation-schedule'] as const,
+    depreciationReport: (filters?: Record<string, any>) => [...QueryKeys.fixedAssets.all(), 'depreciation-report', filters] as const,
+    // Maintenance
+    maintenance: (assetId: string) => [...QueryKeys.fixedAssets.all(), assetId, 'maintenance'] as const,
+    upcomingMaintenance: () => [...QueryKeys.fixedAssets.all(), 'upcoming-maintenance'] as const,
+    overdueMaintenance: () => [...QueryKeys.fixedAssets.all(), 'overdue-maintenance'] as const,
+    // Disposal
+    disposals: (filters?: Record<string, any>) => [...QueryKeys.fixedAssets.all(), 'disposals', filters] as const,
+    // Categories
+    categories: () => [...QueryKeys.fixedAssets.all(), 'categories'] as const,
+    // Locations
+    locations: () => [...QueryKeys.fixedAssets.all(), 'locations'] as const,
+    byLocation: (locationId: string) => [...QueryKeys.fixedAssets.all(), 'by-location', locationId] as const,
+    // Valuation
+    valuationReport: (asOfDate?: string) => [...QueryKeys.fixedAssets.all(), 'valuation-report', asOfDate] as const,
+  },
+
+  // ==================== FLEET MANAGEMENT (API Contract Part 10) ====================
+  fleet: {
+    all: () => ['fleet'] as const,
+    // Vehicles
+    vehicles: {
+      all: () => [...QueryKeys.fleet.all(), 'vehicles'] as const,
+      lists: () => [...QueryKeys.fleet.vehicles.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.vehicles.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.vehicles.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.vehicles.details(), id] as const,
+      stats: () => [...QueryKeys.fleet.vehicles.all(), 'stats'] as const,
+      available: () => [...QueryKeys.fleet.vehicles.all(), 'available'] as const,
+      dueForService: () => [...QueryKeys.fleet.vehicles.all(), 'due-for-service'] as const,
+      documents: (vehicleId: string) => [...QueryKeys.fleet.vehicles.all(), vehicleId, 'documents'] as const,
+      expiringDocuments: (days?: number) => [...QueryKeys.fleet.vehicles.all(), 'expiring-documents', days] as const,
+    },
+    // Drivers
+    drivers: {
+      all: () => [...QueryKeys.fleet.all(), 'drivers'] as const,
+      lists: () => [...QueryKeys.fleet.drivers.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.drivers.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.drivers.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.drivers.details(), id] as const,
+      available: () => [...QueryKeys.fleet.drivers.all(), 'available'] as const,
+      score: (driverId: string) => [...QueryKeys.fleet.drivers.all(), driverId, 'score'] as const,
+      expiringLicenses: (days?: number) => [...QueryKeys.fleet.drivers.all(), 'expiring-licenses', days] as const,
+    },
+    // Trips
+    trips: {
+      all: () => [...QueryKeys.fleet.all(), 'trips'] as const,
+      lists: () => [...QueryKeys.fleet.trips.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.trips.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.trips.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.trips.details(), id] as const,
+      active: () => [...QueryKeys.fleet.trips.all(), 'active'] as const,
+      byVehicle: (vehicleId: string, filters?: Record<string, any>) =>
+        [...QueryKeys.fleet.trips.all(), 'vehicle', vehicleId, filters] as const,
+      byDriver: (driverId: string, filters?: Record<string, any>) =>
+        [...QueryKeys.fleet.trips.all(), 'driver', driverId, filters] as const,
+    },
+    // Fuel Logs
+    fuelLogs: {
+      all: () => [...QueryKeys.fleet.all(), 'fuel-logs'] as const,
+      lists: () => [...QueryKeys.fleet.fuelLogs.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.fuelLogs.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.fuelLogs.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.fuelLogs.details(), id] as const,
+      byVehicle: (vehicleId: string) => [...QueryKeys.fleet.fuelLogs.all(), 'vehicle', vehicleId] as const,
+      stats: (filters?: Record<string, any>) => [...QueryKeys.fleet.fuelLogs.all(), 'stats', filters] as const,
+    },
+    // Maintenance
+    maintenance: {
+      all: () => [...QueryKeys.fleet.all(), 'maintenance'] as const,
+      lists: () => [...QueryKeys.fleet.maintenance.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.maintenance.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.maintenance.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.maintenance.details(), id] as const,
+      byVehicle: (vehicleId: string) => [...QueryKeys.fleet.maintenance.all(), 'vehicle', vehicleId] as const,
+      upcoming: () => [...QueryKeys.fleet.maintenance.all(), 'upcoming'] as const,
+      overdue: () => [...QueryKeys.fleet.maintenance.all(), 'overdue'] as const,
+    },
+    // Incidents
+    incidents: {
+      all: () => [...QueryKeys.fleet.all(), 'incidents'] as const,
+      lists: () => [...QueryKeys.fleet.incidents.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.fleet.incidents.lists(), filters] as const,
+      details: () => [...QueryKeys.fleet.incidents.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.fleet.incidents.details(), id] as const,
+      byVehicle: (vehicleId: string) => [...QueryKeys.fleet.incidents.all(), 'vehicle', vehicleId] as const,
+      byDriver: (driverId: string) => [...QueryKeys.fleet.incidents.all(), 'driver', driverId] as const,
+      stats: (filters?: Record<string, any>) => [...QueryKeys.fleet.incidents.all(), 'stats', filters] as const,
+    },
+    // Analytics
+    analytics: (filters?: Record<string, any>) => [...QueryKeys.fleet.all(), 'analytics', filters] as const,
+    costAnalysis: (filters?: Record<string, any>) => [...QueryKeys.fleet.all(), 'cost-analysis', filters] as const,
+    utilizationReport: (filters?: Record<string, any>) => [...QueryKeys.fleet.all(), 'utilization', filters] as const,
+  },
+
+  // ==================== SURVEYS (API Contract Part 11) ====================
+  surveys: {
+    all: () => ['surveys'] as const,
+    // Templates
+    templates: {
+      all: () => [...QueryKeys.surveys.all(), 'templates'] as const,
+      lists: () => [...QueryKeys.surveys.templates.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.surveys.templates.lists(), filters] as const,
+      details: () => [...QueryKeys.surveys.templates.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.surveys.templates.details(), id] as const,
+      stats: () => [...QueryKeys.surveys.templates.all(), 'stats'] as const,
+    },
+    // Instances (Active Surveys)
+    instances: {
+      all: () => [...QueryKeys.surveys.all(), 'instances'] as const,
+      lists: () => [...QueryKeys.surveys.instances.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.surveys.instances.lists(), filters] as const,
+      details: () => [...QueryKeys.surveys.instances.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.surveys.instances.details(), id] as const,
+      active: () => [...QueryKeys.surveys.instances.all(), 'active'] as const,
+      participationStats: (surveyId: string) => [...QueryKeys.surveys.instances.all(), surveyId, 'participation'] as const,
+      results: (surveyId: string) => [...QueryKeys.surveys.instances.all(), surveyId, 'results'] as const,
+    },
+    // My Surveys (Employee View)
+    mySurveys: {
+      all: () => [...QueryKeys.surveys.all(), 'my-surveys'] as const,
+      pending: () => [...QueryKeys.surveys.mySurveys.all(), 'pending'] as const,
+      completed: () => [...QueryKeys.surveys.mySurveys.all(), 'completed'] as const,
+    },
+    // Responses
+    responses: {
+      all: () => [...QueryKeys.surveys.all(), 'responses'] as const,
+      bySurvey: (surveyId: string, filters?: Record<string, any>) =>
+        [...QueryKeys.surveys.responses.all(), 'survey', surveyId, filters] as const,
+      byEmployee: (employeeId: string) => [...QueryKeys.surveys.responses.all(), 'employee', employeeId] as const,
+    },
+    // Analytics
+    analytics: {
+      all: () => [...QueryKeys.surveys.all(), 'analytics'] as const,
+      nps: (surveyId?: string, filters?: Record<string, any>) =>
+        [...QueryKeys.surveys.analytics.all(), 'nps', surveyId, filters] as const,
+      enps: (filters?: Record<string, any>) => [...QueryKeys.surveys.analytics.all(), 'enps', filters] as const,
+      trends: (filters?: Record<string, any>) => [...QueryKeys.surveys.analytics.all(), 'trends', filters] as const,
+      benchmarks: () => [...QueryKeys.surveys.analytics.all(), 'benchmarks'] as const,
+    },
+  },
+
+  // ==================== COMPLIANCE (API Contract Part 11) ====================
+  compliance: {
+    all: () => ['compliance'] as const,
+    // Dashboard
+    dashboard: () => [...QueryKeys.compliance.all(), 'dashboard'] as const,
+    // GOSI
+    gosi: {
+      all: () => [...QueryKeys.compliance.all(), 'gosi'] as const,
+      status: () => [...QueryKeys.compliance.gosi.all(), 'status'] as const,
+      contributions: (month: number, year: number) =>
+        [...QueryKeys.compliance.gosi.all(), 'contributions', month, year] as const,
+      submissions: (filters?: Record<string, any>) =>
+        [...QueryKeys.compliance.gosi.all(), 'submissions', filters] as const,
+      submission: (submissionId: string) => [...QueryKeys.compliance.gosi.all(), 'submission', submissionId] as const,
+    },
+    // Nitaqat (Saudization)
+    nitaqat: {
+      all: () => [...QueryKeys.compliance.all(), 'nitaqat'] as const,
+      status: () => [...QueryKeys.compliance.nitaqat.all(), 'status'] as const,
+      projection: (months?: number) => [...QueryKeys.compliance.nitaqat.all(), 'projection', months] as const,
+      history: (filters?: Record<string, any>) => [...QueryKeys.compliance.nitaqat.all(), 'history', filters] as const,
+    },
+    // WPS (Wage Protection System)
+    wps: {
+      all: () => [...QueryKeys.compliance.all(), 'wps'] as const,
+      status: () => [...QueryKeys.compliance.wps.all(), 'status'] as const,
+      submissions: (filters?: Record<string, any>) =>
+        [...QueryKeys.compliance.wps.all(), 'submissions', filters] as const,
+      submission: (submissionId: string) => [...QueryKeys.compliance.wps.all(), 'submission', submissionId] as const,
+    },
+    // Labor Law
+    laborLaw: {
+      all: () => [...QueryKeys.compliance.all(), 'labor-law'] as const,
+      violations: (filters?: Record<string, any>) =>
+        [...QueryKeys.compliance.laborLaw.all(), 'violations', filters] as const,
+      expiringContracts: (days?: number) => [...QueryKeys.compliance.laborLaw.all(), 'expiring-contracts', days] as const,
+      probationEnding: (days?: number) => [...QueryKeys.compliance.laborLaw.all(), 'probation-ending', days] as const,
+    },
+    // Violations & Alerts
+    violations: (filters?: Record<string, any>) => [...QueryKeys.compliance.all(), 'violations', filters] as const,
+    alerts: (filters?: Record<string, any>) => [...QueryKeys.compliance.all(), 'alerts', filters] as const,
+    // Reports
+    reports: (filters?: Record<string, any>) => [...QueryKeys.compliance.all(), 'reports', filters] as const,
+  },
+
+  // ==================== SELF-SERVICE (API Contract Part 11) ====================
+  selfService: {
+    all: () => ['self-service'] as const,
+    // Dashboard
+    dashboard: () => [...QueryKeys.selfService.all(), 'dashboard'] as const,
+    // Requests
+    requests: {
+      all: () => [...QueryKeys.selfService.all(), 'requests'] as const,
+      lists: () => [...QueryKeys.selfService.requests.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.selfService.requests.lists(), filters] as const,
+      details: () => [...QueryKeys.selfService.requests.all(), 'detail'] as const,
+      detail: (id: string) => [...QueryKeys.selfService.requests.details(), id] as const,
+      pending: () => [...QueryKeys.selfService.requests.all(), 'pending'] as const,
+    },
+    // Payslips
+    payslips: {
+      all: () => [...QueryKeys.selfService.all(), 'payslips'] as const,
+      lists: () => [...QueryKeys.selfService.payslips.all(), 'list'] as const,
+      list: (year?: number) => [...QueryKeys.selfService.payslips.lists(), year] as const,
+      detail: (payslipId: string) => [...QueryKeys.selfService.payslips.all(), payslipId] as const,
+    },
+    // Documents
+    documents: {
+      all: () => [...QueryKeys.selfService.all(), 'documents'] as const,
+      lists: () => [...QueryKeys.selfService.documents.all(), 'list'] as const,
+      list: (documentType?: string) => [...QueryKeys.selfService.documents.lists(), documentType] as const,
+    },
+    // Benefits
+    benefits: () => [...QueryKeys.selfService.all(), 'benefits'] as const,
+    benefitDetail: (benefitId: string) => [...QueryKeys.selfService.all(), 'benefit', benefitId] as const,
+    // Leave Balance
+    leaveBalance: () => [...QueryKeys.selfService.all(), 'leave-balance'] as const,
+    // Policies
+    policies: {
+      all: () => [...QueryKeys.selfService.all(), 'policies'] as const,
+      lists: () => [...QueryKeys.selfService.policies.all(), 'list'] as const,
+      list: (category?: string) => [...QueryKeys.selfService.policies.lists(), category] as const,
+      detail: (policyId: string) => [...QueryKeys.selfService.policies.all(), policyId] as const,
+      pendingAcknowledgments: () => [...QueryKeys.selfService.policies.all(), 'pending-acknowledgments'] as const,
+    },
+    // Profile
+    profile: () => [...QueryKeys.selfService.all(), 'profile'] as const,
+    // Attendance
+    attendance: (month?: string) => [...QueryKeys.selfService.all(), 'attendance', month] as const,
+    // Team (For Managers)
+    myTeam: () => [...QueryKeys.selfService.all(), 'my-team'] as const,
+    pendingApprovals: () => [...QueryKeys.selfService.all(), 'pending-approvals'] as const,
+  },
+
+  // ==================== ANALYTICS (API Contract Part 12) ====================
+  analytics: {
+    all: () => ['analytics'] as const,
+    // Dashboard
+    dashboard: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'dashboard', filters] as const,
+    // Time Series
+    timeSeries: (metric: string, filters?: Record<string, any>) =>
+      [...QueryKeys.analytics.all(), 'timeseries', metric, filters] as const,
+    // Funnel Analysis
+    funnel: (funnelId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.analytics.all(), 'funnel', funnelId, filters] as const,
+    // Cohort Analysis
+    cohorts: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'cohorts', filters] as const,
+    // Event Analytics
+    events: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'events', filters] as const,
+    // User Analytics
+    users: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'users', filters] as const,
+    // Domain-Specific Analytics
+    crm: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'crm', filters] as const,
+    hr: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'hr', filters] as const,
+    financial: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'financial', filters] as const,
+    // Metrics
+    availableMetrics: () => [...QueryKeys.analytics.all(), 'metrics'] as const,
+    customMetrics: () => [...QueryKeys.analytics.all(), 'custom-metrics'] as const,
+    customMetric: (metricId: string) => [...QueryKeys.analytics.all(), 'custom-metric', metricId] as const,
+    // Alerts
+    alerts: () => [...QueryKeys.analytics.all(), 'alerts'] as const,
+    alert: (alertId: string) => [...QueryKeys.analytics.all(), 'alert', alertId] as const,
+    alertHistory: (alertId: string) => [...QueryKeys.analytics.all(), 'alert', alertId, 'history'] as const,
+    // Real-time
+    realtime: () => [...QueryKeys.analytics.all(), 'realtime'] as const,
+    // Comparison
+    compare: (filters?: Record<string, any>) => [...QueryKeys.analytics.all(), 'compare', filters] as const,
+  },
+
+  // ==================== ANALYTICS REPORTS (API Contract Part 12) ====================
+  analyticsReports: {
+    all: () => ['analytics-reports'] as const,
+    // Reports
+    lists: () => [...QueryKeys.analyticsReports.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.analyticsReports.lists(), filters] as const,
+    details: () => [...QueryKeys.analyticsReports.all(), 'detail'] as const,
+    detail: (reportId: string) => [...QueryKeys.analyticsReports.details(), reportId] as const,
+    // Generations
+    generations: (reportId: string) => [...QueryKeys.analyticsReports.all(), reportId, 'generations'] as const,
+    generation: (generationId: string) => [...QueryKeys.analyticsReports.all(), 'generation', generationId] as const,
+    // Schedules
+    schedules: (reportId?: string) => [...QueryKeys.analyticsReports.all(), 'schedules', reportId] as const,
+    schedule: (scheduleId: string) => [...QueryKeys.analyticsReports.all(), 'schedule', scheduleId] as const,
+    // Dashboards
+    dashboards: () => [...QueryKeys.analyticsReports.all(), 'dashboards'] as const,
+    dashboard: (dashboardId: string) => [...QueryKeys.analyticsReports.all(), 'dashboard', dashboardId] as const,
+    widgetData: (dashboardId: string, widgetId: string) =>
+      [...QueryKeys.analyticsReports.all(), 'dashboard', dashboardId, 'widget', widgetId] as const,
+    // Templates
+    templates: (category?: string) => [...QueryKeys.analyticsReports.all(), 'templates', category] as const,
+    template: (templateId: string) => [...QueryKeys.analyticsReports.all(), 'template', templateId] as const,
+    // User Reports
+    recentReports: () => [...QueryKeys.analyticsReports.all(), 'recent'] as const,
+    sharedReports: () => [...QueryKeys.analyticsReports.all(), 'shared'] as const,
+    reportUsage: (reportId: string) => [...QueryKeys.analyticsReports.all(), reportId, 'usage'] as const,
   },
 } as const
 

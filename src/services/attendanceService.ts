@@ -954,3 +954,42 @@ export const getComplianceReport = async (startDate: string, endDate: string, de
   const response = await api.get(`/attendance/compliance-report?${params.toString()}`)
   return response.data
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const attendanceService = {
+  // List & Details
+  getAttendanceRecords,
+  getAttendanceRecord,
+  getAttendanceStats,
+  getDailySummary,
+  getEmployeeSummary,
+  getMonthlyReport,
+  getDepartmentStats,
+  // CRUD
+  createAttendanceRecord,
+  updateAttendanceRecord,
+  deleteAttendanceRecord,
+  // Check-in/out
+  checkIn,
+  checkOut,
+  // Breaks
+  startBreak,
+  endBreak,
+  // Corrections
+  requestCorrection,
+  getCorrectionRequests,
+  approveCorrection,
+  rejectCorrection,
+  // Bulk operations
+  bulkCheckIn,
+  lockForPayroll,
+  // Violations
+  getViolations,
+  confirmViolation,
+  dismissViolation,
+  // Reports
+  getComplianceReport,
+}
+
+export default attendanceService

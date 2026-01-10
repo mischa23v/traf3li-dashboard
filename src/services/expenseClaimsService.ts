@@ -1104,3 +1104,52 @@ export const exportExpenseClaims = async (filters?: ExpenseClaimFilters): Promis
     handleExpenseClaimError(error, 'FETCH_FAILED')
   }
 }
+
+// ==================== DEFAULT EXPORT ====================
+
+const expenseClaimsService = {
+  // List & Details
+  getExpenseClaims,
+  getExpenseClaim,
+  getExpenseClaimStats,
+  getEmployeeExpenseClaims,
+  getPendingClaimApprovals,
+  getPendingPayments,
+  // CRUD
+  createExpenseClaim,
+  updateExpenseClaim,
+  deleteExpenseClaim,
+  bulkDeleteExpenseClaims,
+  duplicateExpenseClaim,
+  // Workflow
+  submitExpenseClaim,
+  approveExpenseClaim,
+  rejectExpenseClaim,
+  requestClaimChanges,
+  // Payment
+  processClaimPayment,
+  confirmClaimPayment,
+  // Line Items
+  addLineItem,
+  updateLineItem,
+  deleteLineItem,
+  // Receipts
+  uploadReceipt,
+  deleteReceipt,
+  verifyReceipt,
+  // Corporate Card
+  reconcileCardTransaction,
+  getCorporateCardTransactions,
+  // Policy & Compliance
+  checkPolicyCompliance,
+  approveException,
+  getExpensePolicies,
+  getMileageRates,
+  // Billing
+  markAsBillable,
+  createBillableInvoice,
+  // Export
+  exportExpenseClaims,
+}
+
+export default expenseClaimsService
