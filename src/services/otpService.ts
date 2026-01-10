@@ -25,10 +25,14 @@ export interface SendOtpResponse {
 }
 
 // Verify OTP request/response
+// GOLD STANDARD API: For 'login' purpose, email is optional - backend extracts from loginSessionToken
 export interface VerifyOtpRequest {
-  email: string
+  /** Email - REQUIRED for non-login purposes, OPTIONAL for login (backend extracts from token) */
+  email?: string
   otp: string
   purpose: OtpPurpose
+  /** Login session token - REQUIRED for 'login' purpose, proves password was verified */
+  loginSessionToken?: string
 }
 
 export interface VerifyOtpResponse {

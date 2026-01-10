@@ -654,13 +654,53 @@ const authService = {
 
         // Return OTP required response - caller must redirect to OTP page
         // Backend sends messageAr for Arabic, message for English
+        //
+        // GOLD STANDARD UPDATE: Backend now extracts email from loginSessionToken
+        // Frontend no longer needs to send email in verify-otp request for 'login' purpose.
+        // However, we still extract fullEmail for DISPLAY PURPOSES ONLY on the OTP page.
+        //
+        // fullEmail extraction priority:
+        // 1. If user logged in with email format (contains @), use that
+        // 2. Otherwise, try backend's fullEmail field (if provided)
+        // 3. Extract from loginSessionToken (base64 encoded JSON with signature)
+        // 4. Fallback to masked email (for display only)
+        const isEmailFormat = credentials.username.includes('@')
+        let fullEmail = ''
+
+        if (isEmailFormat) {
+          fullEmail = credentials.username
+        } else if (response.data.fullEmail) {
+          fullEmail = response.data.fullEmail
+        } else if (response.data.loginSessionToken) {
+          // Extract email from token payload (format: base64payload.signature)
+          try {
+            const tokenParts = response.data.loginSessionToken.split('.')
+            if (tokenParts.length >= 1) {
+              const payload = JSON.parse(atob(tokenParts[0]))
+              if (payload.email) {
+                fullEmail = payload.email
+                authLog('Extracted email from loginSessionToken', { email: payload.email })
+              }
+            }
+          } catch (e) {
+            authWarn('Failed to extract email from loginSessionToken', e)
+          }
+        }
+
+        // Final fallback to masked email for display purposes
+        // Note: With Gold Standard API, backend extracts email from token, so this is display-only
+        if (!fullEmail) {
+          fullEmail = response.data.email || ''
+          authWarn('Using masked email as fallback for display', { email: fullEmail })
+        }
+
         const otpResponse: LoginOTPRequiredResponse = {
           requiresOtp: true,
           code: 'OTP_REQUIRED',
           message: response.data.messageAr || response.data.message || 'يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني',
           messageEn: response.data.message || response.data.messageEn || 'Please enter the verification code sent to your email',
           email: response.data.email || '', // Masked email for display
-          fullEmail: credentials.username, // Use the email they logged in with
+          fullEmail, // Full email for OTP verification
           expiresIn: response.data.expiresIn || 300, // Default 5 min
           loginSessionToken: response.data.loginSessionToken || '',
           loginSessionExpiresIn: response.data.loginSessionExpiresIn || 600, // Default 10 min

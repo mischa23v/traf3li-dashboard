@@ -129,15 +129,26 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
 
     try {
       // In production, this would call the actual API
-      if (email) {
-        // Include purpose and loginSessionToken in the verification request
-        // loginSessionToken is REQUIRED for purpose='login' to prove password was verified
-        await authApi.post('/auth/verify-otp', {
-          email,
-          otp: data.otp,
-          purpose,
-          ...(loginSessionToken && { loginSessionToken }),
-        })
+      if (email || (purpose === 'login' && loginSessionToken)) {
+        // GOLD STANDARD API (Enterprise Pattern):
+        // - For 'login' purpose: Backend extracts email from loginSessionToken (HMAC-signed by backend)
+        // - For other purposes: Email is required in request body
+        // This follows AWS Cognito, Auth0, Google patterns where signed tokens are source of truth
+        const requestBody = purpose === 'login' && loginSessionToken
+          ? {
+              otp: data.otp,
+              purpose,
+              loginSessionToken,
+              // Note: Email is optional for login - backend extracts from signed token
+            }
+          : {
+              email,
+              otp: data.otp,
+              purpose,
+              ...(loginSessionToken && { loginSessionToken }),
+            }
+
+        await authApi.post('/auth/verify-otp', requestBody)
         toast.success(isRTL ? 'تم التحقق بنجاح' : 'Verification successful')
         if (onSuccess) {
           onSuccess()
