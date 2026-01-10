@@ -227,41 +227,97 @@ export function SignIn() {
         }
       }
 
-      // Call backend auth service
-      await login({
+      // Call backend auth service - returns discriminated union LoginResult
+      const result = await login({
         username: formData.usernameOrEmail,
         password: formData.password,
         captchaToken: token || undefined,
         rememberMe: keepSignedIn,
       });
 
-      // Record successful login - clears throttle data
-      recordSuccessfulLogin(identifier);
-
-      // Get the updated user from store to check MFA status
-      const currentUser = useAuthStore.getState().user;
-
-      // Navigate to redirect URL or dashboard
       // SECURITY: Validate redirect URL to prevent open redirect attacks
       const rawRedirect = (search as { redirect?: string }).redirect;
       const redirectTo = validateRedirectUrl(rawRedirect, { defaultUrl: '/' });
 
-      // Check if MFA verification is required
-      if (currentUser?.mfaEnabled || currentUser?.mfaPending) {
-        // Set mfaPending flag if not already set
-        if (!currentUser.mfaPending) {
-          useAuthStore.getState().setUser({
-            ...currentUser,
-            mfaPending: true,
-          });
+      // Handle each result type explicitly (Enterprise Pattern: Command-Query Separation)
+      if (!result) {
+        // Should never happen with proper implementation
+        console.error('[SignIn] login() returned undefined');
+        throw new Error(isRTL ? 'فشل تسجيل الدخول' : 'Login failed');
+      }
+
+      // Handle OTP required - password verified, now need email OTP
+      if (result.type === 'otp_required') {
+        const { otpData } = result;
+
+        // Validate that we have the required loginSessionToken
+        if (!otpData.loginSessionToken) {
+          console.error('[SignIn] OTP required but loginSessionToken is missing!');
+          throw new Error(isRTL ? 'خطأ في نظام التحقق' : 'Verification system error');
         }
+
+        console.log('[SignIn] OTP required, navigating to OTP page');
+
+        // Record successful password verification (not full login, but correct credentials)
+        recordSuccessfulLogin(identifier);
+
+        // Navigate to OTP page with necessary data
+        navigate({
+          to: ROUTES.auth.otp,
+          search: {
+            email: otpData.fullEmail,
+            purpose: 'login' as const,
+            token: otpData.loginSessionToken,
+          },
+        });
+        return;
+      }
+
+      // Handle MFA required - user authenticated but MFA verification pending
+      if (result.type === 'mfa_required') {
+        console.log('[SignIn] MFA required, navigating to MFA verification');
+
+        recordSuccessfulLogin(identifier);
+
         // Redirect to MFA challenge page with original redirect preserved
         navigate({ to: ROUTES.auth.mfaChallenge, search: { redirect: redirectTo } });
-      } else {
-        navigate({ to: redirectTo });
+        return;
       }
+
+      // Handle successful login - user is fully authenticated
+      if (result.type === 'success') {
+        console.log('[SignIn] Login successful, redirecting user');
+
+        // Record successful login - clears throttle data
+        recordSuccessfulLogin(identifier);
+
+        navigate({ to: redirectTo });
+        return;
+      }
+
+      // Exhaustive check - TypeScript will error if we miss a case
+      const _exhaustiveCheck: never = result;
+      console.error('[SignIn] Unhandled result type:', _exhaustiveCheck)
     } catch (err: any) {
       const status = err?.status || err?.response?.status;
+
+      // CRITICAL: Before handling any error, check if OTP was already required from a previous successful request
+      // This handles the race condition where a second request (e.g., double-click) gets 429
+      // but the first request already set otpRequired=true
+      const postErrorState = useAuthStore.getState();
+      if (postErrorState.otpRequired && postErrorState.otpData?.loginSessionToken) {
+        console.log('[SignIn] OTP already required from previous request, navigating despite error');
+        recordSuccessfulLogin(identifier);
+        navigate({
+          to: ROUTES.auth.otp,
+          search: {
+            email: postErrorState.otpData.fullEmail,
+            purpose: 'login' as const,
+            token: postErrorState.otpData.loginSessionToken,
+          },
+        });
+        return;
+      }
 
       // Handle server-side 429 rate limit - DON'T count as failed attempt
       if (status === 429) {
