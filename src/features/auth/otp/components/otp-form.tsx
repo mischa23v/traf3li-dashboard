@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,7 +20,7 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
-import { Loader2, RefreshCw } from 'lucide-react'
+import { Loader2, RefreshCw, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClientNoVersion } from '@/lib/api'
 import { storeTokens } from '@/lib/api'
@@ -30,6 +29,9 @@ import type { OtpPurpose, VerifyOtpResponse } from '@/services/otpService'
 
 // Auth routes are NOT versioned - /api/auth/*, not /api/v1/auth/*
 const authApi = apiClientNoVersion
+
+// Session expiry warning threshold (show warning when 2 minutes remain)
+const SESSION_WARNING_THRESHOLD = 120 // seconds
 
 const formSchema = z.object({
   otp: z
@@ -44,6 +46,8 @@ interface OtpFormProps extends React.HTMLAttributes<HTMLFormElement> {
   purpose?: OtpPurpose
   /** Login session token - REQUIRED for purpose='login' to prove password was verified */
   loginSessionToken?: string
+  /** Session expiry time in seconds (default: 600 = 10 minutes) */
+  sessionExpiresIn?: number
   onResendOtp?: () => Promise<void>
   /** Callback when OTP is verified successfully */
   onSuccess?: () => void
@@ -52,7 +56,7 @@ interface OtpFormProps extends React.HTMLAttributes<HTMLFormElement> {
 // Cooldown duration in seconds (OTP endpoints are rate-limited to 3/hour)
 const RESEND_COOLDOWN = 60
 
-export function OtpForm({ className, email, purpose = 'login', loginSessionToken, onResendOtp, onSuccess, ...props }: OtpFormProps) {
+export function OtpForm({ className, email, purpose = 'login', loginSessionToken, sessionExpiresIn = 600, onResendOtp, onSuccess, ...props }: OtpFormProps) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
@@ -63,6 +67,14 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null)
   const [requestId, setRequestId] = useState<string | null>(null)
 
+  // Session expiry tracking
+  const [sessionTimeLeft, setSessionTimeLeft] = useState(sessionExpiresIn)
+  const sessionExpired = sessionTimeLeft <= 0
+  const sessionWarning = sessionTimeLeft > 0 && sessionTimeLeft <= SESSION_WARNING_THRESHOLD
+
+  // Double-submit prevention
+  const isSubmittingRef = useRef(false)
+
   const defaultValues = useMemo(() => ({ otp: '' }), [])
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,6 +84,23 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const otp = form.watch('otp')
+
+  // Session expiry timer effect (for login purpose)
+  useEffect(() => {
+    if (purpose !== 'login' || !loginSessionToken) return
+
+    const timer = setInterval(() => {
+      setSessionTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [purpose, loginSessionToken])
 
   // Cooldown timer effect
   useEffect(() => {
@@ -125,79 +154,101 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
   }, [cooldown, isResending, email, purpose, onResendOtp, isRTL])
 
   async function onSubmit(formData: z.infer<typeof formSchema>) {
+    // SECURITY: Double-submit prevention
+    if (isSubmittingRef.current) {
+      console.warn('[OTP] Blocked duplicate submission')
+      return
+    }
+
+    // SECURITY: Block submission if session expired
+    if (sessionExpired && purpose === 'login') {
+      setErrorMessage(
+        isRTL
+          ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.'
+          : 'Session expired. Please sign in again.'
+      )
+      return
+    }
+
+    isSubmittingRef.current = true
     setIsLoading(true)
     setErrorMessage(null)
     setAttemptsLeft(null)
 
     try {
-      // In production, this would call the actual API
-      if (email || (purpose === 'login' && loginSessionToken)) {
-        // GOLD STANDARD API (Enterprise Pattern):
-        // - For 'login' purpose: Backend extracts email from loginSessionToken (HMAC-signed by backend)
-        // - For other purposes: Email is required in request body
-        // This follows AWS Cognito, Auth0, Google patterns where signed tokens are source of truth
-        const requestBody = purpose === 'login' && loginSessionToken
-          ? {
-              otp: formData.otp,
-              purpose,
-              loginSessionToken,
-              // Note: Email is optional for login - backend extracts from signed token
-            }
-          : {
-              email,
-              otp: formData.otp,
-              purpose,
-              ...(loginSessionToken && { loginSessionToken }),
-            }
+      // SECURITY: For login purpose, loginSessionToken is REQUIRED
+      if (purpose === 'login' && !loginSessionToken) {
+        throw new Error(
+          isRTL
+            ? 'جلسة تسجيل الدخول غير صالحة. يرجى تسجيل الدخول مرة أخرى.'
+            : 'Invalid login session. Please sign in again.'
+        )
+      }
 
-        const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', requestBody)
-        const responseData = response.data
+      // SECURITY: For non-login purposes, email is REQUIRED
+      if (purpose !== 'login' && !email) {
+        throw new Error(
+          isRTL
+            ? 'البريد الإلكتروني مطلوب للتحقق.'
+            : 'Email is required for verification.'
+        )
+      }
 
-        // For login purpose: Store tokens and set user in auth store
-        // Backend returns both snake_case (OAuth 2.0) and camelCase (backwards compat)
-        const accessToken = responseData.accessToken || (responseData as any).access_token
-        const refreshToken = responseData.refreshToken || (responseData as any).refresh_token
-
-        if (purpose === 'login') {
-          // SECURITY: For login OTP, tokens and user MUST be present
-          if (!accessToken || !responseData.user) {
-            console.error('[OTP] Login OTP verified but missing tokens/user:', {
-              hasAccessToken: !!accessToken,
-              hasUser: !!responseData.user,
-            })
-            throw new Error(isRTL
-              ? 'خطأ في نظام التحقق. يرجى المحاولة مرة أخرى.'
-              : 'Authentication system error. Please try again.')
+      // GOLD STANDARD API (Enterprise Pattern):
+      // - For 'login' purpose: Backend extracts email from loginSessionToken (HMAC-signed by backend)
+      // - For other purposes: Email is required in request body
+      // This follows AWS Cognito, Auth0, Google patterns where signed tokens are source of truth
+      const requestBody = purpose === 'login' && loginSessionToken
+        ? {
+            otp: formData.otp,
+            purpose,
+            loginSessionToken,
+            // Note: Email is optional for login - backend extracts from signed token
+          }
+        : {
+            email,
+            otp: formData.otp,
+            purpose,
+            ...(loginSessionToken && { loginSessionToken }),
           }
 
-          // Store tokens for API authentication
-          storeTokens(accessToken, refreshToken)
+      const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', requestBody)
+      const responseData = response.data
 
-          // Set user in auth store - this makes the user authenticated
-          useAuthStore.getState().setUser(responseData.user as any)
+      // For login purpose: Store tokens and set user in auth store
+      // Backend returns both snake_case (OAuth 2.0) and camelCase (backwards compat)
+      const accessToken = responseData.accessToken || (responseData as any).access_token
+      const refreshToken = responseData.refreshToken || (responseData as any).refresh_token
 
-          console.log('[OTP] Login OTP verified, tokens stored, user set:', {
-            userId: responseData.user._id,
-            role: responseData.user.role,
+      if (purpose === 'login') {
+        // SECURITY: For login OTP, tokens and user MUST be present
+        if (!accessToken || !responseData.user) {
+          console.error('[OTP] Login OTP verified but missing tokens/user:', {
+            hasAccessToken: !!accessToken,
+            hasUser: !!responseData.user,
           })
+          throw new Error(isRTL
+            ? 'خطأ في نظام التحقق. يرجى المحاولة مرة أخرى.'
+            : 'Authentication system error. Please try again.')
         }
 
-        toast.success(isRTL ? 'تم التحقق بنجاح' : 'Verification successful')
-        if (onSuccess) {
-          onSuccess()
-        } else {
-          navigate({ to: '/' })
-        }
+        // Store tokens for API authentication
+        storeTokens(accessToken, refreshToken)
+
+        // Set user in auth store - this makes the user authenticated
+        useAuthStore.getState().setUser(responseData.user as any)
+
+        console.log('[OTP] Login OTP verified, tokens stored, user set:', {
+          userId: responseData.user._id,
+          role: responseData.user.role,
+        })
+      }
+
+      toast.success(isRTL ? 'تم التحقق بنجاح' : 'Verification successful')
+      if (onSuccess) {
+        onSuccess()
       } else {
-        // Fallback for demo
-        showSubmittedData(formData)
-        setTimeout(() => {
-          if (onSuccess) {
-            onSuccess()
-          } else {
-            navigate({ to: '/' })
-          }
-        }, 1000)
+        navigate({ to: '/' })
       }
     } catch (error: any) {
       // Clear the OTP input on error
@@ -254,6 +305,7 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
       }
     } finally {
       setIsLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
@@ -308,6 +360,30 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
           )}
         />
 
+        {/* Session expiry warning for login purpose */}
+        {purpose === 'login' && sessionWarning && !sessionExpired && (
+          <div className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 p-3 rounded-lg flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            <p>
+              {isRTL
+                ? `الجلسة ستنتهي خلال ${formatCooldown(sessionTimeLeft)}. يرجى إدخال الرمز بسرعة.`
+                : `Session expires in ${formatCooldown(sessionTimeLeft)}. Please enter the code quickly.`}
+            </p>
+          </div>
+        )}
+
+        {/* Session expired error for login purpose */}
+        {purpose === 'login' && sessionExpired && (
+          <div className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            <p>
+              {isRTL
+                ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.'
+                : 'Session expired. Please sign in again.'}
+            </p>
+          </div>
+        )}
+
         {/* Error message with attempts remaining */}
         {errorMessage && (
           <div className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg space-y-1">
@@ -330,7 +406,7 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
           </div>
         )}
 
-        <Button className='mt-2' disabled={otp.length < 6 || isLoading}>
+        <Button className='mt-2' disabled={otp.length < 6 || isLoading || sessionExpired}>
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin me-2" />

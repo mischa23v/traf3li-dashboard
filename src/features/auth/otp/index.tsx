@@ -31,6 +31,8 @@ export function Otp() {
   const email = search.email || otpData?.fullEmail
   const purpose = search.purpose || 'login'
   const loginSessionToken = search.token || otpData?.loginSessionToken
+  // Session expiry from backend (default 600 seconds = 10 minutes)
+  const sessionExpiresIn = otpData?.loginSessionExpiresIn || 600
 
   // Security: For login purpose, loginSessionToken is REQUIRED
   // If missing, redirect back to sign-in
@@ -78,6 +80,7 @@ export function Otp() {
             email={email}
             purpose={purpose}
             loginSessionToken={loginSessionToken}
+            sessionExpiresIn={sessionExpiresIn}
             onSuccess={handleSuccess}
           />
         </CardContent>
