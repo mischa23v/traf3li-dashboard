@@ -647,6 +647,15 @@ export const QueryKeys = {
     employee: (employeeId: string) => [...QueryKeys.benefits.all(), 'employee', employeeId] as const,
     enrollments: (filters?: Record<string, any>) => [...QueryKeys.benefits.all(), 'enrollments', filters] as const,
     stats: () => [...QueryKeys.benefits.all(), 'stats'] as const,
+    // Benefit Plans
+    plans: {
+      all: () => [...QueryKeys.benefits.all(), 'plans'] as const,
+      lists: () => [...QueryKeys.benefits.plans.all(), 'list'] as const,
+      list: (filters?: Record<string, any>) => [...QueryKeys.benefits.plans.lists(), filters] as const,
+      details: () => [...QueryKeys.benefits.plans.all(), 'detail'] as const,
+      detail: (planId: string) => [...QueryKeys.benefits.plans.details(), planId] as const,
+      available: (employeeId: string) => [...QueryKeys.benefits.plans.all(), 'available', employeeId] as const,
+    },
   },
 
   // ==================== COMPENSATION ====================

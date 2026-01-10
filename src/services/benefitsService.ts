@@ -413,6 +413,127 @@ export const getEmployeeBenefits = async (employeeId: string) => {
   return response.data
 }
 
+// ==================== BENEFIT PLANS (per Part 5 API Contract) ====================
+
+/**
+ * Benefit Plan - Available benefit plan for enrollment
+ */
+export interface BenefitPlan {
+  _id: string
+  planId: string
+  name: string
+  nameAr: string
+  type: BenefitType
+  provider: string
+  providerAr?: string
+  description?: string
+  descriptionAr?: string
+  features: string[]
+  featuresAr?: string[]
+  eligibility: {
+    employmentTypes: Array<'full_time' | 'part_time' | 'contract' | 'temporary'>
+    minServiceMonths: number
+    grades?: string[]
+    departments?: string[]
+  }
+  cost: {
+    employeePerMonth: number
+    employerPerMonth: number
+    dependentPerMonth?: number
+    currency: string
+  }
+  coverage?: {
+    class: string
+    annualLimit: number
+    coverageDetails?: {
+      inpatient?: number
+      outpatient?: number
+      dental?: number
+      optical?: number
+      maternity?: number
+    }
+  }
+  isActive: boolean
+  enrollmentPeriod?: {
+    startDate: string
+    endDate: string
+  }
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface BenefitPlanFilters {
+  type?: BenefitType
+  isActive?: boolean
+  search?: string
+  page?: number
+  limit?: number
+}
+
+/**
+ * Get available benefit plans
+ * GET /hr/benefits/plans
+ */
+export const getBenefitPlans = async (filters?: BenefitPlanFilters) => {
+  const params = new URLSearchParams()
+  if (filters?.type) params.append('type', filters.type)
+  if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString())
+  if (filters?.search) params.append('search', filters.search)
+  if (filters?.page) params.append('page', filters.page.toString())
+  if (filters?.limit) params.append('limit', filters.limit.toString())
+
+  const response = await api.get<{
+    data: BenefitPlan[]
+    pagination: { total: number; page: number; limit: number; totalPages: number }
+  }>(`/hr/benefits/plans?${params.toString()}`)
+  return response.data
+}
+
+/**
+ * Get single benefit plan
+ * GET /hr/benefits/plans/:id
+ */
+export const getBenefitPlan = async (planId: string) => {
+  const response = await api.get<BenefitPlan>(`/hr/benefits/plans/${planId}`)
+  return response.data
+}
+
+/**
+ * Create benefit plan
+ * POST /hr/benefits/plans
+ */
+export const createBenefitPlan = async (data: Omit<BenefitPlan, '_id' | 'planId' | 'createdAt' | 'updatedAt'>) => {
+  const response = await api.post<BenefitPlan>('/hr/benefits/plans', data)
+  return response.data
+}
+
+/**
+ * Update benefit plan
+ * PATCH /hr/benefits/plans/:id
+ */
+export const updateBenefitPlan = async (planId: string, data: Partial<BenefitPlan>) => {
+  const response = await api.patch<BenefitPlan>(`/hr/benefits/plans/${planId}`, data)
+  return response.data
+}
+
+/**
+ * Delete benefit plan
+ * DELETE /hr/benefits/plans/:id
+ */
+export const deleteBenefitPlan = async (planId: string) => {
+  const response = await api.delete(`/hr/benefits/plans/${planId}`)
+  return response.data
+}
+
+/**
+ * Get available plans for employee enrollment
+ * GET /hr/benefits/plans/available/:employeeId
+ */
+export const getAvailablePlansForEmployee = async (employeeId: string) => {
+  const response = await api.get<BenefitPlan[]>(`/hr/benefits/plans/available/${employeeId}`)
+  return response.data
+}
+
 // Create benefit enrollment
 export const createBenefit = async (data: CreateBenefitData) => {
   const response = await api.post<EmployeeBenefit>('/hr/employee-benefits', data)
@@ -519,6 +640,7 @@ export const exportBenefits = async (filters?: BenefitFilters) => {
 }
 
 export default {
+  // Employee benefits
   getBenefits,
   getBenefit,
   getBenefitStats,
@@ -542,4 +664,11 @@ export default {
   requestPreAuth,
   reportQualifyingEvent,
   exportBenefits,
+  // Benefit plans (Part 5 API)
+  getBenefitPlans,
+  getBenefitPlan,
+  createBenefitPlan,
+  updateBenefitPlan,
+  deleteBenefitPlan,
+  getAvailablePlansForEmployee,
 }
