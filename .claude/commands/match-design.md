@@ -167,21 +167,56 @@ useKeyboardShortcuts({
 
 **File:** `{module}-sidebar.tsx`
 
+#### Quick Actions Widget Structure
 | Check | Gold Standard | Status |
 |-------|---------------|--------|
 | **Uses `useKeyboardShortcuts` hook** | MANDATORY - not custom implementation | ✅/❌ |
 | Receives `mode` prop | `'list' \| 'create' \| 'details'` | ✅/❌ |
 | Receives `entityId` prop | For detail view | ✅/❌ |
 | **List view has tabs** | Main (أساسي) + Bulk (جماعي) | ✅/❌ |
-| List Main buttons | Create, Select, Delete, Archive | ✅/❌ |
-| List Bulk buttons | Select All, Complete, Delete, Archive | ✅/❌ |
+| List Main buttons | View (V), Select (S), Delete (D), Archive (A) | ✅/❌ |
+| List Bulk buttons | Select All (L), Complete (C), Delete (D), Archive (A) | ✅/❌ |
 | **Detail view NO tabs** | 4 buttons directly | ✅/❌ |
 | Detail buttons | Complete, Edit, Delete, View All | ✅/❌ |
 | **Create view NO tabs** | 4 buttons directly | ✅/❌ |
 | Create buttons | Create, Clear, Cancel, Save | ✅/❌ |
-| Widget styling | `bg-gradient-to-br from-emerald-900 to-slate-900` | ✅/❌ |
-| Button styling | `rounded-3xl`, `py-6`, kbd badges | ✅/❌ |
-| Calendar widget | Below Quick Actions | ✅/❌ |
+
+#### Quick Actions Styling (CRITICAL)
+| Check | Gold Standard | Status |
+|-------|---------------|--------|
+| Container | `bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950` | ✅/❌ |
+| Container border | `ring-1 ring-white/10` | ✅/❌ |
+| Container radius | `rounded-[2rem]` | ✅/❌ |
+| Container padding | `p-5` | ✅/❌ |
+| Tab buttons container | `bg-white/5 rounded-2xl p-1.5` | ✅/❌ |
+| Active tab | `bg-emerald-500 text-white` | ✅/❌ |
+| Inactive tab | `text-slate-400 hover:text-white` | ✅/❌ |
+| Action buttons layout | `grid grid-cols-2 gap-3 mt-5` | ✅/❌ |
+| Action button | `rounded-3xl py-6 border-0` | ✅/❌ |
+| Keyboard badge | `kbd` style with `bg-white/20 text-white/90 px-2 py-0.5 rounded-md text-xs font-mono` | ✅/❌ |
+
+#### Calendar & Notifications Widget (Below Quick Actions)
+| Check | Gold Standard | Status |
+|-------|---------------|--------|
+| Widget container | `bg-white rounded-[2rem] ring-1 ring-black/5 shadow-sm p-5 mt-6` | ✅/❌ |
+| Tab buttons | التقويم (Calendar) + التنبيهات (Notifications) | ✅/❌ |
+| Tab container | `bg-slate-100 rounded-xl p-1` | ✅/❌ |
+| Active calendar tab | `bg-white shadow-sm text-emerald-700` | ✅/❌ |
+| Day strip | Horizontal scroll with 5 days visible | ✅/❌ |
+| Current day highlight | `bg-emerald-500 text-white` | ✅/❌ |
+| Uses `useCalendar` hook | For date selection state | ✅/❌ |
+| Uses `useUpcomingReminders` hook | For notifications data | ✅/❌ |
+| Empty state icon | Calendar or Bell icon with message | ✅/❌ |
+
+#### Keyboard Shortcuts Reference
+| Shortcut | Action | View |
+|----------|--------|------|
+| V | View/Navigate to list | List Main |
+| S | Toggle selection mode | List Main |
+| D | Delete selected | List Main/Bulk |
+| A | Archive selected | List Main/Bulk |
+| L | Select all | List Bulk |
+| C | Complete selected | List Bulk |
 
 ---
 

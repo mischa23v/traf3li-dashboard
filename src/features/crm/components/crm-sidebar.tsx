@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import {
@@ -12,7 +13,6 @@ import {
   Trash2,
   Phone,
   Calendar,
-  FileBarChart,
   BarChart3,
   Package,
   FileText,
@@ -22,7 +22,8 @@ import {
   Share2,
   Mail,
   MessageCircle,
-  UserCheck,
+  CheckCheck,
+  Archive,
 } from 'lucide-react'
 import { useLeadStats, useLeadsNeedingFollowUp, useUpcomingTasks } from '@/hooks/useCrm'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -30,13 +31,24 @@ import { formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
 import { cn } from '@/lib/utils'
+import {
+  useKeyboardShortcuts,
+  KEYBOARD_SHORTCUTS,
+  KBD_COLORS,
+} from '@/hooks/useKeyboardShortcuts'
 
 interface CrmSidebarProps {
   context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports' | 'products' | 'quotes' | 'campaigns' | 'transactions' | 'settings' | 'contacts' | 'email-marketing' | 'whatsapp'
+  mode?: 'list' | 'detail' | 'create'
   isSelectionMode?: boolean
   onToggleSelectionMode?: () => void
   selectedCount?: number
+  totalCount?: number
   onDeleteSelected?: () => void
+  // Bulk actions
+  onBulkArchive?: () => void
+  onBulkComplete?: () => void
+  onSelectAll?: () => void
 }
 
 const links = {
@@ -93,19 +105,54 @@ const links = {
 
 export function CrmSidebar({
   context,
-  isSelectionMode,
+  mode = 'list',
+  isSelectionMode = false,
   onToggleSelectionMode,
   selectedCount = 0,
+  totalCount = 0,
   onDeleteSelected,
+  onBulkArchive,
+  onBulkComplete,
+  onSelectAll,
 }: CrmSidebarProps) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const dateLocale = isRTL ? ar : enUS
+  const navigate = useNavigate()
   const { data: statsData, isLoading: statsLoading } = useLeadStats()
   const { data: followUpData, isLoading: followUpLoading } = useLeadsNeedingFollowUp(5)
   const { data: tasksData, isLoading: tasksLoading } = useUpcomingTasks({ limit: 5 })
 
   const stats = statsData?.stats
+
+  // Quick Actions tab state (Main / Bulk)
+  const [quickActionsTab, setQuickActionsTab] = useState<'main' | 'bulk'>('main')
+
+  // Check if context has a create page
+  const hasCreatePage = context !== 'transactions' && context !== 'pipeline' && context !== 'settings'
+
+  // Get current links for keyboard shortcuts
+  const currentLinks = links[context] || links.leads
+
+  // Register keyboard shortcuts (Gold Standard)
+  useKeyboardShortcuts({
+    mode,
+    links: {
+      create: currentLinks.create || currentLinks.viewAll,
+      viewAll: currentLinks.viewAll,
+    },
+    disabled: !hasCreatePage && mode === 'list', // Disable create shortcuts for read-only views
+    listCallbacks: {
+      onToggleSelectionMode,
+      onDeleteSelected,
+      onBulkArchive,
+      onBulkComplete,
+      onSelectAll,
+      isSelectionMode,
+      selectedCount,
+      totalCount,
+    },
+  })
 
   // Navigation links for the current context
   const navigationLinks = [
@@ -124,62 +171,166 @@ export function CrmSidebar({
     { key: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'Settings', route: links.settings.viewAll, color: 'text-gray-600' },
   ]
 
-  const currentLinks = links[context] || links.leads
+  // Get keyboard shortcut info
+  const getKbdClass = (color: keyof typeof KBD_COLORS) =>
+    cn('text-[10px] font-mono px-1.5 py-0.5 rounded', KBD_COLORS[color])
 
   return (
     <div className="space-y-6">
-      {/* Quick Actions */}
+      {/* Quick Actions - Gold Standard with Tabs */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <h3 className="font-bold text-navy text-lg mb-4">
           {isRTL ? 'إجراءات سريعة' : 'Quick Actions'}
         </h3>
+
+        {/* Main / Bulk Tabs (Only show in list mode with selection capability) */}
+        {mode === 'list' && onToggleSelectionMode && (
+          <div className="flex gap-2 mb-4 p-1 bg-slate-50 rounded-xl">
+            <button
+              onClick={() => setQuickActionsTab('main')}
+              className={cn(
+                'flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all',
+                quickActionsTab === 'main'
+                  ? 'bg-white text-navy shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              )}
+            >
+              {isRTL ? 'رئيسي' : 'Main'}
+            </button>
+            <button
+              onClick={() => setQuickActionsTab('bulk')}
+              className={cn(
+                'flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all',
+                quickActionsTab === 'bulk'
+                  ? 'bg-white text-navy shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              )}
+            >
+              {isRTL ? 'تجميعي' : 'Bulk'}
+            </button>
+          </div>
+        )}
+
         <div className="space-y-3">
-          {/* Dynamic Create Button based on context */}
-          {currentLinks.create && (
-            <Button
-              asChild
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
-            >
-              <Link to={currentLinks.create}>
-                <Plus className="ms-3 h-5 w-5" aria-hidden="true" />
-                {context === 'leads' && (isRTL ? 'إضافة عميل محتمل' : 'Add Lead')}
-                {context === 'products' && (isRTL ? 'إضافة منتج' : 'Add Product')}
-                {context === 'quotes' && (isRTL ? 'إنشاء عرض سعر' : 'Create Quote')}
-                {context === 'campaigns' && (isRTL ? 'إنشاء حملة' : 'Create Campaign')}
-                {context === 'activities' && (isRTL ? 'إضافة نشاط' : 'Add Activity')}
-                {context === 'referrals' && (isRTL ? 'إضافة إحالة' : 'Add Referral')}
-                {context === 'reports' && (isRTL ? 'إنشاء تقرير' : 'Create Report')}
-                {context === 'contacts' && (isRTL ? 'إضافة جهة اتصال' : 'Add Contact')}
-                {context === 'email-marketing' && (isRTL ? 'إنشاء حملة بريدية' : 'Create Email Campaign')}
-                {context === 'whatsapp' && (isRTL ? 'بدء محادثة' : 'Start Conversation')}
-                {!['leads', 'products', 'quotes', 'campaigns', 'activities', 'referrals', 'reports', 'contacts', 'email-marketing', 'whatsapp'].includes(context) && (isRTL ? 'إضافة جديد' : 'Add New')}
-              </Link>
-            </Button>
+          {/* Main Tab Content */}
+          {quickActionsTab === 'main' && (
+            <>
+              {/* Dynamic Create Button based on context */}
+              {hasCreatePage && currentLinks.create && (
+                <Button
+                  asChild
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-between"
+                >
+                  <Link to={currentLinks.create}>
+                    <span className="flex items-center">
+                      <Plus className="ms-3 h-5 w-5" aria-hidden="true" />
+                      {context === 'leads' && (isRTL ? 'إضافة عميل محتمل' : 'Add Lead')}
+                      {context === 'products' && (isRTL ? 'إضافة منتج' : 'Add Product')}
+                      {context === 'quotes' && (isRTL ? 'إنشاء عرض سعر' : 'Create Quote')}
+                      {context === 'campaigns' && (isRTL ? 'إنشاء حملة' : 'Create Campaign')}
+                      {context === 'activities' && (isRTL ? 'إضافة نشاط' : 'Add Activity')}
+                      {context === 'referrals' && (isRTL ? 'إضافة إحالة' : 'Add Referral')}
+                      {context === 'reports' && (isRTL ? 'إنشاء تقرير' : 'Create Report')}
+                      {context === 'contacts' && (isRTL ? 'إضافة جهة اتصال' : 'Add Contact')}
+                      {context === 'email-marketing' && (isRTL ? 'إنشاء حملة بريدية' : 'Create Email Campaign')}
+                      {context === 'whatsapp' && (isRTL ? 'بدء محادثة' : 'Start Conversation')}
+                      {!['leads', 'products', 'quotes', 'campaigns', 'activities', 'referrals', 'reports', 'contacts', 'email-marketing', 'whatsapp'].includes(context) && (isRTL ? 'إضافة جديد' : 'Add New')}
+                    </span>
+                    <kbd className={getKbdClass('emerald')}>N</kbd>
+                  </Link>
+                </Button>
+              )}
+
+              {/* Selection Mode Toggle */}
+              {onToggleSelectionMode && (
+                <Button
+                  onClick={onToggleSelectionMode}
+                  variant="ghost"
+                  className="w-full rounded-xl h-12 justify-between text-slate-600"
+                >
+                  <span className="flex items-center">
+                    {isSelectionMode
+                      ? (isRTL ? 'إلغاء التحديد' : 'Cancel Selection')
+                      : (isRTL ? 'تحديد متعدد' : 'Multi-Select')
+                    }
+                  </span>
+                  <kbd className={getKbdClass('slate')}>S</kbd>
+                </Button>
+              )}
+            </>
           )}
 
-          {/* Selection Mode Actions */}
-          {isSelectionMode && selectedCount > 0 && (
-            <Button
-              onClick={onDeleteSelected}
-              variant="destructive"
-              className="w-full rounded-xl h-12 justify-start"
-            >
-              <Trash2 className="ms-3 h-5 w-5" aria-hidden="true" />
-              {isRTL ? `حذف المحدد (${selectedCount})` : `Delete Selected (${selectedCount})`}
-            </Button>
-          )}
+          {/* Bulk Tab Content */}
+          {quickActionsTab === 'bulk' && (
+            <>
+              {/* Select All */}
+              {onSelectAll && (
+                <Button
+                  onClick={onSelectAll}
+                  variant="outline"
+                  className="w-full rounded-xl h-12 justify-between"
+                  disabled={totalCount === 0}
+                >
+                  <span className="flex items-center gap-2">
+                    <CheckCheck className="h-5 w-5" />
+                    {isRTL ? 'تحديد الكل' : 'Select All'}
+                    {totalCount > 0 && <span className="text-xs text-slate-400">({totalCount})</span>}
+                  </span>
+                  <kbd className={getKbdClass('blue')}>L</kbd>
+                </Button>
+              )}
 
-          {onToggleSelectionMode && (
-            <Button
-              onClick={onToggleSelectionMode}
-              variant="ghost"
-              className="w-full rounded-xl h-12 justify-start text-slate-600"
-            >
-              {isSelectionMode
-                ? (isRTL ? 'إلغاء التحديد' : 'Cancel Selection')
-                : (isRTL ? 'تحديد متعدد' : 'Multi-Select')
-              }
-            </Button>
+              {/* Bulk Complete */}
+              {onBulkComplete && (
+                <Button
+                  onClick={onBulkComplete}
+                  variant="outline"
+                  className="w-full rounded-xl h-12 justify-between text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                  disabled={selectedCount === 0}
+                >
+                  <span className="flex items-center gap-2">
+                    <CheckCheck className="h-5 w-5" />
+                    {isRTL ? 'إكمال المحدد' : 'Complete Selected'}
+                    {selectedCount > 0 && <span className="text-xs">({selectedCount})</span>}
+                  </span>
+                  <kbd className={getKbdClass('emerald')}>C</kbd>
+                </Button>
+              )}
+
+              {/* Bulk Archive */}
+              {onBulkArchive && (
+                <Button
+                  onClick={onBulkArchive}
+                  variant="outline"
+                  className="w-full rounded-xl h-12 justify-between text-slate-600"
+                  disabled={selectedCount === 0}
+                >
+                  <span className="flex items-center gap-2">
+                    <Archive className="h-5 w-5" />
+                    {isRTL ? 'أرشفة المحدد' : 'Archive Selected'}
+                    {selectedCount > 0 && <span className="text-xs text-slate-400">({selectedCount})</span>}
+                  </span>
+                  <kbd className={getKbdClass('slate')}>A</kbd>
+                </Button>
+              )}
+
+              {/* Delete Selected */}
+              {onDeleteSelected && (
+                <Button
+                  onClick={onDeleteSelected}
+                  variant="outline"
+                  className="w-full rounded-xl h-12 justify-between text-red-600 border-red-200 hover:bg-red-50"
+                  disabled={selectedCount === 0}
+                >
+                  <span className="flex items-center gap-2">
+                    <Trash2 className="h-5 w-5" />
+                    {isRTL ? 'حذف المحدد' : 'Delete Selected'}
+                    {selectedCount > 0 && <span className="text-xs">({selectedCount})</span>}
+                  </span>
+                  <kbd className={getKbdClass('red')}>D</kbd>
+                </Button>
+              )}
+            </>
           )}
         </div>
       </div>

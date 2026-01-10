@@ -931,6 +931,7 @@ export const QueryKeys = {
     detail: (id: string) => [...QueryKeys.leads.details(), id] as const,
     stats: (params?: Record<string, any>) => [...QueryKeys.leads.all(), 'stats', params] as const,
     pipeline: (pipelineId?: string) => [...QueryKeys.leads.all(), 'pipeline', pipelineId] as const,
+    followUp: (limit?: number) => [...QueryKeys.leads.all(), 'follow-up', limit] as const,
   },
 
   // ==================== CRM - PIPELINES ====================
@@ -973,6 +974,18 @@ export const QueryKeys = {
     detail: (id: string) => [...QueryKeys.products.details(), id] as const,
     categories: () => [...QueryKeys.products.all(), 'categories'] as const,
     stats: (id: string) => [...QueryKeys.products.detail(id), 'stats'] as const,
+  },
+
+  // ==================== CRM - TRANSACTIONS ====================
+  crmTransactions: {
+    all: () => ['crm-transactions'] as const,
+    lists: () => [...QueryKeys.crmTransactions.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.crmTransactions.lists(), filters] as const,
+    details: () => [...QueryKeys.crmTransactions.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.crmTransactions.details(), id] as const,
+    stats: (filters?: Record<string, any>) => [...QueryKeys.crmTransactions.all(), 'stats', filters] as const,
+    byEntity: (entityType: string, entityId: string) => [...QueryKeys.crmTransactions.all(), entityType, entityId] as const,
+    byType: (type: string, filters?: Record<string, any>) => [...QueryKeys.crmTransactions.all(), 'type', type, filters] as const,
   },
 
   // ==================== CRM ADVANCED ====================
@@ -1062,9 +1075,15 @@ export const QueryKeys = {
     all: () => ['activities'] as const,
     lists: () => [...QueryKeys.activities.all(), 'list'] as const,
     list: (filters?: Record<string, any>) => [...QueryKeys.activities.lists(), filters] as const,
-    entity: (entityType: string, entityId: string) => [...QueryKeys.activities.all(), 'entity', entityType, entityId] as const,
+    entity: (entityType: string, entityId: string, params?: Record<string, any>) => [...QueryKeys.activities.all(), 'entity', entityType, entityId, params] as const,
     recent: (limit?: number) => [...QueryKeys.activities.all(), 'recent', limit] as const,
-    timeline: () => ['activity-timeline'] as const,
+    timeline: (params?: Record<string, any>) => [...QueryKeys.activities.all(), 'timeline', params] as const,
+    stats: (params?: Record<string, any>) => [...QueryKeys.activities.all(), 'stats', params] as const,
+    tasks: {
+      all: () => [...QueryKeys.activities.all(), 'tasks'] as const,
+      upcoming: (params?: Record<string, any>) => [...QueryKeys.activities.tasks.all(), 'upcoming', params] as const,
+      overdue: (params?: Record<string, any>) => [...QueryKeys.activities.tasks.all(), 'overdue', params] as const,
+    },
   },
 
   // ==================== ODOO ACTIVITIES ====================

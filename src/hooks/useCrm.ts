@@ -998,6 +998,47 @@ export const useActivityTimeline = (params?: {
 }
 
 /**
+ * CRM Transactions Hook
+ * Fetches CRM activity logs for the transactions view
+ * Uses the existing crmActivityService.getActivities under the hood
+ */
+export const useCrmTransactions = (params?: {
+  type?: string
+  entity_type?: string
+  period?: string
+  startDate?: string
+  endDate?: string
+  search?: string
+  page?: number
+  pageSize?: number
+}, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QueryKeys.crmTransactions.list(params),
+    queryFn: () => crmActivityService.getActivities(params),
+    staleTime: LIST_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
+  })
+}
+
+/**
+ * CRM Transaction Stats Hook
+ * Fetches stats for CRM transactions view hero section
+ */
+export const useCrmTransactionStats = (params?: {
+  startDate?: string
+  endDate?: string
+}, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QueryKeys.crmTransactions.stats(params),
+    queryFn: () => crmActivityService.getStats(params),
+    staleTime: STATS_STALE_TIME,
+    gcTime: STATS_GC_TIME,
+    enabled,
+  })
+}
+
+/**
  * Get activity statistics
  */
 export const useActivityStats = (params?: {

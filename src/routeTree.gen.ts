@@ -236,6 +236,7 @@ import { Route as AuthenticatedDashboardFinanceCreditNotesIndexRouteImport } fro
 import { Route as AuthenticatedDashboardFinanceBillsIndexRouteImport } from './routes/_authenticated/dashboard.finance.bills.index'
 import { Route as AuthenticatedDashboardFinanceActivityIndexRouteImport } from './routes/_authenticated/dashboard.finance.activity.index'
 import { Route as AuthenticatedDashboardCrmWhatsappIndexRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.index'
+import { Route as AuthenticatedDashboardCrmTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.crm.transactions.index'
 import { Route as AuthenticatedDashboardCrmSettingsIndexRouteImport } from './routes/_authenticated/dashboard.crm.settings.index'
 import { Route as AuthenticatedDashboardCrmReportsIndexRouteImport } from './routes/_authenticated/dashboard.crm.reports.index'
 import { Route as AuthenticatedDashboardCrmReferralsIndexRouteImport } from './routes/_authenticated/dashboard.crm.referrals.index'
@@ -1748,6 +1749,12 @@ const AuthenticatedDashboardCrmWhatsappIndexRoute =
   AuthenticatedDashboardCrmWhatsappIndexRouteImport.update({
     id: '/whatsapp/',
     path: '/whatsapp/',
+    getParentRoute: () => AuthenticatedDashboardCrmRoute,
+  } as any)
+const AuthenticatedDashboardCrmTransactionsIndexRoute =
+  AuthenticatedDashboardCrmTransactionsIndexRouteImport.update({
+    id: '/transactions/',
+    path: '/transactions/',
     getParentRoute: () => AuthenticatedDashboardCrmRoute,
   } as any)
 const AuthenticatedDashboardCrmSettingsIndexRoute =
@@ -3293,6 +3300,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/crm/reports': typeof AuthenticatedDashboardCrmReportsIndexRoute
   '/dashboard/crm/settings': typeof AuthenticatedDashboardCrmSettingsIndexRoute
+  '/dashboard/crm/transactions': typeof AuthenticatedDashboardCrmTransactionsIndexRoute
   '/dashboard/crm/whatsapp': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -3711,6 +3719,7 @@ export interface FileRoutesByTo {
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/crm/reports': typeof AuthenticatedDashboardCrmReportsIndexRoute
   '/dashboard/crm/settings': typeof AuthenticatedDashboardCrmSettingsIndexRoute
+  '/dashboard/crm/transactions': typeof AuthenticatedDashboardCrmTransactionsIndexRoute
   '/dashboard/crm/whatsapp': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -4141,6 +4150,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/crm/referrals/': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/_authenticated/dashboard/crm/reports/': typeof AuthenticatedDashboardCrmReportsIndexRoute
   '/_authenticated/dashboard/crm/settings/': typeof AuthenticatedDashboardCrmSettingsIndexRoute
+  '/_authenticated/dashboard/crm/transactions/': typeof AuthenticatedDashboardCrmTransactionsIndexRoute
   '/_authenticated/dashboard/crm/whatsapp/': typeof AuthenticatedDashboardCrmWhatsappIndexRoute
   '/_authenticated/dashboard/finance/activity/': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/_authenticated/dashboard/finance/bills/': typeof AuthenticatedDashboardFinanceBillsIndexRoute
@@ -4569,6 +4579,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm/referrals'
     | '/dashboard/crm/reports'
     | '/dashboard/crm/settings'
+    | '/dashboard/crm/transactions'
     | '/dashboard/crm/whatsapp'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/bills'
@@ -4987,6 +4998,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm/referrals'
     | '/dashboard/crm/reports'
     | '/dashboard/crm/settings'
+    | '/dashboard/crm/transactions'
     | '/dashboard/crm/whatsapp'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/bills'
@@ -5416,6 +5428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/crm/referrals/'
     | '/_authenticated/dashboard/crm/reports/'
     | '/_authenticated/dashboard/crm/settings/'
+    | '/_authenticated/dashboard/crm/transactions/'
     | '/_authenticated/dashboard/crm/whatsapp/'
     | '/_authenticated/dashboard/finance/activity/'
     | '/_authenticated/dashboard/finance/bills/'
@@ -7141,6 +7154,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardCrmRoute
     }
+    '/_authenticated/dashboard/crm/transactions/': {
+      id: '/_authenticated/dashboard/crm/transactions/'
+      path: '/transactions'
+      fullPath: '/dashboard/crm/transactions'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmTransactionsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmRoute
+    }
     '/_authenticated/dashboard/crm/settings/': {
       id: '/_authenticated/dashboard/crm/settings/'
       path: '/settings'
@@ -8773,6 +8793,7 @@ interface AuthenticatedDashboardCrmRouteChildren {
   AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
   AuthenticatedDashboardCrmReportsIndexRoute: typeof AuthenticatedDashboardCrmReportsIndexRoute
   AuthenticatedDashboardCrmSettingsIndexRoute: typeof AuthenticatedDashboardCrmSettingsIndexRoute
+  AuthenticatedDashboardCrmTransactionsIndexRoute: typeof AuthenticatedDashboardCrmTransactionsIndexRoute
   AuthenticatedDashboardCrmWhatsappIndexRoute: typeof AuthenticatedDashboardCrmWhatsappIndexRoute
 }
 
@@ -8881,6 +8902,8 @@ const AuthenticatedDashboardCrmRouteChildren: AuthenticatedDashboardCrmRouteChil
       AuthenticatedDashboardCrmReportsIndexRoute,
     AuthenticatedDashboardCrmSettingsIndexRoute:
       AuthenticatedDashboardCrmSettingsIndexRoute,
+    AuthenticatedDashboardCrmTransactionsIndexRoute:
+      AuthenticatedDashboardCrmTransactionsIndexRoute,
     AuthenticatedDashboardCrmWhatsappIndexRoute:
       AuthenticatedDashboardCrmWhatsappIndexRoute,
   }
