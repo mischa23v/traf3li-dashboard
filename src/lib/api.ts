@@ -962,9 +962,36 @@ apiClientNoVersion.interceptors.response.use(
       }
     }
 
-    // Handle 403 Forbidden - Check for CSRF token errors and retry once with fresh token
+    // Handle 403 Forbidden - Check for email verification or CSRF token errors
     if (error.response?.status === 403) {
-      const csrfErrorCode = error.response?.data?.code
+      const errorCode = error.response?.data?.code
+
+      // Handle EMAIL_VERIFICATION_REQUIRED - Redirect to email verification page
+      if (errorCode === 'EMAIL_VERIFICATION_REQUIRED') {
+        const blockedFeature = error.response?.data?.emailVerification?.blockedFeature
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
+
+        // Build redirect URL with context
+        const params = new URLSearchParams({
+          returnTo: currentPath,
+          ...(blockedFeature && { blockedFeature }),
+        })
+
+        // Redirect to email verification page
+        if (typeof window !== 'undefined') {
+          window.location.href = `/verify-email-required?${params.toString()}`
+        }
+
+        return Promise.reject({
+          status: 403,
+          message: error.response?.data?.message || 'يرجى تفعيل بريدك الإلكتروني للوصول إلى هذه الميزة',
+          code: 'EMAIL_VERIFICATION_REQUIRED',
+          error: true,
+          blockedFeature,
+        })
+      }
+
+      const csrfErrorCode = errorCode
       const csrfErrorMessage = error.response?.data?.message?.toLowerCase() || ''
 
       // Check for CSRF token errors - retry once with fresh token
@@ -1417,6 +1444,35 @@ apiClient.interceptors.response.use(
       ;(error as any).retryAfter = retryAfter
 
       return Promise.reject(rateLimitError)
+    }
+
+    // Handle 403 EMAIL_VERIFICATION_REQUIRED - Redirect to email verification page
+    if (error.response?.status === 403) {
+      const errorCode = error.response?.data?.code
+
+      if (errorCode === 'EMAIL_VERIFICATION_REQUIRED') {
+        const blockedFeature = error.response?.data?.emailVerification?.blockedFeature
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
+
+        // Build redirect URL with context
+        const params = new URLSearchParams({
+          returnTo: currentPath,
+          ...(blockedFeature && { blockedFeature }),
+        })
+
+        // Redirect to email verification page
+        if (typeof window !== 'undefined') {
+          window.location.href = `/verify-email-required?${params.toString()}`
+        }
+
+        return Promise.reject({
+          status: 403,
+          message: error.response?.data?.message || 'يرجى تفعيل بريدك الإلكتروني للوصول إلى هذه الميزة',
+          code: 'EMAIL_VERIFICATION_REQUIRED',
+          error: true,
+          blockedFeature,
+        })
+      }
     }
 
     // Handle 401 Unauthorized - Token refresh logic
