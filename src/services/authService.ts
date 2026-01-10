@@ -416,14 +416,26 @@ export interface EmailVerificationResponse {
  * Supports both OAuth 2.0 standard fields (snake_case) and backwards-compatible fields (camelCase)
  */
 interface AuthResponse {
-  error: boolean
-  message: string
+  // Standard response fields
+  success?: boolean
+  error?: boolean
+  message?: string
+  messageAr?: string  // Arabic message from backend
   messageEn?: string
   user?: User
 
-  // OTP Required Response fields (password login flow)
-  requiresOtp?: boolean
-  code?: string  // 'OTP_REQUIRED' when OTP is needed
+  // OTP/MFA Required Response - Backend uses nested "requires" object
+  // Example: { "requires": { "otp": true, "mfa": false } }
+  requires?: {
+    otp?: boolean
+    mfa?: boolean
+  }
+
+  // Legacy flat fields (for backwards compatibility)
+  requiresOtp?: boolean  // Legacy: prefer requires.otp
+  code?: string  // 'OTP_REQUIRED' when OTP is needed (legacy)
+
+  // OTP session fields
   email?: string  // Masked email for display
   loginSessionToken?: string  // Token to pass to verify-otp
   loginSessionExpiresIn?: number  // Session expiry in seconds
@@ -571,19 +583,26 @@ const authService = {
 
       // Check if OTP verification is required (email-based 2FA for password login)
       // This is the normal flow for password-based login: password verified, now needs OTP
-      if (response.data.requiresOtp === true && response.data.code === 'OTP_REQUIRED') {
+      // Backend uses nested format: { requires: { otp: true } }
+      // Also support legacy flat format for backwards compatibility: { requiresOtp: true }
+      const otpRequired = response.data.requires?.otp === true || response.data.requiresOtp === true
+      const hasLoginSessionToken = !!response.data.loginSessionToken
+
+      if (otpRequired && hasLoginSessionToken) {
         authLog('Password verified, OTP required for login', {
           email: response.data.email, // Masked email
           expiresIn: response.data.expiresIn,
           hasSecurityWarning: !!response.data.securityWarning,
+          format: response.data.requires ? 'nested' : 'legacy',
         })
 
         // Return OTP required response - caller must redirect to OTP page
+        // Backend sends messageAr for Arabic, message for English
         const otpResponse: LoginOTPRequiredResponse = {
           requiresOtp: true,
           code: 'OTP_REQUIRED',
-          message: response.data.message || 'يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني',
-          messageEn: response.data.messageEn || 'Please enter the verification code sent to your email',
+          message: response.data.messageAr || response.data.message || 'يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني',
+          messageEn: response.data.message || response.data.messageEn || 'Please enter the verification code sent to your email',
           email: response.data.email || '', // Masked email for display
           fullEmail: credentials.username, // Use the email they logged in with
           expiresIn: response.data.expiresIn || 300, // Default 5 min
