@@ -124,7 +124,7 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
     }
   }, [cooldown, isResending, email, purpose, onResendOtp, isRTL])
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(formData: z.infer<typeof formSchema>) {
     setIsLoading(true)
     setErrorMessage(null)
     setAttemptsLeft(null)
@@ -138,32 +138,47 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
         // This follows AWS Cognito, Auth0, Google patterns where signed tokens are source of truth
         const requestBody = purpose === 'login' && loginSessionToken
           ? {
-              otp: data.otp,
+              otp: formData.otp,
               purpose,
               loginSessionToken,
               // Note: Email is optional for login - backend extracts from signed token
             }
           : {
               email,
-              otp: data.otp,
+              otp: formData.otp,
               purpose,
               ...(loginSessionToken && { loginSessionToken }),
             }
 
         const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', requestBody)
-        const data = response.data
+        const responseData = response.data
 
         // For login purpose: Store tokens and set user in auth store
-        if (purpose === 'login' && data.accessToken && data.user) {
+        // Backend returns both snake_case (OAuth 2.0) and camelCase (backwards compat)
+        const accessToken = responseData.accessToken || (responseData as any).access_token
+        const refreshToken = responseData.refreshToken || (responseData as any).refresh_token
+
+        if (purpose === 'login') {
+          // SECURITY: For login OTP, tokens and user MUST be present
+          if (!accessToken || !responseData.user) {
+            console.error('[OTP] Login OTP verified but missing tokens/user:', {
+              hasAccessToken: !!accessToken,
+              hasUser: !!responseData.user,
+            })
+            throw new Error(isRTL
+              ? 'خطأ في نظام التحقق. يرجى المحاولة مرة أخرى.'
+              : 'Authentication system error. Please try again.')
+          }
+
           // Store tokens for API authentication
-          storeTokens(data.accessToken, data.refreshToken)
+          storeTokens(accessToken, refreshToken)
 
           // Set user in auth store - this makes the user authenticated
-          useAuthStore.getState().setUser(data.user as any)
+          useAuthStore.getState().setUser(responseData.user as any)
 
           console.log('[OTP] Login OTP verified, tokens stored, user set:', {
-            userId: data.user._id,
-            role: data.user.role,
+            userId: responseData.user._id,
+            role: responseData.user.role,
           })
         }
 
@@ -175,7 +190,7 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
         }
       } else {
         // Fallback for demo
-        showSubmittedData(data)
+        showSubmittedData(formData)
         setTimeout(() => {
           if (onSuccess) {
             onSuccess()
