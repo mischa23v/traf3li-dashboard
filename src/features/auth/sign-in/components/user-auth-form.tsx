@@ -255,25 +255,56 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       await login(loginData)
 
       // Check if OTP verification is required (email-based 2FA for password login)
-      const currentOtpRequired = useAuthStore.getState().otpRequired
-      const currentOtpData = useAuthStore.getState().otpData
+      // IMPORTANT: Get fresh state after login completes - Zustand updates are synchronous
+      const storeState = useAuthStore.getState()
+      const currentOtpRequired = storeState.otpRequired
+      const currentOtpData = storeState.otpData
+
+      // Log authentication flow state (safe for production - no sensitive data)
+      console.log('[SignIn] Post-login state:', {
+        otpRequired: currentOtpRequired,
+        hasOtpData: !!currentOtpData,
+        hasEmail: !!currentOtpData?.fullEmail,
+        hasLoginSessionToken: !!currentOtpData?.loginSessionToken,
+        hasUser: !!storeState.user,
+        isAuthenticated: storeState.isAuthenticated,
+      })
 
       if (currentOtpRequired && currentOtpData) {
         // Password verified, OTP needed - redirect to OTP page
-        // Store the loginSessionToken in URL search params (NOT in localStorage for security)
+        // Validate that we have the required loginSessionToken before navigation
+        if (!currentOtpData.loginSessionToken) {
+          console.error('[SignIn] OTP required but loginSessionToken is missing!')
+          throw new Error(t('auth.signIn.error'))
+        }
+
         rateLimit.recordSuccess()
         markDeviceAsRecognized()
 
         // Navigate to OTP page with necessary data
+        const otpPath = ROUTES.auth.otp
+        const otpParams = {
+          email: currentOtpData.fullEmail,
+          purpose: 'login' as const,
+          token: currentOtpData.loginSessionToken,
+        }
+
+        console.log('[SignIn] Navigating to OTP page:', otpPath)
+
         navigate({
-          to: ROUTES.auth.otp,
-          search: {
-            email: currentOtpData.fullEmail,
-            purpose: 'login',
-            token: currentOtpData.loginSessionToken,
-          },
+          to: otpPath,
+          search: otpParams,
         })
         return
+      }
+
+      // If we get here without OTP required, check if we have a user (direct login success)
+      const user = storeState.user
+
+      if (!user) {
+        // Neither OTP required nor user present - something went wrong
+        console.error('[SignIn] Login completed but no user and no OTP required. State:', storeState)
+        throw new Error(t('auth.signIn.error'))
       }
 
       // Record successful login - clears rate limit data
@@ -281,13 +312,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       // Mark device as recognized
       markDeviceAsRecognized()
-
-      // Get user from store to determine redirect
-      const user = useAuthStore.getState().user
-
-      if (!user) {
-        throw new Error(t('auth.signIn.error'))
-      }
 
       // Redirect based on role
       // No firm check needed - lawyers without firm are treated as solo lawyers
