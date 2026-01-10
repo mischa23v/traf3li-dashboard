@@ -18,6 +18,7 @@ import { FeatureTour } from '@/features/onboarding/components/feature-tour'
 import { QuickStartChecklist } from '@/features/onboarding/components/quick-start-checklist'
 import { SetupReminderBanner } from '@/features/onboarding/components/setup-reminder-banner'
 import { useWelcome } from '@/hooks/useWelcome'
+import { EmailVerificationBanner } from '@/components/email-verification-banner'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -98,6 +99,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                 'bg-white text-[#0f172a]'
               )}
             >
+              {/* Email Verification Banner - Shows if user is logged in but email not verified */}
+              <EmailVerificationBanner />
+
               {/* Setup Reminder Banner */}
               {onboardingStatus?.completed && <SetupReminderBanner />}
 
