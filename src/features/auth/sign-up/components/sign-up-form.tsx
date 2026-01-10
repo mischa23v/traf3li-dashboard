@@ -643,10 +643,11 @@ export function SignUpForm() {
         const errorMessage = error?.response?.data?.message || error?.message
         const errorMessageEn = error?.response?.data?.messageEn
         const errors = error?.response?.data?.errors // Array of specific validation errors
+        const errorField = error?.response?.data?.field // Field indicator for form validation
 
-        // Handle specific error codes from backend
+        // Handle specific error codes from backend (Gold Standard pattern)
         if (errorCode === 'WEAK_PASSWORD') {
-          // Backend returns { code: 'WEAK_PASSWORD', errors: [...] }
+          // Backend returns { code: 'WEAK_PASSWORD', errors: [...], messageEn: '...' }
           const weaknessDetails = errors?.join(', ') || ''
           toast({
             title: isRTL ? 'كلمة المرور ضعيفة' : 'Weak Password',
@@ -656,7 +657,7 @@ export function SignUpForm() {
             variant: 'destructive',
           })
         } else if (errorCode === 'PASSWORD_BREACHED') {
-          // Backend returns { code: 'PASSWORD_BREACHED' } for passwords found in data breaches
+          // Backend returns { code: 'PASSWORD_BREACHED', breachCount: N }
           toast({
             title: isRTL ? 'كلمة المرور غير آمنة' : 'Password Compromised',
             description: isRTL
@@ -664,26 +665,26 @@ export function SignUpForm() {
               : 'This password has been found in data breaches. Please choose a different password.',
             variant: 'destructive',
           })
-        } else if (errorMessage?.includes('البريد الإلكتروني مستخدم') || errorMessage?.includes('email') && errorMessage?.includes('use')) {
-          // Duplicate email
+        } else if (errorCode === 'EMAIL_EXISTS') {
+          // Backend returns { code: 'EMAIL_EXISTS', field: 'email', messageEn: '...' }
           toast({
             title: isRTL ? 'البريد الإلكتروني مستخدم' : 'Email Already Exists',
             description: isRTL
               ? 'هذا البريد الإلكتروني مسجل بالفعل. جرب تسجيل الدخول.'
-              : 'This email is already registered. Try signing in instead.',
+              : errorMessageEn || 'This email is already registered. Try signing in instead.',
             variant: 'destructive',
           })
-        } else if (errorMessage?.includes('اسم المستخدم مستخدم') || errorMessage?.includes('username') && errorMessage?.includes('use')) {
-          // Duplicate username
+        } else if (errorCode === 'USERNAME_TAKEN') {
+          // Backend returns { code: 'USERNAME_TAKEN', field: 'username', messageEn: '...' }
           toast({
             title: isRTL ? 'اسم المستخدم مستخدم' : 'Username Taken',
             description: isRTL
               ? 'اسم المستخدم هذا مستخدم بالفعل. يرجى اختيار اسم آخر.'
-              : 'This username is already taken. Please choose a different one.',
+              : errorMessageEn || 'This username is already taken. Please choose a different one.',
             variant: 'destructive',
           })
         } else {
-          // Generic error
+          // Generic error - use messageEn if available for English users
           toast({
             title: isRTL ? 'فشل التسجيل' : 'Registration Failed',
             description: (isRTL ? errorMessage : errorMessageEn) || errorMessage || t('auth.signUp.errors.generalError', 'An error occurred, please try again'),
