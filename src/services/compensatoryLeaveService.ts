@@ -423,7 +423,7 @@ export const getCompensatoryLeaveRequests = async (
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/compensatory-leave-requests?${params.toString()}`)
+  const response = await api.get(`/hr/compensatory-leave-requests?${params.toString()}`)
   return response.data
 }
 
@@ -433,7 +433,7 @@ export const getCompensatoryLeaveRequests = async (
 export const getCompensatoryLeaveRequest = async (
   id: string
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.get(`/compensatory-leave-requests/${id}`)
+  const response = await api.get(`/hr/compensatory-leave-requests/${id}`)
   return response.data
 }
 
@@ -443,7 +443,7 @@ export const getCompensatoryLeaveRequest = async (
 export const createCompensatoryLeaveRequest = async (
   data: CreateCompensatoryLeaveRequestData
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.post('/compensatory-leave-requests', data)
+  const response = await api.post('/hr/compensatory-leave-requests', data)
   return response.data
 }
 
@@ -454,7 +454,7 @@ export const updateCompensatoryLeaveRequest = async (
   id: string,
   data: UpdateCompensatoryLeaveRequestData
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.patch(`/compensatory-leave-requests/${id}`, data)
+  const response = await api.patch(`/hr/compensatory-leave-requests/${id}`, data)
   return response.data
 }
 
@@ -462,7 +462,7 @@ export const updateCompensatoryLeaveRequest = async (
  * Delete a compensatory leave request (only if in draft status)
  */
 export const deleteCompensatoryLeaveRequest = async (id: string): Promise<void> => {
-  await api.delete(`/compensatory-leave-requests/${id}`)
+  await api.delete(`/hr/compensatory-leave-requests/${id}`)
 }
 
 /**
@@ -471,7 +471,7 @@ export const deleteCompensatoryLeaveRequest = async (id: string): Promise<void> 
 export const submitCompensatoryLeaveRequest = async (
   id: string
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.post(`/compensatory-leave-requests/${id}/submit`)
+  const response = await api.post(`/hr/compensatory-leave-requests/${id}/submit`)
   return response.data
 }
 
@@ -487,7 +487,7 @@ export const calculateLeaveDays = async (
   method: CalculationMethod,
   reason?: WorkReason
 ): Promise<LeaveDaysCalculation> => {
-  const response = await api.post('/compensatory-leave-requests/calculate-days', {
+  const response = await api.post('/hr/compensatory-leave-requests/calculate-days', {
     hoursWorked,
     method,
     reason,
@@ -503,7 +503,7 @@ export const approveCompensatoryLeaveRequest = async (
   id: string,
   data?: ApprovalActionData
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.post(`/compensatory-leave-requests/${id}/approve`, data || {})
+  const response = await api.post(`/hr/compensatory-leave-requests/${id}/approve`, data || {})
   return response.data
 }
 
@@ -514,7 +514,7 @@ export const rejectCompensatoryLeaveRequest = async (
   id: string,
   data: RejectionActionData
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.post(`/compensatory-leave-requests/${id}/reject`, data)
+  const response = await api.post(`/hr/compensatory-leave-requests/${id}/reject`, data)
   return response.data
 }
 
@@ -525,7 +525,7 @@ export const cancelCompensatoryLeaveRequest = async (
   id: string,
   reason: string
 ): Promise<CompensatoryLeaveRequest> => {
-  const response = await api.post(`/compensatory-leave-requests/${id}/cancel`, { reason })
+  const response = await api.post(`/hr/compensatory-leave-requests/${id}/cancel`, { reason })
   return response.data
 }
 
@@ -535,7 +535,7 @@ export const cancelCompensatoryLeaveRequest = async (
 export const getEmployeeCompLeaveBalance = async (
   employeeId: string
 ): Promise<EmployeeCompLeaveBalance> => {
-  const response = await api.get(`/compensatory-leave-requests/balance/${employeeId}`)
+  const response = await api.get(`/hr/compensatory-leave-requests/balance/${employeeId}`)
   return response.data
 }
 
@@ -550,7 +550,7 @@ export const expireUnusedCompLeave = async (
   if (asOfDate) params.append('asOfDate', asOfDate)
 
   const response = await api.post(
-    `/compensatory-leave-requests/expire-unused?${params.toString()}`
+    `/hr/compensatory-leave-requests/expire-unused?${params.toString()}`
   )
   return response.data
 }
@@ -578,7 +578,7 @@ export const getHolidayWorkRecords = async (
   if (filters?.includeHolidays !== undefined) params.append('includeHolidays', String(filters.includeHolidays))
   if (filters?.withoutCompLeave !== undefined) params.append('withoutCompLeave', String(filters.withoutCompLeave))
 
-  const response = await api.get(`/compensatory-leave-requests/holiday-work-records?${params.toString()}`)
+  const response = await api.get(`/hr/compensatory-leave-requests/holiday-work-records?${params.toString()}`)
   return response.data
 }
 
@@ -597,7 +597,7 @@ export const getCompensatoryLeaveStats = async (
   if (filters?.month) params.append('month', filters.month.toString())
   if (filters?.departmentId) params.append('departmentId', filters.departmentId)
 
-  const response = await api.get(`/compensatory-leave-requests/stats?${params.toString()}`)
+  const response = await api.get(`/hr/compensatory-leave-requests/stats?${params.toString()}`)
   return response.data
 }
 
@@ -605,7 +605,7 @@ export const getCompensatoryLeaveStats = async (
  * Get pending compensatory leave requests (for approvers)
  */
 export const getPendingCompensatoryLeaveRequests = async (): Promise<CompensatoryLeaveRequest[]> => {
-  const response = await api.get('/compensatory-leave-requests/pending-approvals')
+  const response = await api.get('/hr/compensatory-leave-requests/pending-approvals')
   return response.data
 }
 
@@ -632,7 +632,7 @@ export const getExpiringCompensatoryLeave = async (
   const params = new URLSearchParams()
   params.append('daysBeforeExpiry', daysBeforeExpiry.toString())
 
-  const response = await api.get(`/compensatory-leave-requests/expiring?${params.toString()}`)
+  const response = await api.get(`/hr/compensatory-leave-requests/expiring?${params.toString()}`)
   return response.data
 }
 
@@ -649,7 +649,7 @@ export const uploadCompensatoryLeaveDocument = async (
   formData.append('documentType', documentType)
 
   const response = await api.post(
-    `/compensatory-leave-requests/${requestId}/documents`,
+    `/hr/compensatory-leave-requests/${requestId}/documents`,
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -674,7 +674,7 @@ export const exportCompensatoryLeaveRequests = async (
   }
 
   const response = await api.get(
-    `/compensatory-leave-requests/export?${params.toString()}`,
+    `/hr/compensatory-leave-requests/export?${params.toString()}`,
     {
       responseType: 'blob'
     }
@@ -689,7 +689,7 @@ export const bulkApproveCompensatoryLeaveRequests = async (
   ids: string[],
   createLeaveAllocation: boolean = true
 ): Promise<{ approved: number; failed: number }> => {
-  const response = await api.post('/compensatory-leave-requests/bulk-approve', {
+  const response = await api.post('/hr/compensatory-leave-requests/bulk-approve', {
     ids,
     createLeaveAllocation,
   })
@@ -703,7 +703,7 @@ export const bulkRejectCompensatoryLeaveRequests = async (
   ids: string[],
   reason: string
 ): Promise<{ rejected: number; failed: number }> => {
-  const response = await api.post('/compensatory-leave-requests/bulk-reject', {
+  const response = await api.post('/hr/compensatory-leave-requests/bulk-reject', {
     ids,
     reason,
   })
@@ -731,7 +731,7 @@ export const getCompensatoryLeavePolicy = async (): Promise<{
     descriptionAr: string
   }[]
 }> => {
-  const response = await api.get('/compensatory-leave-requests/policy')
+  const response = await api.get('/hr/compensatory-leave-requests/policy')
   return response.data
 }
 

@@ -334,6 +334,51 @@ export const QueryKeys = {
     search: (query: string) => [...QueryKeys.employees.all(), 'search', query] as const,
   },
 
+  // ==================== HR DEPARTMENTS (API Contract) ====================
+  departments: {
+    all: () => ['departments'] as const,
+    lists: () => [...QueryKeys.departments.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.departments.lists(), filters] as const,
+    details: () => [...QueryKeys.departments.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.departments.details(), id] as const,
+    stats: () => [...QueryKeys.departments.all(), 'stats'] as const,
+    hierarchy: () => [...QueryKeys.departments.all(), 'hierarchy'] as const,
+    employees: (departmentId: string) => [...QueryKeys.departments.all(), 'employees', departmentId] as const,
+  },
+
+  // ==================== HR BRANCHES (API Contract) ====================
+  branches: {
+    all: () => ['branches'] as const,
+    lists: () => [...QueryKeys.branches.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.branches.lists(), filters] as const,
+    details: () => [...QueryKeys.branches.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.branches.details(), id] as const,
+    stats: () => [...QueryKeys.branches.all(), 'stats'] as const,
+    employees: (branchId: string) => [...QueryKeys.branches.all(), 'employees', branchId] as const,
+  },
+
+  // ==================== HR JOB DESCRIPTIONS (API Contract) ====================
+  jobDescriptions: {
+    all: () => ['job-descriptions'] as const,
+    lists: () => [...QueryKeys.jobDescriptions.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.jobDescriptions.lists(), filters] as const,
+    details: () => [...QueryKeys.jobDescriptions.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.jobDescriptions.details(), id] as const,
+    stats: () => [...QueryKeys.jobDescriptions.all(), 'stats'] as const,
+    versions: (id: string) => [...QueryKeys.jobDescriptions.all(), 'versions', id] as const,
+  },
+
+  // ==================== HR ORGANIZATION CHART (API Contract) ====================
+  organizationChart: {
+    all: () => ['organization-chart'] as const,
+    chart: (params?: { departmentId?: string; branchId?: string; maxLevel?: number }) =>
+      [...QueryKeys.organizationChart.all(), 'chart', params] as const,
+    reportingLine: (employeeId: string) =>
+      [...QueryKeys.organizationChart.all(), 'reporting-line', employeeId] as const,
+    directReports: (employeeId: string) =>
+      [...QueryKeys.organizationChart.all(), 'direct-reports', employeeId] as const,
+  },
+
   // ==================== STAFF (Lawyers/Team) ====================
   staff: {
     all: () => ['staff'] as const,
@@ -468,6 +513,69 @@ export const QueryKeys = {
     balance: (employeeId: string) => [...QueryKeys.compensatoryLeave.all(), 'balance', employeeId] as const,
     stats: () => [...QueryKeys.compensatoryLeave.all(), 'stats'] as const,
     pendingApprovals: () => [...QueryKeys.compensatoryLeave.all(), 'pending-approvals'] as const,
+    expiring: (daysBeforeExpiry?: number) =>
+      [...QueryKeys.compensatoryLeave.all(), 'expiring', daysBeforeExpiry] as const,
+    holidayWorkRecords: (employeeId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.compensatoryLeave.all(), 'holiday-work-records', employeeId, filters] as const,
+    policy: () => [...QueryKeys.compensatoryLeave.all(), 'policy'] as const,
+  },
+
+  // ==================== LEAVE TYPES (API CONTRACT PART 3 - Section 1) ====================
+  leaveTypes: {
+    all: () => ['leave-types'] as const,
+    lists: () => [...QueryKeys.leaveTypes.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.leaveTypes.lists(), filters] as const,
+    details: () => [...QueryKeys.leaveTypes.all(), 'detail'] as const,
+    detail: (code: string) => [...QueryKeys.leaveTypes.details(), code] as const,
+    active: () => [...QueryKeys.leaveTypes.all(), 'active'] as const,
+    byCategory: (category: string) => [...QueryKeys.leaveTypes.all(), 'by-category', category] as const,
+    eligibility: (employeeId: string, leaveTypeCode: string) =>
+      [...QueryKeys.leaveTypes.all(), 'eligibility', employeeId, leaveTypeCode] as const,
+    laborLawCompliant: () => [...QueryKeys.leaveTypes.all(), 'labor-law-compliant'] as const,
+  },
+
+  // ==================== WHO'S OUT CALENDAR (API CONTRACT PART 3 - Section 8) ====================
+  whosOut: {
+    all: () => ['whos-out'] as const,
+    calendar: (startDate: string, endDate: string, filters?: Record<string, any>) =>
+      [...QueryKeys.whosOut.all(), 'calendar', startDate, endDate, filters] as const,
+    today: () => [...QueryKeys.whosOut.all(), 'today'] as const,
+    currentlyOut: () => [...QueryKeys.whosOut.all(), 'currently-out'] as const,
+    upcoming: (days?: number) => [...QueryKeys.whosOut.all(), 'upcoming', days] as const,
+    teamCoverage: (department: string, startDate: string, endDate: string) =>
+      [...QueryKeys.whosOut.all(), 'team-coverage', department, startDate, endDate] as const,
+    conflicts: (startDate: string, endDate: string, employeeId?: string) =>
+      [...QueryKeys.whosOut.all(), 'conflicts', startDate, endDate, employeeId] as const,
+    summary: (period: string) => [...QueryKeys.whosOut.all(), 'summary', period] as const,
+  },
+
+  // ==================== BLACKOUT PERIODS (API CONTRACT PART 3) ====================
+  blackoutPeriods: {
+    all: () => ['blackout-periods'] as const,
+    lists: () => [...QueryKeys.blackoutPeriods.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.blackoutPeriods.lists(), filters] as const,
+    details: () => [...QueryKeys.blackoutPeriods.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.blackoutPeriods.details(), id] as const,
+    active: () => [...QueryKeys.blackoutPeriods.all(), 'active'] as const,
+    upcoming: () => [...QueryKeys.blackoutPeriods.all(), 'upcoming'] as const,
+    checkDate: (date: string, department?: string) =>
+      [...QueryKeys.blackoutPeriods.all(), 'check-date', date, department] as const,
+  },
+
+  // ==================== HOLIDAYS (API CONTRACT PART 3) ====================
+  holidays: {
+    all: () => ['holidays'] as const,
+    lists: () => [...QueryKeys.holidays.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.holidays.lists(), filters] as const,
+    details: () => [...QueryKeys.holidays.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.holidays.details(), id] as const,
+    byYear: (year: number) => [...QueryKeys.holidays.all(), 'by-year', year] as const,
+    upcoming: (days?: number) => [...QueryKeys.holidays.all(), 'upcoming', days] as const,
+    next: () => [...QueryKeys.holidays.all(), 'next'] as const,
+    religious: () => [...QueryKeys.holidays.all(), 'religious'] as const,
+    national: () => [...QueryKeys.holidays.all(), 'national'] as const,
+    company: () => [...QueryKeys.holidays.all(), 'company'] as const,
+    checkDate: (date: string) => [...QueryKeys.holidays.all(), 'check-date', date] as const,
   },
 
   // ==================== PAYROLL ====================
@@ -577,6 +685,65 @@ export const QueryKeys = {
     stats: (filters?: Record<string, any>) => [...QueryKeys.retentionBonus.all(), 'stats', filters] as const,
     pendingApprovals: () => [...QueryKeys.retentionBonus.all(), 'pending-approvals'] as const,
     departmentSummary: (departmentId?: string) => [...QueryKeys.retentionBonus.all(), 'department-summary', departmentId] as const,
+  },
+
+  // ==================== GOSI (General Organization for Social Insurance) ====================
+  gosi: {
+    all: () => ['gosi'] as const,
+    summary: (month: number, year: number) => [...QueryKeys.gosi.all(), 'summary', month, year] as const,
+    contributions: (filters?: Record<string, any>) => [...QueryKeys.gosi.all(), 'contributions', filters] as const,
+    employeeContribution: (employeeId: string, month: number, year: number) =>
+      [...QueryKeys.gosi.all(), 'employee-contribution', employeeId, month, year] as const,
+    reports: (filters?: Record<string, any>) => [...QueryKeys.gosi.all(), 'reports', filters] as const,
+    report: (reportId: string) => [...QueryKeys.gosi.all(), 'report', reportId] as const,
+    stats: (year?: number) => [...QueryKeys.gosi.all(), 'stats', year] as const,
+    employeeHistory: (employeeId: string, year?: number) =>
+      [...QueryKeys.gosi.all(), 'employee-history', employeeId, year] as const,
+    rates: () => [...QueryKeys.gosi.all(), 'rates'] as const,
+  },
+
+  // ==================== WPS (Wage Protection System) ====================
+  wps: {
+    all: () => ['wps'] as const,
+    submissions: (filters?: Record<string, any>) => [...QueryKeys.wps.all(), 'submissions', filters] as const,
+    submission: (submissionId: string) => [...QueryKeys.wps.all(), 'submission', submissionId] as const,
+    submissionEmployees: (submissionId: string, filters?: Record<string, any>) =>
+      [...QueryKeys.wps.all(), 'submission-employees', submissionId, filters] as const,
+    stats: (year?: number) => [...QueryKeys.wps.all(), 'stats', year] as const,
+    history: (payrollRunId: string) => [...QueryKeys.wps.all(), 'history', payrollRunId] as const,
+    bankRequirements: (bankCode: string) => [...QueryKeys.wps.all(), 'bank-requirements', bankCode] as const,
+  },
+
+  // ==================== BONUSES ====================
+  bonuses: {
+    all: () => ['bonuses'] as const,
+    lists: () => [...QueryKeys.bonuses.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.bonuses.lists(), filters] as const,
+    details: () => [...QueryKeys.bonuses.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.bonuses.details(), id] as const,
+    employeeHistory: (employeeId: string, year?: number) =>
+      [...QueryKeys.bonuses.all(), 'employee-history', employeeId, year] as const,
+    stats: (year?: number, department?: string) => [...QueryKeys.bonuses.all(), 'stats', year, department] as const,
+    pendingApprovals: () => [...QueryKeys.bonuses.all(), 'pending-approvals'] as const,
+    batches: (filters?: Record<string, any>) => [...QueryKeys.bonuses.all(), 'batches', filters] as const,
+    calculatePreview: (data: Record<string, any>) => [...QueryKeys.bonuses.all(), 'calculate-preview', data] as const,
+  },
+
+  // ==================== EOSB (End of Service Benefits) ====================
+  eosb: {
+    all: () => ['eosb'] as const,
+    lists: () => [...QueryKeys.eosb.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.eosb.lists(), filters] as const,
+    details: () => [...QueryKeys.eosb.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.eosb.details(), id] as const,
+    preview: (employeeId: string, data: Record<string, any>) =>
+      [...QueryKeys.eosb.all(), 'preview', employeeId, data] as const,
+    stats: (year?: number) => [...QueryKeys.eosb.all(), 'stats', year] as const,
+    simulate: (employeeId: string, futureDate?: string) =>
+      [...QueryKeys.eosb.all(), 'simulate', employeeId, futureDate] as const,
+    liabilityReport: (asOfDate?: string) => [...QueryKeys.eosb.all(), 'liability-report', asOfDate] as const,
+    pendingApprovals: () => [...QueryKeys.eosb.all(), 'pending-approvals'] as const,
+    rules: () => [...QueryKeys.eosb.all(), 'rules'] as const,
   },
 
   // ==================== RECRUITMENT ====================
@@ -766,7 +933,11 @@ export const QueryKeys = {
     list: (filters?: Record<string, any>) => [...QueryKeys.shiftTypes.lists(), filters] as const,
     details: () => [...QueryKeys.shiftTypes.all(), 'detail'] as const,
     detail: (id: string) => [...QueryKeys.shiftTypes.details(), id] as const,
+    stats: () => [...QueryKeys.shiftTypes.all(), 'stats'] as const,
+    default: () => [...QueryKeys.shiftTypes.all(), 'default'] as const,
     active: () => [...QueryKeys.shiftTypes.all(), 'active'] as const,
+    ramadan: () => [...QueryKeys.shiftTypes.all(), 'ramadan'] as const,
+    byDay: (day: string) => [...QueryKeys.shiftTypes.all(), 'by-day', day] as const,
   },
 
   // ==================== SHIFT ASSIGNMENTS ====================
@@ -800,6 +971,8 @@ export const QueryKeys = {
       [...QueryKeys.shiftRequests.all(), 'stats', filters] as const,
     employee: (employeeId: string) => [...QueryKeys.shiftRequests.all(), 'employee', employeeId] as const,
     pending: () => [...QueryKeys.shiftRequests.all(), 'pending'] as const,
+    checkConflicts: (data: Record<string, any>) =>
+      [...QueryKeys.shiftRequests.all(), 'check-conflicts', data] as const,
   },
 
   // ==================== ORGANIZATIONAL STRUCTURE ====================
@@ -1690,6 +1863,62 @@ export const QueryKeys = {
     // Firm-specific
     byFirm: (firmId: string) => [...QueryKeys.invitations.all(), 'firm', firmId] as const,
     pending: (firmId: string) => [...QueryKeys.invitations.byFirm(firmId), 'pending'] as const,
+  },
+
+  // ==================== OVERTIME MANAGEMENT (API Contract Section 6) ====================
+  overtime: {
+    all: () => ['overtime'] as const,
+    lists: () => [...QueryKeys.overtime.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.overtime.lists(), filters] as const,
+    details: () => [...QueryKeys.overtime.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.overtime.details(), id] as const,
+    // Statistics
+    stats: (filters?: Record<string, any>) => [...QueryKeys.overtime.all(), 'stats', filters] as const,
+    // Pending approvals
+    pending: () => [...QueryKeys.overtime.all(), 'pending'] as const,
+    // Employee summary
+    employeeSummary: (employeeId: string, month?: number, year?: number) =>
+      [...QueryKeys.overtime.all(), 'employee-summary', employeeId, month, year] as const,
+    // Reports
+    report: (month: number, year: number, department?: string) =>
+      [...QueryKeys.overtime.all(), 'report', month, year, department] as const,
+  },
+
+  // ==================== GEOFENCE MANAGEMENT (API Contract Section 8) ====================
+  geofencing: {
+    all: () => ['geofencing'] as const,
+    lists: () => [...QueryKeys.geofencing.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.geofencing.lists(), filters] as const,
+    details: () => [...QueryKeys.geofencing.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.geofencing.details(), id] as const,
+    // Statistics
+    stats: () => [...QueryKeys.geofencing.all(), 'stats'] as const,
+    // Active geofences
+    active: () => [...QueryKeys.geofencing.all(), 'active'] as const,
+    // By type
+    byType: (type: string) => [...QueryKeys.geofencing.all(), 'by-type', type] as const,
+    // Nearby
+    nearby: (coordinates: [number, number], maxDistance?: number) =>
+      [...QueryKeys.geofencing.all(), 'nearby', coordinates, maxDistance] as const,
+    // Location verification
+    verifyLocation: (coordinates: [number, number]) =>
+      [...QueryKeys.geofencing.all(), 'verify', coordinates] as const,
+  },
+
+  // ==================== ATTENDANCE CORRECTIONS (API Contract Section 7) ====================
+  attendanceCorrections: {
+    all: () => ['attendance-corrections'] as const,
+    lists: () => [...QueryKeys.attendanceCorrections.all(), 'list'] as const,
+    list: (filters?: Record<string, any>) => [...QueryKeys.attendanceCorrections.lists(), filters] as const,
+    details: () => [...QueryKeys.attendanceCorrections.all(), 'detail'] as const,
+    detail: (id: string) => [...QueryKeys.attendanceCorrections.details(), id] as const,
+    // Pending corrections
+    pending: () => [...QueryKeys.attendanceCorrections.all(), 'pending'] as const,
+    // By employee
+    byEmployee: (employeeId: string) => [...QueryKeys.attendanceCorrections.all(), 'employee', employeeId] as const,
+    // By attendance record
+    byRecord: (attendanceRecordId: string) =>
+      [...QueryKeys.attendanceCorrections.all(), 'record', attendanceRecordId] as const,
   },
 } as const
 

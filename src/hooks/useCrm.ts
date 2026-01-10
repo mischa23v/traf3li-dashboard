@@ -13,6 +13,7 @@ import {
   pipelineService,
   referralService,
   crmActivityService,
+  crmTransactionService,
 } from '@/services/crmService'
 import type {
   Lead,
@@ -35,6 +36,8 @@ import type {
   LogEmailData,
   LogMeetingData,
   AddNoteData,
+  // Transaction types - API contract Section 5
+  CrmTransactionFilters,
 } from '@/types/crm'
 
 // ==================== Cache Configuration ====================
@@ -998,23 +1001,14 @@ export const useActivityTimeline = (params?: {
 }
 
 /**
- * CRM Transactions Hook
- * Fetches CRM activity logs for the transactions view
- * Uses the existing crmActivityService.getActivities under the hood
+ * CRM Transactions Hook - API Contract Section 5
+ * Fetches CRM transaction logs for the transactions view
+ * Uses the crmTransactionService which calls /transactions endpoint
  */
-export const useCrmTransactions = (params?: {
-  type?: string
-  entity_type?: string
-  period?: string
-  startDate?: string
-  endDate?: string
-  search?: string
-  page?: number
-  pageSize?: number
-}, enabled: boolean = true) => {
+export const useCrmTransactions = (params?: CrmTransactionFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: QueryKeys.crmTransactions.list(params),
-    queryFn: () => crmActivityService.getActivities(params),
+    queryFn: () => crmTransactionService.getTransactions(params),
     staleTime: LIST_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,
@@ -1022,8 +1016,9 @@ export const useCrmTransactions = (params?: {
 }
 
 /**
- * CRM Transaction Stats Hook
+ * CRM Transaction Stats Hook - API Contract Section 5
  * Fetches stats for CRM transactions view hero section
+ * Uses the crmTransactionService which calls /transactions/stats endpoint
  */
 export const useCrmTransactionStats = (params?: {
   startDate?: string
@@ -1031,7 +1026,7 @@ export const useCrmTransactionStats = (params?: {
 }, enabled: boolean = true) => {
   return useQuery({
     queryKey: QueryKeys.crmTransactions.stats(params),
-    queryFn: () => crmActivityService.getStats(params),
+    queryFn: () => crmTransactionService.getStats(params),
     staleTime: STATS_STALE_TIME,
     gcTime: STATS_GC_TIME,
     enabled,

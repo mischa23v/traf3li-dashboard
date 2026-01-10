@@ -145,7 +145,7 @@ export interface AllocateLeavesResponse {
 
 /**
  * Get all leave periods with optional filters
- * GET /leave-periods
+ * GET /hr/leave-periods
  */
 export const getLeavePeriods = async (filters?: LeavePeriodFilters): Promise<LeavePeriodsResponse> => {
   const params = new URLSearchParams()
@@ -155,111 +155,111 @@ export const getLeavePeriods = async (filters?: LeavePeriodFilters): Promise<Lea
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/leave-periods?${params.toString()}`)
+  const response = await api.get(`/hr/leave-periods?${params.toString()}`)
   return response.data
 }
 
 /**
  * Get single leave period by ID
- * GET /leave-periods/:id
+ * GET /hr/leave-periods/:id
  */
 export const getLeavePeriod = async (id: string): Promise<LeavePeriod> => {
-  const response = await api.get(`/leave-periods/${id}`)
+  const response = await api.get(`/hr/leave-periods/${id}`)
   return response.data
 }
 
 /**
  * Create a new leave period
- * POST /leave-periods
+ * POST /hr/leave-periods
  */
 export const createLeavePeriod = async (data: CreateLeavePeriodData): Promise<LeavePeriod> => {
-  const response = await api.post('/leave-periods', data)
+  const response = await api.post('/hr/leave-periods', data)
   return response.data
 }
 
 /**
  * Update an existing leave period
- * PATCH /leave-periods/:id
+ * PATCH /hr/leave-periods/:id
  */
 export const updateLeavePeriod = async (id: string, data: UpdateLeavePeriodData): Promise<LeavePeriod> => {
-  const response = await api.patch(`/leave-periods/${id}`, data)
+  const response = await api.patch(`/hr/leave-periods/${id}`, data)
   return response.data
 }
 
 /**
  * Delete a leave period
- * DELETE /leave-periods/:id
+ * DELETE /hr/leave-periods/:id
  */
 export const deleteLeavePeriod = async (id: string): Promise<void> => {
-  await api.delete(`/leave-periods/${id}`)
+  await api.delete(`/hr/leave-periods/${id}`)
 }
 
 /**
  * Get the currently active leave period
- * GET /leave-periods/active
+ * GET /hr/leave-periods/active
  */
 export const getActivePeriod = async (): Promise<LeavePeriod | null> => {
-  const response = await api.get('/leave-periods/active')
+  const response = await api.get('/hr/leave-periods/active')
   return response.data
 }
 
 /**
  * Allocate leaves for a period
- * POST /leave-periods/:id/allocate
+ * POST /hr/leave-periods/:id/allocate
  */
 export const allocateLeavesForPeriod = async (
   periodId: string,
   data?: Omit<AllocateLeavesRequest, 'periodId'>
 ): Promise<AllocateLeavesResponse> => {
-  const response = await api.post(`/leave-periods/${periodId}/allocate`, data || {})
+  const response = await api.post(`/hr/leave-periods/${periodId}/allocate`, data || {})
   return response.data
 }
 
 /**
  * Get statistics for a specific period
- * GET /leave-periods/:id/statistics
+ * GET /hr/leave-periods/:id/statistics
  */
 export const getPeriodStatistics = async (periodId: string): Promise<LeavePeriodStatistics> => {
-  const response = await api.get(`/leave-periods/${periodId}/statistics`)
+  const response = await api.get(`/hr/leave-periods/${periodId}/statistics`)
   return response.data
 }
 
 /**
  * Activate a leave period
- * POST /leave-periods/:id/activate
+ * POST /hr/leave-periods/:id/activate
  */
 export const activateLeavePeriod = async (id: string): Promise<LeavePeriod> => {
-  const response = await api.post(`/leave-periods/${id}/activate`)
+  const response = await api.post(`/hr/leave-periods/${id}/activate`)
   return response.data
 }
 
 /**
  * Deactivate a leave period
- * POST /leave-periods/:id/deactivate
+ * POST /hr/leave-periods/:id/deactivate
  */
 export const deactivateLeavePeriod = async (id: string): Promise<LeavePeriod> => {
-  const response = await api.post(`/leave-periods/${id}/deactivate`)
+  const response = await api.post(`/hr/leave-periods/${id}/deactivate`)
   return response.data
 }
 
 /**
  * Get all leave periods for a specific year
- * GET /leave-periods/year/:year
+ * GET /hr/leave-periods/year/:year
  */
 export const getLeavePeriodsByYear = async (year: number): Promise<LeavePeriod[]> => {
-  const response = await api.get(`/leave-periods/year/${year}`)
+  const response = await api.get(`/hr/leave-periods/year/${year}`)
   return response.data
 }
 
 /**
  * Check if a date falls within an active leave period
- * GET /leave-periods/check-date
+ * GET /hr/leave-periods/check-date
  */
 export const checkDateInPeriod = async (date: string): Promise<{
   inPeriod: boolean
   period?: LeavePeriod
 }> => {
-  const response = await api.get('/leave-periods/check-date', {
+  const response = await api.get('/hr/leave-periods/check-date', {
     params: { date }
   })
   return response.data
@@ -267,7 +267,7 @@ export const checkDateInPeriod = async (date: string): Promise<{
 
 /**
  * Get leave allocation summary for a period
- * GET /leave-periods/:id/allocation-summary
+ * GET /hr/leave-periods/:id/allocation-summary
  */
 export const getAllocationSummary = async (periodId: string): Promise<{
   totalAllocations: number
@@ -283,7 +283,7 @@ export const getAllocationSummary = async (periodId: string): Promise<{
     totalDays: number
   }>
 }> => {
-  const response = await api.get(`/leave-periods/${periodId}/allocation-summary`)
+  const response = await api.get(`/hr/leave-periods/${periodId}/allocation-summary`)
   return response.data
 }
 

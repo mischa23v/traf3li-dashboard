@@ -279,7 +279,7 @@ export const getLeaveEncashments = async (filters?: LeaveEncashmentFilters): Pro
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/leave-encashments?${params.toString()}`)
+  const response = await api.get(`/hr/leave-encashments?${params.toString()}`)
   return response.data
 }
 
@@ -287,7 +287,7 @@ export const getLeaveEncashments = async (filters?: LeaveEncashmentFilters): Pro
  * Get a single leave encashment by ID
  */
 export const getLeaveEncashment = async (id: string): Promise<LeaveEncashment> => {
-  const response = await api.get(`/leave-encashments/${id}`)
+  const response = await api.get(`/hr/leave-encashments/${id}`)
   return response.data
 }
 
@@ -295,7 +295,7 @@ export const getLeaveEncashment = async (id: string): Promise<LeaveEncashment> =
  * Create a new leave encashment request
  */
 export const createLeaveEncashment = async (data: CreateLeaveEncashmentData): Promise<LeaveEncashment> => {
-  const response = await api.post('/leave-encashments', data)
+  const response = await api.post('/hr/leave-encashments', data)
   return response.data
 }
 
@@ -303,7 +303,7 @@ export const createLeaveEncashment = async (data: CreateLeaveEncashmentData): Pr
  * Update an existing leave encashment
  */
 export const updateLeaveEncashment = async (id: string, data: UpdateLeaveEncashmentData): Promise<LeaveEncashment> => {
-  const response = await api.patch(`/leave-encashments/${id}`, data)
+  const response = await api.patch(`/hr/leave-encashments/${id}`, data)
   return response.data
 }
 
@@ -311,14 +311,14 @@ export const updateLeaveEncashment = async (id: string, data: UpdateLeaveEncashm
  * Delete a leave encashment (only if in draft status)
  */
 export const deleteLeaveEncashment = async (id: string): Promise<void> => {
-  await api.delete(`/leave-encashments/${id}`)
+  await api.delete(`/hr/leave-encashments/${id}`)
 }
 
 /**
  * Submit leave encashment for approval
  */
 export const submitLeaveEncashment = async (id: string): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/submit`)
+  const response = await api.post(`/hr/leave-encashments/${id}/submit`)
   return response.data
 }
 
@@ -330,7 +330,7 @@ export const calculateEncashmentAmount = async (
   leaveType: string,
   days: number
 ): Promise<EncashmentCalculation> => {
-  const response = await api.post('/leave-encashments/calculate', {
+  const response = await api.post('/hr/leave-encashments/calculate', {
     employeeId,
     leaveType,
     days
@@ -345,7 +345,7 @@ export const getEncashableBalance = async (
   employeeId: string,
   leaveType: string
 ): Promise<EncashmentEligibility> => {
-  const response = await api.get(`/leave-encashments/eligibility/${employeeId}`, {
+  const response = await api.get(`/hr/leave-encashments/eligibility/${employeeId}`, {
     params: { leaveType }
   })
   return response.data
@@ -358,7 +358,7 @@ export const approveLeaveEncashment = async (
   id: string,
   data?: ApprovalActionData
 ): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/approve`, data || {})
+  const response = await api.post(`/hr/leave-encashments/${id}/approve`, data || {})
   return response.data
 }
 
@@ -369,7 +369,7 @@ export const rejectLeaveEncashment = async (
   id: string,
   data: RejectionActionData
 ): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/reject`, data)
+  const response = await api.post(`/hr/leave-encashments/${id}/reject`, data)
   return response.data
 }
 
@@ -380,7 +380,7 @@ export const markAsPaid = async (
   id: string,
   data: MarkAsPaidData
 ): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/mark-paid`, data)
+  const response = await api.post(`/hr/leave-encashments/${id}/mark-paid`, data)
   return response.data
 }
 
@@ -391,7 +391,7 @@ export const processEncashment = async (
   id: string,
   data?: ProcessEncashmentData
 ): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/process`, data || { updateLeaveAllocation: true })
+  const response = await api.post(`/hr/leave-encashments/${id}/process`, data || { updateLeaveAllocation: true })
   return response.data
 }
 
@@ -402,7 +402,7 @@ export const cancelLeaveEncashment = async (
   id: string,
   reason: string
 ): Promise<LeaveEncashment> => {
-  const response = await api.post(`/leave-encashments/${id}/cancel`, { reason })
+  const response = await api.post(`/hr/leave-encashments/${id}/cancel`, { reason })
   return response.data
 }
 
@@ -419,7 +419,7 @@ export const getEncashmentStats = async (filters?: {
   if (filters?.month) params.append('month', filters.month.toString())
   if (filters?.departmentId) params.append('departmentId', filters.departmentId)
 
-  const response = await api.get(`/leave-encashments/stats?${params.toString()}`)
+  const response = await api.get(`/hr/leave-encashments/stats?${params.toString()}`)
   return response.data
 }
 
@@ -427,7 +427,7 @@ export const getEncashmentStats = async (filters?: {
  * Get pending encashment requests (for approvers)
  */
 export const getPendingEncashments = async (): Promise<LeaveEncashment[]> => {
-  const response = await api.get('/leave-encashments/pending-approvals')
+  const response = await api.get('/hr/leave-encashments/pending-approvals')
   return response.data
 }
 
@@ -435,7 +435,7 @@ export const getPendingEncashments = async (): Promise<LeaveEncashment[]> => {
  * Get employee encashment history
  */
 export const getEmployeeEncashmentHistory = async (employeeId: string): Promise<LeaveEncashment[]> => {
-  const response = await api.get(`/leave-encashments/employee/${employeeId}`)
+  const response = await api.get(`/hr/leave-encashments/employee/${employeeId}`)
   return response.data
 }
 
@@ -443,7 +443,7 @@ export const getEmployeeEncashmentHistory = async (employeeId: string): Promise<
  * Bulk approve encashments
  */
 export const bulkApproveEncashments = async (ids: string[]): Promise<{ approved: number }> => {
-  const response = await api.post('/leave-encashments/bulk-approve', { ids })
+  const response = await api.post('/hr/leave-encashments/bulk-approve', { ids })
   return response.data
 }
 
@@ -451,7 +451,7 @@ export const bulkApproveEncashments = async (ids: string[]): Promise<{ approved:
  * Bulk reject encashments
  */
 export const bulkRejectEncashments = async (ids: string[], reason: string): Promise<{ rejected: number }> => {
-  const response = await api.post('/leave-encashments/bulk-reject', { ids, reason })
+  const response = await api.post('/hr/leave-encashments/bulk-reject', { ids, reason })
   return response.data
 }
 
@@ -468,7 +468,7 @@ export const exportEncashments = async (filters?: LeaveEncashmentFilters): Promi
     })
   }
 
-  const response = await api.get(`/leave-encashments/export?${params.toString()}`, {
+  const response = await api.get(`/hr/leave-encashments/export?${params.toString()}`, {
     responseType: 'blob'
   })
   return response.data
@@ -485,7 +485,7 @@ export const getEncashmentPolicy = async (): Promise<{
   eligibilityCriteria: string[]
   eligibilityCriteriaAr: string[]
 }> => {
-  const response = await api.get('/leave-encashments/policy')
+  const response = await api.get('/hr/leave-encashments/policy')
   return response.data
 }
 

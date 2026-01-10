@@ -252,7 +252,7 @@ export const getLeaveAllocations = async (
   if (filters?.sortBy) params.append('sortBy', filters.sortBy)
   if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder)
 
-  const response = await api.get(`/leave-allocations?${params.toString()}`)
+  const response = await api.get(`/hr/leave-allocations?${params.toString()}`)
   return response.data
 }
 
@@ -260,7 +260,7 @@ export const getLeaveAllocations = async (
  * Get single leave allocation by ID
  */
 export const getLeaveAllocation = async (allocationId: string): Promise<LeaveAllocation> => {
-  const response = await api.get(`/leave-allocations/${allocationId}`)
+  const response = await api.get(`/hr/leave-allocations/${allocationId}`)
   return response.data
 }
 
@@ -270,7 +270,7 @@ export const getLeaveAllocation = async (allocationId: string): Promise<LeaveAll
 export const createLeaveAllocation = async (
   data: CreateLeaveAllocationData
 ): Promise<LeaveAllocation> => {
-  const response = await api.post('/leave-allocations', data)
+  const response = await api.post('/hr/leave-allocations', data)
   return response.data
 }
 
@@ -281,7 +281,7 @@ export const updateLeaveAllocation = async (
   allocationId: string,
   data: UpdateLeaveAllocationData
 ): Promise<LeaveAllocation> => {
-  const response = await api.patch(`/leave-allocations/${allocationId}`, data)
+  const response = await api.patch(`/hr/leave-allocations/${allocationId}`, data)
   return response.data
 }
 
@@ -289,7 +289,7 @@ export const updateLeaveAllocation = async (
  * Delete a leave allocation
  */
 export const deleteLeaveAllocation = async (allocationId: string): Promise<void> => {
-  await api.delete(`/leave-allocations/${allocationId}`)
+  await api.delete(`/hr/leave-allocations/${allocationId}`)
 }
 
 /**
@@ -313,7 +313,7 @@ export const getEmployeeLeaveBalance = async (
   if (leaveType) params.append('leaveType', leaveType)
 
   const response = await api.get(
-    `/leave-allocations/balance/${employeeId}?${params.toString()}`
+    `/hr/leave-allocations/balance/${employeeId}?${params.toString()}`
   )
   return response.data
 }
@@ -324,7 +324,7 @@ export const getEmployeeLeaveBalance = async (
 export const getEmployeeAllAllocations = async (
   employeeId: string
 ): Promise<EmployeeLeaveBalance> => {
-  const response = await api.get(`/leave-allocations/employee/${employeeId}/all`)
+  const response = await api.get(`/hr/leave-allocations/employee/${employeeId}/all`)
   return response.data
 }
 
@@ -343,7 +343,7 @@ export const bulkAllocateLeaves = async (
     error: string
   }>
 }> => {
-  const response = await api.post('/leave-allocations/bulk', data)
+  const response = await api.post('/hr/leave-allocations/bulk', data)
   return response.data
 }
 
@@ -353,7 +353,7 @@ export const bulkAllocateLeaves = async (
 export const carryForwardLeaves = async (
   data: CarryForwardData
 ): Promise<LeaveAllocation> => {
-  const response = await api.post('/leave-allocations/carry-forward', data)
+  const response = await api.post('/hr/leave-allocations/carry-forward', data)
   return response.data
 }
 
@@ -373,7 +373,7 @@ export const processCarryForwardForAll = async (
     error: string
   }>
 }> => {
-  const response = await api.post('/leave-allocations/carry-forward/process-all', data)
+  const response = await api.post('/hr/leave-allocations/carry-forward/process-all', data)
   return response.data
 }
 
@@ -392,7 +392,7 @@ export const expireCarryForwardedLeaves = async (
   if (asOfDate) params.append('asOfDate', asOfDate)
 
   const response = await api.post(
-    `/leave-allocations/carry-forward/expire?${params.toString()}`
+    `/hr/leave-allocations/carry-forward/expire?${params.toString()}`
   )
   return response.data
 }
@@ -406,7 +406,7 @@ export const updateLeaveBalance = async (
   usedDays: number,
   pendingDays?: number
 ): Promise<LeaveAllocation> => {
-  const response = await api.patch(`/leave-allocations/${allocationId}/update-balance`, {
+  const response = await api.patch(`/hr/leave-allocations/${allocationId}/update-balance`, {
     usedDays,
     pendingDays,
   })
@@ -421,7 +421,7 @@ export const encashLeaves = async (
   daysToEncash: number,
   reason?: string
 ): Promise<LeaveAllocation> => {
-  const response = await api.post(`/leave-allocations/${allocationId}/encash`, {
+  const response = await api.post(`/hr/leave-allocations/${allocationId}/encash`, {
     daysToEncash,
     reason,
   })
@@ -443,7 +443,7 @@ export const getAllocationSummary = async (
   if (filters?.leaveType) params.append('leaveType', filters.leaveType)
 
   const response = await api.get(
-    `/leave-allocations/summary/${leavePeriodId}?${params.toString()}`
+    `/hr/leave-allocations/summary/${leavePeriodId}?${params.toString()}`
   )
   return response.data
 }
@@ -465,7 +465,7 @@ export const getCarryForwardSummary = async (
   if (filters?.departmentId) params.append('departmentId', filters.departmentId)
   if (filters?.leaveType) params.append('leaveType', filters.leaveType)
 
-  const response = await api.get(`/leave-allocations/carry-forward/summary?${params.toString()}`)
+  const response = await api.get(`/hr/leave-allocations/carry-forward/summary?${params.toString()}`)
   return response.data
 }
 
@@ -490,7 +490,7 @@ export const getEmployeesWithLowBalance = async (
   params.append('leaveType', leaveType)
   params.append('threshold', threshold.toString())
 
-  const response = await api.get(`/leave-allocations/low-balance?${params.toString()}`)
+  const response = await api.get(`/hr/leave-allocations/low-balance?${params.toString()}`)
   return response.data
 }
 
@@ -513,7 +513,7 @@ export const getExpiringCarryForward = async (
   const params = new URLSearchParams()
   params.append('daysBeforeExpiry', daysBeforeExpiry.toString())
 
-  const response = await api.get(`/leave-allocations/expiring-carry-forward?${params.toString()}`)
+  const response = await api.get(`/hr/leave-allocations/expiring-carry-forward?${params.toString()}`)
   return response.data
 }
 
@@ -529,7 +529,7 @@ export const adjustAllocation = async (
     affectField: 'newLeavesAllocated' | 'carryForwardedLeaves' | 'leavesUsed'
   }
 ): Promise<LeaveAllocation> => {
-  const response = await api.post(`/leave-allocations/${allocationId}/adjust`, adjustment)
+  const response = await api.post(`/hr/leave-allocations/${allocationId}/adjust`, adjustment)
   return response.data
 }
 
@@ -556,7 +556,7 @@ export const getAllocationHistory = async (
   if (leaveType) params.append('leaveType', leaveType)
 
   const response = await api.get(
-    `/leave-allocations/history/${employeeId}?${params.toString()}`
+    `/hr/leave-allocations/history/${employeeId}?${params.toString()}`
   )
   return response.data
 }
@@ -601,6 +601,6 @@ export const getAllocationStatistics = async (
   if (filters?.departmentId) params.append('departmentId', filters.departmentId)
   if (filters?.leaveType) params.append('leaveType', filters.leaveType)
 
-  const response = await api.get(`/leave-allocations/statistics?${params.toString()}`)
+  const response = await api.get(`/hr/leave-allocations/statistics?${params.toString()}`)
   return response.data
 }

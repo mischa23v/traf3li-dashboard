@@ -18,17 +18,19 @@ import type {
 // ═══════════════════════════════════════════════════════════════
 // LEAD TYPES
 // ═══════════════════════════════════════════════════════════════
+/**
+ * Lead Status - matches API contract Section 4 (Leads API)
+ * Valid values: new, contacted, qualified, proposal, negotiation, won, lost, dormant
+ */
 export type LeadStatus =
   | 'new'
   | 'contacted'
   | 'qualified'
   | 'proposal'
-  | 'proposal_sent'
   | 'negotiation'
   | 'won'
   | 'lost'
   | 'dormant'
-  | 'on_hold'
 
 export type LeadType = 'individual' | 'company'
 
@@ -640,24 +642,22 @@ export interface FeePaymentData {
 // ═══════════════════════════════════════════════════════════════
 // ACTIVITY TYPES
 // ═══════════════════════════════════════════════════════════════
+/**
+ * Activity Type - matches API contract Section 6 (CRM Activities API)
+ * Valid values: call, email, meeting, note, task, status_change, stage_change,
+ *               assignment, lead_created, lead_converted, other
+ */
 export type ActivityType =
   | 'call'
   | 'email'
-  | 'sms'
-  | 'whatsapp'
   | 'meeting'
   | 'note'
   | 'task'
-  | 'document'
-  | 'proposal'
   | 'status_change'
   | 'stage_change'
   | 'assignment'
   | 'lead_created'
   | 'lead_converted'
-  | 'case_created'
-  | 'case_updated'
-  | 'case_deleted'
   | 'other'
 
 export type ActivityEntityType =
@@ -823,7 +823,72 @@ export interface AddNoteData {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// API RESPONSE TYPES
+// CRM TRANSACTION TYPES - matches API contract Section 5
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Transaction Type - matches API contract Section 5
+ * Represents CRM transaction/activity log entries
+ */
+export type TransactionType =
+  | 'activity'
+  | 'stage_change'
+  | 'new_client'
+  | 'conversion'
+  | 'won'
+  | 'lost'
+
+export type TransactionEntityType = 'lead' | 'client' | 'contact' | 'case'
+
+export interface CrmTransaction {
+  _id: string
+  transactionId: string
+  lawyerId: string
+  type: TransactionType
+  entityType: TransactionEntityType
+  entityId: string
+  entityName?: string
+  title: string
+  titleAr?: string
+  description?: string
+  metadata?: {
+    previousStage?: string
+    newStage?: string
+    previousStatus?: string
+    newStatus?: string
+    value?: number
+    reason?: string
+  }
+  performedBy: {
+    _id: string
+    firstName: string
+    lastName: string
+    avatar?: string
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CrmTransactionFilters {
+  type?: TransactionType
+  entityType?: TransactionEntityType
+  entityId?: string
+  startDate?: string
+  endDate?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
+export interface CrmTransactionStats {
+  total: number
+  byType: { _id: TransactionType; count: number }[]
+  byEntityType: { _id: TransactionEntityType; count: number }[]
+  recentActivity: CrmTransaction[]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// API RESPONSE TYPES - matches API contract format
 // ═══════════════════════════════════════════════════════════════
 export interface ApiResponse<T> {
   success: boolean
@@ -834,9 +899,15 @@ export interface ApiResponse<T> {
     limit: number
     total: number
     pages: number
+    hasNext: boolean
+    hasPrev: boolean
   }
 }
 
+/**
+ * Paginated Response - matches API contract pagination format
+ * All list endpoints return this format
+ */
 export interface PaginatedResponse<T> {
   data: T[]
   pagination: {
@@ -844,5 +915,7 @@ export interface PaginatedResponse<T> {
     limit: number
     total: number
     pages: number
+    hasNext: boolean
+    hasPrev: boolean
   }
 }

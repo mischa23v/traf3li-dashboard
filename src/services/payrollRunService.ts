@@ -428,74 +428,74 @@ export const getPayrollRuns = async (filters?: PayrollRunFilters): Promise<Payro
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/payroll-runs?${params.toString()}`)
+  const response = await api.get(`/hr/payroll/runs?${params.toString()}`)
   return response.data
 }
 
 export const getPayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.get(`/payroll-runs/${runId}`)
+  const response = await api.get(`/hr/payroll/runs/${runId}`)
   return response.data
 }
 
 export const createPayrollRun = async (data: CreatePayrollRunData): Promise<PayrollRun> => {
-  const response = await api.post('/payroll-runs', data)
+  const response = await api.post('/hr/payroll/runs', data)
   return response.data
 }
 
 export const updatePayrollRun = async (runId: string, data: UpdatePayrollRunData): Promise<PayrollRun> => {
-  const response = await api.patch(`/payroll-runs/${runId}`, data)
+  const response = await api.patch(`/hr/payroll/runs/${runId}`, data)
   return response.data
 }
 
 export const deletePayrollRun = async (runId: string): Promise<void> => {
-  await api.delete(`/payroll-runs/${runId}`)
+  await api.delete(`/hr/payroll/runs/${runId}`)
 }
 
 // Calculate payroll for all employees in the run
 export const calculatePayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/calculate`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/calculate`)
   return response.data
 }
 
 // Validate payroll run before approval
 export const validatePayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/validate`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/validate`)
   return response.data
 }
 
 // Approve payroll run
 export const approvePayrollRun = async (runId: string, comments?: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/approve`, { comments })
+  const response = await api.post(`/hr/payroll/runs/${runId}/approve`, { comments })
   return response.data
 }
 
 // Process payments
 export const processPayments = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/process-payments`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/process-payment`)
   return response.data
 }
 
 // Generate WPS file
 export const generateWPSFile = async (runId: string): Promise<{ fileUrl: string; fileName: string }> => {
-  const response = await api.post(`/payroll-runs/${runId}/generate-wps`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/generate-wps`)
   return response.data
 }
 
 // Submit WPS to bank (Note: uses generate-wps endpoint)
 export const submitWPS = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/generate-wps`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/generate-wps`)
   return response.data
 }
 
 // Cancel payroll run
 export const cancelPayrollRun = async (runId: string, reason: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/cancel`, { reason })
+  const response = await api.post(`/hr/payroll/runs/${runId}/cancel`, { reason })
   return response.data
 }
 
 // Send payslip notifications to employees
 export const sendPayslipNotifications = async (runId: string): Promise<{ sent: number; failed: number }> => {
-  const response = await api.post(`/payroll-runs/${runId}/send-notifications`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/send-notifications`)
   return response.data
 }
 
@@ -507,73 +507,60 @@ export const getPayrollRunStats = async (): Promise<{
   completedThisMonth: number
   totalPaidThisMonth: number
 }> => {
-  const response = await api.get('/payroll-runs/stats')
+  const response = await api.get('/hr/payroll/runs/stats')
   return response.data
 }
 
 // Hold/Unhold employee in payroll run
 export const holdEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${empId}/hold`, { reason })
+  const response = await api.post(`/hr/payroll/runs/${runId}/employees/${empId}/hold`, { reason })
   return response.data
 }
 
 export const unholdEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${empId}/unhold`)
+  const response = await api.post(`/hr/payroll/runs/${runId}/employees/${empId}/unhold`)
   return response.data
 }
 
 /**
  * Exclude employee from payroll run
- * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/exclude
- * @throws Error indicating the endpoint is not implemented
- * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/exclude endpoint
+ * POST /hr/payroll/runs/:id/employees/:empId/exclude
  */
 export const excludeEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
-  throw new Error(
-    'Feature not available: Employee exclusion is not yet implemented. | الميزة غير متاحة: استبعاد الموظف غير مطبق حالياً.\n' +
-    'Endpoint: POST /payroll-runs/:id/employees/:empId/exclude'
-  )
+  const response = await api.post(`/hr/payroll/runs/${runId}/employees/${empId}/exclude`, { reason })
+  return response.data
 }
 
 /**
  * Include employee back in payroll run
- * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/include
- * @throws Error indicating the endpoint is not implemented
- * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/include endpoint
+ * POST /hr/payroll/runs/:id/employees/:empId/include
  */
 export const includeEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
-  throw new Error(
-    'Feature not available: Employee inclusion is not yet implemented. | الميزة غير متاحة: تضمين الموظف غير مطبق حالياً.\n' +
-    'Endpoint: POST /payroll-runs/:id/employees/:empId/include'
-  )
+  const response = await api.post(`/hr/payroll/runs/${runId}/employees/${empId}/include`)
+  return response.data
 }
 
 /**
  * Recalculate single employee in payroll run
- * @deprecated Backend endpoint not implemented - POST /payroll-runs/:id/employees/:empId/recalculate
- * @throws Error indicating the endpoint is not implemented
- * TODO: [BACKEND-PENDING] Implement POST /payroll-runs/:id/employees/:empId/recalculate endpoint
+ * POST /hr/payroll/runs/:id/employees/:empId/recalculate
  */
 export const recalculateEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
-  throw new Error(
-    'Feature not available: Individual employee recalculation is not yet implemented. Please recalculate the entire payroll run. | الميزة غير متاحة: إعادة حساب الموظف الفردي غير مطبق حالياً. يرجى إعادة حساب دورة الرواتب بالكامل.\n' +
-    'Endpoint: POST /payroll-runs/:id/employees/:empId/recalculate'
-  )
+  const response = await api.post(`/hr/payroll/runs/${runId}/employees/${empId}/recalculate`)
+  return response.data
 }
 
 /**
  * Export payroll run report
- * @deprecated Backend endpoint not implemented - GET /payroll-runs/:id/export
- * @throws Error indicating the endpoint is not implemented
- * TODO: [BACKEND-PENDING] Implement GET /payroll-runs/:id/export endpoint with support for multiple report types and formats (pdf, excel, csv)
+ * GET /hr/payroll/runs/:id/export
  */
 export const exportPayrollRunReport = async (
   runId: string,
   reportType: 'summary' | 'detailed' | 'bank_file' | 'wps_sif' | 'journal_entry',
   format: 'pdf' | 'excel' | 'csv'
 ): Promise<Blob> => {
-  throw new Error(
-    'Export not available: Payroll report export is not yet implemented. | التصدير غير متاح: تصدير تقرير الرواتب غير مطبق حالياً.\n' +
-    'Endpoint: GET /payroll-runs/:id/export'
-  )
+  const response = await api.get(`/hr/payroll/runs/${runId}/export`, {
+    params: { reportType, format },
+    responseType: 'blob',
+  })
+  return response.data
 }

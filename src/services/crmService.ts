@@ -41,6 +41,10 @@ import type {
   LogEmailData,
   LogMeetingData,
   AddNoteData,
+  // Transaction types - API contract Section 5
+  CrmTransaction,
+  CrmTransactionFilters,
+  CrmTransactionStats,
 } from '@/types/crm'
 import type { NationalAddress } from '@/types/najiz'
 
@@ -955,12 +959,87 @@ export const crmActivityService = {
   },
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CRM TRANSACTIONS SERVICE - API Contract Section 5
+// ═══════════════════════════════════════════════════════════════
+/**
+ * CRM Transactions Service - Manages transaction logs
+ *
+ * API Endpoints (per API Contract Section 5):
+ * - GET    /transactions                     - List all transactions
+ * - GET    /transactions/:id                 - Get single transaction
+ * - GET    /transactions/stats               - Get transaction statistics
+ * - GET    /transactions/entity/:type/:id    - Get transactions for entity
+ */
+export const crmTransactionService = {
+  /**
+   * Get all transactions with optional filters
+   */
+  getTransactions: async (
+    params?: CrmTransactionFilters
+  ): Promise<{ data: CrmTransaction[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/transactions', { params })
+      return response.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Get single transaction
+   */
+  getTransaction: async (id: string): Promise<CrmTransaction> => {
+    try {
+      const response = await apiClient.get(`/transactions/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Get transaction statistics
+   */
+  getStats: async (params?: {
+    startDate?: string
+    endDate?: string
+  }): Promise<CrmTransactionStats> => {
+    try {
+      const response = await apiClient.get('/transactions/stats', { params })
+      return response.data.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+
+  /**
+   * Get transactions for a specific entity
+   */
+  getEntityTransactions: async (
+    entityType: string,
+    entityId: string,
+    params?: { type?: string }
+  ): Promise<CrmTransaction[]> => {
+    try {
+      const response = await apiClient.get(
+        `/transactions/entity/${entityType}/${entityId}`,
+        { params }
+      )
+      return response.data.data
+    } catch (error: any) {
+      throwBilingualError(error)
+    }
+  },
+}
+
 // Export all services as default object
 const crmService = {
   lead: leadService,
   pipeline: pipelineService,
   referral: referralService,
   activity: crmActivityService,
+  transaction: crmTransactionService,
 }
 
 export default crmService

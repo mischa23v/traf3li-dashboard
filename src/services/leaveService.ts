@@ -563,68 +563,68 @@ export const getLeaveRequests = async (filters?: LeaveRequestFilters): Promise<L
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/leave-requests?${params.toString()}`)
+  const response = await api.get(`/hr/leave-requests?${params.toString()}`)
   return response.data
 }
 
 export const getLeaveRequest = async (requestId: string): Promise<LeaveRequest> => {
-  const response = await api.get(`/leave-requests/${requestId}`)
+  const response = await api.get(`/hr/leave-requests/${requestId}`)
   return response.data
 }
 
 export const createLeaveRequest = async (data: CreateLeaveRequestData): Promise<LeaveRequest> => {
-  const response = await api.post('/leave-requests', data)
+  const response = await api.post('/hr/leave-requests', data)
   return response.data
 }
 
 export const updateLeaveRequest = async (requestId: string, data: UpdateLeaveRequestData): Promise<LeaveRequest> => {
-  const response = await api.patch(`/leave-requests/${requestId}`, data)
+  const response = await api.patch(`/hr/leave-requests/${requestId}`, data)
   return response.data
 }
 
 export const deleteLeaveRequest = async (requestId: string): Promise<void> => {
-  await api.delete(`/leave-requests/${requestId}`)
+  await api.delete(`/hr/leave-requests/${requestId}`)
 }
 
 // Submit for approval
 export const submitLeaveRequest = async (requestId: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/submit`)
+  const response = await api.post(`/hr/leave-requests/${requestId}/submit`)
   return response.data
 }
 
 // Approve leave request
 export const approveLeaveRequest = async (requestId: string, comments?: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/approve`, { comments })
+  const response = await api.post(`/hr/leave-requests/${requestId}/approve`, { comments })
   return response.data
 }
 
 // Reject leave request
 export const rejectLeaveRequest = async (requestId: string, reason: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/reject`, { reason })
+  const response = await api.post(`/hr/leave-requests/${requestId}/reject`, { reason })
   return response.data
 }
 
 // Cancel leave request
 export const cancelLeaveRequest = async (requestId: string, reason: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/cancel`, { reason })
+  const response = await api.post(`/hr/leave-requests/${requestId}/cancel`, { reason })
   return response.data
 }
 
 // Confirm return from leave
 export const confirmReturn = async (requestId: string, returnDate: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/confirm-return`, { returnDate })
+  const response = await api.post(`/hr/leave-requests/${requestId}/confirm-return`, { returnDate })
   return response.data
 }
 
 // Request extension
 export const requestExtension = async (requestId: string, extensionDays: number, reason: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/request-extension`, { extensionDays, reason })
+  const response = await api.post(`/hr/leave-requests/${requestId}/request-extension`, { extensionDays, reason })
   return response.data
 }
 
 // Get employee leave balance
 export const getLeaveBalance = async (employeeId: string): Promise<LeaveBalance> => {
-  const response = await api.get(`/leave-requests/balance/${employeeId}`)
+  const response = await api.get(`/hr/leave-requests/balance/${employeeId}`)
   return response.data
 }
 
@@ -641,7 +641,7 @@ export const getLeaveStats = async (filters?: { year?: number; department?: stri
   if (filters?.year) params.append('year', filters.year.toString())
   if (filters?.department) params.append('department', filters.department)
 
-  const response = await api.get(`/leave-requests/stats?${params.toString()}`)
+  const response = await api.get(`/hr/leave-requests/stats?${params.toString()}`)
   return response.data
 }
 
@@ -660,7 +660,7 @@ export const getTeamCalendar = async (startDate: string, endDate: string, depart
   params.append('endDate', endDate)
   if (department) params.append('department', department)
 
-  const response = await api.get(`/leave-requests/calendar?${params.toString()}`)
+  const response = await api.get(`/hr/leave-requests/calendar?${params.toString()}`)
   return response.data
 }
 
@@ -682,7 +682,7 @@ export const checkConflicts = async (data: {
     acceptable: boolean
   }
 }> => {
-  const response = await api.post('/leave-requests/check-conflicts', data)
+  const response = await api.post('/hr/leave-requests/check-conflicts', data)
   return response.data
 }
 
@@ -692,7 +692,7 @@ export const uploadLeaveDocument = async (requestId: string, file: File, documen
   formData.append('file', file)
   formData.append('documentType', documentType)
 
-  const response = await api.post(`/leave-requests/${requestId}/documents`, formData, {
+  const response = await api.post(`/hr/leave-requests/${requestId}/documents`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
   return response.data
@@ -700,13 +700,13 @@ export const uploadLeaveDocument = async (requestId: string, file: File, documen
 
 // Complete handover
 export const completeHandover = async (requestId: string): Promise<LeaveRequest> => {
-  const response = await api.post(`/leave-requests/${requestId}/complete-handover`)
+  const response = await api.post(`/hr/leave-requests/${requestId}/complete-handover`)
   return response.data
 }
 
 // Get pending approvals (for managers)
 export const getPendingApprovals = async (): Promise<LeaveRequest[]> => {
-  const response = await api.get('/leave-requests/pending-approvals')
+  const response = await api.get('/hr/leave-requests/pending-approvals')
   return response.data
 }
 
@@ -718,6 +718,6 @@ export const getLeaveTypes = async (): Promise<Array<{
   maxDays?: number
   article?: string
 }>> => {
-  const response = await api.get('/leave-requests/types')
+  const response = await api.get('/hr/leave-types')
   return response.data
 }
