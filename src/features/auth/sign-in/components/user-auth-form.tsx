@@ -356,6 +356,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         return
       }
 
+      // Handle EMAIL_NOT_VERIFIED (403) - user needs to verify email before login
+      // Backend returns this for users who registered after 2025-02-01 and haven't verified
+      if (status === 403 && errorCode === 'EMAIL_NOT_VERIFIED') {
+        const responseData = error?.response?.data
+        navigate({
+          to: ROUTES.auth.verifyEmailRequired,
+          search: {
+            email: responseData?.email || '', // Masked email from backend
+            verificationSent: responseData?.verificationResent || false,
+          },
+        })
+        return
+      }
+
       // Handle server-side 429 rate limit - DON'T count as failed attempt
       // 429 means "slow down", not "wrong password"
       const rateLimitInfo = rateLimit.handle429(error)
