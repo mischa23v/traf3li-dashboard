@@ -180,11 +180,16 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
             ? 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.'
             : 'Verification code has expired. Please request a new code.'
         )
-      } else if (error?.response?.data?.code === 'OTP_NOT_FOUND') {
+      } else if (error?.response?.data?.code === 'OTP_NOT_FOUND' ||
+                 error?.response?.data?.code === 'OTP_INVALID' ||
+                 error?.response?.data?.code === 'USER_NOT_FOUND') {
+        // SECURITY: Generic message to prevent user enumeration attacks
+        // OTP_NOT_FOUND could mean: no OTP sent (user doesn't exist), OTP expired, or wrong OTP
+        // We intentionally don't reveal which case it is
         setErrorMessage(
           isRTL
-            ? 'رمز التحقق غير موجود. يرجى طلب رمز جديد.'
-            : 'Verification code not found. Please request a new code.'
+            ? 'رمز التحقق غير صالح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى أو التسجيل إذا لم يكن لديك حساب.'
+            : 'Invalid or expired verification code. Please try again or register if you don\'t have an account.'
         )
       } else {
         const defaultMsg = isRTL ? 'رمز التحقق غير صحيح' : 'Invalid verification code'

@@ -489,9 +489,10 @@ const refreshAccessToken = async (): Promise<boolean> => {
     return false
   }
 
+  // SECURITY: Never log token content, even partial - prevents token leakage to logs
   tokenLog('Attempting token refresh...', {
     tokenSource: getRefreshToken() ? 'localStorage' : 'cookie',
-    tokenPreview: refreshToken.substring(0, 20) + '...',
+    tokenLength: refreshToken.length,
   })
 
   try {

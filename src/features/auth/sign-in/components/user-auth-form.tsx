@@ -74,6 +74,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isLDAPLoading, setIsLDAPLoading] = useState(false)
 
+  // SECURITY: Ref-based guard to prevent double-click/double-submit attacks
+  // This is checked BEFORE any async operations to prevent race conditions
+  const isSubmittingRef = useRef(false)
+
   const formSchema = useMemo(() => createFormSchema(t), [t])
 
   const defaultValues = useMemo(() => ({
@@ -196,6 +200,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
    * Handle form submission with rate limiting and CAPTCHA
    */
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    // SECURITY: Prevent double-click/double-submit attacks
+    // This check must be FIRST before any async operations
+    if (isSubmittingRef.current) {
+      return
+    }
+    isSubmittingRef.current = true
+
     const identifier = getLoginIdentifier(data.username)
     setCurrentIdentifier(identifier)
 
@@ -203,6 +214,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const status = rateLimit.checkAllowed()
     if (!status.allowed) {
       // Rate limit UI components will show the error
+      isSubmittingRef.current = false
       return
     }
 
@@ -220,10 +232,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               description: t('auth.toast.verificationRequired.description'),
               variant: 'destructive',
             })
+            isSubmittingRef.current = false
             return
           }
         } catch (err) {
           console.error('CAPTCHA execution failed:', err)
+          isSubmittingRef.current = false
           return
         }
       }
@@ -241,25 +255,56 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       await login(loginData)
 
       // Check if OTP verification is required (email-based 2FA for password login)
-      const currentOtpRequired = useAuthStore.getState().otpRequired
-      const currentOtpData = useAuthStore.getState().otpData
+      // IMPORTANT: Get fresh state after login completes - Zustand updates are synchronous
+      const storeState = useAuthStore.getState()
+      const currentOtpRequired = storeState.otpRequired
+      const currentOtpData = storeState.otpData
+
+      // Log authentication flow state (safe for production - no sensitive data)
+      console.log('[SignIn] Post-login state:', {
+        otpRequired: currentOtpRequired,
+        hasOtpData: !!currentOtpData,
+        hasEmail: !!currentOtpData?.fullEmail,
+        hasLoginSessionToken: !!currentOtpData?.loginSessionToken,
+        hasUser: !!storeState.user,
+        isAuthenticated: storeState.isAuthenticated,
+      })
 
       if (currentOtpRequired && currentOtpData) {
         // Password verified, OTP needed - redirect to OTP page
-        // Store the loginSessionToken in URL search params (NOT in localStorage for security)
+        // Validate that we have the required loginSessionToken before navigation
+        if (!currentOtpData.loginSessionToken) {
+          console.error('[SignIn] OTP required but loginSessionToken is missing!')
+          throw new Error(t('auth.signIn.error'))
+        }
+
         rateLimit.recordSuccess()
         markDeviceAsRecognized()
 
         // Navigate to OTP page with necessary data
+        const otpPath = ROUTES.auth.otp
+        const otpParams = {
+          email: currentOtpData.fullEmail,
+          purpose: 'login' as const,
+          token: currentOtpData.loginSessionToken,
+        }
+
+        console.log('[SignIn] Navigating to OTP page:', otpPath)
+
         navigate({
-          to: ROUTES.auth.otp,
-          search: {
-            email: currentOtpData.fullEmail,
-            purpose: 'login',
-            token: currentOtpData.loginSessionToken,
-          },
+          to: otpPath,
+          search: otpParams,
         })
         return
+      }
+
+      // If we get here without OTP required, check if we have a user (direct login success)
+      const user = storeState.user
+
+      if (!user) {
+        // Neither OTP required nor user present - something went wrong
+        console.error('[SignIn] Login completed but no user and no OTP required. State:', storeState)
+        throw new Error(t('auth.signIn.error'))
       }
 
       // Record successful login - clears rate limit data
@@ -267,13 +312,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       // Mark device as recognized
       markDeviceAsRecognized()
-
-      // Get user from store to determine redirect
-      const user = useAuthStore.getState().user
-
-      if (!user) {
-        throw new Error(t('auth.signIn.error'))
-      }
 
       // Redirect based on role
       // No firm check needed - lawyers without firm are treated as solo lawyers
@@ -287,6 +325,25 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     } catch (error: any) {
       const status = error?.status || error?.response?.status
       const errorCode = error?.response?.data?.code || error?.code
+
+      // CRITICAL: Before handling any error, check if OTP was already required from a previous successful request
+      // This handles the race condition where a second request (e.g., double-click) gets 429
+      // but the first request already set otpRequired=true
+      const postErrorState = useAuthStore.getState()
+      if (postErrorState.otpRequired && postErrorState.otpData?.loginSessionToken) {
+        console.log('[SignIn] OTP already required from previous request, navigating despite error')
+        rateLimit.recordSuccess()
+        markDeviceAsRecognized()
+        navigate({
+          to: ROUTES.auth.otp,
+          search: {
+            email: postErrorState.otpData.fullEmail,
+            purpose: 'login' as const,
+            token: postErrorState.otpData.loginSessionToken,
+          },
+        })
+        return
+      }
 
       // Handle CAPTCHA_REQUIRED response from backend
       if (errorCode === 'CAPTCHA_REQUIRED') {
@@ -330,6 +387,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       // For other errors (network, 500s), just let the error display without counting
     } finally {
       setIsLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
@@ -338,12 +396,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
    * Uses the same form fields but authenticates via LDAP
    */
   const handleLDAPLogin = async () => {
+    // SECURITY: Prevent double-click/double-submit attacks
+    if (isSubmittingRef.current) {
+      return
+    }
+    isSubmittingRef.current = true
+
     // Get current form values
     const values = form.getValues()
 
     // Validate form before attempting LDAP login
     const isValid = await form.trigger()
     if (!isValid) {
+      isSubmittingRef.current = false
       return
     }
 
@@ -353,6 +418,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     // Check client-side rate limiting
     const status = rateLimit.checkAllowed()
     if (!status.allowed) {
+      isSubmittingRef.current = false
       return
     }
 
@@ -418,6 +484,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       })
     } finally {
       setIsLDAPLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
