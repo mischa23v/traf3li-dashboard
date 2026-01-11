@@ -365,53 +365,24 @@ const oauthService = {
       })
 
       // =========================================================================
-      // 🚨 BACKEND_TODO: CRITICAL CHECK - Backend must return tokens!
+      // Check for tokens/session info in response
       // =========================================================================
-      // If this error appears, the backend /auth/sso/callback endpoint is NOT
-      // returning tokens. This is a BACKEND BUG.
-      //
-      // BACKEND FIX REQUIRED (OAuth 2.0 format):
-      // In the SSO callback controller, add to the response:
-      //
-      // res.json({
-      //   error: false,
-      //   message: 'Login successful',
-      //   user: userData,
-      //   access_token: jwt.sign({ userId, email, role, firmId }, ACCESS_SECRET, { expiresIn: '15m' }),
-      //   refresh_token: jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: '7d' }),
-      //   token_type: 'Bearer',
-      //   expires_in: 900,  // 15 minutes in seconds
-      //   isNewUser: isNewUser
-      // });
-      //
-      // See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
+      // Supports two patterns:
+      // 1. BFF Pattern: No tokens in body, only expires_in. Tokens in httpOnly cookies.
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase format)
       // =========================================================================
       const hasOAuth2Tokens = response.data.access_token && response.data.refresh_token
       const hasLegacyTokens = response.data.accessToken && response.data.refreshToken
+      const hasExpiresInOnly = !hasOAuth2Tokens && !hasLegacyTokens && ((response.data as any).expires_in !== undefined || (response.data as any).expiresIn !== undefined)
 
-      if (!hasOAuth2Tokens && !hasLegacyTokens) {
-        console.error('🚨🚨🚨 BACKEND DID NOT RETURN TOKENS! 🚨🚨🚨')
-        console.error('[OAUTH] ❌ CRITICAL: Backend SSO callback returned user but NO TOKENS!')
-        console.error('[OAUTH] This is a BACKEND BUG - the /auth/sso/callback endpoint must return tokens')
-        console.error('[OAUTH] Full response data:', JSON.stringify(response.data, null, 2))
-        console.error('[OAUTH] Expected OAuth 2.0 format: { user: {...}, access_token: "...", refresh_token: "...", token_type: "Bearer", expires_in: 900, isNewUser: boolean }')
-        console.error('[OAUTH] Legacy format also supported: { user: {...}, accessToken: "...", refreshToken: "...", isNewUser: boolean }')
-        console.error('[OAUTH] Actual response keys:', Object.keys(response.data))
-        console.error('[OAUTH] 📋 See src/config/BACKEND_AUTH_ISSUES.ts for fix instructions')
-
-        // Check if tokens might be in a nested structure (common backend mistake)
-        const possibleTokenLocations = {
-          'response.data.access_token (OAuth 2.0)': response.data.access_token,
-          'response.data.refresh_token (OAuth 2.0)': response.data.refresh_token,
-          'response.data.accessToken (legacy)': response.data.accessToken,
-          'response.data.refreshToken (legacy)': response.data.refreshToken,
-          'response.data.token': (response.data as any).token,
-          'response.data.tokens': (response.data as any).tokens,
-          'response.data.data?.access_token': (response.data as any).data?.access_token,
-          'response.data.data?.accessToken': (response.data as any).data?.accessToken,
-          'response.data.auth?.access_token': (response.data as any).auth?.access_token,
-        }
-        console.error('[OAUTH] Checking alternate token locations:', possibleTokenLocations)
+      // BFF pattern: No tokens but has expiresIn - this is valid!
+      if (hasExpiresInOnly) {
+        oauthLog('BFF Pattern detected: tokens in httpOnly cookies, expiresIn in response')
+      } else if (!hasOAuth2Tokens && !hasLegacyTokens) {
+        // No tokens AND no expiresIn - might still be BFF pattern without expiresIn
+        // Only warn (not error) since BFF with httpOnly cookies may not send any token info
+        oauthWarn('No tokens or expiresIn in response - may be BFF pattern with httpOnly cookies only')
+        oauthLog('Response keys:', Object.keys(response.data))
       }
 
       if (response.data.error || !response.data.user) {
@@ -443,9 +414,23 @@ const oauthService = {
         }
       }
 
-      // Store tokens if accessToken is provided (refreshToken may be in httpOnly cookie)
-      if (accessToken) {
-        oauthLog('Storing tokens from callback response...', {
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        oauthLog('Storing session from callback (BFF pattern)...', {
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokensIn: 'httpOnly cookies',
+        })
+        storeTokens(null, null, expiresIn)
+        oauthLog('BFF session stored successfully')
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
+        oauthLog('Storing tokens from callback response (Legacy pattern)...', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
           refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
@@ -467,17 +452,23 @@ const oauthService = {
           refreshTokenStrategy: refreshToken ? 'localStorage' : 'httpOnly cookie',
         })
       } else {
-        // accessToken is required - if missing, SSO callback failed
-        console.error('🚨 NO accessToken RETURNED - User will NOT be authenticated!')
-        console.error('[OAUTH] Without tokens, subsequent API calls will fail with 401')
-        console.error('[OAUTH] The user appears logged in but actually is not authenticated')
-        console.error('[OAUTH] 📋 BACKEND FIX REQUIRED: Return accessToken & refreshToken from /auth/sso/callback')
-        console.error('[OAUTH] 📋 See src/config/BACKEND_AUTH_ISSUES.ts for complete fix instructions')
-        oauthWarn('No tokens in callback response!', {
-          hasAccessToken: !!accessToken,
-          hasRefreshToken: !!refreshToken,
-          responseKeys: Object.keys(response.data),
-        })
+        // No tokens and no expiresIn - BFF pattern may not provide expiresIn either
+        // Check if we have user data, which indicates successful auth via httpOnly cookies
+        if (response.data.user) {
+          oauthLog('No tokens/expiresIn in response, but user present - assuming BFF with httpOnly cookies')
+          // Store minimal session state (default 15 min expiry)
+          storeTokens(null, null, 900)
+        } else {
+          // This is an actual error - no tokens AND no user
+          console.error('🚨 NO accessToken AND NO expiresIn RETURNED - User will NOT be authenticated!')
+          console.error('[OAUTH] Without tokens or session info, subsequent API calls will fail')
+          oauthWarn('No tokens or session info in callback response!', {
+            hasAccessToken: !!accessToken,
+            hasRefreshToken: !!refreshToken,
+            hasExpiresIn: expiresIn !== undefined,
+            responseKeys: Object.keys(response.data),
+          })
+        }
       }
 
       // Store user in localStorage

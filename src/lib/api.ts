@@ -102,6 +102,19 @@ export async function initDeviceFingerprint(): Promise<string> {
  */
 let tokenRefreshTimeoutId: ReturnType<typeof setTimeout> | null = null
 
+/**
+ * In-memory token expiration tracking
+ * With httpOnly cookies, we can't read the token itself, but we track when it expires
+ * based on the expiresIn value from auth responses
+ */
+let memoryExpiresAt: number | null = null
+
+/**
+ * Session indicator - set to true when we have evidence of an active session
+ * Used to determine if we should attempt token refresh when tokens are in httpOnly cookies
+ */
+let hasActiveSession: boolean = false
+
 // ==================== TOKEN DEBUG LOGGING ====================
 // Always enabled to help diagnose auth issues on production
 const tokenLog = (message: string, data?: any) => {
@@ -165,6 +178,8 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
 
 /**
  * Get access token from localStorage
+ * NOTE: With httpOnly cookies, this may return null even when authenticated.
+ * The token is in the cookie and sent automatically with credentials: 'include'
  */
 export const getAccessToken = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
@@ -172,9 +187,27 @@ export const getAccessToken = (): string | null => {
 
 /**
  * Get refresh token from localStorage
+ * NOTE: With httpOnly cookie strategy, this returns null (refresh token is in httpOnly cookie).
+ * Use hasActiveSession() to check if a session exists.
  */
 export const getRefreshToken = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
+}
+
+/**
+ * Check if there's evidence of an active session
+ * With httpOnly cookies, we can't read tokens, but we track session state
+ */
+export const hasActiveSessionIndicator = (): boolean => {
+  // Check memory flag first (set by storeTokens)
+  if (hasActiveSession) return true
+
+  // Check localStorage indicators (user data, auth storage)
+  const hasUserData = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
+  const hasAuthStorage = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
+  const hasExpiresAt = !!localStorage.getItem(STORAGE_KEYS.AUTH.EXPIRES_AT) || memoryExpiresAt !== null
+
+  return hasUserData || hasAuthStorage || hasExpiresAt
 }
 
 /**
@@ -212,26 +245,41 @@ export const getAnyRefreshToken = (): string | null => {
 
 /**
  * Check if access token is missing or expired and needs refresh
+ * With httpOnly cookies, we can't read the token, so we rely on:
+ * 1. expiresAt tracking (from login/refresh responses)
+ * 2. Session indicators (user data exists)
  */
 export const needsTokenRefresh = (): boolean => {
+  // BFF Pattern: Check expiration time from memory/localStorage
+  const expiresAt = getTokenExpiresAt()
+  if (expiresAt) {
+    // Token is expiring soon or expired - need refresh
+    if (isTokenExpiringSoon(30)) { // 30 second buffer
+      return true
+    }
+    // Token is valid and not expiring soon
+    return false
+  }
+
+  // Fallback: Try to read token from localStorage (legacy/transition)
   const accessToken = getAccessToken()
+  if (accessToken) {
+    // Check if token is expired by decoding it
+    const decoded = decodeJWTForDebug(accessToken)
+    if (!decoded.valid || decoded.isExpired) {
+      return true
+    }
+    // Token exists and is valid
+    return false
+  }
 
-  // No access token at all - definitely need refresh
-  if (!accessToken) {
+  // No expiration info and no readable token
+  // If we have session indicators, assume we need to verify with server
+  if (hasActiveSessionIndicator()) {
     return true
   }
 
-  // Check if token is expired by decoding it
-  const decoded = decodeJWTForDebug(accessToken)
-  if (!decoded.valid || decoded.isExpired) {
-    return true
-  }
-
-  // Check stored expiration time (more reliable if backend provided expires_in)
-  if (isTokenExpiringSoon(30)) { // 30 second buffer
-    return true
-  }
-
+  // No session - don't need refresh (user should login)
   return false
 }
 
@@ -284,9 +332,15 @@ export const cancelScheduledTokenRefresh = (): void => {
 }
 
 /**
- * Get token expiration time from localStorage
+ * Get token expiration time
+ * Checks memory first (BFF pattern), then localStorage (legacy)
  */
 export const getTokenExpiresAt = (): number | null => {
+  // Memory-first for BFF pattern (httpOnly cookies)
+  if (memoryExpiresAt !== null) {
+    return memoryExpiresAt
+  }
+  // Fallback to localStorage for backward compatibility
   const expiresAt = localStorage.getItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
   return expiresAt ? parseInt(expiresAt, 10) : null
 }
@@ -301,65 +355,76 @@ export const isTokenExpiringSoon = (bufferSeconds: number = AUTH_TIMING.TOKEN_RE
 }
 
 /**
- * Store tokens in localStorage
- * @param accessToken - The access token to store (required)
- * @param refreshToken - The refresh token to store (optional - backend may use httpOnly cookie instead)
- * @param expiresIn - Optional: seconds until access token expires (enables automatic refresh scheduling)
+ * Store tokens and session state
  *
- * Note: With httpOnly cookie strategy, refreshToken is NOT in the response body.
- * The browser automatically sends the refresh_token cookie with requests to /api/auth/*.
- * This is more secure as JavaScript cannot access the refresh token.
+ * BFF Pattern (httpOnly cookies):
+ * - accessToken and refreshToken are in httpOnly cookies (JS can't read)
+ * - Backend does NOT return tokens in response body
+ * - We only receive expiresIn from the response
+ * - We track expiresAt in memory for refresh scheduling
  *
- * Also emits token refresh event so WebSocket layer can update its token
+ * Legacy Pattern (for backward compatibility during transition):
+ * - If accessToken is provided, store in localStorage
+ * - If refreshToken is provided, store in localStorage
+ *
+ * @param accessToken - Optional: The access token (only if backend returns it in body)
+ * @param refreshToken - Optional: The refresh token (only if backend returns it in body)
+ * @param expiresIn - Seconds until access token expires (enables automatic refresh scheduling)
  */
-export const storeTokens = (accessToken: string, refreshToken?: string | null, expiresIn?: number): void => {
-  tokenLog('Storing tokens in localStorage...', {
-    accessTokenLength: accessToken?.length,
+export const storeTokens = (accessToken?: string | null, refreshToken?: string | null, expiresIn?: number): void => {
+  const isBffPattern = !accessToken && expiresIn // No token in body, but have expiration
+
+  tokenLog('Storing auth state...', {
+    pattern: isBffPattern ? 'BFF (httpOnly cookies)' : 'Legacy (localStorage)',
+    accessTokenLength: accessToken?.length || '(httpOnly cookie)',
     refreshTokenLength: refreshToken?.length || '(httpOnly cookie)',
     hasExpiresIn: !!expiresIn,
     expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
   })
 
-  localStorage.setItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN, accessToken)
-  // Only store refreshToken if provided (backend may use httpOnly cookie instead)
+  // Mark session as active
+  hasActiveSession = true
+
+  // Legacy: Store tokens in localStorage if provided (for backward compatibility)
+  if (accessToken) {
+    localStorage.setItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN, accessToken)
+  }
   if (refreshToken) {
     localStorage.setItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN, refreshToken)
   }
 
-  // Store expiration time if expires_in was provided
+  // Store expiration time (primary mechanism for BFF pattern)
   if (expiresIn && expiresIn > 0) {
     const expiresAt = Date.now() + (expiresIn * 1000)
+
+    // Store in memory (BFF pattern - primary)
+    memoryExpiresAt = expiresAt
+
+    // Also store in localStorage for cross-tab sync and page refresh recovery
     localStorage.setItem(STORAGE_KEYS.AUTH.EXPIRES_AT, expiresAt.toString())
 
     // Schedule automatic token refresh
     scheduleTokenRefresh(expiresIn)
   }
 
-  // Verify storage
-  const storedAccess = localStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
-  const storedRefresh = localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
+  tokenLog('Auth state stored successfully', {
+    memoryExpiresAt: memoryExpiresAt ? new Date(memoryExpiresAt).toISOString() : 'not set',
+    hasActiveSession,
+  })
 
-  if (storedAccess !== accessToken || storedRefresh !== refreshToken) {
-    tokenWarn('Token storage verification FAILED!', {
-      accessMatch: storedAccess === accessToken,
-      refreshMatch: storedRefresh === refreshToken,
-    })
-  } else {
-    tokenLog('Tokens stored successfully')
+  // Emit token refresh event so WebSocket layer can update
+  // This ensures WebSocket stays authenticated after HTTP token refresh
+  // Pass accessToken if available (legacy), otherwise signal BFF pattern
+  tokenRefreshEvents.emit(accessToken || 'httpOnly', expiresIn)
 
-    // Emit token refresh event so WebSocket layer can update its token
-    // This ensures WebSocket stays authenticated after HTTP token refresh
-    tokenRefreshEvents.emit(accessToken, expiresIn)
-
-    // Also emit via auth events for other subscribers
-    authEvents.onTokensRefreshed.emit({ accessToken, expiresIn })
-    authEvents.onAuthStateChange.emit({ isAuthenticated: true })
-  }
+  // Also emit via auth events for other subscribers
+  authEvents.onTokensRefreshed.emit({ accessToken: accessToken || undefined, expiresIn })
+  authEvents.onAuthStateChange.emit({ isAuthenticated: true })
 }
 
 /**
- * Clear tokens from localStorage
- * Also clears auth-related storage to ensure UI reflects logged-out state
+ * Clear tokens and all auth state
+ * Clears both memory state (BFF pattern) and localStorage (legacy)
  *
  * IMPORTANT: This function is SYNCHRONOUS. All state is cleared before it returns.
  * Subscribers to authEvents.onTokensCleared are notified synchronously.
@@ -367,9 +432,13 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
  * @param reason - Optional reason for clearing tokens (for analytics/debugging)
  */
 export const clearTokens = (reason: string = 'manual'): void => {
-  tokenLog('Clearing tokens from localStorage', { reason })
+  tokenLog('Clearing auth state', { reason })
 
-  // Clear token storage
+  // Clear memory state (BFF pattern)
+  memoryExpiresAt = null
+  hasActiveSession = false
+
+  // Clear localStorage token storage (legacy pattern)
   localStorage.removeItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
   localStorage.removeItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
   localStorage.removeItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
@@ -393,13 +462,29 @@ export const clearTokens = (reason: string = 'manual'): void => {
 
   // Emit auth state change event
   authEvents.onAuthStateChange.emit({ isAuthenticated: false })
+
+  tokenLog('Auth state cleared', { reason })
 }
 
 /**
- * Check if we have valid tokens stored
+ * Check if we have valid auth state
+ * With BFF pattern, tokens are in httpOnly cookies (JS can't read).
+ * We check for session indicators instead.
  */
 export const hasTokens = (): boolean => {
-  return !!getAccessToken() && !!getRefreshToken()
+  // BFF Pattern: Check for session indicators
+  if (hasActiveSession || memoryExpiresAt !== null) {
+    return true
+  }
+
+  // Legacy: Check localStorage
+  const hasLocalStorageTokens = !!getAccessToken() && !!getRefreshToken()
+  if (hasLocalStorageTokens) {
+    return true
+  }
+
+  // Check other session indicators
+  return hasActiveSessionIndicator()
 }
 
 // ==================== TOKEN REFRESH MECHANISM ====================
@@ -543,33 +628,37 @@ const processQueue = (error: any = null): void => {
 /**
  * Internal token refresh implementation
  * This does the actual work - refreshAccessToken() handles deduplication
+ *
+ * BFF Pattern: Refresh token is in httpOnly cookie, auto-attached with credentials: 'include'
+ * We send an empty request body - the backend reads the refresh_token from cookies.
+ *
+ * Response:
+ * - BFF: { expiresIn, refreshedAt } (no tokens in body)
+ * - Legacy: { accessToken, refreshToken, expiresIn } (tokens in body)
  */
 const performTokenRefresh = async (): Promise<boolean> => {
-  // Try localStorage first, then fall back to cookie
+  // Check for session indicators
+  const hasSession = hasActiveSessionIndicator()
+
+  // Also check legacy localStorage tokens for backward compatibility
   const refreshTokenFromStorage = getRefreshToken()
   const refreshTokenFromCookie = getRefreshTokenFromCookie()
-  const refreshToken = refreshTokenFromStorage || refreshTokenFromCookie
+  const legacyRefreshToken = refreshTokenFromStorage || refreshTokenFromCookie
 
-  // Check if there's any indication of an active session
-  // Even if we can't read the refresh token, it might be in an httpOnly cookie
-  const hasUserData = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
-  const hasAuthStorage = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
-  const mayHaveHttpOnlyCookie = hasUserData || hasAuthStorage
-
-  // Enhanced debug: Show all token sources
+  // Enhanced debug: Show all auth sources
   console.log('[TOKEN] 🔍 Token refresh check:', {
+    hasActiveSession: hasActiveSession,
+    hasSessionIndicators: hasSession,
+    memoryExpiresAt: memoryExpiresAt ? new Date(memoryExpiresAt).toISOString() : 'not set',
     hasRefreshTokenInLocalStorage: !!refreshTokenFromStorage,
     hasRefreshTokenInCookie: !!refreshTokenFromCookie,
     hasAccessToken: !!getAccessToken(),
-    tokenExpiresAt: getTokenExpiresAt() ? new Date(getTokenExpiresAt()!).toISOString() : 'not set',
-    isExpiringSoon: isTokenExpiringSoon(60),
-    allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
-    mayHaveHttpOnlyCookie,
+    visibleCookies: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
   })
 
-  if (!refreshToken && !mayHaveHttpOnlyCookie) {
-    tokenWarn('No refresh token available (checked localStorage, cookies, and session indicators)')
-    console.error('[TOKEN] ❌ REFRESH BLOCKED - No refresh token or session found!')
+  if (!hasSession && !legacyRefreshToken) {
+    tokenWarn('No session indicators found - cannot refresh')
+    console.error('[TOKEN] ❌ REFRESH BLOCKED - No active session!')
     console.error('[TOKEN] 💡 This usually means:')
     console.error('[TOKEN]    1. User has been fully logged out')
     console.error('[TOKEN]    2. Session expired on backend')
@@ -577,26 +666,19 @@ const performTokenRefresh = async (): Promise<boolean> => {
     return false
   }
 
-  // If we don't have a visible token but may have an httpOnly cookie, try anyway
-  if (!refreshToken && mayHaveHttpOnlyCookie) {
-    tokenLog('No visible refresh token, but session indicators present - trying httpOnly cookie refresh')
-  }
-
   // SECURITY: Never log token content, even partial - prevents token leakage to logs
   tokenLog('Attempting token refresh...', {
-    tokenSource: refreshTokenFromStorage ? 'localStorage' : (refreshTokenFromCookie ? 'cookie' : 'httpOnly'),
-    tokenLength: refreshToken?.length || 0,
+    pattern: legacyRefreshToken ? 'Legacy (token in body)' : 'BFF (httpOnly cookie)',
     endpoint: `${API_BASE_URL_NO_VERSION}/auth/refresh`,
   })
 
   const startTime = Date.now()
 
   try {
-    // Use a separate axios instance to avoid interceptor loops
-    // Supports both OAuth 2.0 (snake_case) and legacy (camelCase) response format
-    // If we have a visible refresh token, send it in body
-    // Otherwise, rely on httpOnly cookie (withCredentials: true sends it automatically)
-    const requestBody = refreshToken ? { refreshToken } : {}
+    // BFF Pattern: Send empty body, refresh token is in httpOnly cookie
+    // Legacy Pattern: Send refresh token in body for backward compatibility
+    // withCredentials: true ensures httpOnly cookies are sent automatically
+    const requestBody = legacyRefreshToken ? { refreshToken: legacyRefreshToken } : {}
 
     const response = await axios.post(
       `${API_BASE_URL_NO_VERSION}/auth/refresh`,
@@ -612,14 +694,35 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
     const duration = Date.now() - startTime
 
-    // Support both OAuth 2.0 (snake_case) and legacy (camelCase) token fields
+    // Support both OAuth 2.0 (snake_case) and legacy (camelCase) response format
+    // BFF Pattern: No tokens in response, only expiresIn
+    // Legacy Pattern: Tokens in response body
     const accessToken = response.data.access_token || response.data.accessToken
     const newRefreshToken = response.data.refresh_token || response.data.refreshToken
     const expiresIn = response.data.expires_in || response.data.expiresIn  // seconds until access token expires
+    const refreshedAt = response.data.refreshedAt // BFF pattern indicator
 
-    // accessToken is required; refreshToken is optional (may be in httpOnly cookie)
-    if (accessToken) {
-      console.log('[TOKEN] ✅ Token refresh SUCCESS', {
+    // Determine which pattern the backend is using
+    const isBffResponse = !accessToken && expiresIn !== undefined
+    const isLegacyResponse = !!accessToken
+
+    if (isBffResponse) {
+      // BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      console.log('[TOKEN] ✅ Token refresh SUCCESS (BFF pattern)', {
+        duration: `${duration}ms`,
+        expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+        refreshedAt: refreshedAt,
+        nextRefreshAt: expiresIn ? new Date(Date.now() + (expiresIn - 60) * 1000).toISOString() : 'unknown',
+        tokensIn: 'httpOnly cookies',
+      })
+      // Store only expiresIn - tokens are in httpOnly cookies
+      storeTokens(null, null, expiresIn)
+      return true
+    }
+
+    if (isLegacyResponse) {
+      // Legacy Pattern: Tokens in response body
+      console.log('[TOKEN] ✅ Token refresh SUCCESS (Legacy pattern)', {
         duration: `${duration}ms`,
         hasExpiresIn: !!expiresIn,
         expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
@@ -627,17 +730,27 @@ const performTokenRefresh = async (): Promise<boolean> => {
         tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         nextRefreshAt: expiresIn ? new Date(Date.now() + (expiresIn - 60) * 1000).toISOString() : 'unknown',
       })
-      // Pass refreshToken as optional - backend may use httpOnly cookie for security
+      // Store tokens from response body
       storeTokens(accessToken, newRefreshToken, expiresIn)
       return true
     }
 
-    // accessToken is required - if missing, refresh failed
-    tokenWarn('Token refresh response missing accessToken:', {
+    // Neither pattern matched - check if expiresIn is at least present (minimal BFF response)
+    if (expiresIn !== undefined) {
+      console.log('[TOKEN] ✅ Token refresh SUCCESS (minimal response)', {
+        duration: `${duration}ms`,
+        expiresIn: `${expiresIn}s (${Math.round(expiresIn / 60)}min)`,
+      })
+      storeTokens(null, null, expiresIn)
+      return true
+    }
+
+    // No useful response - refresh failed
+    tokenWarn('Token refresh response has no usable data:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!newRefreshToken,
+      hasExpiresIn: expiresIn !== undefined,
       responseKeys: Object.keys(response.data),
-      responseData: response.data,
     })
     return false
   } catch (error: any) {
@@ -668,7 +781,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
       console.error('[TOKEN]    → Check CORS, network connectivity, or server status')
     }
 
-    clearTokens()
+    clearTokens('token_refresh_failed')
     return false
   }
 }
@@ -911,13 +1024,15 @@ apiClientNoVersion.interceptors.request.use(
     }
 
     // PROACTIVE TOKEN REFRESH:
-    // Check if access token is missing/expired and refresh token is available
+    // Check if access token is missing/expired and we have an active session
     // Skip for auth endpoints to avoid loops
     // Note: refreshAccessToken() handles deduplication internally via Promise-based pattern
     const isAuthEndpoint = url.includes('/auth/')
     if (!isAuthEndpoint && needsTokenRefresh()) {
-      const hasRefreshToken = getAnyRefreshToken()
-      if (hasRefreshToken) {
+      // BFF Pattern: Check for session indicators (can't read httpOnly cookies)
+      // Legacy: Check for visible refresh token
+      const hasSession = hasActiveSessionIndicator() || getAnyRefreshToken()
+      if (hasSession) {
         tokenLog('Proactive token refresh triggered (noVersion)', {
           reason: 'Access token missing or expired',
           url,
@@ -929,7 +1044,7 @@ apiClientNoVersion.interceptors.request.use(
           if (refreshed) {
             tokenLog('Proactive token refresh succeeded (noVersion)')
           } else {
-            tokenWarn('Proactive token refresh failed (noVersion) - request will proceed without token')
+            tokenWarn('Proactive token refresh failed (noVersion) - request will proceed')
           }
         } catch (error) {
           tokenWarn('Proactive token refresh error (noVersion):', error)
@@ -1321,13 +1436,15 @@ apiClient.interceptors.request.use(
     }
 
     // PROACTIVE TOKEN REFRESH:
-    // Check if access token is missing/expired and refresh token is available
+    // Check if access token is missing/expired and we have an active session
     // Skip for auth endpoints to avoid loops
     // Note: refreshAccessToken() handles deduplication internally via Promise-based pattern
     const isAuthEndpoint = url.includes('/auth/')
     if (!isAuthEndpoint && needsTokenRefresh()) {
-      const hasRefreshToken = getAnyRefreshToken()
-      if (hasRefreshToken) {
+      // BFF Pattern: Check for session indicators (can't read httpOnly cookies)
+      // Legacy: Check for visible refresh token
+      const hasSession = hasActiveSessionIndicator() || getAnyRefreshToken()
+      if (hasSession) {
         tokenLog('Proactive token refresh triggered', {
           reason: 'Access token missing or expired',
           url,
@@ -1339,7 +1456,7 @@ apiClient.interceptors.request.use(
           if (refreshed) {
             tokenLog('Proactive token refresh succeeded')
           } else {
-            tokenWarn('Proactive token refresh failed - request will proceed without token')
+            tokenWarn('Proactive token refresh failed - request will proceed')
           }
         } catch (error) {
           tokenWarn('Proactive token refresh error:', error)
@@ -1676,14 +1793,15 @@ apiClient.interceptors.response.use(
       // Don't try to refresh if:
       // 1. Already tried once (_retry flag set)
       // 2. This is a refresh token request itself
-      // 3. No refresh token available (check both localStorage AND cookies)
+      // 3. No session indicators (BFF pattern) and no visible refresh token (legacy)
       const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh')
-      const anyRefreshToken = getAnyRefreshToken()
-      if (originalRequest?._retry || isRefreshRequest || !anyRefreshToken) {
+      const hasSession = hasActiveSessionIndicator() || getAnyRefreshToken()
+      if (originalRequest?._retry || isRefreshRequest || !hasSession) {
         // Log and let auth system handle it
         console.warn('[API] 401 Unauthorized (no refresh possible):', {
           url: error.config?.url,
           method: error.config?.method,
+          hasSessionIndicators: hasActiveSessionIndicator(),
           hasRefreshTokenLocalStorage: !!getRefreshToken(),
           hasRefreshTokenCookie: !!getRefreshTokenFromCookie(),
           isRetry: !!originalRequest?._retry,
@@ -2101,8 +2219,9 @@ export const debugAuth = () => {
   const refreshTokenStorage = getRefreshToken()
   const refreshTokenCookie = getRefreshTokenFromCookie()
   const expiresAt = getTokenExpiresAt()
+  const hasSession = hasActiveSessionIndicator()
 
-  // Decode access token for info
+  // Decode access token for info (only if readable - not httpOnly)
   let tokenInfo = null
   if (accessToken) {
     const decoded = decodeJWTForDebug(accessToken)
@@ -2121,30 +2240,45 @@ export const debugAuth = () => {
     }
   }
 
+  // Determine auth pattern
+  const isBffPattern = hasSession && !accessToken
+  const isLegacyPattern = !!accessToken
+  const pattern = isBffPattern ? 'BFF (httpOnly cookies)' : (isLegacyPattern ? 'Legacy (localStorage)' : 'No session')
+
   const state = {
     '🔐 Auth State': {
-      hasAccessToken: !!accessToken,
-      hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
-      hasRefreshTokenInCookie: !!refreshTokenCookie,
-      tokenExpiresAt: expiresAt ? new Date(expiresAt).toISOString() : 'not set',
+      pattern: pattern,
+      hasActiveSession: hasActiveSession,
+      hasSessionIndicators: hasSession,
+      memoryExpiresAt: memoryExpiresAt ? new Date(memoryExpiresAt).toISOString() : 'not set',
+      localStorageExpiresAt: expiresAt ? new Date(expiresAt).toISOString() : 'not set',
       isExpiringSoon: isTokenExpiringSoon(60),
       scheduledRefreshActive: !!tokenRefreshTimeoutId,
     },
-    '👤 Token Info': tokenInfo || 'No valid access token',
-    '🍪 Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+    '📦 Legacy Storage (for backward compatibility)': {
+      hasAccessToken: !!accessToken,
+      hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
+      hasRefreshTokenInCookie: !!refreshTokenCookie,
+    },
+    '👤 Token Info': tokenInfo || (isBffPattern ? 'Token in httpOnly cookie (not readable by JS)' : 'No valid access token'),
+    '🍪 Visible Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
     '💡 Tips': {
       'Force refresh': 'debugAuth.refresh()',
-      'Clear tokens': 'debugAuth.clear()',
+      'Clear auth state': 'debugAuth.clear()',
       'Watch logs': 'Filter console by [TOKEN]',
+      'Note': isBffPattern ? 'Auth tokens in httpOnly cookies - browser sends them automatically' : 'Auth tokens in localStorage',
     },
   }
 
   console.log('%c🔍 Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
+  console.log('%c📋 Pattern: ' + pattern, 'font-size: 14px; font-weight: bold; color: #2196F3')
   console.table(state['🔐 Auth State'])
+  console.log('%c📦 Legacy Storage', 'font-size: 14px; font-weight: bold; color: #607D8B')
+  console.table(state['📦 Legacy Storage (for backward compatibility)'])
   console.log('%c👤 Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
   console.log(state['👤 Token Info'])
-  console.log('%c🍪 Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
-  console.log(state['🍪 Cookies'])
+  console.log('%c🍪 Visible Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
+  console.log(state['🍪 Visible Cookies'])
   console.log('%c💡 Tips', 'font-size: 14px; font-weight: bold; color: #9C27B0')
   console.log(state['💡 Tips'])
 
@@ -2202,9 +2336,20 @@ if (typeof window !== 'undefined') {
    * - Tab B redirects to login page
    */
   const handleStorageChange = (event: StorageEvent): void => {
-    // Check if access token was removed (logout in another tab)
-    if (event.key === STORAGE_KEYS.AUTH.ACCESS_TOKEN && event.newValue === null && event.oldValue !== null) {
-      tokenLog('Access token cleared in another tab - syncing logout')
+    // Check if access token or expiresAt was removed (logout in another tab)
+    // BFF Pattern: Watch for expiresAt removal (since tokens are in httpOnly cookies)
+    // Legacy Pattern: Watch for accessToken removal
+    const isTokenCleared = event.key === STORAGE_KEYS.AUTH.ACCESS_TOKEN && event.newValue === null && event.oldValue !== null
+    const isExpiresAtCleared = event.key === STORAGE_KEYS.AUTH.EXPIRES_AT && event.newValue === null && event.oldValue !== null
+
+    if (isTokenCleared || isExpiresAtCleared) {
+      tokenLog('Auth state cleared in another tab - syncing logout', {
+        clearedKey: event.key,
+      })
+
+      // Clear memory state (BFF pattern)
+      memoryExpiresAt = null
+      hasActiveSession = false
 
       // Clear local state
       refreshPromise = null
@@ -2226,8 +2371,8 @@ if (typeof window !== 'undefined') {
     // Also check if auth-storage (Zustand) was cleared
     if (event.key === STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST && event.newValue === null && event.oldValue !== null) {
       tokenLog('Auth storage cleared in another tab - syncing logout')
-      // If Zustand storage is cleared but we still have tokens, clear them too
-      if (getAccessToken()) {
+      // Clear memory state and localStorage if we have any session
+      if (hasActiveSession || memoryExpiresAt || getAccessToken()) {
         clearTokens('cross_tab_sync')
       }
     }
@@ -2247,6 +2392,7 @@ if (typeof window !== 'undefined') {
  *
  * ENTERPRISE PATTERN: Comprehensive state reset
  * This function clears ALL auth-related state to ensure no stale data remains:
+ * - Memory state (BFF pattern: memoryExpiresAt, hasActiveSession)
  * - Pending requests (cancel and clear)
  * - Circuit breakers (reset all)
  * - Idempotency keys (clear all)
@@ -2261,7 +2407,7 @@ export const resetApiState = () => {
   clearPendingRequests()
   resetAllCircuits()
   clearAllIdempotencyKeys()
-  clearTokens() // Clear access and refresh tokens (also cancels scheduled refresh)
+  clearTokens() // Clears both memory state and localStorage (also cancels scheduled refresh)
 
   // Reset token refresh state
   refreshPromise = null
@@ -2274,6 +2420,8 @@ export const resetApiState = () => {
 
   // Clear token refresh event listeners (prevents stale callbacks)
   tokenRefreshEvents.clear()
+
+  tokenLog('All API state reset')
 }
 
 // Re-export circuit breaker utilities for monitoring
