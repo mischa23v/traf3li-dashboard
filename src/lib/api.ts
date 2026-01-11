@@ -2354,17 +2354,27 @@ debugAuth.clear = () => {
 if (typeof window !== 'undefined') {
   (window as any).debugAuth = debugAuth
 
+  // Expose enterprise modules for advanced debugging
+  ;(window as any).authBroadcast = authBroadcast
+  ;(window as any).sessionActivity = sessionActivity
+
   // Show debug commands on app load
   console.log(
     '%c🔐 Auth Debug Commands Available',
     'font-size: 14px; font-weight: bold; color: #4CAF50; background: #E8F5E9; padding: 4px 8px; border-radius: 4px;'
   )
   console.log(
-    '%c┌─────────────────────────────────────────────────────────┐\n' +
-    '│  debugAuth()          → Show current auth state         │\n' +
-    '│  debugAuth.refresh()  → Force token refresh             │\n' +
-    '│  debugAuth.clear()    → Clear all tokens (logout)       │\n' +
-    '└─────────────────────────────────────────────────────────┘',
+    '%c┌────────────────────────────────────────────────────────────────────┐\n' +
+    '│  debugAuth()                  → Show current auth state            │\n' +
+    '│  debugAuth.refresh()          → Force token refresh                │\n' +
+    '│  debugAuth.clear()            → Clear all tokens (logout)          │\n' +
+    '├────────────────────────────────────────────────────────────────────┤\n' +
+    '│  🏢 Enterprise Features:                                           │\n' +
+    '│  authBroadcast.getTabId()     → Get this tab\'s ID                  │\n' +
+    '│  authBroadcast.broadcastLogout(\'test\') → Test cross-tab logout     │\n' +
+    '│  sessionActivity.getDebugInfo() → Session activity state           │\n' +
+    '│  sessionActivity.isUserIdle() → Check if user is idle              │\n' +
+    '└────────────────────────────────────────────────────────────────────┘',
     'font-family: monospace; color: #1976D2;'
   )
   console.log(
