@@ -155,7 +155,15 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
   }
 
   if (!accessToken) {
-    tokenWarn(`Request WITHOUT token: ${method.toUpperCase()} ${url}`)
+    // In BFF pattern, no localStorage token is expected - tokens are in httpOnly cookies
+    // Only warn if we also don't have an active session
+    if (hasActiveSession || memoryExpiresAt) {
+      // BFF mode - tokens in httpOnly cookies, this is expected
+      tokenLog(`Request via httpOnly cookie: ${method.toUpperCase()} ${url}`)
+    } else {
+      // No token AND no session - this might be unauthenticated request (like login)
+      tokenWarn(`Request WITHOUT token: ${method.toUpperCase()} ${url}`)
+    }
     return
   }
 
