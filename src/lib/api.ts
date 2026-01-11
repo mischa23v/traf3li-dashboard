@@ -65,6 +65,18 @@ import {
 } from './request-cancellation'
 import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint } from './device-fingerprint'
 import { ROUTES } from '@/constants/routes'
+import { STORAGE_KEYS, AUTH_TIMING } from '@/constants/storage-keys'
+import { authEvents } from './auth-events'
+import { showErrorToast, showWarningToast, showInfoToast } from './toast-utils'
+import {
+  scheduleSignInRedirect,
+  cancelPendingRedirect,
+  handleSessionExpired,
+  handleSessionTimeout,
+  handleCrossTabLogout,
+  handleCsrfFailure,
+  type RedirectReason,
+} from './auth-redirect'
 
 // Cached device fingerprint for request headers
 let cachedDeviceFingerprint: string | null = null
@@ -88,47 +100,10 @@ export async function initDeviceFingerprint(): Promise<string> {
 // ==================== TOKEN MANAGEMENT ====================
 
 /**
- * Token storage keys
- */
-const TOKEN_KEYS = {
-  ACCESS: 'accessToken',
-  REFRESH: 'refreshToken',
-  EXPIRES_AT: 'tokenExpiresAt',  // Timestamp when access token expires
-} as const
-
-/**
- * Auth storage keys for Zustand persist and user cache
- * IMPORTANT: Keep in sync with auth-store.ts persist config
- */
-const AUTH_STORAGE_KEYS = {
-  ZUSTAND_PERSIST: 'auth-storage',  // Zustand persist key from auth-store.ts
-  USER: 'user',                      // Direct user cache from authService
-} as const
-
-/**
- * Callback for clearing auth memory cache
- * Registered by authService to avoid circular dependency
- * Called synchronously by clearTokens()
- */
-let onTokensClearedCallback: (() => void) | null = null
-
-/**
- * Register callback to be called when tokens are cleared
- * This allows authService to register its clearAuthMemoryCache function
- * without creating a circular dependency
- *
- * @param callback - Function to call when clearTokens() is invoked
- */
-export const registerTokensClearedCallback = (callback: () => void): void => {
-  onTokensClearedCallback = callback
-}
-
-/**
  * Token refresh scheduler
  * Automatically refreshes the access token before it expires
  */
 let tokenRefreshTimeoutId: ReturnType<typeof setTimeout> | null = null
-const TOKEN_REFRESH_BUFFER_SECONDS = 60 // Refresh 1 minute before expiry
 
 // ==================== TOKEN DEBUG LOGGING ====================
 // Always enabled to help diagnose auth issues on production
@@ -195,14 +170,14 @@ const logRequestTokenState = (method: string, url: string, accessToken: string |
  * Get access token from localStorage
  */
 export const getAccessToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEYS.ACCESS)
+  return localStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
 }
 
 /**
  * Get refresh token from localStorage
  */
 export const getRefreshToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEYS.REFRESH)
+  return localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
 }
 
 /**
@@ -275,7 +250,7 @@ const scheduleTokenRefresh = (expiresIn: number): void => {
   }
 
   // Calculate refresh time (expires_in - buffer, minimum 10 seconds)
-  const refreshInSeconds = Math.max(expiresIn - TOKEN_REFRESH_BUFFER_SECONDS, 10)
+  const refreshInSeconds = Math.max(expiresIn - AUTH_TIMING.TOKEN_REFRESH_BUFFER_SECONDS, 10)
   const refreshInMs = refreshInSeconds * 1000
 
   tokenLog('Scheduling automatic token refresh', {
@@ -315,14 +290,14 @@ export const cancelScheduledTokenRefresh = (): void => {
  * Get token expiration time from localStorage
  */
 export const getTokenExpiresAt = (): number | null => {
-  const expiresAt = localStorage.getItem(TOKEN_KEYS.EXPIRES_AT)
+  const expiresAt = localStorage.getItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
   return expiresAt ? parseInt(expiresAt, 10) : null
 }
 
 /**
  * Check if token is expired or about to expire
  */
-export const isTokenExpiringSoon = (bufferSeconds: number = TOKEN_REFRESH_BUFFER_SECONDS): boolean => {
+export const isTokenExpiringSoon = (bufferSeconds: number = AUTH_TIMING.TOKEN_REFRESH_BUFFER_SECONDS): boolean => {
   const expiresAt = getTokenExpiresAt()
   if (!expiresAt) return false
   return Date.now() >= (expiresAt - bufferSeconds * 1000)
@@ -348,24 +323,24 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
     expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
   })
 
-  localStorage.setItem(TOKEN_KEYS.ACCESS, accessToken)
+  localStorage.setItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN, accessToken)
   // Only store refreshToken if provided (backend may use httpOnly cookie instead)
   if (refreshToken) {
-    localStorage.setItem(TOKEN_KEYS.REFRESH, refreshToken)
+    localStorage.setItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN, refreshToken)
   }
 
   // Store expiration time if expires_in was provided
   if (expiresIn && expiresIn > 0) {
     const expiresAt = Date.now() + (expiresIn * 1000)
-    localStorage.setItem(TOKEN_KEYS.EXPIRES_AT, expiresAt.toString())
+    localStorage.setItem(STORAGE_KEYS.AUTH.EXPIRES_AT, expiresAt.toString())
 
     // Schedule automatic token refresh
     scheduleTokenRefresh(expiresIn)
   }
 
   // Verify storage
-  const storedAccess = localStorage.getItem(TOKEN_KEYS.ACCESS)
-  const storedRefresh = localStorage.getItem(TOKEN_KEYS.REFRESH)
+  const storedAccess = localStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
+  const storedRefresh = localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
 
   if (storedAccess !== accessToken || storedRefresh !== refreshToken) {
     tokenWarn('Token storage verification FAILED!', {
@@ -378,6 +353,10 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
     // Emit token refresh event so WebSocket layer can update its token
     // This ensures WebSocket stays authenticated after HTTP token refresh
     tokenRefreshEvents.emit(accessToken, expiresIn)
+
+    // Also emit via auth events for other subscribers
+    authEvents.onTokensRefreshed.emit({ accessToken, expiresIn })
+    authEvents.onAuthStateChange.emit({ isAuthenticated: true })
   }
 }
 
@@ -386,40 +365,36 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
  * Also clears auth-related storage to ensure UI reflects logged-out state
  *
  * IMPORTANT: This function is SYNCHRONOUS. All state is cleared before it returns.
- * The memory cache callback is registered by authService on module load.
+ * Subscribers to authEvents.onTokensCleared are notified synchronously.
+ *
+ * @param reason - Optional reason for clearing tokens (for analytics/debugging)
  */
-export const clearTokens = (): void => {
-  tokenLog('Clearing tokens from localStorage')
+export const clearTokens = (reason: string = 'manual'): void => {
+  tokenLog('Clearing tokens from localStorage', { reason })
 
   // Clear token storage
-  localStorage.removeItem(TOKEN_KEYS.ACCESS)
-  localStorage.removeItem(TOKEN_KEYS.REFRESH)
-  localStorage.removeItem(TOKEN_KEYS.EXPIRES_AT)
+  localStorage.removeItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
+  localStorage.removeItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
+  localStorage.removeItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
 
   // Cancel any scheduled token refresh
   cancelScheduledTokenRefresh()
 
+  // Cancel any pending redirect (we're explicitly clearing tokens)
+  cancelPendingRedirect()
+
   // Clear auth-storage (Zustand persisted state) to ensure isAuthenticated becomes false
-  // Using constant to ensure consistency with auth-store.ts
-  localStorage.removeItem(AUTH_STORAGE_KEYS.ZUSTAND_PERSIST)
+  localStorage.removeItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
 
   // Clear cached user data
-  localStorage.removeItem(AUTH_STORAGE_KEYS.USER)
+  localStorage.removeItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
 
-  // Clear memory cache in authService SYNCHRONOUSLY via registered callback
-  // This prevents race conditions where getCachedUser() could restore stale data
-  if (onTokensClearedCallback) {
-    try {
-      onTokensClearedCallback()
-    } catch (error) {
-      // Log error but don't throw - localStorage is already cleared
-      console.error('[TOKEN] Error in onTokensClearedCallback:', error)
-    }
-  } else {
-    // Callback not registered - authService may not be loaded yet
-    // This is OK during initial load, but log warning for debugging
-    tokenWarn('onTokensClearedCallback not registered - memory cache may be stale')
-  }
+  // Emit tokens cleared event - subscribers (like authService) can clear their caches
+  // This is SYNCHRONOUS - all listeners run before this function returns
+  authEvents.onTokensCleared.emit({ reason })
+
+  // Emit auth state change event
+  authEvents.onAuthStateChange.emit({ isAuthenticated: false })
 }
 
 /**
@@ -1110,12 +1085,11 @@ apiClientNoVersion.interceptors.response.use(
 
       if (!originalRequest._rateLimitToastShown) {
         originalRequest._rateLimitToastShown = true
-        import('sonner').then(({ toast }) => {
-          toast.error(message, {
-            description: `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`,
-            duration: Math.min(retryAfter * 1000, 10000),
-          })
-        })
+        // Use safe toast with custom duration based on retry time
+        showErrorToast(
+          message,
+          `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`
+        )
       }
 
       ;(error as any).retryAfter = retryAfter
@@ -1571,12 +1545,8 @@ apiClient.interceptors.response.use(
       const remainingTime = data?.remainingTime || 15
       const message = data?.message || `الحساب مقفل مؤقتاً. حاول مرة أخرى بعد ${remainingTime} دقيقة`
 
-      import('sonner').then(({ toast }) => {
-        toast.error(message, {
-          description: `يرجى الانتظار ${remainingTime} دقيقة قبل المحاولة مرة أخرى`,
-          duration: 10000,
-        })
-      })
+      // Use safe toast utility
+      showErrorToast(message, `يرجى الانتظار ${remainingTime} دقيقة قبل المحاولة مرة أخرى`)
 
       return Promise.reject({
         status: 423,
@@ -1612,12 +1582,11 @@ apiClient.interceptors.response.use(
       // Only show toast once (not on retries)
       if (!originalRequest._rateLimitToastShown) {
         originalRequest._rateLimitToastShown = true
-        import('sonner').then(({ toast }) => {
-          toast.error(message, {
-            description: `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`,
-            duration: Math.min(retryAfter * 1000, 10000),
-          })
-        })
+        // Use safe toast utility
+        showErrorToast(
+          message,
+          `سيتم إعادة المحاولة تلقائياً بعد ${formatRetryAfter(retryAfter)}`
+        )
       }
 
       // Return error with retryAfter for TanStack Query to use
@@ -1672,28 +1641,18 @@ apiClient.interceptors.response.use(
       // Handle specific session timeout codes (no refresh possible)
       if (errorCode === 'SESSION_IDLE_TIMEOUT' || errorCode === 'SESSION_ABSOLUTE_TIMEOUT') {
         const isIdleTimeout = reason === 'idle_timeout' || errorCode === 'SESSION_IDLE_TIMEOUT'
-        const message = isIdleTimeout
-          ? 'انتهت جلستك بسبب عدم النشاط'
-          : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى'
 
         // Clear all auth state (clearTokens handles user localStorage too)
-        clearTokens()
+        clearTokens(isIdleTimeout ? 'session_idle_timeout' : 'session_absolute_timeout')
 
-        import('sonner').then(({ toast }) => {
-          toast.warning(message, {
-            description: 'جارٍ إعادة التوجيه إلى صفحة تسجيل الدخول...',
-            duration: 3000,
-          })
-        })
-
-        // Redirect to login with reason
-        setTimeout(() => {
-          window.location.href = `/sign-in?reason=${reason || 'session_expired'}`
-        }, 2000)
+        // Use centralized handler for toast + redirect
+        handleSessionTimeout(isIdleTimeout)
 
         return Promise.reject({
           status: 401,
-          message,
+          message: isIdleTimeout
+            ? 'انتهت جلستك بسبب عدم النشاط'
+            : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى',
           code: errorCode,
           error: true,
           reason,
@@ -1721,18 +1680,10 @@ apiClient.interceptors.response.use(
         // If refresh failed, clear tokens and redirect to sign-in
         if (isRefreshRequest) {
           // clearTokens handles all auth state including user localStorage
-          clearTokens()
+          clearTokens('token_refresh_failed')
 
-          import('sonner').then(({ toast }) => {
-            toast.error('انتهت صلاحية الجلسة | Session expired', {
-              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-              duration: 3000,
-            })
-          })
-
-          setTimeout(() => {
-            window.location.href = '/sign-in?reason=session_expired'
-          }, 2000)
+          // Use centralized handler for toast + redirect
+          handleSessionExpired('token_refresh_failed')
         }
 
         return Promise.reject({
@@ -1776,18 +1727,10 @@ apiClient.interceptors.response.use(
           processQueue(new Error('Token refresh failed'))
 
           // clearTokens handles all auth state including user localStorage
-          clearTokens()
+          clearTokens('token_refresh_failed')
 
-          import('sonner').then(({ toast }) => {
-            toast.error('انتهت صلاحية الجلسة | Session expired', {
-              description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-              duration: 3000,
-            })
-          })
-
-          setTimeout(() => {
-            window.location.href = '/sign-in?reason=session_expired'
-          }, 2000)
+          // Use centralized handler for toast + redirect
+          handleSessionExpired('token_refresh_failed')
 
           return Promise.reject({
             status: 401,
@@ -1800,7 +1743,10 @@ apiClient.interceptors.response.use(
         processQueue(refreshError)
 
         // clearTokens handles all auth state including user localStorage
-        clearTokens()
+        clearTokens('token_refresh_error')
+
+        // Use centralized handler for toast + redirect
+        handleSessionExpired('token_refresh_failed')
 
         return Promise.reject({
           status: 401,
@@ -1886,16 +1832,8 @@ apiClient.interceptors.response.use(
               }
               processCsrfQueue(csrfFailErr)
 
-              // Redirect to login for versioned API (non-auth endpoints)
-              import('sonner').then(({ toast }) => {
-                toast.error('انتهت صلاحية الجلسة | Session expired', {
-                  description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-                  duration: 3000,
-                })
-              })
-              setTimeout(() => {
-                window.location.href = '/sign-in?reason=csrf_failed'
-              }, 2000)
+              // Use centralized handler for toast + redirect
+              handleCsrfFailure()
 
               return Promise.reject(csrfFailErr)
             }
@@ -1925,16 +1863,8 @@ apiClient.interceptors.response.use(
             }
             processCsrfQueue(failErr)
 
-            // Redirect to login
-            import('sonner').then(({ toast }) => {
-              toast.error('انتهت صلاحية الجلسة | Session expired', {
-                description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-                duration: 3000,
-              })
-            })
-            setTimeout(() => {
-              window.location.href = '/sign-in?reason=csrf_failed'
-            }, 2000)
+            // Use centralized handler for toast + redirect
+            handleCsrfFailure()
 
             return Promise.reject(failErr)
           } finally {
@@ -1942,16 +1872,8 @@ apiClient.interceptors.response.use(
           }
         }
 
-        // If CSRF retry already attempted, redirect to login
-        import('sonner').then(({ toast }) => {
-          toast.error('انتهت صلاحية الجلسة | Session expired', {
-            description: 'يرجى تسجيل الدخول مرة أخرى | Please log in again',
-            duration: 3000,
-          })
-        })
-        setTimeout(() => {
-          window.location.href = '/sign-in?reason=csrf_failed'
-        }, 2000)
+        // If CSRF retry already attempted, use centralized handler
+        handleCsrfFailure()
 
         return Promise.reject({
           status: 403,
@@ -1965,13 +1887,11 @@ apiClient.interceptors.response.use(
       // Check for Arabic permission messages from departed user blocking
       // These messages indicate the user doesn't have permission to access a resource
       if (message?.includes('ليس لديك صلاحية')) {
-        // Import toast dynamically to avoid circular dependencies
-        import('sonner').then(({ toast }) => {
-          toast.error(message, {
-            description: 'قد تكون صلاحياتك محدودة. تواصل مع إدارة المكتب للمزيد من المعلومات.',
-            duration: 5000,
-          })
-        })
+        // Use safe toast utility
+        showErrorToast(
+          message,
+          'قد تكون صلاحياتك محدودة. تواصل مع إدارة المكتب للمزيد من المعلومات.'
+        )
       }
     }
 
@@ -1980,24 +1900,17 @@ apiClient.interceptors.response.use(
       const errors = error.response?.data?.errors
       // Support both nested error object and root-level message
       const errorObj = error.response?.data?.error
-      const message = errorObj?.messageAr || errorObj?.message || error.response?.data?.message
+      const validationMessage = errorObj?.messageAr || errorObj?.message || error.response?.data?.message
 
       // Show validation errors as toast messages
       if (errors && Array.isArray(errors)) {
-        import('sonner').then(({ toast }) => {
-          errors.forEach((err: { field: string; message: string }) => {
-            toast.error(`${err.field}: ${err.message}`, {
-              duration: 4000,
-            })
-          })
+        // Show each validation error
+        errors.forEach((err: { field: string; message: string }) => {
+          showErrorToast(`${err.field}: ${err.message}`)
         })
-      } else if (message) {
+      } else if (validationMessage) {
         // Show generic validation message
-        import('sonner').then(({ toast }) => {
-          toast.error(message, {
-            duration: 4000,
-          })
-        })
+        showErrorToast(validationMessage)
       }
     }
 
@@ -2274,9 +2187,9 @@ if (typeof window !== 'undefined') {
    * - Tab B detects storage change
    * - Tab B redirects to login page
    */
-  window.addEventListener('storage', (event) => {
+  const handleStorageChange = (event: StorageEvent): void => {
     // Check if access token was removed (logout in another tab)
-    if (event.key === TOKEN_KEYS.ACCESS && event.newValue === null && event.oldValue !== null) {
+    if (event.key === STORAGE_KEYS.AUTH.ACCESS_TOKEN && event.newValue === null && event.oldValue !== null) {
       tokenLog('Access token cleared in another tab - syncing logout')
 
       // Clear local state
@@ -2286,28 +2199,32 @@ if (typeof window !== 'undefined') {
       csrfFailedQueue = []
       cachedCsrfToken = null
 
-      // Notify user and redirect
-      import('sonner').then(({ toast }) => {
-        toast.info('تم تسجيل الخروج من جلسة أخرى | Logged out from another session', {
-          duration: 3000,
-        })
-      })
+      // Cancel any scheduled token refresh
+      cancelScheduledTokenRefresh()
 
-      // Redirect after short delay to allow toast to show
-      setTimeout(() => {
-        window.location.href = '/sign-in?reason=logout_other_tab'
-      }, 1500)
+      // Emit cross-tab logout event for subscribers
+      authEvents.onCrossTabLogout.emit({ sourceTab: 'other' })
+
+      // Use centralized handler for toast + redirect
+      handleCrossTabLogout()
     }
 
     // Also check if auth-storage (Zustand) was cleared
-    if (event.key === AUTH_STORAGE_KEYS.ZUSTAND_PERSIST && event.newValue === null && event.oldValue !== null) {
+    if (event.key === STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST && event.newValue === null && event.oldValue !== null) {
       tokenLog('Auth storage cleared in another tab - syncing logout')
       // If Zustand storage is cleared but we still have tokens, clear them too
       if (getAccessToken()) {
-        clearTokens()
+        clearTokens('cross_tab_sync')
       }
     }
-  })
+  }
+
+  window.addEventListener('storage', handleStorageChange)
+
+  // Export cleanup function for testing/unmount
+  ;(window as any).__cleanupAuthStorageListener = () => {
+    window.removeEventListener('storage', handleStorageChange)
+  }
 }
 
 /**

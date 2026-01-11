@@ -49,8 +49,8 @@ import {
   refreshCsrfToken,
   getAccessToken,
   getRefreshToken,
-  registerTokensClearedCallback,
 } from '@/lib/api'
+import { authEvents } from '@/lib/auth-events'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -577,7 +577,9 @@ const logAuthEvent = import.meta.env.DEV
 /**
  * Clear auth memory cache
  * Called when tokens are cleared to prevent getCachedUser() from restoring stale user
- * This is exported for use by api.ts to avoid circular dependency issues
+ *
+ * ENTERPRISE PATTERN: This function is subscribed to authEvents.onTokensCleared
+ * so it runs synchronously when clearTokens() is called anywhere in the app.
  */
 export const clearAuthMemoryCache = (): void => {
   memoryCachedUser = null
@@ -588,9 +590,12 @@ export const clearAuthMemoryCache = (): void => {
   logAuthEvent('MEMORY_CACHE_CLEARED', { reason: 'tokens cleared' })
 }
 
-// Register the callback with api.ts so clearTokens() can call it synchronously
-// This avoids circular dependency issues while ensuring memory cache is cleared immediately
-registerTokensClearedCallback(clearAuthMemoryCache)
+// Subscribe to auth events to clear memory cache when tokens are cleared
+// This is called synchronously by api.ts clearTokens() via the event emitter
+authEvents.onTokensCleared.subscribe(({ reason }) => {
+  logAuthEvent('ON_TOKENS_CLEARED_EVENT', { reason })
+  clearAuthMemoryCache()
+})
 
 /**
  * Auth Service Object
