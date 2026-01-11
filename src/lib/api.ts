@@ -394,9 +394,13 @@ export const hasTokens = (): boolean => {
 
 /**
  * Token refresh state management
- * Prevents multiple concurrent refresh attempts
+ * Uses Promise-based deduplication to prevent race conditions
+ *
+ * ENTERPRISE PATTERN: Promise-based deduplication
+ * Instead of using a flag (isRefreshing) which can race, we use a Promise.
+ * All concurrent refresh requests wait for the same Promise, ensuring only one refresh happens.
  */
-let isRefreshing = false
+let refreshPromise: Promise<boolean> | null = null
 let failedQueue: Array<{
   resolve: (value: any) => void
   reject: (error: any) => void
@@ -498,7 +502,11 @@ const processQueue = (error: any = null): void => {
  * See: src/config/BACKEND_AUTH_ISSUES.ts for full documentation
  * ============================================================================
  */
-const refreshAccessToken = async (): Promise<boolean> => {
+/**
+ * Internal token refresh implementation
+ * This does the actual work - refreshAccessToken() handles deduplication
+ */
+const performTokenRefresh = async (): Promise<boolean> => {
   // Try localStorage first, then fall back to cookie
   const refreshTokenFromStorage = getRefreshToken()
   const refreshTokenFromCookie = getRefreshTokenFromCookie()
@@ -608,6 +616,39 @@ const refreshAccessToken = async (): Promise<boolean> => {
 
     clearTokens()
     return false
+  }
+}
+
+/**
+ * Refresh access token with Promise-based deduplication
+ *
+ * ENTERPRISE PATTERN: All concurrent refresh requests wait for the same Promise.
+ * This prevents race conditions where multiple 401 responses trigger multiple refreshes.
+ *
+ * Example:
+ * - Request A gets 401, calls refreshAccessToken()
+ * - Request B gets 401 0.1ms later, calls refreshAccessToken()
+ * - Both A and B wait for the SAME refresh promise
+ * - Only ONE network request is made
+ * - Both get the result when it completes
+ */
+const refreshAccessToken = async (): Promise<boolean> => {
+  // If a refresh is already in progress, return the same promise
+  // This is the key to preventing race conditions
+  if (refreshPromise) {
+    tokenLog('Token refresh already in progress, waiting for existing request...')
+    return refreshPromise
+  }
+
+  // Create a new refresh promise
+  refreshPromise = performTokenRefresh()
+
+  try {
+    return await refreshPromise
+  } finally {
+    // Clear the promise when done (success or failure)
+    // This allows future refresh attempts to start fresh
+    refreshPromise = null
   }
 }
 
@@ -813,18 +854,18 @@ apiClientNoVersion.interceptors.request.use(
     // PROACTIVE TOKEN REFRESH:
     // Check if access token is missing/expired and refresh token is available
     // Skip for auth endpoints to avoid loops
+    // Note: refreshAccessToken() handles deduplication internally via Promise-based pattern
     const isAuthEndpoint = url.includes('/auth/')
     if (!isAuthEndpoint && needsTokenRefresh()) {
       const hasRefreshToken = getAnyRefreshToken()
-      if (hasRefreshToken && !isRefreshing) {
+      if (hasRefreshToken) {
         tokenLog('Proactive token refresh triggered (noVersion)', {
           reason: 'Access token missing or expired',
           url,
         })
 
-        // Only one refresh at a time
-        isRefreshing = true
         try {
+          // refreshAccessToken() handles deduplication - safe to call concurrently
           const refreshed = await refreshAccessToken()
           if (refreshed) {
             tokenLog('Proactive token refresh succeeded (noVersion)')
@@ -833,8 +874,6 @@ apiClientNoVersion.interceptors.request.use(
           }
         } catch (error) {
           tokenWarn('Proactive token refresh error (noVersion):', error)
-        } finally {
-          isRefreshing = false
         }
       }
     }
@@ -1212,18 +1251,18 @@ apiClient.interceptors.request.use(
     // PROACTIVE TOKEN REFRESH:
     // Check if access token is missing/expired and refresh token is available
     // Skip for auth endpoints to avoid loops
+    // Note: refreshAccessToken() handles deduplication internally via Promise-based pattern
     const isAuthEndpoint = url.includes('/auth/')
     if (!isAuthEndpoint && needsTokenRefresh()) {
       const hasRefreshToken = getAnyRefreshToken()
-      if (hasRefreshToken && !isRefreshing) {
+      if (hasRefreshToken) {
         tokenLog('Proactive token refresh triggered', {
           reason: 'Access token missing or expired',
           url,
         })
 
-        // Only one refresh at a time
-        isRefreshing = true
         try {
+          // refreshAccessToken() handles deduplication - safe to call concurrently
           const refreshed = await refreshAccessToken()
           if (refreshed) {
             tokenLog('Proactive token refresh succeeded')
@@ -1232,8 +1271,6 @@ apiClient.interceptors.request.use(
           }
         } catch (error) {
           tokenWarn('Proactive token refresh error:', error)
-        } finally {
-          isRefreshing = false
         }
       }
     }
@@ -1627,16 +1664,15 @@ apiClient.interceptors.response.use(
       // Mark this request as a retry attempt
       originalRequest._retry = true
 
-      // If already refreshing, queue this request
-      if (isRefreshing) {
+      // If a refresh is already in progress, queue this request and wait for the refresh to complete
+      // refreshPromise is set by refreshAccessToken() and cleared when done
+      if (refreshPromise) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject, config: originalRequest })
         })
       }
 
-      // Start refresh process
-      isRefreshing = true
-
+      // Start refresh process (refreshAccessToken handles deduplication via Promise)
       try {
         const refreshSuccess = await refreshAccessToken()
 
@@ -1688,8 +1724,6 @@ apiClient.interceptors.response.use(
           message: 'Token refresh failed',
           error: true,
         })
-      } finally {
-        isRefreshing = false
       }
     }
 
@@ -2143,6 +2177,17 @@ if (typeof window !== 'undefined') {
 /**
  * Reset all API state (pending requests, circuit breakers, idempotency keys, tokens, scheduled refresh)
  * Call this on logout to ensure clean state
+ *
+ * ENTERPRISE PATTERN: Comprehensive state reset
+ * This function clears ALL auth-related state to ensure no stale data remains:
+ * - Pending requests (cancel and clear)
+ * - Circuit breakers (reset all)
+ * - Idempotency keys (clear all)
+ * - Access/refresh tokens (clear from localStorage)
+ * - Token refresh promise (clear)
+ * - Failed request queues (clear)
+ * - CSRF state (token, queue, flag)
+ * - Token refresh event listeners (prevent stale callbacks)
  */
 export const resetApiState = () => {
   cancelAllRequests('Logout - clearing state')
@@ -2150,9 +2195,16 @@ export const resetApiState = () => {
   resetAllCircuits()
   clearAllIdempotencyKeys()
   clearTokens() // Clear access and refresh tokens (also cancels scheduled refresh)
+
   // Reset token refresh state
-  isRefreshing = false
+  refreshPromise = null
   failedQueue = []
+
+  // Reset CSRF refresh state
+  isRefreshingCsrf = false
+  csrfFailedQueue = []
+  cachedCsrfToken = null
+
   // Clear token refresh event listeners (prevents stale callbacks)
   tokenRefreshEvents.clear()
 }
