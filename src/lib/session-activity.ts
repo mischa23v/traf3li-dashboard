@@ -202,19 +202,23 @@ class SessionActivityManager {
   /**
    * Create debounced activity handler
    * Prevents excessive processing of rapid events
+   *
+   * NOTE: Using setTimeout instead of requestAnimationFrame because:
+   * 1. RAF doesn't fire in background tabs
+   * 2. We're not doing visual updates, just state tracking
    */
   private createDebouncedHandler(): () => void {
-    let rafId: number | null = null
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
 
     return () => {
-      if (rafId !== null) {
+      if (timeoutId !== null) {
         return // Already scheduled
       }
 
-      rafId = requestAnimationFrame(() => {
-        rafId = null
+      timeoutId = setTimeout(() => {
+        timeoutId = null
         this.handleActivity()
-      })
+      }, 0)
     }
   }
 
@@ -297,12 +301,18 @@ class SessionActivityManager {
    * Called after successful token refresh
    */
   updateExpiresAt(expiresAt: number): void {
+    // Calculate extension BEFORE updating state
+    const oldExpiresAt = this.state.expiresAt
+    const extendedBy = oldExpiresAt ? expiresAt - oldExpiresAt : 0
+
+    // Now update state
     this.state.expiresAt = expiresAt
     this.state.lastExtendRequest = Date.now()
 
-    // Broadcast to other tabs
-    const extendedBy = expiresAt - (this.state.expiresAt || Date.now())
-    authBroadcast.broadcastSessionExtend(expiresAt, Math.round(extendedBy / 1000))
+    // Broadcast to other tabs (only if actually extended)
+    if (extendedBy > 0) {
+      authBroadcast.broadcastSessionExtend(expiresAt, Math.round(extendedBy / 1000))
+    }
 
     this.notifyExtendCallbacks(expiresAt)
   }

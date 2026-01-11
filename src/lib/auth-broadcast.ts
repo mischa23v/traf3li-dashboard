@@ -145,6 +145,7 @@ class AuthBroadcastManager {
   private channel: BroadcastChannel | null = null
   private subscribers = new Set<AuthBroadcastSubscriber>()
   private isInitialized = false
+  private storageHandler: ((event: StorageEvent) => void) | null = null
 
   constructor() {
     this.initialize()
@@ -179,7 +180,8 @@ class AuthBroadcastManager {
    * Setup localStorage event listener as fallback
    */
   private setupLocalStorageFallback(): void {
-    window.addEventListener('storage', (event) => {
+    // Store reference so we can remove it in close()
+    this.storageHandler = (event: StorageEvent) => {
       if (event.key === STORAGE_FALLBACK_KEY && event.newValue) {
         try {
           const message = JSON.parse(event.newValue) as AuthBroadcastMessage
@@ -191,7 +193,23 @@ class AuthBroadcastManager {
           console.error('[AUTH_BROADCAST] Failed to parse localStorage message:', error)
         }
       }
-    })
+    }
+    window.addEventListener('storage', this.storageHandler)
+  }
+
+  /**
+   * Validate incoming message has required fields
+   */
+  private isValidMessage(message: unknown): message is AuthBroadcastMessage {
+    if (!message || typeof message !== 'object') return false
+    const msg = message as Record<string, unknown>
+    if (typeof msg.type !== 'string') return false
+    if (typeof msg.timestamp !== 'number') return false
+    if (typeof msg.tabId !== 'string') return false
+    // Validate type is one of our known types
+    const validTypes = ['logout', 'login', 'token_refresh', 'session_extend', 'activity_ping']
+    if (!validTypes.includes(msg.type)) return false
+    return true
   }
 
   /**
@@ -199,6 +217,12 @@ class AuthBroadcastManager {
    */
   private handleMessage(event: MessageEvent<AuthBroadcastMessage>): void {
     const message = event.data
+
+    // Validate message structure (security: prevent injection attacks)
+    if (!this.isValidMessage(message)) {
+      console.warn('[AUTH_BROADCAST] Received invalid message, ignoring:', message)
+      return
+    }
 
     // Ignore messages from this tab
     if (message.tabId === TAB_ID) {
@@ -366,6 +390,11 @@ class AuthBroadcastManager {
     if (this.channel) {
       this.channel.close()
       this.channel = null
+    }
+    // Clean up localStorage fallback handler
+    if (this.storageHandler) {
+      window.removeEventListener('storage', this.storageHandler)
+      this.storageHandler = null
     }
     this.subscribers.clear()
     this.isInitialized = false

@@ -2440,6 +2440,11 @@ if (typeof window !== 'undefined') {
   const unsubscribeBroadcast = authBroadcast.subscribe((message) => {
     switch (message.type) {
       case 'logout':
+        // Guard: Skip if already logged out (prevents double-handling)
+        if (!hasActiveSession && !memoryExpiresAt && !getAccessToken()) {
+          tokenLog('Received logout broadcast but already logged out, skipping')
+          return
+        }
         tokenLog('Received logout broadcast from other tab', {
           reason: message.reason,
           fromTab: message.tabId,
@@ -2455,6 +2460,8 @@ if (typeof window !== 'undefined') {
         cachedCsrfToken = null
         // Cancel scheduled refresh
         cancelScheduledTokenRefresh()
+        // Stop session activity tracking
+        sessionActivity.stopTracking()
         // Emit cross-tab logout event
         authEvents.onCrossTabLogout.emit({ sourceTab: 'other' })
         // Redirect to login
