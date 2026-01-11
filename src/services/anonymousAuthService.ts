@@ -68,14 +68,25 @@ const anonymousAuthService = {
         )
       }
 
-      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
       const accessToken = (response.data as any).access_token || response.data.accessToken
       const refreshToken = (response.data as any).refresh_token || response.data.refreshToken
-      const expiresIn = (response.data as any).expires_in // seconds until access token expires
+      const expiresIn = (response.data as any).expires_in || (response.data as any).expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        storeTokens(null, null, expiresIn)
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
         storeTokens(accessToken, refreshToken, expiresIn)
       }
+      // If neither pattern matches, session may still be valid via httpOnly cookies
 
       const user = response.data.user as AnonymousUser
       user.isAnonymous = true
@@ -118,14 +129,25 @@ const anonymousAuthService = {
         )
       }
 
-      // Store new tokens if provided - supports both OAuth 2.0 (snake_case) and legacy (camelCase)
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
       const accessToken = (response.data as any).access_token || response.data.accessToken
       const refreshToken = (response.data as any).refresh_token || response.data.refreshToken
-      const expiresIn = (response.data as any).expires_in // seconds until access token expires
+      const expiresIn = (response.data as any).expires_in || (response.data as any).expiresIn // seconds until access token expires
 
-      if (accessToken && refreshToken) {
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        storeTokens(null, null, expiresIn)
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
         storeTokens(accessToken, refreshToken, expiresIn)
       }
+      // If neither pattern matches, session may still be valid via httpOnly cookies
 
       // Update user in localStorage
       localStorage.setItem('user', JSON.stringify(response.data.user))
