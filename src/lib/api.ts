@@ -172,22 +172,18 @@ export const getAccessToken = (): string | null => {
 
 /**
  * Get refresh token from localStorage
- * @deprecated GOLD STANDARD: Refresh token should be in httpOnly cookie only.
- * This function exists for backward compatibility during migration.
  */
 export const getRefreshToken = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
 }
 
 /**
- * @deprecated GOLD STANDARD: httpOnly cookies cannot be read by JavaScript.
- * This function is useless and kept only for backward compatibility.
+ * Get refresh token from cookies (fallback when localStorage is empty)
+ * Backend sets refreshToken cookie with httpOnly:false so JS can read it
  */
 export const getRefreshTokenFromCookie = (): string | null => {
-  // httpOnly cookies are INVISIBLE to JavaScript - that's their security feature
-  // This will never find an httpOnly refresh_token cookie
   const cookies = document.cookie
-  const match = cookies.match(/refresh_token=([^;]+)/)
+  const match = cookies.match(/refreshToken=([^;]+)/)
   if (match && match[1]) {
     return match[1]
   }
@@ -195,15 +191,22 @@ export const getRefreshTokenFromCookie = (): string | null => {
 }
 
 /**
- * @deprecated GOLD STANDARD: Never check for refresh token - just make the request.
- * The browser sends httpOnly cookies automatically with credentials: 'include'.
+ * Get refresh token from any available source (localStorage first, then cookies)
  */
 export const getAnyRefreshToken = (): string | null => {
-  // Try localStorage first (legacy support)
+  // Try localStorage first (faster, no parsing)
   const localStorageToken = getRefreshToken()
   if (localStorageToken) {
     return localStorageToken
   }
+
+  // Fallback to cookie
+  const cookieToken = getRefreshTokenFromCookie()
+  if (cookieToken) {
+    tokenLog('Using refresh token from cookie (localStorage empty)')
+    return cookieToken
+  }
+
   return null
 }
 
@@ -298,29 +301,30 @@ export const isTokenExpiringSoon = (bufferSeconds: number = AUTH_TIMING.TOKEN_RE
 }
 
 /**
- * Store tokens
- *
- * GOLD STANDARD:
- * - Access token stored in localStorage (for persistence across tabs/refreshes)
- * - Refresh token is NEVER stored in JavaScript - it's in httpOnly cookie only
- *
+ * Store tokens in localStorage
  * @param accessToken - The access token to store (required)
- * @param _refreshToken - IGNORED. Refresh token should be in httpOnly cookie.
- * @param expiresIn - Seconds until access token expires (enables automatic refresh)
+ * @param refreshToken - The refresh token to store (optional - backend may use httpOnly cookie instead)
+ * @param expiresIn - Optional: seconds until access token expires (enables automatic refresh scheduling)
+ *
+ * Note: With httpOnly cookie strategy, refreshToken is NOT in the response body.
+ * The browser automatically sends the refresh_token cookie with requests to /api/auth/*.
+ * This is more secure as JavaScript cannot access the refresh token.
+ *
+ * Also emits token refresh event so WebSocket layer can update its token
  */
-export const storeTokens = (accessToken: string, _refreshToken?: string | null, expiresIn?: number): void => {
-  tokenLog('Storing access token...', {
+export const storeTokens = (accessToken: string, refreshToken?: string | null, expiresIn?: number): void => {
+  tokenLog('Storing tokens in localStorage...', {
     accessTokenLength: accessToken?.length,
+    refreshTokenLength: refreshToken?.length || '(httpOnly cookie)',
     hasExpiresIn: !!expiresIn,
     expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
-    note: 'Refresh token is in httpOnly cookie (not stored in JS)',
   })
 
-  // Store access token
   localStorage.setItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN, accessToken)
-
-  // GOLD STANDARD: Never store refresh token in localStorage
-  // The _refreshToken parameter is ignored - refresh token lives in httpOnly cookie only
+  // Only store refreshToken if provided (backend may use httpOnly cookie instead)
+  if (refreshToken) {
+    localStorage.setItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN, refreshToken)
+  }
 
   // Store expiration time if expires_in was provided
   if (expiresIn && expiresIn > 0) {
@@ -333,13 +337,18 @@ export const storeTokens = (accessToken: string, _refreshToken?: string | null, 
 
   // Verify storage
   const storedAccess = localStorage.getItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
+  const storedRefresh = localStorage.getItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
 
-  if (storedAccess !== accessToken) {
-    tokenWarn('Token storage verification FAILED!')
+  if (storedAccess !== accessToken || storedRefresh !== refreshToken) {
+    tokenWarn('Token storage verification FAILED!', {
+      accessMatch: storedAccess === accessToken,
+      refreshMatch: storedRefresh === refreshToken,
+    })
   } else {
-    tokenLog('Access token stored successfully')
+    tokenLog('Tokens stored successfully')
 
     // Emit token refresh event so WebSocket layer can update its token
+    // This ensures WebSocket stays authenticated after HTTP token refresh
     tokenRefreshEvents.emit(accessToken, expiresIn)
 
     // Also emit via auth events for other subscribers
@@ -350,26 +359,27 @@ export const storeTokens = (accessToken: string, _refreshToken?: string | null, 
 
 /**
  * Clear tokens from localStorage
- *
- * GOLD STANDARD: Only clears localStorage state.
- * The httpOnly refresh cookie is cleared by calling /auth/logout on the backend.
+ * Also clears auth-related storage to ensure UI reflects logged-out state
  *
  * IMPORTANT: This function is SYNCHRONOUS. All state is cleared before it returns.
+ * Subscribers to authEvents.onTokensCleared are notified synchronously.
  *
- * @param reason - Reason for clearing tokens (for analytics/debugging)
+ * @param reason - Optional reason for clearing tokens (for analytics/debugging)
  */
 export const clearTokens = (reason: string = 'manual'): void => {
   tokenLog('Clearing tokens from localStorage', { reason })
 
-  // Clear token storage (access token only - refresh is in httpOnly cookie)
+  // Clear token storage
   localStorage.removeItem(STORAGE_KEYS.AUTH.ACCESS_TOKEN)
-  localStorage.removeItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
-
-  // Legacy cleanup - remove any old refresh tokens that might still be there
   localStorage.removeItem(STORAGE_KEYS.AUTH.REFRESH_TOKEN)
+  localStorage.removeItem(STORAGE_KEYS.AUTH.EXPIRES_AT)
 
   // Cancel any scheduled token refresh
   cancelScheduledTokenRefresh()
+
+  // NOTE: We intentionally do NOT cancel pending redirects here.
+  // The redirect handlers (handleSessionExpired, etc.) manage their own debouncing.
+  // If we cancelled here, we'd defeat the debounce when multiple 401s happen rapidly.
 
   // Clear auth-storage (Zustand persisted state) to ensure isAuthenticated becomes false
   localStorage.removeItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
@@ -378,6 +388,7 @@ export const clearTokens = (reason: string = 'manual'): void => {
   localStorage.removeItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
 
   // Emit tokens cleared event - subscribers (like authService) can clear their caches
+  // This is SYNCHRONOUS - all listeners run before this function returns
   authEvents.onTokensCleared.emit({ reason })
 
   // Emit auth state change event
@@ -385,13 +396,10 @@ export const clearTokens = (reason: string = 'manual'): void => {
 }
 
 /**
- * Check if we have an access token stored
- *
- * GOLD STANDARD: Only checks access token.
- * We cannot check for httpOnly refresh cookie from JavaScript.
+ * Check if we have valid tokens stored
  */
 export const hasTokens = (): boolean => {
-  return !!getAccessToken()
+  return !!getAccessToken() && !!getRefreshToken()
 }
 
 // ==================== TOKEN REFRESH MECHANISM ====================
@@ -534,24 +542,67 @@ const processQueue = (error: any = null): void => {
  */
 /**
  * Internal token refresh implementation
- *
- * GOLD STANDARD: Just make the request. Never check for httpOnly cookies.
- * Browser sends httpOnly cookies automatically with credentials: 'include'.
- * Let the backend tell us if the refresh fails.
+ * This does the actual work - refreshAccessToken() handles deduplication
  */
 const performTokenRefresh = async (): Promise<boolean> => {
-  tokenLog('Attempting token refresh (Gold Standard - httpOnly cookie)...')
+  // Try localStorage first, then fall back to cookie
+  const refreshTokenFromStorage = getRefreshToken()
+  const refreshTokenFromCookie = getRefreshTokenFromCookie()
+  const refreshToken = refreshTokenFromStorage || refreshTokenFromCookie
+
+  // Check if there's any indication of an active session
+  // Even if we can't read the refresh token, it might be in an httpOnly cookie
+  const hasUserData = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
+  const hasAuthStorage = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
+  const mayHaveHttpOnlyCookie = hasUserData || hasAuthStorage
+
+  // Enhanced debug: Show all token sources
+  console.log('[TOKEN] 🔍 Token refresh check:', {
+    hasRefreshTokenInLocalStorage: !!refreshTokenFromStorage,
+    hasRefreshTokenInCookie: !!refreshTokenFromCookie,
+    hasAccessToken: !!getAccessToken(),
+    tokenExpiresAt: getTokenExpiresAt() ? new Date(getTokenExpiresAt()!).toISOString() : 'not set',
+    isExpiringSoon: isTokenExpiringSoon(60),
+    allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+    mayHaveHttpOnlyCookie,
+  })
+
+  if (!refreshToken && !mayHaveHttpOnlyCookie) {
+    tokenWarn('No refresh token available (checked localStorage, cookies, and session indicators)')
+    console.error('[TOKEN] ❌ REFRESH BLOCKED - No refresh token or session found!')
+    console.error('[TOKEN] 💡 This usually means:')
+    console.error('[TOKEN]    1. User has been fully logged out')
+    console.error('[TOKEN]    2. Session expired on backend')
+    console.error('[TOKEN]    3. User never completed login')
+    return false
+  }
+
+  // If we don't have a visible token but may have an httpOnly cookie, try anyway
+  if (!refreshToken && mayHaveHttpOnlyCookie) {
+    tokenLog('No visible refresh token, but session indicators present - trying httpOnly cookie refresh')
+  }
+
+  // SECURITY: Never log token content, even partial - prevents token leakage to logs
+  tokenLog('Attempting token refresh...', {
+    tokenSource: refreshTokenFromStorage ? 'localStorage' : (refreshTokenFromCookie ? 'cookie' : 'httpOnly'),
+    tokenLength: refreshToken?.length || 0,
+    endpoint: `${API_BASE_URL_NO_VERSION}/auth/refresh`,
+  })
 
   const startTime = Date.now()
 
   try {
-    // GOLD STANDARD: Empty body. Refresh token is in httpOnly cookie.
-    // Browser sends it automatically with credentials: 'include'.
+    // Use a separate axios instance to avoid interceptor loops
+    // Supports both OAuth 2.0 (snake_case) and legacy (camelCase) response format
+    // If we have a visible refresh token, send it in body
+    // Otherwise, rely on httpOnly cookie (withCredentials: true sends it automatically)
+    const requestBody = refreshToken ? { refreshToken } : {}
+
     const response = await axios.post(
       `${API_BASE_URL_NO_VERSION}/auth/refresh`,
-      {},  // Empty body - refresh token in httpOnly cookie
+      requestBody,
       {
-        withCredentials: true,  // CRITICAL: Sends httpOnly cookie
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
           ...(cachedDeviceFingerprint && { 'X-Device-Fingerprint': cachedDeviceFingerprint }),
@@ -2047,6 +2098,8 @@ export const getCacheSize = () => {
  */
 export const debugAuth = () => {
   const accessToken = getAccessToken()
+  const refreshTokenStorage = getRefreshToken()
+  const refreshTokenCookie = getRefreshTokenFromCookie()
   const expiresAt = getTokenExpiresAt()
 
   // Decode access token for info
@@ -2068,33 +2121,30 @@ export const debugAuth = () => {
     }
   }
 
-  // Get visible cookies (httpOnly cookies won't appear here)
-  const visibleCookies = document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean)
-
   const state = {
-    '🔐 Auth State (Gold Standard)': {
+    '🔐 Auth State': {
       hasAccessToken: !!accessToken,
-      refreshToken: 'httpOnly cookie (invisible to JS)',
+      hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
+      hasRefreshTokenInCookie: !!refreshTokenCookie,
       tokenExpiresAt: expiresAt ? new Date(expiresAt).toISOString() : 'not set',
       isExpiringSoon: isTokenExpiringSoon(60),
       scheduledRefreshActive: !!tokenRefreshTimeoutId,
     },
     '👤 Token Info': tokenInfo || 'No valid access token',
-    '🍪 Visible Cookies': visibleCookies.length > 0 ? visibleCookies : ['(none visible - httpOnly cookies hidden)'],
+    '🍪 Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
     '💡 Tips': {
-      'Force refresh': 'debugAuth.refresh() - uses httpOnly cookie',
-      'Clear tokens': 'debugAuth.clear() - clears localStorage only',
-      'Full logout': 'Call /auth/logout to clear httpOnly cookie',
+      'Force refresh': 'debugAuth.refresh()',
+      'Clear tokens': 'debugAuth.clear()',
       'Watch logs': 'Filter console by [TOKEN]',
     },
   }
 
-  console.log('%c🔍 Auth Debug Info (Gold Standard)', 'font-size: 16px; font-weight: bold; color: #4CAF50')
-  console.table(state['🔐 Auth State (Gold Standard)'])
+  console.log('%c🔍 Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
+  console.table(state['🔐 Auth State'])
   console.log('%c👤 Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
   console.log(state['👤 Token Info'])
-  console.log('%c🍪 Visible Cookies (httpOnly hidden)', 'font-size: 14px; font-weight: bold; color: #FF9800')
-  console.log(state['🍪 Visible Cookies'])
+  console.log('%c🍪 Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
+  console.log(state['🍪 Cookies'])
   console.log('%c💡 Tips', 'font-size: 14px; font-weight: bold; color: #9C27B0')
   console.log(state['💡 Tips'])
 
