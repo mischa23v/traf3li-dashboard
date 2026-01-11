@@ -356,6 +356,7 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
 
 /**
  * Clear tokens from localStorage
+ * Also clears auth-related storage to ensure UI reflects logged-out state
  */
 export const clearTokens = (): void => {
   tokenLog('Clearing tokens from localStorage')
@@ -365,6 +366,21 @@ export const clearTokens = (): void => {
 
   // Cancel any scheduled token refresh
   cancelScheduledTokenRefresh()
+
+  // Clear auth-storage (Zustand persisted state) to ensure isAuthenticated becomes false
+  // This prevents the UI from showing logged-in state when tokens are gone
+  localStorage.removeItem('auth-storage')
+
+  // Clear cached user data
+  localStorage.removeItem('user')
+
+  // Clear memory cache in authService to prevent getCachedUser() from restoring stale user
+  // Using dynamic import to avoid circular dependency issues
+  import('@/services/authService').then(({ clearAuthMemoryCache }) => {
+    clearAuthMemoryCache()
+  }).catch(() => {
+    // Silently fail if authService isn't available - localStorage clear is enough
+  })
 }
 
 /**

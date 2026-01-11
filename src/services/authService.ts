@@ -565,6 +565,20 @@ const logAuthEvent = import.meta.env.DEV
   : () => {} // No-op in production
 
 /**
+ * Clear auth memory cache
+ * Called when tokens are cleared to prevent getCachedUser() from restoring stale user
+ * This is exported for use by api.ts to avoid circular dependency issues
+ */
+export const clearAuthMemoryCache = (): void => {
+  memoryCachedUser = null
+  lastSuccessfulAuth = 0
+  consecutive401Count = 0
+  lastAuthRequestTime = 0
+  lastAuthRequestResult = null
+  logAuthEvent('MEMORY_CACHE_CLEARED', { reason: 'tokens cleared' })
+}
+
+/**
  * Auth Service Object
  */
 const authService = {
