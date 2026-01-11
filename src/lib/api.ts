@@ -74,6 +74,8 @@ import {
   handleCrossTabLogout,
   handleCsrfFailure,
 } from './auth-redirect'
+import { authBroadcast } from './auth-broadcast'
+import { sessionActivity } from './session-activity'
 
 // Cached device fingerprint for request headers
 let cachedDeviceFingerprint: string | null = null
@@ -420,6 +422,22 @@ export const storeTokens = (accessToken?: string | null, refreshToken?: string |
   // Also emit via auth events for other subscribers
   authEvents.onTokensRefreshed.emit({ accessToken: accessToken || undefined, expiresIn })
   authEvents.onAuthStateChange.emit({ isAuthenticated: true })
+
+  // ENTERPRISE: Broadcast to other tabs via BroadcastChannel API
+  // This is more reliable than localStorage events for cross-tab sync
+  if (memoryExpiresAt && expiresIn) {
+    authBroadcast.broadcastTokenRefresh(memoryExpiresAt, expiresIn)
+  }
+
+  // ENTERPRISE: Update session activity tracker for rolling sessions
+  // This enables activity-based session extension
+  if (memoryExpiresAt) {
+    sessionActivity.updateExpiresAt(memoryExpiresAt)
+    // Start tracking if not already tracking
+    if (!sessionActivity.isTracking()) {
+      sessionActivity.startTracking(memoryExpiresAt)
+    }
+  }
 }
 
 /**
@@ -462,6 +480,13 @@ export const clearTokens = (reason: string = 'manual'): void => {
 
   // Emit auth state change event
   authEvents.onAuthStateChange.emit({ isAuthenticated: false })
+
+  // ENTERPRISE: Broadcast logout to other tabs via BroadcastChannel API
+  // This ensures all tabs logout simultaneously for security
+  authBroadcast.broadcastLogout(reason)
+
+  // ENTERPRISE: Stop session activity tracking
+  sessionActivity.stopTracking()
 
   tokenLog('Auth state cleared', { reason })
 }
@@ -2245,6 +2270,22 @@ export const debugAuth = () => {
   const isLegacyPattern = !!accessToken
   const pattern = isBffPattern ? 'BFF (httpOnly cookies)' : (isLegacyPattern ? 'Legacy (localStorage)' : 'No session')
 
+  // Get enterprise feature states
+  const broadcastInfo = {
+    usingBroadcastChannel: authBroadcast.isUsingBroadcastChannel(),
+    tabId: authBroadcast.getTabId(),
+    subscribers: authBroadcast.getSubscriberCount(),
+  }
+
+  const activityInfo = {
+    isTracking: sessionActivity.isTracking(),
+    isIdle: sessionActivity.isUserIdle(),
+    idleTime: Math.round(sessionActivity.getIdleTime() / 1000) + 's',
+    timeToExpiry: sessionActivity.getTimeToExpiry()
+      ? Math.round(sessionActivity.getTimeToExpiry()! / 1000) + 's'
+      : 'unknown',
+  }
+
   const state = {
     '🔐 Auth State': {
       pattern: pattern,
@@ -2255,6 +2296,8 @@ export const debugAuth = () => {
       isExpiringSoon: isTokenExpiringSoon(60),
       scheduledRefreshActive: !!tokenRefreshTimeoutId,
     },
+    '📡 Cross-Tab Sync (Enterprise)': broadcastInfo,
+    '⏱️ Session Activity (Enterprise)': activityInfo,
     '📦 Legacy Storage (for backward compatibility)': {
       hasAccessToken: !!accessToken,
       hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
@@ -2273,6 +2316,10 @@ export const debugAuth = () => {
   console.log('%c🔍 Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
   console.log('%c📋 Pattern: ' + pattern, 'font-size: 14px; font-weight: bold; color: #2196F3')
   console.table(state['🔐 Auth State'])
+  console.log('%c📡 Cross-Tab Sync (Enterprise)', 'font-size: 14px; font-weight: bold; color: #00BCD4')
+  console.table(state['📡 Cross-Tab Sync (Enterprise)'])
+  console.log('%c⏱️ Session Activity (Enterprise)', 'font-size: 14px; font-weight: bold; color: #8BC34A')
+  console.table(state['⏱️ Session Activity (Enterprise)'])
   console.log('%c📦 Legacy Storage', 'font-size: 14px; font-weight: bold; color: #607D8B')
   console.table(state['📦 Legacy Storage (for backward compatibility)'])
   console.log('%c👤 Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
@@ -2380,9 +2427,115 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('storage', handleStorageChange)
 
+  // ==================== BROADCASTCHANNEL CROSS-TAB SYNC ====================
+  /**
+   * ENTERPRISE PATTERN: BroadcastChannel API for more reliable cross-tab sync
+   * This is used by Auth0, Azure AD, and enterprise applications.
+   *
+   * BroadcastChannel advantages over localStorage events:
+   * 1. More reliable - localStorage events don't fire in the same tab
+   * 2. More efficient - No serialization to localStorage needed
+   * 3. Better semantics - Designed specifically for inter-tab communication
+   */
+  const unsubscribeBroadcast = authBroadcast.subscribe((message) => {
+    switch (message.type) {
+      case 'logout':
+        tokenLog('Received logout broadcast from other tab', {
+          reason: message.reason,
+          fromTab: message.tabId,
+        })
+        // Clear memory state (BFF pattern)
+        memoryExpiresAt = null
+        hasActiveSession = false
+        // Clear request state
+        refreshPromise = null
+        failedQueue = []
+        csrfRefreshPromise = null
+        csrfFailedQueue = []
+        cachedCsrfToken = null
+        // Cancel scheduled refresh
+        cancelScheduledTokenRefresh()
+        // Emit cross-tab logout event
+        authEvents.onCrossTabLogout.emit({ sourceTab: 'other' })
+        // Redirect to login
+        handleCrossTabLogout()
+        break
+
+      case 'token_refresh':
+        tokenLog('Received token refresh broadcast from other tab', {
+          expiresAt: new Date(message.expiresAt).toISOString(),
+          fromTab: message.tabId,
+        })
+        // Update our memory state with the new expiration
+        memoryExpiresAt = message.expiresAt
+        hasActiveSession = true
+        // Update localStorage for persistence
+        localStorage.setItem(STORAGE_KEYS.AUTH.EXPIRES_AT, message.expiresAt.toString())
+        // Reschedule our token refresh based on new expiration
+        scheduleTokenRefresh(message.expiresIn)
+        // Update session activity tracker
+        sessionActivity.updateExpiresAt(message.expiresAt)
+        break
+
+      case 'session_extend':
+        tokenLog('Received session extend broadcast from other tab', {
+          expiresAt: new Date(message.expiresAt).toISOString(),
+          fromTab: message.tabId,
+        })
+        // Update our memory state
+        memoryExpiresAt = message.expiresAt
+        localStorage.setItem(STORAGE_KEYS.AUTH.EXPIRES_AT, message.expiresAt.toString())
+        break
+
+      case 'login':
+        tokenLog('Received login broadcast from other tab', {
+          userId: message.userId,
+          fromTab: message.tabId,
+        })
+        // Another tab logged in - we may need to refresh our page
+        // For now, just update our session state
+        hasActiveSession = true
+        if (message.expiresAt) {
+          memoryExpiresAt = message.expiresAt
+          localStorage.setItem(STORAGE_KEYS.AUTH.EXPIRES_AT, message.expiresAt.toString())
+        }
+        break
+    }
+  })
+
+  // ==================== ACTIVITY-BASED SESSION EXTENSION ====================
+  /**
+   * ENTERPRISE PATTERN: Rolling sessions (nextjs-auth0 pattern)
+   * Automatically extend sessions for active users.
+   *
+   * The session:extend event is triggered by sessionActivity when:
+   * 1. User is active (not idle)
+   * 2. Session is expiring soon
+   * 3. Debounce period has passed
+   */
+  const handleSessionExtend = async (event: Event) => {
+    const detail = (event as CustomEvent).detail
+    tokenLog('Session extend requested due to user activity', detail)
+
+    // Trigger token refresh to extend the session
+    try {
+      const success = await refreshAccessToken()
+      if (success) {
+        tokenLog('Session extended successfully via activity-based refresh')
+      } else {
+        tokenWarn('Failed to extend session - user may need to re-authenticate')
+      }
+    } catch (error) {
+      tokenWarn('Error extending session:', error)
+    }
+  }
+  window.addEventListener('session:extend', handleSessionExtend)
+
   // Export cleanup function for testing/unmount
   ;(window as any).__cleanupAuthStorageListener = () => {
     window.removeEventListener('storage', handleStorageChange)
+    window.removeEventListener('session:extend', handleSessionExtend)
+    unsubscribeBroadcast()
   }
 }
 
@@ -2421,6 +2574,10 @@ export const resetApiState = () => {
   // Clear token refresh event listeners (prevents stale callbacks)
   tokenRefreshEvents.clear()
 
+  // ENTERPRISE: Stop session activity tracking
+  // This is also called in clearTokens, but we call it here explicitly for completeness
+  sessionActivity.stopTracking()
+
   tokenLog('All API state reset')
 }
 
@@ -2444,5 +2601,9 @@ export {
 
 // Alias export for compatibility with services that import 'api'
 export const api = apiClient
+
+// Re-export cross-tab sync utilities
+export { authBroadcast, getAuthBroadcastDebugInfo } from './auth-broadcast'
+export { sessionActivity, SESSION_ACTIVITY_CONFIG } from './session-activity'
 
 export default apiClient
