@@ -484,17 +484,38 @@ const processQueue = (error: any = null): void => {
  */
 const refreshAccessToken = async (): Promise<boolean> => {
   // Try localStorage first, then fall back to cookie
-  const refreshToken = getAnyRefreshToken()
+  const refreshTokenFromStorage = getRefreshToken()
+  const refreshTokenFromCookie = getRefreshTokenFromCookie()
+  const refreshToken = refreshTokenFromStorage || refreshTokenFromCookie
+
+  // Enhanced debug: Show all token sources
+  console.log('[TOKEN] 🔍 Token refresh check:', {
+    hasRefreshTokenInLocalStorage: !!refreshTokenFromStorage,
+    hasRefreshTokenInCookie: !!refreshTokenFromCookie,
+    hasAccessToken: !!getAccessToken(),
+    tokenExpiresAt: getTokenExpiresAt() ? new Date(getTokenExpiresAt()!).toISOString() : 'not set',
+    isExpiringSoon: isTokenExpiringSoon(60),
+    allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+  })
+
   if (!refreshToken) {
     tokenWarn('No refresh token available (checked localStorage and cookies)')
+    console.error('[TOKEN] ❌ REFRESH BLOCKED - No refresh token found anywhere!')
+    console.error('[TOKEN] 💡 This usually means:')
+    console.error('[TOKEN]    1. SameSite=Strict is blocking the cookie (backend issue)')
+    console.error('[TOKEN]    2. Cookie expired or was cleared')
+    console.error('[TOKEN]    3. User never completed login')
     return false
   }
 
   // SECURITY: Never log token content, even partial - prevents token leakage to logs
   tokenLog('Attempting token refresh...', {
-    tokenSource: getRefreshToken() ? 'localStorage' : 'cookie',
+    tokenSource: refreshTokenFromStorage ? 'localStorage' : 'cookie',
     tokenLength: refreshToken.length,
+    endpoint: `${API_BASE_URL_NO_VERSION}/auth/refresh`,
   })
+
+  const startTime = Date.now()
 
   try {
     // Use a separate axios instance to avoid interceptor loops
@@ -511,6 +532,8 @@ const refreshAccessToken = async (): Promise<boolean> => {
       }
     )
 
+    const duration = Date.now() - startTime
+
     // Support both OAuth 2.0 (snake_case) and legacy (camelCase) token fields
     const accessToken = response.data.access_token || response.data.accessToken
     const newRefreshToken = response.data.refresh_token || response.data.refreshToken
@@ -518,11 +541,13 @@ const refreshAccessToken = async (): Promise<boolean> => {
 
     // accessToken is required; refreshToken is optional (may be in httpOnly cookie)
     if (accessToken) {
-      tokenLog('Token refresh successful', {
+      console.log('[TOKEN] ✅ Token refresh SUCCESS', {
+        duration: `${duration}ms`,
         hasExpiresIn: !!expiresIn,
         expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
         refreshTokenIn: newRefreshToken ? 'response body' : 'httpOnly cookie',
         tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
+        nextRefreshAt: expiresIn ? new Date(Date.now() + (expiresIn - 60) * 1000).toISOString() : 'unknown',
       })
       // Pass refreshToken as optional - backend may use httpOnly cookie for security
       storeTokens(accessToken, newRefreshToken, expiresIn)
@@ -534,11 +559,37 @@ const refreshAccessToken = async (): Promise<boolean> => {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!newRefreshToken,
       responseKeys: Object.keys(response.data),
+      responseData: response.data,
     })
     return false
   } catch (error: any) {
-    // Refresh failed - clear tokens
-    console.error('[TOKEN] ❌ Token refresh failed:', error?.message || error)
+    const duration = Date.now() - startTime
+
+    // Enhanced error logging for diagnosis
+    console.error('[TOKEN] ❌ Token refresh FAILED', {
+      duration: `${duration}ms`,
+      status: error?.response?.status,
+      statusText: error?.response?.statusText,
+      errorCode: error?.response?.data?.code,
+      errorMessage: error?.response?.data?.message || error?.message,
+      endpoint: `${API_BASE_URL_NO_VERSION}/auth/refresh`,
+    })
+
+    // Specific guidance based on error type
+    if (error?.response?.status === 401) {
+      console.error('[TOKEN] 💡 401 Error - Refresh token is invalid or expired')
+      console.error('[TOKEN]    → User needs to log in again')
+    } else if (error?.response?.status === 400) {
+      console.error('[TOKEN] 💡 400 Error - Missing or malformed refresh token')
+      console.error('[TOKEN]    → Check if SameSite cookie is blocking the refresh token')
+    } else if (error?.response?.status === 403) {
+      console.error('[TOKEN] 💡 403 Error - CSRF or security issue')
+      console.error('[TOKEN]    → Check CSRF token configuration')
+    } else if (!error?.response) {
+      console.error('[TOKEN] 💡 Network Error - Could not reach the server')
+      console.error('[TOKEN]    → Check CORS, network connectivity, or server status')
+    }
+
     clearTokens()
     return false
   }
@@ -1966,6 +2017,93 @@ export const getCacheSize = () => {
     '  ✅ const data = queryClient.getQueryData(["cases"])'
   )
   return 0 // No axios-level cache
+}
+
+/**
+ * Debug helper for browser console
+ * Call window.debugAuth() to see current auth state
+ *
+ * Usage in browser console:
+ *   debugAuth()           - Show current auth state
+ *   debugAuth.refresh()   - Force a token refresh
+ *   debugAuth.clear()     - Clear all tokens (logout)
+ */
+export const debugAuth = () => {
+  const accessToken = getAccessToken()
+  const refreshTokenStorage = getRefreshToken()
+  const refreshTokenCookie = getRefreshTokenFromCookie()
+  const expiresAt = getTokenExpiresAt()
+
+  // Decode access token for info
+  let tokenInfo = null
+  if (accessToken) {
+    const decoded = decodeJWTForDebug(accessToken)
+    if (decoded.valid) {
+      const now = Math.floor(Date.now() / 1000)
+      tokenInfo = {
+        userId: decoded.payload.id || decoded.payload.userId || decoded.payload.sub,
+        email: decoded.payload.email,
+        role: decoded.payload.role,
+        firmId: decoded.payload.firm_id,
+        issuedAt: new Date(decoded.payload.iat * 1000).toISOString(),
+        expiresAt: new Date(decoded.payload.exp * 1000).toISOString(),
+        expiresIn: `${Math.round((decoded.payload.exp - now) / 60)} minutes`,
+        isExpired: decoded.isExpired,
+      }
+    }
+  }
+
+  const state = {
+    '🔐 Auth State': {
+      hasAccessToken: !!accessToken,
+      hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
+      hasRefreshTokenInCookie: !!refreshTokenCookie,
+      tokenExpiresAt: expiresAt ? new Date(expiresAt).toISOString() : 'not set',
+      isExpiringSoon: isTokenExpiringSoon(60),
+      scheduledRefreshActive: !!tokenRefreshTimeoutId,
+    },
+    '👤 Token Info': tokenInfo || 'No valid access token',
+    '🍪 Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+    '💡 Tips': {
+      'Force refresh': 'debugAuth.refresh()',
+      'Clear tokens': 'debugAuth.clear()',
+      'Watch logs': 'Filter console by [TOKEN]',
+    },
+  }
+
+  console.log('%c🔍 Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
+  console.table(state['🔐 Auth State'])
+  console.log('%c👤 Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
+  console.log(state['👤 Token Info'])
+  console.log('%c🍪 Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
+  console.log(state['🍪 Cookies'])
+  console.log('%c💡 Tips', 'font-size: 14px; font-weight: bold; color: #9C27B0')
+  console.log(state['💡 Tips'])
+
+  return state
+}
+
+// Attach helper methods
+debugAuth.refresh = async () => {
+  console.log('%c🔄 Forcing token refresh...', 'font-size: 14px; font-weight: bold; color: #FF5722')
+  const result = await refreshAccessToken()
+  if (result) {
+    console.log('%c✅ Token refresh successful!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
+  } else {
+    console.log('%c❌ Token refresh failed!', 'font-size: 14px; font-weight: bold; color: #F44336')
+  }
+  return result
+}
+
+debugAuth.clear = () => {
+  console.log('%c🗑️ Clearing all tokens...', 'font-size: 14px; font-weight: bold; color: #FF5722')
+  clearTokens()
+  console.log('%c✅ Tokens cleared!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
+}
+
+// Expose to window for console access
+if (typeof window !== 'undefined') {
+  (window as any).debugAuth = debugAuth
 }
 
 /**
