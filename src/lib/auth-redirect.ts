@@ -12,6 +12,7 @@ import { showErrorToast, showInfoToast, showWarningToast } from './toast-utils'
 
 /**
  * Redirect reasons for analytics and debugging
+ * These match the reasons passed to clearTokens() for consistency
  */
 export type RedirectReason =
   | 'session_expired'
@@ -20,7 +21,10 @@ export type RedirectReason =
   | 'csrf_failed'
   | 'logout_other_tab'
   | 'token_refresh_failed'
+  | 'token_refresh_error'
   | 'unauthorized'
+  | 'manual'
+  | 'cross_tab_sync'
 
 /**
  * Track pending redirect to prevent duplicates
@@ -96,14 +100,22 @@ export const redirectToSignIn = (reason: RedirectReason): void => {
 
 /**
  * Handle session expired with toast and redirect
+ *
+ * ENTERPRISE PATTERN: Error-resilient handler
+ * Even if toast fails, we still attempt the redirect.
  */
 export const handleSessionExpired = async (
   reason: RedirectReason = 'session_expired'
 ): Promise<void> => {
-  await showErrorToast(
-    'انتهت صلاحية الجلسة | Session expired',
-    'يرجى تسجيل الدخول مرة أخرى | Please log in again'
-  )
+  try {
+    await showErrorToast(
+      'انتهت صلاحية الجلسة | Session expired',
+      'يرجى تسجيل الدخول مرة أخرى | Please log in again'
+    )
+  } catch (error) {
+    // Toast failed but we still want to redirect
+    console.error('[AUTH_REDIRECT] Toast failed in handleSessionExpired:', error)
+  }
   scheduleSignInRedirect(reason, AUTH_TIMING.REDIRECT_DELAY_AFTER_ERROR)
 }
 
@@ -115,9 +127,13 @@ export const handleSessionTimeout = async (isIdleTimeout: boolean): Promise<void
     ? 'انتهت جلستك بسبب عدم النشاط'
     : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى'
 
-  await showWarningToast(message, 'جارٍ إعادة التوجيه إلى صفحة تسجيل الدخول...')
+  try {
+    await showWarningToast(message, 'جارٍ إعادة التوجيه إلى صفحة تسجيل الدخول...')
+  } catch (error) {
+    console.error('[AUTH_REDIRECT] Toast failed in handleSessionTimeout:', error)
+  }
 
-  const reason = isIdleTimeout ? 'session_idle_timeout' : 'session_absolute_timeout'
+  const reason: RedirectReason = isIdleTimeout ? 'session_idle_timeout' : 'session_absolute_timeout'
   scheduleSignInRedirect(reason, AUTH_TIMING.REDIRECT_DELAY_AFTER_ERROR)
 }
 
@@ -125,9 +141,13 @@ export const handleSessionTimeout = async (isIdleTimeout: boolean): Promise<void
  * Handle cross-tab logout notification
  */
 export const handleCrossTabLogout = async (): Promise<void> => {
-  await showInfoToast(
-    'تم تسجيل الخروج من جلسة أخرى | Logged out from another session'
-  )
+  try {
+    await showInfoToast(
+      'تم تسجيل الخروج من جلسة أخرى | Logged out from another session'
+    )
+  } catch (error) {
+    console.error('[AUTH_REDIRECT] Toast failed in handleCrossTabLogout:', error)
+  }
   scheduleSignInRedirect('logout_other_tab', AUTH_TIMING.REDIRECT_DELAY_AFTER_TOAST)
 }
 
@@ -135,9 +155,13 @@ export const handleCrossTabLogout = async (): Promise<void> => {
  * Handle CSRF failure with redirect
  */
 export const handleCsrfFailure = async (): Promise<void> => {
-  await showErrorToast(
-    'انتهت صلاحية الجلسة | Session expired',
-    'يرجى تسجيل الدخول مرة أخرى | Please log in again'
-  )
+  try {
+    await showErrorToast(
+      'انتهت صلاحية الجلسة | Session expired',
+      'يرجى تسجيل الدخول مرة أخرى | Please log in again'
+    )
+  } catch (error) {
+    console.error('[AUTH_REDIRECT] Toast failed in handleCsrfFailure:', error)
+  }
   scheduleSignInRedirect('csrf_failed', AUTH_TIMING.REDIRECT_DELAY_AFTER_ERROR)
 }

@@ -67,15 +67,12 @@ import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint
 import { ROUTES } from '@/constants/routes'
 import { STORAGE_KEYS, AUTH_TIMING } from '@/constants/storage-keys'
 import { authEvents } from './auth-events'
-import { showErrorToast, showWarningToast, showInfoToast } from './toast-utils'
+import { showErrorToast } from './toast-utils'
 import {
-  scheduleSignInRedirect,
-  cancelPendingRedirect,
   handleSessionExpired,
   handleSessionTimeout,
   handleCrossTabLogout,
   handleCsrfFailure,
-  type RedirectReason,
 } from './auth-redirect'
 
 // Cached device fingerprint for request headers
@@ -380,8 +377,9 @@ export const clearTokens = (reason: string = 'manual'): void => {
   // Cancel any scheduled token refresh
   cancelScheduledTokenRefresh()
 
-  // Cancel any pending redirect (we're explicitly clearing tokens)
-  cancelPendingRedirect()
+  // NOTE: We intentionally do NOT cancel pending redirects here.
+  // The redirect handlers (handleSessionExpired, etc.) manage their own debouncing.
+  // If we cancelled here, we'd defeat the debounce when multiple 401s happen rapidly.
 
   // Clear auth-storage (Zustand persisted state) to ensure isAuthenticated becomes false
   localStorage.removeItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
