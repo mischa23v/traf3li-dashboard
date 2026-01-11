@@ -40,7 +40,17 @@
  * ============================================================================
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
+import {
+  apiClientNoVersion,
+  handleApiError,
+  storeTokens,
+  clearTokens,
+  resetApiState,
+  refreshCsrfToken,
+  getAccessToken,
+  getRefreshToken,
+  registerTokensClearedCallback,
+} from '@/lib/api'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -577,6 +587,10 @@ export const clearAuthMemoryCache = (): void => {
   lastAuthRequestResult = null
   logAuthEvent('MEMORY_CACHE_CLEARED', { reason: 'tokens cleared' })
 }
+
+// Register the callback with api.ts so clearTokens() can call it synchronously
+// This avoids circular dependency issues while ensuring memory cache is cleared immediately
+registerTokensClearedCallback(clearAuthMemoryCache)
 
 /**
  * Auth Service Object
