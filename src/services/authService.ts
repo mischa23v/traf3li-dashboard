@@ -597,6 +597,15 @@ authEvents.onTokensCleared.subscribe(({ reason }) => {
   clearAuthMemoryCache()
 })
 
+// Subscribe to cross-tab logout events to clear memory cache
+// CRITICAL: When Tab A logs out, Tab B's storage listener emits onCrossTabLogout
+// but does NOT emit onTokensCleared (because tokens are already gone in localStorage).
+// Without this subscription, memoryCachedUser would remain stale in Tab B.
+authEvents.onCrossTabLogout.subscribe(({ sourceTab }) => {
+  logAuthEvent('ON_CROSS_TAB_LOGOUT_EVENT', { sourceTab })
+  clearAuthMemoryCache()
+})
+
 /**
  * Auth Service Object
  */
