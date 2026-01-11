@@ -24,7 +24,6 @@ import {
     Send, Calendar, Users
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { ROUTES } from '@/constants/routes'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'

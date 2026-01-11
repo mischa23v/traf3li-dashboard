@@ -5,7 +5,7 @@
  * - Calendar & Notifications widget with التقويم/التنبيهات tabs
  */
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Clock, Bell, MapPin, Calendar as CalendarIcon,
   Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
@@ -20,6 +20,10 @@ import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
+import {
+  useKeyboardShortcuts,
+  KBD_COLORS,
+} from '@/hooks/useKeyboardShortcuts'
 
 interface CrmTransactionsSidebarProps {
   mode?: 'list' | 'detail'
@@ -88,59 +92,28 @@ export function CrmTransactionsSidebar({
     return upcomingRemindersData.data.slice(0, 5)
   }, [upcomingRemindersData])
 
-  // Keyboard shortcuts for Quick Actions
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip if user is typing in an input, textarea, or contenteditable
-      const target = e.target as HTMLElement
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
-        return
-      }
+  // Register keyboard shortcuts (Gold Standard) - using centralized hook
+  useKeyboardShortcuts({
+    mode,
+    links: {
+      viewAll: ROUTES.dashboard.crm.transactions,
+    },
+    disabled: false,
+    listCallbacks: {
+      onToggleSelectionMode,
+      onDeleteSelected,
+      onBulkArchive,
+      onBulkComplete,
+      onSelectAll,
+      isSelectionMode,
+      selectedCount,
+      totalCount,
+    },
+  })
 
-      // List View shortcuts
-      switch (e.key.toLowerCase()) {
-        case 's':
-          e.preventDefault()
-          onToggleSelectionMode?.()
-          break
-        case 'd':
-          e.preventDefault()
-          if (isSelectionMode && selectedCount > 0) {
-            onDeleteSelected?.()
-          }
-          break
-        case 'a':
-          e.preventDefault()
-          if (isSelectionMode && selectedCount > 0) {
-            onBulkArchive?.()
-          }
-          break
-        case 'c':
-          e.preventDefault()
-          if (isSelectionMode && selectedCount > 0) {
-            onBulkComplete?.()
-          }
-          break
-        case 'l':
-          e.preventDefault()
-          if (isSelectionMode && totalCount > 0) {
-            onSelectAll?.()
-          }
-          break
-        case 'v':
-          e.preventDefault()
-          navigate({ to: ROUTES.dashboard.crm.transactions })
-          break
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [mode, navigate, onToggleSelectionMode, onDeleteSelected, isSelectionMode, selectedCount, onBulkArchive, onBulkComplete, onSelectAll, totalCount])
+  // Get keyboard shortcut class helper
+  const getKbdClass = (color: keyof typeof KBD_COLORS) =>
+    cn('text-[10px] font-mono px-1.5 py-0.5 rounded', KBD_COLORS[color])
 
   // Generate 5 days for the strip
   const calendarStripDays = useMemo(() => {

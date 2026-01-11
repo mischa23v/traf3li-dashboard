@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CACHE_TIMES } from '@/config'
 import { toast } from 'sonner'
-import { CACHE_TIMES } from '@/config'
 import { invalidateCache } from '@/lib/cache-invalidation'
 import { payrollService } from '@/services/payrollService'
 import type { SalarySlipFilters, CreateSalarySlipData } from '@/services/payrollService'

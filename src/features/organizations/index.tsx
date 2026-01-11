@@ -208,8 +208,8 @@ function OrganizationsListView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
 
-            {/* FILTERS BAR */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+            {/* FILTERS BAR - Gold Standard */}
+            <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-sm border border-slate-100">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -219,12 +219,12 @@ function OrganizationsListView() {
                       placeholder={t('organizations.searchPlaceholder', 'البحث عن منظمة...')}
                       defaultValue={searchQuery}
                       onChange={(e) => debouncedSetSearch(e.target.value)}
-                      className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                      className="pe-10 h-14 rounded-2xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-base"
                     />
                   </div>
 
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
+                    <SelectTrigger className="w-[160px] h-14 rounded-2xl border-slate-200">
                       <SelectValue placeholder={t('organizations.type', 'النوع')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -238,7 +238,7 @@ function OrganizationsListView() {
                   </Select>
 
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                    <SelectTrigger className="w-[160px] h-14 rounded-2xl border-slate-200">
                       <SelectValue placeholder={t('organizations.status', 'الحالة')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -256,7 +256,7 @@ function OrganizationsListView() {
                       variant="ghost"
                       size="sm"
                       onClick={clearFilters}
-                      className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                      className="h-14 px-6 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl border border-dashed border-red-200"
                     >
                       <X className="h-4 w-4 ms-2" aria-hidden="true" />
                       {t('organizations.clearFilters', 'مسح الفلاتر')}
@@ -266,8 +266,8 @@ function OrganizationsListView() {
               </div>
             </div>
 
-            {/* MAIN ORGANIZATIONS LIST */}
-            <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+            {/* MAIN ORGANIZATIONS LIST - Gold Standard */}
+            <div className="bg-white rounded-[2rem] p-1 shadow-sm border border-slate-100">
               <div className="p-6 pb-2 flex justify-between items-center">
                 <h3 className="font-bold text-navy text-xl">
                   {t('organizations.organizationsList', 'قائمة المنظمات')}

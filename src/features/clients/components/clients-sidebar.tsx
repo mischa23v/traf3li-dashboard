@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Bell, MapPin, Calendar as CalendarIcon,
-    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    CheckCheck, Archive
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,27 +14,40 @@ import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import { ROUTES } from '@/constants/routes'
+import {
+    useKeyboardShortcuts,
+    KBD_COLORS,
+} from '@/hooks/useKeyboardShortcuts'
 
 interface ClientsSidebarProps {
     context?: 'clients' | 'contacts' | 'organizations' | 'staff'
+    mode?: 'list' | 'detail' | 'create'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
+    totalCount?: number
     onDeleteSelected?: () => void
+    onBulkArchive?: () => void
+    onSelectAll?: () => void
 }
 
 export function ClientsSidebar({
     context = 'clients',
+    mode = 'list',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
-    onDeleteSelected
+    totalCount = 0,
+    onDeleteSelected,
+    onBulkArchive,
+    onSelectAll
 }: ClientsSidebarProps) {
     const { t, i18n } = useTranslation()
     const isRTL = i18n.language === 'ar'
     const dateLocale = isRTL ? arSA : enUS
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
+    const [quickActionsTab, setQuickActionsTab] = useState<'main' | 'bulk'>('main')
 
     // Calculate date range for the strip (Today + 4 days)
     // Fixed: Move date calculation outside useMemo to prevent infinite re-renders
@@ -87,6 +101,28 @@ export function ClientsSidebar({
     }
 
     const currentLinks = links[context] || links.clients
+
+    // Register keyboard shortcuts (Gold Standard)
+    useKeyboardShortcuts({
+        mode,
+        links: {
+            create: currentLinks.create,
+            viewAll: currentLinks.viewAll,
+        },
+        listCallbacks: {
+            onToggleSelectionMode,
+            onDeleteSelected,
+            onBulkArchive,
+            onSelectAll,
+            isSelectionMode,
+            selectedCount,
+            totalCount,
+        },
+    })
+
+    // Get keyboard shortcut class
+    const getKbdClass = (color: keyof typeof KBD_COLORS) =>
+        cn('text-[10px] font-mono px-1.5 py-0.5 rounded', KBD_COLORS[color])
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
@@ -168,62 +204,159 @@ export function ClientsSidebar({
     return (
         <div className="space-y-8 lg:col-span-1">
 
-            {/* QUICK ACTIONS WIDGET */}
-            <div className="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 shadow-xl shadow-emerald-900/20 ring-1 ring-white/10 relative overflow-hidden">
+            {/* QUICK ACTIONS WIDGET - Gold Standard with Main/Bulk Tabs */}
+            <div className="bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 rounded-3xl p-6 shadow-xl shadow-emerald-900/20 ring-1 ring-white/10 relative overflow-hidden">
                 {/* Background Glow */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center justify-between mb-4 relative z-10">
                     <h3 className="font-bold text-lg text-white">{t('sidebar.quickActions.title')}</h3>
                 </div>
 
+                {/* Main / Bulk Tabs (Only show in list mode with selection capability) */}
+                {mode === 'list' && onToggleSelectionMode && (
+                    <div className="flex bg-[#033a2d] p-1 rounded-xl mb-4 relative z-10">
+                        <button
+                            onClick={() => setQuickActionsTab('main')}
+                            className={cn(
+                                "flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                quickActionsTab === 'main'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            {isRTL ? 'أساسي' : 'Main'}
+                        </button>
+                        <button
+                            onClick={() => setQuickActionsTab('bulk')}
+                            className={cn(
+                                "flex-1 px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                quickActionsTab === 'bulk'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            {isRTL ? 'جماعي' : 'Bulk'}
+                        </button>
+                    </div>
+                )}
+
                 {/* Content */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" aria-hidden="true" />
-                            <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
-                        </Link>
-                    </Button>
+                    {/* Main Tab Content */}
+                    {quickActionsTab === 'main' && (
+                        <>
+                            {/* Create Button - White + Green Text + Glow */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0 relative">
+                                <Link to={currentLinks.create}>
+                                    <Plus className="h-6 w-6" aria-hidden="true" />
+                                    <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
+                                    <kbd className={cn(getKbdClass('emerald'), 'absolute top-2 end-2')}>N</kbd>
+                                </Link>
+                            </Button>
 
-                    {/* Select Button - White + Dark Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className={cn(
-                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                            isSelectionMode
-                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                        )}
-                        onClick={onToggleSelectionMode}
-                    >
-                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('sidebar.quickActions.select')}</span>
-                    </Button>
+                            {/* Select Button - White + Dark Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-lg relative",
+                                    isSelectionMode
+                                        ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                        : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                                )}
+                                onClick={onToggleSelectionMode}
+                            >
+                                {isSelectionMode ? <X className="h-5 w-5" aria-hidden="true" /> : <CheckSquare className="h-5 w-5" />}
+                                <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('sidebar.quickActions.select')}</span>
+                                <kbd className={cn(getKbdClass('slate'), 'absolute top-2 end-2')}>S</kbd>
+                            </Button>
 
-                    {/* Delete Button - White + Red Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                        onClick={onDeleteSelected}
-                        disabled={!isSelectionMode || selectedCount === 0}
-                    >
-                        <Trash2 className="h-6 w-6" />
-                        <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `${t('common.delete')} (${selectedCount})` : t('common.delete')}
-                        </span>
-                    </Button>
+                            {/* Delete Button - White + Red Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative"
+                                onClick={onDeleteSelected}
+                                disabled={!isSelectionMode || selectedCount === 0}
+                            >
+                                <Trash2 className="h-5 w-5" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `${t('common.delete')} (${selectedCount})` : t('common.delete')}
+                                </span>
+                                <kbd className={cn(getKbdClass('red'), 'absolute top-2 end-2')}>D</kbd>
+                            </Button>
 
-                    {/* View All Button - White + Dark Text + Glow */}
-                    <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                        <Link to={currentLinks.viewAll}>
-                            <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">{t('sidebar.quickActions.viewAll')}</span>
-                        </Link>
-                    </Button>
+                            {/* View All Button - White + Dark Text + Glow */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-5 w-5" />
+                                    <span className="text-sm font-bold">{t('sidebar.quickActions.viewAll')}</span>
+                                    <kbd className={cn(getKbdClass('slate'), 'absolute top-2 end-2')}>V</kbd>
+                                </Link>
+                            </Button>
+                        </>
+                    )}
+
+                    {/* Bulk Tab Content */}
+                    {quickActionsTab === 'bulk' && (
+                        <>
+                            {/* Select All Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative disabled:opacity-50"
+                                onClick={onSelectAll}
+                                disabled={totalCount === 0}
+                            >
+                                <CheckCheck className="h-5 w-5" />
+                                <span className="text-sm font-bold">
+                                    {isRTL ? 'تحديد الكل' : 'Select All'}
+                                    {totalCount > 0 && <span className="text-xs opacity-70 ms-1">({totalCount})</span>}
+                                </span>
+                                <kbd className={cn(getKbdClass('blue'), 'absolute top-2 end-2')}>L</kbd>
+                            </Button>
+
+                            {/* Bulk Delete Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative"
+                                onClick={onDeleteSelected}
+                                disabled={selectedCount === 0}
+                            >
+                                <Trash2 className="h-5 w-5" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `${t('common.delete')} (${selectedCount})` : t('common.delete')}
+                                </span>
+                                <kbd className={cn(getKbdClass('red'), 'absolute top-2 end-2')}>D</kbd>
+                            </Button>
+
+                            {/* Bulk Archive Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-slate-100 text-slate-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative"
+                                onClick={onBulkArchive}
+                                disabled={selectedCount === 0}
+                            >
+                                <Archive className="h-5 w-5" />
+                                <span className="text-sm font-bold">
+                                    {isRTL ? 'أرشفة' : 'Archive'}
+                                    {selectedCount > 0 && <span className="text-xs opacity-70 ms-1">({selectedCount})</span>}
+                                </span>
+                                <kbd className={cn(getKbdClass('slate'), 'absolute top-2 end-2')}>A</kbd>
+                            </Button>
+
+                            {/* Cancel Selection Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-amber-50 text-amber-600 h-auto py-5 flex flex-col items-center justify-center gap-2 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10 relative"
+                                onClick={onToggleSelectionMode}
+                            >
+                                <X className="h-5 w-5" />
+                                <span className="text-sm font-bold">{isRTL ? 'إلغاء' : 'Cancel'}</span>
+                                <kbd className={cn(getKbdClass('amber'), 'absolute top-2 end-2')}>Esc</kbd>
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 
