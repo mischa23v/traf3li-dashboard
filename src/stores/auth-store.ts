@@ -9,6 +9,7 @@ import { setUser as setSentryUser } from '@/lib/sentry'
 import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/analytics'
 import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning, isOTPRequired, LoginOTPRequiredResponse } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 /**
  * Email verification state from backend
@@ -389,7 +390,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage', // localStorage key
+      name: STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST, // localStorage key - using centralized constant
       partialize: (state) => ({
         // Only persist user data, not loading/error states
         user: state.user,
