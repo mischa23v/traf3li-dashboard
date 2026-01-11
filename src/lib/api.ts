@@ -550,6 +550,12 @@ const performTokenRefresh = async (): Promise<boolean> => {
   const refreshTokenFromCookie = getRefreshTokenFromCookie()
   const refreshToken = refreshTokenFromStorage || refreshTokenFromCookie
 
+  // Check if there's any indication of an active session
+  // Even if we can't read the refresh token, it might be in an httpOnly cookie
+  const hasUserData = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.USER_CACHE)
+  const hasAuthStorage = !!localStorage.getItem(STORAGE_KEYS.AUTH_STATE.ZUSTAND_PERSIST)
+  const mayHaveHttpOnlyCookie = hasUserData || hasAuthStorage
+
   // Enhanced debug: Show all token sources
   console.log('[TOKEN] 🔍 Token refresh check:', {
     hasRefreshTokenInLocalStorage: !!refreshTokenFromStorage,
@@ -558,22 +564,28 @@ const performTokenRefresh = async (): Promise<boolean> => {
     tokenExpiresAt: getTokenExpiresAt() ? new Date(getTokenExpiresAt()!).toISOString() : 'not set',
     isExpiringSoon: isTokenExpiringSoon(60),
     allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+    mayHaveHttpOnlyCookie,
   })
 
-  if (!refreshToken) {
-    tokenWarn('No refresh token available (checked localStorage and cookies)')
-    console.error('[TOKEN] ❌ REFRESH BLOCKED - No refresh token found anywhere!')
+  if (!refreshToken && !mayHaveHttpOnlyCookie) {
+    tokenWarn('No refresh token available (checked localStorage, cookies, and session indicators)')
+    console.error('[TOKEN] ❌ REFRESH BLOCKED - No refresh token or session found!')
     console.error('[TOKEN] 💡 This usually means:')
-    console.error('[TOKEN]    1. SameSite=Strict is blocking the cookie (backend issue)')
-    console.error('[TOKEN]    2. Cookie expired or was cleared')
+    console.error('[TOKEN]    1. User has been fully logged out')
+    console.error('[TOKEN]    2. Session expired on backend')
     console.error('[TOKEN]    3. User never completed login')
     return false
   }
 
+  // If we don't have a visible token but may have an httpOnly cookie, try anyway
+  if (!refreshToken && mayHaveHttpOnlyCookie) {
+    tokenLog('No visible refresh token, but session indicators present - trying httpOnly cookie refresh')
+  }
+
   // SECURITY: Never log token content, even partial - prevents token leakage to logs
   tokenLog('Attempting token refresh...', {
-    tokenSource: refreshTokenFromStorage ? 'localStorage' : 'cookie',
-    tokenLength: refreshToken.length,
+    tokenSource: refreshTokenFromStorage ? 'localStorage' : (refreshTokenFromCookie ? 'cookie' : 'httpOnly'),
+    tokenLength: refreshToken?.length || 0,
     endpoint: `${API_BASE_URL_NO_VERSION}/auth/refresh`,
   })
 
@@ -582,9 +594,13 @@ const performTokenRefresh = async (): Promise<boolean> => {
   try {
     // Use a separate axios instance to avoid interceptor loops
     // Supports both OAuth 2.0 (snake_case) and legacy (camelCase) response format
+    // If we have a visible refresh token, send it in body
+    // Otherwise, rely on httpOnly cookie (withCredentials: true sends it automatically)
+    const requestBody = refreshToken ? { refreshToken } : {}
+
     const response = await axios.post(
       `${API_BASE_URL_NO_VERSION}/auth/refresh`,
-      { refreshToken },  // ← Sending token in body as expected by backend
+      requestBody,
       {
         withCredentials: true,
         headers: {
