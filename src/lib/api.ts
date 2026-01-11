@@ -2104,6 +2104,24 @@ debugAuth.clear = () => {
 // Expose to window for console access
 if (typeof window !== 'undefined') {
   (window as any).debugAuth = debugAuth
+
+  // Show debug commands on app load
+  console.log(
+    '%c🔐 Auth Debug Commands Available',
+    'font-size: 14px; font-weight: bold; color: #4CAF50; background: #E8F5E9; padding: 4px 8px; border-radius: 4px;'
+  )
+  console.log(
+    '%c┌─────────────────────────────────────────────────────────┐\n' +
+    '│  debugAuth()          → Show current auth state         │\n' +
+    '│  debugAuth.refresh()  → Force token refresh             │\n' +
+    '│  debugAuth.clear()    → Clear all tokens (logout)       │\n' +
+    '└─────────────────────────────────────────────────────────┘',
+    'font-family: monospace; color: #1976D2;'
+  )
+  console.log(
+    '%c💡 Filter console by [TOKEN] to see all auth activity',
+    'color: #9C27B0; font-style: italic;'
+  )
 }
 
 /**
