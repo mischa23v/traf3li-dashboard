@@ -97,6 +97,33 @@ const TOKEN_KEYS = {
 } as const
 
 /**
+ * Auth storage keys for Zustand persist and user cache
+ * IMPORTANT: Keep in sync with auth-store.ts persist config
+ */
+const AUTH_STORAGE_KEYS = {
+  ZUSTAND_PERSIST: 'auth-storage',  // Zustand persist key from auth-store.ts
+  USER: 'user',                      // Direct user cache from authService
+} as const
+
+/**
+ * Callback for clearing auth memory cache
+ * Registered by authService to avoid circular dependency
+ * Called synchronously by clearTokens()
+ */
+let onTokensClearedCallback: (() => void) | null = null
+
+/**
+ * Register callback to be called when tokens are cleared
+ * This allows authService to register its clearAuthMemoryCache function
+ * without creating a circular dependency
+ *
+ * @param callback - Function to call when clearTokens() is invoked
+ */
+export const registerTokensClearedCallback = (callback: () => void): void => {
+  onTokensClearedCallback = callback
+}
+
+/**
  * Token refresh scheduler
  * Automatically refreshes the access token before it expires
  */
@@ -357,9 +384,14 @@ export const storeTokens = (accessToken: string, refreshToken?: string | null, e
 /**
  * Clear tokens from localStorage
  * Also clears auth-related storage to ensure UI reflects logged-out state
+ *
+ * IMPORTANT: This function is SYNCHRONOUS. All state is cleared before it returns.
+ * The memory cache callback is registered by authService on module load.
  */
 export const clearTokens = (): void => {
   tokenLog('Clearing tokens from localStorage')
+
+  // Clear token storage
   localStorage.removeItem(TOKEN_KEYS.ACCESS)
   localStorage.removeItem(TOKEN_KEYS.REFRESH)
   localStorage.removeItem(TOKEN_KEYS.EXPIRES_AT)
@@ -368,19 +400,26 @@ export const clearTokens = (): void => {
   cancelScheduledTokenRefresh()
 
   // Clear auth-storage (Zustand persisted state) to ensure isAuthenticated becomes false
-  // This prevents the UI from showing logged-in state when tokens are gone
-  localStorage.removeItem('auth-storage')
+  // Using constant to ensure consistency with auth-store.ts
+  localStorage.removeItem(AUTH_STORAGE_KEYS.ZUSTAND_PERSIST)
 
   // Clear cached user data
-  localStorage.removeItem('user')
+  localStorage.removeItem(AUTH_STORAGE_KEYS.USER)
 
-  // Clear memory cache in authService to prevent getCachedUser() from restoring stale user
-  // Using dynamic import to avoid circular dependency issues
-  import('@/services/authService').then(({ clearAuthMemoryCache }) => {
-    clearAuthMemoryCache()
-  }).catch(() => {
-    // Silently fail if authService isn't available - localStorage clear is enough
-  })
+  // Clear memory cache in authService SYNCHRONOUSLY via registered callback
+  // This prevents race conditions where getCachedUser() could restore stale data
+  if (onTokensClearedCallback) {
+    try {
+      onTokensClearedCallback()
+    } catch (error) {
+      // Log error but don't throw - localStorage is already cleared
+      console.error('[TOKEN] Error in onTokensClearedCallback:', error)
+    }
+  } else {
+    // Callback not registered - authService may not be loaded yet
+    // This is OK during initial load, but log warning for debugging
+    tokenWarn('onTokensClearedCallback not registered - memory cache may be stale')
+  }
 }
 
 /**
@@ -409,9 +448,9 @@ let failedQueue: Array<{
 
 /**
  * CSRF refresh state management
- * Prevents multiple concurrent CSRF refresh attempts
+ * Uses Promise-based deduplication (same pattern as token refresh)
  */
-let isRefreshingCsrf = false
+let csrfRefreshPromise: Promise<boolean> | null = null
 let csrfFailedQueue: Array<{
   resolve: (value: any) => void
   reject: (error: any) => void
@@ -421,9 +460,22 @@ let csrfFailedQueue: Array<{
 
 /**
  * Process queued requests after CSRF refresh
+ *
+ * IMPORTANT: We clear the queue BEFORE iterating to prevent double processing.
  */
 const processCsrfQueue = (error: any = null): void => {
-  csrfFailedQueue.forEach((prom) => {
+  // CRITICAL: Capture and clear queue atomically before processing
+  const queue = csrfFailedQueue
+  csrfFailedQueue = []
+
+  // Nothing to process if queue was already cleared
+  if (queue.length === 0) {
+    return
+  }
+
+  tokenLog(`Processing ${queue.length} queued CSRF requests`, { hasError: !!error })
+
+  queue.forEach((prom) => {
     if (error) {
       prom.reject(error)
     } else {
@@ -440,14 +492,28 @@ const processCsrfQueue = (error: any = null): void => {
       }
     }
   })
-  csrfFailedQueue = []
 }
 
 /**
  * Process queued requests after token refresh
+ *
+ * IMPORTANT: We clear the queue BEFORE iterating to prevent double processing.
+ * If two calls to processQueue happen concurrently, only the first processes requests.
  */
 const processQueue = (error: any = null): void => {
-  failedQueue.forEach((prom) => {
+  // CRITICAL: Capture and clear queue atomically before processing
+  // This prevents double processing if processQueue is called twice
+  const queue = failedQueue
+  failedQueue = []
+
+  // Nothing to process if queue was already cleared
+  if (queue.length === 0) {
+    return
+  }
+
+  tokenLog(`Processing ${queue.length} queued requests`, { hasError: !!error })
+
+  queue.forEach((prom) => {
     if (error) {
       prom.reject(error)
     } else {
@@ -459,7 +525,6 @@ const processQueue = (error: any = null): void => {
       prom.resolve(apiClient(prom.config))
     }
   })
-  failedQueue = []
 }
 
 /**
@@ -625,12 +690,15 @@ const performTokenRefresh = async (): Promise<boolean> => {
  * ENTERPRISE PATTERN: All concurrent refresh requests wait for the same Promise.
  * This prevents race conditions where multiple 401 responses trigger multiple refreshes.
  *
+ * IMPORTANT: The assignment to refreshPromise happens SYNCHRONOUSLY before any await.
+ * JavaScript is single-threaded, so between the check and assignment, no other code runs.
+ *
  * Example:
  * - Request A gets 401, calls refreshAccessToken()
- * - Request B gets 401 0.1ms later, calls refreshAccessToken()
- * - Both A and B wait for the SAME refresh promise
- * - Only ONE network request is made
- * - Both get the result when it completes
+ * - Request A: checks refreshPromise (null), assigns new Promise, then awaits
+ * - Request B gets 401, calls refreshAccessToken()
+ * - Request B: checks refreshPromise (set by A), returns same Promise
+ * - Both A and B wait for the SAME Promise - only ONE network request is made
  */
 const refreshAccessToken = async (): Promise<boolean> => {
   // If a refresh is already in progress, return the same promise
@@ -640,11 +708,13 @@ const refreshAccessToken = async (): Promise<boolean> => {
     return refreshPromise
   }
 
-  // Create a new refresh promise
-  refreshPromise = performTokenRefresh()
+  // SYNCHRONOUS: Create and assign promise BEFORE any await
+  // This ensures no other call can pass the check above before we assign
+  const promise = performTokenRefresh()
+  refreshPromise = promise
 
   try {
-    return await refreshPromise
+    return await promise
   } finally {
     // Clear the promise when done (success or failure)
     // This allows future refresh attempts to start fresh
@@ -1118,7 +1188,8 @@ apiClientNoVersion.interceptors.response.use(
           originalRequest._csrfRetry = true
 
           // If already refreshing CSRF, queue this request
-          if (isRefreshingCsrf) {
+          // Uses Promise-based deduplication (same pattern as token refresh)
+          if (csrfRefreshPromise) {
             return new Promise((resolve, reject) => {
               csrfFailedQueue.push({
                 resolve,
@@ -1129,17 +1200,29 @@ apiClientNoVersion.interceptors.response.use(
             })
           }
 
-          // Start CSRF refresh
-          isRefreshingCsrf = true
+          // SYNCHRONOUS: Create and assign promise BEFORE any await
+          const csrfPromise = (async () => {
+            try {
+              // Refresh CSRF token
+              await refreshCsrfToken()
+
+              // Get the new token
+              const newToken = getCsrfToken()
+              if (!newToken) {
+                return false
+              }
+              return true
+            } catch {
+              return false
+            }
+          })()
+          csrfRefreshPromise = csrfPromise
 
           try {
-            // Refresh CSRF token
-            await refreshCsrfToken()
+            const success = await csrfPromise
 
-            // Get the new token
-            const newToken = getCsrfToken()
-            if (!newToken) {
-              // CSRF refresh succeeded but no token available - fail cleanly
+            if (!success) {
+              // CSRF refresh failed - fail cleanly
               const csrfFailError = {
                 status: 403,
                 message: 'فشل تحديث رمز الأمان | Security token refresh failed',
@@ -1152,7 +1235,8 @@ apiClientNoVersion.interceptors.response.use(
             }
 
             // Update original request with new token
-            if (originalRequest.headers) {
+            const newToken = getCsrfToken()
+            if (originalRequest.headers && newToken) {
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
@@ -1176,7 +1260,7 @@ apiClientNoVersion.interceptors.response.use(
             processCsrfQueue(failError)
             return Promise.reject(failError)
           } finally {
-            isRefreshingCsrf = false
+            csrfRefreshPromise = null
           }
         }
 
@@ -1592,8 +1676,7 @@ apiClient.interceptors.response.use(
           ? 'انتهت جلستك بسبب عدم النشاط'
           : 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى'
 
-        // Clear all auth state
-        localStorage.removeItem('user')
+        // Clear all auth state (clearTokens handles user localStorage too)
         clearTokens()
 
         import('sonner').then(({ toast }) => {
@@ -1637,8 +1720,8 @@ apiClient.interceptors.response.use(
 
         // If refresh failed, clear tokens and redirect to sign-in
         if (isRefreshRequest) {
+          // clearTokens handles all auth state including user localStorage
           clearTokens()
-          localStorage.removeItem('user')
 
           import('sonner').then(({ toast }) => {
             toast.error('انتهت صلاحية الجلسة | Session expired', {
@@ -1692,8 +1775,8 @@ apiClient.interceptors.response.use(
           // Refresh failed - reject all queued requests and redirect to login
           processQueue(new Error('Token refresh failed'))
 
+          // clearTokens handles all auth state including user localStorage
           clearTokens()
-          localStorage.removeItem('user')
 
           import('sonner').then(({ toast }) => {
             toast.error('انتهت صلاحية الجلسة | Session expired', {
@@ -1716,8 +1799,8 @@ apiClient.interceptors.response.use(
         // Refresh failed - reject all queued requests
         processQueue(refreshError)
 
+        // clearTokens handles all auth state including user localStorage
         clearTokens()
-        localStorage.removeItem('user')
 
         return Promise.reject({
           status: 401,
@@ -1765,7 +1848,8 @@ apiClient.interceptors.response.use(
           originalRequest._csrfRetry = true
 
           // If already refreshing CSRF, queue this request
-          if (isRefreshingCsrf) {
+          // Uses Promise-based deduplication (same pattern as token refresh)
+          if (csrfRefreshPromise) {
             return new Promise((resolve, reject) => {
               csrfFailedQueue.push({
                 resolve,
@@ -1776,17 +1860,23 @@ apiClient.interceptors.response.use(
             })
           }
 
-          // Start CSRF refresh
-          isRefreshingCsrf = true
+          // SYNCHRONOUS: Create and assign promise BEFORE any await
+          const csrfPromise = (async () => {
+            try {
+              await refreshCsrfToken()
+              const newToken = getCsrfToken()
+              return !!newToken
+            } catch {
+              return false
+            }
+          })()
+          csrfRefreshPromise = csrfPromise
 
           try {
-            // Refresh CSRF token
-            await refreshCsrfToken()
+            const success = await csrfPromise
 
-            // Get the new token
-            const newToken = getCsrfToken()
-            if (!newToken) {
-              // CSRF refresh succeeded but no token available
+            if (!success) {
+              // CSRF refresh failed
               const csrfFailErr = {
                 status: 403,
                 message: 'فشل تحديث رمز الأمان | Security token refresh failed',
@@ -1811,7 +1901,8 @@ apiClient.interceptors.response.use(
             }
 
             // Update original request with new token
-            if (originalRequest.headers) {
+            const newToken = getCsrfToken()
+            if (originalRequest.headers && newToken) {
               originalRequest.headers.set('X-CSRF-Token', newToken)
             }
 
@@ -1847,7 +1938,7 @@ apiClient.interceptors.response.use(
 
             return Promise.reject(failErr)
           } finally {
-            isRefreshingCsrf = false
+            csrfRefreshPromise = null
           }
         }
 
@@ -2172,6 +2263,51 @@ if (typeof window !== 'undefined') {
     '%c💡 Filter console by [TOKEN] to see all auth activity',
     'color: #9C27B0; font-style: italic;'
   )
+
+  // ==================== CROSS-TAB LOGOUT SYNC ====================
+  /**
+   * Listen for storage changes from other tabs
+   * When accessToken is removed in another tab, sync logout to this tab
+   *
+   * ENTERPRISE PATTERN: Multi-tab session sync
+   * - User logs out in Tab A
+   * - Tab B detects storage change
+   * - Tab B redirects to login page
+   */
+  window.addEventListener('storage', (event) => {
+    // Check if access token was removed (logout in another tab)
+    if (event.key === TOKEN_KEYS.ACCESS && event.newValue === null && event.oldValue !== null) {
+      tokenLog('Access token cleared in another tab - syncing logout')
+
+      // Clear local state
+      refreshPromise = null
+      failedQueue = []
+      csrfRefreshPromise = null
+      csrfFailedQueue = []
+      cachedCsrfToken = null
+
+      // Notify user and redirect
+      import('sonner').then(({ toast }) => {
+        toast.info('تم تسجيل الخروج من جلسة أخرى | Logged out from another session', {
+          duration: 3000,
+        })
+      })
+
+      // Redirect after short delay to allow toast to show
+      setTimeout(() => {
+        window.location.href = '/sign-in?reason=logout_other_tab'
+      }, 1500)
+    }
+
+    // Also check if auth-storage (Zustand) was cleared
+    if (event.key === AUTH_STORAGE_KEYS.ZUSTAND_PERSIST && event.newValue === null && event.oldValue !== null) {
+      tokenLog('Auth storage cleared in another tab - syncing logout')
+      // If Zustand storage is cleared but we still have tokens, clear them too
+      if (getAccessToken()) {
+        clearTokens()
+      }
+    }
+  })
 }
 
 /**
@@ -2201,7 +2337,7 @@ export const resetApiState = () => {
   failedQueue = []
 
   // Reset CSRF refresh state
-  isRefreshingCsrf = false
+  csrfRefreshPromise = null
   csrfFailedQueue = []
   cachedCsrfToken = null
 
