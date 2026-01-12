@@ -159,12 +159,18 @@ Output exactly this:
 
 **Do you approve these requirements?**
 
-Reply:
-- "yes" or "approved" → I'll create the approval marker and you can run `/implementation`
-- "no" or feedback → I'll revise the requirements
+Reply with one of: `approved`, `yes`, `proceed`, `lgtm`, `looks good`
+→ I'll create the approval marker and tell you to run `/implementation`
+
+Or provide feedback → I'll revise the requirements
 ```
 
-**WAIT FOR USER RESPONSE. DO NOT PROCEED.**
+**WAIT FOR USER RESPONSE.**
+
+**DO NOT** continue until user responds.
+**DO NOT** call `/implementation` yourself.
+**DO NOT** start writing code.
+**DO NOT** proceed to design phase.
 
 ---
 

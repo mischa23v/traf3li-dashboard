@@ -89,7 +89,22 @@ After the agent completes, output:
 
 ## Architecture Review Complete
 
-**Health Score**: X/10
+**Architecture Score**: X/100 → Grade: A/B/C/D/F
+
+| Category | Score | Max |
+|----------|-------|-----|
+| Separation of Concerns | X | 20 |
+| SOLID Principles | X | 20 |
+| Scalability | X | 20 |
+| Maintainability | X | 20 |
+| Code Organization | X | 20 |
+
+**Grade Scale**:
+- A (90-100): Excellent architecture
+- B (80-89): Good, minor improvements
+- C (70-79): Acceptable, some work needed
+- D (60-69): Poor, significant refactoring needed
+- F (<60): Critical, major overhaul required
 
 ### Key Findings
 1. {Finding 1}
@@ -103,26 +118,32 @@ After the agent completes, output:
 | High | {action} | {effort} |
 | Medium | {action} | {effort} |
 
-### Patterns to Follow
-- {Pattern from codebase to replicate}
+### Patterns to Follow (Replicate These)
+- {Pattern from codebase}
 
-### Anti-patterns to Fix
+### Anti-patterns Found (Fix These)
 - {Anti-pattern to refactor}
 
 ---
 
 ## MANDATORY NEXT STEP
 
-If Health Score >= 7:
+If Grade C or better (≥70):
 → You MUST now run `/verify {feature}` for final verification.
 
-If Health Score < 7:
+If Grade D or F (<70):
 → Address critical items first, then re-run `/arch-review`
 
-**Run `/verify {feature}` now?** (yes to continue)
+Reply with one of: `yes`, `proceed`, `continue`
+→ I'll run `/verify {feature}`
+
+Or provide feedback → I'll address concerns first
 ```
 
-**DO NOT skip /verify. It's the final step before PR.**
+**WAIT FOR USER RESPONSE.**
+
+**DO NOT** skip /verify.
+**DO NOT** create PR without verification.
 
 ---
 

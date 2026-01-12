@@ -134,12 +134,17 @@ Output exactly this:
 
 **Do you approve this design?**
 
-Reply:
-- "yes" or "approved" → I'll create tasks.md
-- "no" or feedback → I'll revise the design
+Reply with one of: `approved`, `yes`, `proceed`, `lgtm`, `looks good`
+→ I'll create the approval marker and continue to tasks.md
+
+Or provide feedback → I'll revise the design
 ```
 
-**WAIT FOR USER RESPONSE. DO NOT PROCEED.**
+**WAIT FOR USER RESPONSE.**
+
+**DO NOT** continue until user responds.
+**DO NOT** create tasks.md yourself.
+**DO NOT** start implementation.
 
 ---
 
@@ -275,12 +280,17 @@ Output exactly this:
 
 **Do you approve this task breakdown?**
 
-Reply:
-- "yes" or "approved" → I'll create the approval marker, then run `/complete-phase`
-- "no" or feedback → I'll revise the tasks
+Reply with one of: `approved`, `yes`, `proceed`, `lgtm`, `looks good`
+→ I'll create the approval marker and tell you to run `/complete-phase`
+
+Or provide feedback → I'll revise the tasks
 ```
 
-**WAIT FOR USER RESPONSE. DO NOT PROCEED.**
+**WAIT FOR USER RESPONSE.**
+
+**DO NOT** continue until user responds.
+**DO NOT** start `/complete-phase` yourself.
+**DO NOT** write any code yet.
 
 ---
 
