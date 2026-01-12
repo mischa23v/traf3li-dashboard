@@ -155,6 +155,30 @@ Before saying "done", verify:
 | `/discover {topic}` | Analyze existing codebase | Before planning |
 | `/design-concept {topic}` | UI/UX specifications | Before UI features |
 
+### Code Quality & Testing
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/bugs [path]` | Find bugs, race conditions, edge cases | After writing code |
+| `/test [mode]` | Run tests (unit/coverage/e2e/all) | Before committing |
+| `/perf-check [path]` | Analyze performance issues | When app feels slow |
+| `/ui-review [path]` | Review UI/UX and RTL support | After UI changes |
+
+### Documentation
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/docs [path]` | 3-phase doc workflow (review, implement, commit) | After feature complete |
+
+### Git Operations
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/commit [desc]` | Smart commit based on context | When ready to commit |
+| `/rebase [branch]` | Rebase with smart stash handling | When syncing with upstream |
+| `/worktree` | Create numbered worktree for parallel work | When working on multiple features |
+| `/issue [desc]` | Create GitHub issue | When bugs/tasks identified |
+
 ---
 
 ## 📊 Workflow Diagram
@@ -204,6 +228,7 @@ Before saying "done", verify:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-01-12 | 3.0 | Added new commands (/bugs, /test, /perf-check, /ui-review, /docs, /commit, /rebase, /worktree, /issue), agents (bug-finder, test-runner, performance-profiler, ui-ux-consultant, doc-reviewer, doc-implementer, github-issue-creator, git-cherry-pick-orchestrator), and hooks (clean_commit_guard, emoji_remover, protect_claude_md, github_issue_guard, centralized_constants_guard, rtl_check) |
 | 2026-01-12 | 2.0 | Added TL;DR, workflow diagram, commands reference, /arewedone, /arch-review |
 | - | 1.0 | Initial version |
 
