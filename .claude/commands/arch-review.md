@@ -80,7 +80,7 @@ From the report, create tickets for:
 
 ---
 
-# Output After Review
+# MANDATORY STOP
 
 After the agent completes, output:
 
@@ -111,29 +111,56 @@ After the agent completes, output:
 
 ---
 
-**Next steps**:
-- Address critical items before next feature
-- Add high priority to sprint backlog
-- Track medium/low in project backlog
+## MANDATORY NEXT STEP
+
+If Health Score >= 7:
+→ You MUST now run `/verify {feature}` for final verification.
+
+If Health Score < 7:
+→ Address critical items first, then re-run `/arch-review`
+
+**Run `/verify {feature}` now?** (yes to continue)
 ```
+
+**DO NOT skip /verify. It's the final step before PR.**
 
 ---
 
-## Workflow Reference
+# Workflow Chain (MANDATORY)
 
 ```
+PHASE 1: PLANNING
 /plan {topic}
-    ↓
+    ↓ STOP → Wait for approval
+
+PHASE 2-3: DESIGN & TASKS
 /implementation {topic}
-    ↓
+    ↓ STOP → Wait for design approval
+    ↓ STOP → Wait for tasks approval
+
+PHASE 4: IMPLEMENTATION
 /complete-phase
-    ↓
+    ↓ STOP after EACH task → Wait for "continue"
+    (repeat until all tasks done)
+
+PHASE 5: STRUCTURAL REVIEW (MANDATORY)
 /arewedone
-    ↓
-/verify {topic}
-    ↓
-/arch-review            ← YOU ARE HERE (optional but recommended)
+    ↓ Fix any issues found
+    ↓ STOP → Wait for approval
+
+PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
+/arch-review            ← YOU ARE HERE
+    ↓ Review recommendations
+    ↓ STOP → Wait for approval
+
+PHASE 7: FINAL VERIFICATION
+/verify {topic}         ← NEXT STEP
+    ↓ Confirm all checks pass
+
+DONE → Ready for PR
 ```
+
+**You MUST complete ALL phases in order. No skipping.**
 
 ---
 

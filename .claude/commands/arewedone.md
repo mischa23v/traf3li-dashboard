@@ -93,28 +93,56 @@ After the agent completes, output:
 
 ---
 
-**Ready to proceed?**
-- If PASS: Run `/verify {feature}` for final verification
-- If FAIL: Address remaining issues first
+## MANDATORY NEXT STEP
+
+If PASS or PASS WITH WARNINGS:
+→ You MUST now run `/arch-review` for architecture review.
+
+If FAIL:
+→ Fix critical/high issues first, then re-run `/arewedone`
+
+**Run `/arch-review` now?** (yes to continue)
 ```
+
+**DO NOT skip /arch-review. It's part of the required workflow chain.**
 
 ---
 
-## Workflow Reference
+# Workflow Chain (MANDATORY)
 
 ```
+PHASE 1: PLANNING
 /plan {topic}
-    ↓
+    ↓ STOP → Wait for approval
+
+PHASE 2-3: DESIGN & TASKS
 /implementation {topic}
-    ↓
-/complete-phase (multiple times)
-    ↓
+    ↓ STOP → Wait for design approval
+    ↓ STOP → Wait for tasks approval
+
+PHASE 4: IMPLEMENTATION
+/complete-phase
+    ↓ STOP after EACH task → Wait for "continue"
+    (repeat until all tasks done)
+
+PHASE 5: STRUCTURAL REVIEW (MANDATORY)
 /arewedone              ← YOU ARE HERE
-    ↓
+    ↓ Fix any issues found
+    ↓ STOP → Wait for approval
+
+PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
+/arch-review            ← NEXT STEP
+    ↓ Review recommendations
+    ↓ STOP → Wait for approval
+
+PHASE 7: FINAL VERIFICATION
 /verify {topic}
-    ↓
-/arch-review            ← optional deep review
+    ↓ Confirm all checks pass
+
+DONE → Ready for PR
 ```
+
+**You MUST complete ALL phases in order. No skipping.**
 
 ---
 

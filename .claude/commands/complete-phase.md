@@ -178,16 +178,22 @@ When ALL phases done:
 - [x] Phase 3: Integration
 - [x] Phase 4: Polish
 
-**Final Checklist**:
+**Quick Check**:
 - [ ] `npm run build` passes
 - [ ] No console errors
-- [ ] Arabic RTL works
-- [ ] English LTR works
 
 ---
 
-**Next step**: Run `/arewedone` for structural review
+## MANDATORY NEXT STEP
+
+You MUST now run `/arewedone` for structural review.
+
+This is NOT optional - it's part of the required workflow chain.
+
+**Run `/arewedone` now?** (yes to continue)
 ```
+
+**DO NOT skip /arewedone. It catches issues before PR.**
 
 ---
 
@@ -209,19 +215,41 @@ How to proceed?
 
 ---
 
-# Workflow Reference
+# Workflow Chain (MANDATORY)
 
 ```
+PHASE 1: PLANNING
 /plan {topic}
-    ↓
+    ↓ STOP → Wait for approval
+
+PHASE 2-3: DESIGN & TASKS
 /implementation {topic}
-    ↓
+    ↓ STOP → Wait for design approval
+    ↓ STOP → Wait for tasks approval
+
+PHASE 4: IMPLEMENTATION
 /complete-phase          ← YOU ARE HERE (run multiple times)
-    ↓ (after ALL tasks done)
-/arewedone               ← structural review
-    ↓
-/verify {topic}          ← final verification
+    ↓ STOP after EACH task → Wait for "continue"
+    (repeat until all tasks done)
+
+PHASE 5: STRUCTURAL REVIEW (MANDATORY)
+/arewedone               ← NEXT AFTER ALL TASKS DONE
+    ↓ Fix any issues found
+    ↓ STOP → Wait for approval
+
+PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
+/arch-review
+    ↓ Review recommendations
+    ↓ STOP → Wait for approval
+
+PHASE 7: FINAL VERIFICATION
+/verify {topic}
+    ↓ Confirm all checks pass
+
+DONE → Ready for PR
 ```
+
+**You MUST complete ALL phases in order. No skipping.**
 
 ---
 
