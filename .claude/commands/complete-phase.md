@@ -129,11 +129,18 @@ git checkout -- {path}
 ---
 
 **Continue to next task?**
-- "yes" or "continue" → I'll do the next task
-- "no" or feedback → I'll wait or make changes
+
+Reply with one of: `yes`, `continue`, `next`, `proceed`
+→ I'll do the next task
+
+Or provide feedback → I'll wait or make changes
 ```
 
-**WAIT FOR USER RESPONSE. DO NOT AUTO-CONTINUE.**
+**WAIT FOR USER RESPONSE.**
+
+**DO NOT** auto-continue to next task.
+**DO NOT** batch multiple tasks.
+**DO NOT** assume approval.
 
 ---
 

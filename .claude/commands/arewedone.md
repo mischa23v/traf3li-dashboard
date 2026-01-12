@@ -77,9 +77,19 @@ After the agent completes, output:
 
 ## Structural Review Complete
 
-**Verdict**: PASS / PASS WITH WARNINGS / FAIL
+**Completeness Score**: X/100
 
-### Issues Summary
+| Category | Score | Max |
+|----------|-------|-----|
+| Dead Code | X | 20 |
+| Change Completeness | X | 25 |
+| Development Artifacts | X | 20 |
+| Centralized Constants | X | 20 |
+| Config Consistency | X | 15 |
+
+**Verdict**: PASS (≥80) / PASS WITH WARNINGS (60-79) / FAIL (<60)
+
+### Issues Found
 | Severity | Count | Fixed |
 |----------|-------|-------|
 | Critical | X | X |

@@ -4,6 +4,29 @@
 
 ---
 
+## 📚 TL;DR - Quick Reference
+
+| Task | Command | Approval Required? |
+|------|---------|-------------------|
+| **Plan a feature** | `/plan {topic}` | ⛔ YES - HARD STOP |
+| **Design implementation** | `/implementation {topic}` | ⛔ YES - Design + Tasks |
+| **Execute tasks** | `/complete-phase` | ⛔ YES - Per task |
+| **Check if done** | `/arewedone` | ⛔ YES - Before arch-review |
+| **Architecture review** | `/arch-review` | ⛔ YES - Before verify |
+| **Final verification** | `/verify {topic}` | ⛔ YES - Before PR |
+| **UI/RTL review** | `/design-review` | After UI changes |
+
+### Workflow Chain (MANDATORY)
+
+```
+/plan → approval → /implementation → design approval → tasks approval →
+/complete-phase (one task at a time) → /arewedone → /arch-review → /verify → PR
+```
+
+**Every step has a HARD STOP. Claude MUST wait for your approval.**
+
+---
+
 # 🛑 STOP. READ THIS FIRST.
 
 **MANDATORY: Before writing ANY code, you MUST complete these steps:**
@@ -102,4 +125,85 @@ Before saying "done", verify:
 | Cache Config | `src/config/cache.ts` |
 | Cache Invalidation | `src/lib/cache-invalidation.ts` |
 | Design Principles | `/context/design-principles.md` |
+
+---
+
+## 📋 Available Commands Reference
+
+### Planning & Implementation Workflow
+
+| Command | Purpose | Approval? | Output |
+|---------|---------|-----------|--------|
+| `/plan {topic}` | Create EARS requirements | ⛔ HARD STOP | `.claude/specs/{topic}/requirements.md` |
+| `/implementation {topic}` | Create design + tasks | ⛔ HARD STOP x2 | `design.md` + `tasks.md` |
+| `/complete-phase` | Execute one task at a time | ⛔ Per task | Code changes |
+
+### Quality Assurance
+
+| Command | Purpose | When to Use | Output |
+|---------|---------|-------------|--------|
+| `/arewedone` | Structural completeness check | After all tasks done | Score (0-100) |
+| `/arch-review` | Architecture quality review | Before major features | Grade (A-F) |
+| `/verify {topic}` | Final verification | Before PR | Pass/Fail |
+| `/design-review` | RTL/LTR accessibility check | After UI changes | Report |
+
+### Research & Discovery
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/research {topic}` | Research enterprise patterns | Before planning |
+| `/discover {topic}` | Analyze existing codebase | Before planning |
+| `/design-concept {topic}` | UI/UX specifications | Before UI features |
+
+---
+
+## 📊 Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 1: PLANNING                                               │
+│ /plan {topic} → requirements.md → ⛔ WAIT FOR APPROVAL          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ "approved"
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 2: DESIGN                                                 │
+│ /implementation {topic} → design.md → ⛔ WAIT FOR APPROVAL      │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ "approved"
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 3: TASKS                                                  │
+│ /implementation {topic} → tasks.md → ⛔ WAIT FOR APPROVAL       │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ "approved"
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 4: IMPLEMENTATION                                         │
+│ /complete-phase → ONE task → ⛔ WAIT → repeat until done        │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ all tasks complete
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 5: STRUCTURAL REVIEW                                      │
+│ /arewedone → Score (0-100) → ⛔ WAIT FOR APPROVAL               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ score ≥ 80
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 6: ARCHITECTURE REVIEW                                    │
+│ /arch-review → Grade (A-F) → ⛔ WAIT FOR APPROVAL               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ grade ≥ C
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 7: FINAL VERIFICATION                                     │
+│ /verify {topic} → Pass/Fail → ⛔ WAIT FOR APPROVAL              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ "approved"
+                         CREATE PR
+```
+
+---
+
+## 🔄 Version History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2026-01-12 | 2.0 | Added TL;DR, workflow diagram, commands reference, /arewedone, /arch-review |
+| - | 1.0 | Initial version |
 
