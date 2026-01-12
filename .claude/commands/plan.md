@@ -195,19 +195,41 @@ Only when user explicitly says "yes", "approved", "looks good", or similar:
 
 ---
 
-# Workflow Reference
+# Workflow Chain (MANDATORY)
 
 ```
+PHASE 1: PLANNING
 /plan {topic}          ← YOU ARE HERE
-    ↓ (approval required)
+    ↓ STOP → Wait for approval
+
+PHASE 2-3: DESIGN & TASKS
 /implementation {topic}
-    ↓ (approval required)
+    ↓ STOP → Wait for design approval
+    ↓ STOP → Wait for tasks approval
+
+PHASE 4: IMPLEMENTATION
 /complete-phase
-    ↓ (after each task)
-/arewedone             ← structural review
-    ↓
-/verify {topic}        ← final verification
+    ↓ STOP after EACH task → Wait for "continue"
+    (repeat until all tasks done)
+
+PHASE 5: STRUCTURAL REVIEW (MANDATORY)
+/arewedone
+    ↓ Fix any issues found
+    ↓ STOP → Wait for approval
+
+PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
+/arch-review
+    ↓ Review recommendations
+    ↓ STOP → Wait for approval
+
+PHASE 7: FINAL VERIFICATION
+/verify {topic}
+    ↓ Confirm all checks pass
+
+DONE → Ready for PR
 ```
+
+**You MUST complete ALL phases in order. No skipping.**
 
 ---
 
