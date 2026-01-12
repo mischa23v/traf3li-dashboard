@@ -59,7 +59,7 @@
  * const { members } = await firmService.getTeamMembers(firmId, { showDeparted: true });
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient, { handleApiError, storeTokens } from '@/lib/api'
 import type {
   UserPermissions,
   PermissionsResponse,
@@ -568,20 +568,46 @@ const firmService = {
    * Switch active firm
    * POST /api/firms/switch
    * Switches the user's active firm and returns a new JWT token
+   *
+   * Supports both patterns:
+   * 1. BFF Pattern: New token in httpOnly cookie, only expiresIn in response
+   * 2. Legacy Pattern: Token in response body
    */
   switchFirm: async (firmId: string): Promise<SwitchFirmResponse> => {
     try {
-      const response = await apiClient.post<ApiResponse<SwitchFirmResponse>>(
+      const response = await apiClient.post<ApiResponse<SwitchFirmResponse & {
+        accessToken?: string
+        access_token?: string
+        expiresIn?: number
+        expires_in?: number
+      }>>(
         '/firms/switch',
         { firmId }
       )
 
-      // Store the new token
-      if (response.data.data.token) {
-        localStorage.setItem('token', response.data.data.token)
+      const data = response.data.data
+
+      // Support both patterns for token storage
+      const accessToken = (data as any).access_token || (data as any).accessToken || data.token
+      const expiresIn = (data as any).expires_in || (data as any).expiresIn
+
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Token in httpOnly cookie, only track expiresIn
+        storeTokens(null, null, expiresIn)
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Token in response body
+        storeTokens(accessToken, null, expiresIn)
+        // Also store in legacy location for backward compatibility
+        if (data.token) {
+          localStorage.setItem('token', data.token)
+        }
       }
 
-      return response.data.data
+      return data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -1,6 +1,9 @@
-# Post-Implementation Verification Command
+# /verify - Final Verification (Phase 7)
 
-You are conducting a comprehensive verification of implemented features. This is a MANDATORY final step before marking any feature as complete.
+You are conducting the FINAL verification of implemented features. This is the LAST step before creating a PR.
+
+## FIRST: Read Project Rules
+**MANDATORY**: Read `CLAUDE.md` at project root to understand project standards.
 
 ## Feature to Verify
 Verify implementation of: $ARGUMENTS
@@ -248,25 +251,81 @@ Ask yourself these questions for EVERY implementation:
 5. **What's missing from the happy path?** - Corner cases
 6. **Would I approve this PR?** - Honest assessment
 
-## Integration with Workflow
+# MANDATORY STOP
 
-### Run After
-- `/complete-phase` - After implementing each task
-- Major code changes
-- Before creating PR
+After verification, output:
 
-### Run Before
-- Committing final changes
-- Creating pull request
-- Marking feature complete
+```markdown
+---
 
-## Example Usage
+## Final Verification Complete
 
-```bash
-/verify client-portal
-/verify invoice-management
-/verify task-list-updates
+**Verdict**: PASS / FAIL
+
+### Summary
+| Category | Status |
+|----------|--------|
+| Build | ✅/❌ |
+| Code Quality | ✅/❌ |
+| RTL/LTR | ✅/❌ |
+| Accessibility | ✅/❌ |
+| Security | ✅/❌ |
+
+### Issues (if any)
+- {Issue 1}
+
+---
+
+## WORKFLOW COMPLETE
+
+If PASS:
+→ All 7 phases complete! Ready to create PR.
+
+If FAIL:
+→ Fix issues and re-run `/verify {feature}`
+
+**Create PR now?** (yes to proceed)
 ```
+
+---
+
+# Workflow Chain (MANDATORY)
+
+```
+PHASE 1: PLANNING
+/plan {topic}
+    ↓ STOP → Wait for approval
+
+PHASE 2-3: DESIGN & TASKS
+/implementation {topic}
+    ↓ STOP → Wait for design approval
+    ↓ STOP → Wait for tasks approval
+
+PHASE 4: IMPLEMENTATION
+/complete-phase
+    ↓ STOP after EACH task → Wait for "continue"
+    (repeat until all tasks done)
+
+PHASE 5: STRUCTURAL REVIEW (MANDATORY)
+/arewedone
+    ↓ Fix any issues found
+    ↓ STOP → Wait for approval
+
+PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
+/arch-review
+    ↓ Review recommendations
+    ↓ STOP → Wait for approval
+
+PHASE 7: FINAL VERIFICATION
+/verify {topic}         ← YOU ARE HERE (FINAL STEP)
+    ↓ Confirm all checks pass
+
+DONE → Ready for PR
+```
+
+**Congratulations! You've completed the full workflow chain.**
+
+---
 
 ## If Verification Fails
 

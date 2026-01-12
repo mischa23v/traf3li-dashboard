@@ -40,7 +40,18 @@
  * ============================================================================
  */
 
-import { apiClientNoVersion, handleApiError, storeTokens, clearTokens, resetApiState, refreshCsrfToken, getAccessToken, getRefreshToken } from '@/lib/api'
+import {
+  apiClientNoVersion,
+  handleApiError,
+  storeTokens,
+  clearTokens,
+  resetApiState,
+  refreshCsrfToken,
+  getAccessToken,
+  getRefreshToken,
+  hasActiveSessionIndicator,
+} from '@/lib/api'
+import { authEvents } from '@/lib/auth-events'
 
 // Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
 // So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
@@ -565,6 +576,38 @@ const logAuthEvent = import.meta.env.DEV
   : () => {} // No-op in production
 
 /**
+ * Clear auth memory cache
+ * Called when tokens are cleared to prevent getCachedUser() from restoring stale user
+ *
+ * ENTERPRISE PATTERN: This function is subscribed to authEvents.onTokensCleared
+ * so it runs synchronously when clearTokens() is called anywhere in the app.
+ */
+export const clearAuthMemoryCache = (): void => {
+  memoryCachedUser = null
+  lastSuccessfulAuth = 0
+  consecutive401Count = 0
+  lastAuthRequestTime = 0
+  lastAuthRequestResult = null
+  logAuthEvent('MEMORY_CACHE_CLEARED', { reason: 'tokens cleared' })
+}
+
+// Subscribe to auth events to clear memory cache when tokens are cleared
+// This is called synchronously by api.ts clearTokens() via the event emitter
+authEvents.onTokensCleared.subscribe(({ reason }) => {
+  logAuthEvent('ON_TOKENS_CLEARED_EVENT', { reason })
+  clearAuthMemoryCache()
+})
+
+// Subscribe to cross-tab logout events to clear memory cache
+// CRITICAL: When Tab A logs out, Tab B's storage listener emits onCrossTabLogout
+// but does NOT emit onTokensCleared (because tokens are already gone in localStorage).
+// Without this subscription, memoryCachedUser would remain stale in Tab B.
+authEvents.onCrossTabLogout.subscribe(({ sourceTab }) => {
+  logAuthEvent('ON_CROSS_TAB_LOGOUT_EVENT', { sourceTab })
+  clearAuthMemoryCache()
+})
+
+/**
  * Auth Service Object
  */
 const authService = {
@@ -721,23 +764,38 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
-      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
-      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
       const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken) {
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        storeTokens(null, null, expiresIn)
+        authLog('Login session stored (BFF pattern)', {
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokensIn: 'httpOnly cookies',
+        })
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
         storeTokens(accessToken, refreshToken, expiresIn)
-        authLog('Login tokens stored successfully', {
+        authLog('Login tokens stored (Legacy pattern)', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
           refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Login response did not include accessToken!')
-        authLog('Response keys:', Object.keys(response.data))
+        // No tokens and no expiresIn - unexpected response
+        authWarn('Login response missing both tokens and expiresIn!', {
+          responseKeys: Object.keys(response.data),
+        })
       }
 
       // Normalize user data to ensure firmId is set
@@ -1294,22 +1352,35 @@ const authService = {
         throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
       }
 
-      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
-      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
       const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken) {
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        storeTokens(null, null, expiresIn)
+        authLog('OTP verify session stored (BFF pattern)', {
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokensIn: 'httpOnly cookies',
+        })
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
         storeTokens(accessToken, refreshToken, expiresIn)
-        authLog('OTP verify tokens stored successfully', {
+        authLog('OTP verify tokens stored (Legacy pattern)', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
           refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('OTP verify did not return accessToken!')
+        authWarn('OTP verify response missing both tokens and expiresIn!')
       }
 
       // Normalize user data to ensure firmId is set
@@ -1418,22 +1489,35 @@ const authService = {
         )
       }
 
-      // Store tokens if provided - supports both OAuth 2.0 (snake_case) and backwards-compatible (camelCase)
-      // Note: refreshToken may be in httpOnly cookie (more secure) rather than response body
+      // Store tokens/session - supports both patterns:
+      // 1. BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
+      // 2. Legacy Pattern: Tokens in response body (OAuth 2.0 or camelCase)
       const accessToken = response.data.access_token || response.data.accessToken
       const refreshToken = response.data.refresh_token || response.data.refreshToken
       const expiresIn = response.data.expires_in || response.data.expiresIn // seconds until access token expires
 
-      if (accessToken) {
+      // Determine which pattern the backend is using
+      const isBffPattern = !accessToken && expiresIn !== undefined
+      const isLegacyPattern = !!accessToken
+
+      if (isBffPattern) {
+        // BFF Pattern: Tokens in httpOnly cookies, only track expiresIn
+        storeTokens(null, null, expiresIn)
+        authLog('Magic link session stored (BFF pattern)', {
+          expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
+          tokensIn: 'httpOnly cookies',
+        })
+      } else if (isLegacyPattern) {
+        // Legacy Pattern: Tokens in response body
         storeTokens(accessToken, refreshToken, expiresIn)
-        authLog('Magic link tokens stored successfully', {
+        authLog('Magic link tokens stored (Legacy pattern)', {
           hasExpiresIn: !!expiresIn,
           expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
           refreshTokenIn: refreshToken ? 'response body' : 'httpOnly cookie',
           tokenFormat: response.data.access_token ? 'OAuth 2.0 (snake_case)' : 'Legacy (camelCase)',
         })
       } else {
-        authWarn('Magic link verify did not return accessToken!')
+        authWarn('Magic link verify response missing both tokens and expiresIn!')
       }
 
       // Normalize user data to ensure firmId is set
