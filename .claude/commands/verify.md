@@ -205,31 +205,31 @@ Grep: "queryClient.invalidateQueries" with manual keys
 # Verification Report: {Feature}
 
 ## Build Status
-✅ Build successful | ❌ Build failed with [errors]
+ Build successful |  Build failed with [errors]
 
 ## Code Quality
 | Check | Status | Notes |
 |-------|--------|-------|
-| TypeScript | ✅/❌ | |
-| Constants | ✅/❌ | |
-| Edge Cases | ✅/❌ | |
-| Error Handling | ✅/❌ | |
+| TypeScript | / | |
+| Constants | / | |
+| Edge Cases | / | |
+| Error Handling | / | |
 
 ## Browser Testing
 | Test | Status | Screenshot |
 |------|--------|------------|
-| Desktop | ✅/❌ | [link] |
-| Mobile | ✅/❌ | [link] |
-| RTL | ✅/❌ | [link] |
-| LTR | ✅/❌ | [link] |
+| Desktop | / | [link] |
+| Mobile | / | [link] |
+| RTL | / | [link] |
+| LTR | / | [link] |
 
 ## Issues Found
-1. ❌ [Issue description] - [Fix needed]
-2. ❌ [Issue description] - [Fix needed]
+1.  [Issue description] - [Fix needed]
+2.  [Issue description] - [Fix needed]
 
 ## Issues Fixed
-1. ✅ [Issue] - [How fixed]
-2. ✅ [Issue] - [How fixed]
+1.  [Issue] - [How fixed]
+2.  [Issue] - [How fixed]
 
 ## Final Status
 - [ ] All checks passed
@@ -265,11 +265,11 @@ After verification, output:
 ### Summary
 | Category | Status |
 |----------|--------|
-| Build | ✅/❌ |
-| Code Quality | ✅/❌ |
-| RTL/LTR | ✅/❌ |
-| Accessibility | ✅/❌ |
-| Security | ✅/❌ |
+| Build | / |
+| Code Quality | / |
+| RTL/LTR | / |
+| Accessibility | / |
+| Security | / |
 
 ### Issues (if any)
 - {Issue 1}
@@ -294,33 +294,36 @@ If FAIL:
 ```
 PHASE 1: PLANNING
 /plan {topic}
-    ↓ STOP → Wait for approval
+    -> STOP -> Wait for approval -> Creates .requirements-approved
 
-PHASE 2-3: DESIGN & TASKS
-/implementation {topic}
-    ↓ STOP → Wait for design approval
-    ↓ STOP → Wait for tasks approval
+PHASE 2: DESIGN
+/design {topic}
+    -> STOP -> Wait for approval -> Creates .design-approved
+
+PHASE 3: TASKS
+/tasks {topic}
+    -> STOP -> Wait for approval -> Creates .tasks-approved
 
 PHASE 4: IMPLEMENTATION
 /complete-phase
-    ↓ STOP after EACH task → Wait for "continue"
+    -> STOP after EACH task -> Wait for "continue"
     (repeat until all tasks done)
 
 PHASE 5: STRUCTURAL REVIEW (MANDATORY)
 /arewedone
-    ↓ Fix any issues found
-    ↓ STOP → Wait for approval
+    -> Fix any issues found
+    -> STOP -> Wait for approval
 
 PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
 /arch-review
-    ↓ Review recommendations
-    ↓ STOP → Wait for approval
+    -> Review recommendations
+    -> STOP -> Wait for approval
 
 PHASE 7: FINAL VERIFICATION
-/verify {topic}         ← YOU ARE HERE (FINAL STEP)
-    ↓ Confirm all checks pass
+/verify {topic}         <- YOU ARE HERE (FINAL STEP)
+    -> Confirm all checks pass
 
-DONE → Ready for PR
+DONE -> Ready for PR
 ```
 
 **Congratulations! You've completed the full workflow chain.**

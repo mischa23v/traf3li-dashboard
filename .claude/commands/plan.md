@@ -160,7 +160,7 @@ Output exactly this:
 **Do you approve these requirements?**
 
 Reply with one of: `approved`, `yes`, `proceed`, `lgtm`, `looks good`
-→ I'll create the approval marker and tell you to run `/implementation`
+→ I'll create the approval marker and tell you to run `/design`
 
 Or provide feedback → I'll revise the requirements
 ```
@@ -196,7 +196,7 @@ Only when user explicitly says "yes", "approved", "looks good", or similar:
 
    Created: `.claude/specs/{feature-name}/.requirements-approved`
 
-   **Next step**: Run `/implementation {feature-name}` to create design and tasks.
+   **Next step**: Run `/design {feature-name}` to create the technical design.
    ```
 
 ---
@@ -205,34 +205,37 @@ Only when user explicitly says "yes", "approved", "looks good", or similar:
 
 ```
 PHASE 1: PLANNING
-/plan {topic}          ← YOU ARE HERE
-    ↓ STOP → Wait for approval
+/plan {topic}          <- YOU ARE HERE
+    -> STOP -> Wait for approval -> Creates .requirements-approved
 
-PHASE 2-3: DESIGN & TASKS
-/implementation {topic}
-    ↓ STOP → Wait for design approval
-    ↓ STOP → Wait for tasks approval
+PHASE 2: DESIGN
+/design {topic}
+    -> STOP -> Wait for approval -> Creates .design-approved
+
+PHASE 3: TASKS
+/tasks {topic}
+    -> STOP -> Wait for approval -> Creates .tasks-approved
 
 PHASE 4: IMPLEMENTATION
 /complete-phase
-    ↓ STOP after EACH task → Wait for "continue"
+    -> STOP after EACH task -> Wait for "continue"
     (repeat until all tasks done)
 
 PHASE 5: STRUCTURAL REVIEW (MANDATORY)
 /arewedone
-    ↓ Fix any issues found
-    ↓ STOP → Wait for approval
+    -> Fix any issues found
+    -> STOP -> Wait for approval
 
 PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
 /arch-review
-    ↓ Review recommendations
-    ↓ STOP → Wait for approval
+    -> Review recommendations
+    -> STOP -> Wait for approval
 
 PHASE 7: FINAL VERIFICATION
 /verify {topic}
-    ↓ Confirm all checks pass
+    -> Confirm all checks pass
 
-DONE → Ready for PR
+DONE -> Ready for PR
 ```
 
 **You MUST complete ALL phases in order. No skipping.**

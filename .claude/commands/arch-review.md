@@ -152,33 +152,36 @@ Or provide feedback → I'll address concerns first
 ```
 PHASE 1: PLANNING
 /plan {topic}
-    ↓ STOP → Wait for approval
+    -> STOP -> Wait for approval -> Creates .requirements-approved
 
-PHASE 2-3: DESIGN & TASKS
-/implementation {topic}
-    ↓ STOP → Wait for design approval
-    ↓ STOP → Wait for tasks approval
+PHASE 2: DESIGN
+/design {topic}
+    -> STOP -> Wait for approval -> Creates .design-approved
+
+PHASE 3: TASKS
+/tasks {topic}
+    -> STOP -> Wait for approval -> Creates .tasks-approved
 
 PHASE 4: IMPLEMENTATION
 /complete-phase
-    ↓ STOP after EACH task → Wait for "continue"
+    -> STOP after EACH task -> Wait for "continue"
     (repeat until all tasks done)
 
 PHASE 5: STRUCTURAL REVIEW (MANDATORY)
 /arewedone
-    ↓ Fix any issues found
-    ↓ STOP → Wait for approval
+    -> Fix any issues found
+    -> STOP -> Wait for approval
 
 PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
-/arch-review            ← YOU ARE HERE
-    ↓ Review recommendations
-    ↓ STOP → Wait for approval
+/arch-review            <- YOU ARE HERE
+    -> Review recommendations
+    -> STOP -> Wait for approval
 
 PHASE 7: FINAL VERIFICATION
-/verify {topic}         ← NEXT STEP
-    ↓ Confirm all checks pass
+/verify {topic}         <- NEXT STEP
+    -> Confirm all checks pass
 
-DONE → Ready for PR
+DONE -> Ready for PR
 ```
 
 **You MUST complete ALL phases in order. No skipping.**
@@ -192,18 +195,18 @@ The reviewer checks against these goals:
 ### Code Organization
 ```
 src/
-├── components/      # Shared UI components
-├── features/        # Feature modules (tasks, clients, etc.)
-│   └── {feature}/
-│       ├── components/
-│       ├── hooks/
-│       └── types/
-├── hooks/           # Shared hooks
-├── services/        # API services
-├── types/           # Shared types
-├── lib/             # Utilities
-├── constants/       # App constants
-└── config/          # Configuration
+ components/      # Shared UI components
+ features/        # Feature modules (tasks, clients, etc.)
+    {feature}/
+        components/
+        hooks/
+        types/
+ hooks/           # Shared hooks
+ services/        # API services
+ types/           # Shared types
+ lib/             # Utilities
+ constants/       # App constants
+ config/          # Configuration
 ```
 
 ### Key Files

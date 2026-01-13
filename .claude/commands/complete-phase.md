@@ -21,8 +21,8 @@ Cannot proceed - missing approvals.
 
 Missing:
 - [ ] .requirements-approved (run /plan first)
-- [ ] .design-approved (run /implementation first)
-- [ ] .tasks-approved (run /implementation first)
+- [ ] .design-approved (run /design first)
+- [ ] .tasks-approved (run /tasks first)
 ```
 
 ---
@@ -227,33 +227,36 @@ How to proceed?
 ```
 PHASE 1: PLANNING
 /plan {topic}
-    ↓ STOP → Wait for approval
+    -> STOP -> Wait for approval -> Creates .requirements-approved
 
-PHASE 2-3: DESIGN & TASKS
-/implementation {topic}
-    ↓ STOP → Wait for design approval
-    ↓ STOP → Wait for tasks approval
+PHASE 2: DESIGN
+/design {topic}
+    -> STOP -> Wait for approval -> Creates .design-approved
+
+PHASE 3: TASKS
+/tasks {topic}
+    -> STOP -> Wait for approval -> Creates .tasks-approved
 
 PHASE 4: IMPLEMENTATION
-/complete-phase          ← YOU ARE HERE (run multiple times)
-    ↓ STOP after EACH task → Wait for "continue"
+/complete-phase          <- YOU ARE HERE (run multiple times)
+    -> STOP after EACH task -> Wait for "continue"
     (repeat until all tasks done)
 
 PHASE 5: STRUCTURAL REVIEW (MANDATORY)
-/arewedone               ← NEXT AFTER ALL TASKS DONE
-    ↓ Fix any issues found
-    ↓ STOP → Wait for approval
+/arewedone               <- NEXT AFTER ALL TASKS DONE
+    -> Fix any issues found
+    -> STOP -> Wait for approval
 
 PHASE 6: ARCHITECTURE REVIEW (MANDATORY)
 /arch-review
-    ↓ Review recommendations
-    ↓ STOP → Wait for approval
+    -> Review recommendations
+    -> STOP -> Wait for approval
 
 PHASE 7: FINAL VERIFICATION
 /verify {topic}
-    ↓ Confirm all checks pass
+    -> Confirm all checks pass
 
-DONE → Ready for PR
+DONE -> Ready for PR
 ```
 
 **You MUST complete ALL phases in order. No skipping.**
