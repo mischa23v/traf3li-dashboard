@@ -46,6 +46,22 @@
 
 ---
 
+## NEVER Rewrite Entire Files
+
+**ALWAYS use Edit tool to change specific lines. NEVER use Write tool to replace entire files unless:**
+- Creating a NEW file that doesn't exist
+- User explicitly asks for full rewrite
+- File is < 20 lines
+
+**Why:** Rewriting wastes tokens, risks breaking working code, and loses context.
+
+```
+WRONG: Write tool to replace 200-line file to change 3 lines
+RIGHT: Edit tool to change only the 3 lines that need changing
+```
+
+---
+
 ##  The #1 Rule: ASK, DON'T ASSUME
 
 If you need information about:
