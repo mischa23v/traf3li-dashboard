@@ -1,25 +1,26 @@
-# 🔴 REQUIREMENT: ENTERPRISE-LEVEL CODE QUALITY
+#  REQUIREMENT: ENTERPRISE-LEVEL CODE QUALITY
 
 **Make sure all code is enterprise-level, production-level, and meets gold standard. Be honest - review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases. also Do a git diff and review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases.**
 
 ---
 
-## 📚 TL;DR - Quick Reference
+##  TL;DR - Quick Reference
 
-| Task | Command | Approval Required? |
-|------|---------|-------------------|
-| **Plan a feature** | `/plan {topic}` | ⛔ YES - HARD STOP |
-| **Design implementation** | `/implementation {topic}` | ⛔ YES - Design + Tasks |
-| **Execute tasks** | `/complete-phase` | ⛔ YES - Per task |
-| **Check if done** | `/arewedone` | ⛔ YES - Before arch-review |
-| **Architecture review** | `/arch-review` | ⛔ YES - Before verify |
-| **Final verification** | `/verify {topic}` | ⛔ YES - Before PR |
-| **UI/RTL review** | `/design-review` | After UI changes |
+| # | Task | Command | Approval Required? |
+|---|------|---------|-------------------|
+| 1 | **Plan a feature** | `/plan {topic}` |  YES - creates `.requirements-approved` |
+| 2 | **Create design** | `/design {topic}` |  YES - creates `.design-approved` |
+| 3 | **Create tasks** | `/tasks {topic}` |  YES - creates `.tasks-approved` |
+| 4 | **Execute tasks** | `/complete-phase` |  YES - Per task |
+| 5 | **Check if done** | `/arewedone` |  YES - Before arch-review |
+| 6 | **Architecture review** | `/arch-review` |  YES - Before verify |
+| 7 | **Final verification** | `/verify {topic}` |  YES - Before PR |
+| - | **UI/RTL review** | `/design-review` | After UI changes |
 
 ### Workflow Chain (MANDATORY)
 
 ```
-/plan → approval → /implementation → design approval → tasks approval →
+/plan → approval → /design → approval → /tasks → approval →
 /complete-phase (one task at a time) → /arewedone → /arch-review → /verify → PR
 ```
 
@@ -27,11 +28,11 @@
 
 ---
 
-# 🛑 STOP. READ THIS FIRST.
+#  STOP. READ THIS FIRST.
 
 **MANDATORY: Before writing ANY code, you MUST complete these steps:**
 
-## ✅ Pre-Work Checklist (REQUIRED)
+##  Pre-Work Checklist (REQUIRED)
 
 | # | Step | Action |
 |---|------|--------|
@@ -45,7 +46,23 @@
 
 ---
 
-## ⚠️ The #1 Rule: ASK, DON'T ASSUME
+## NEVER Rewrite Entire Files
+
+**ALWAYS use Edit tool to change specific lines. NEVER use Write tool to replace entire files unless:**
+- Creating a NEW file that doesn't exist
+- User explicitly asks for full rewrite
+- File is < 20 lines
+
+**Why:** Rewriting wastes tokens, risks breaking working code, and loses context.
+
+```
+WRONG: Write tool to replace 200-line file to change 3 lines
+RIGHT: Edit tool to change only the 3 lines that need changing
+```
+
+---
+
+##  The #1 Rule: ASK, DON'T ASSUME
 
 If you need information about:
 - Backend API structure or responses
@@ -56,7 +73,7 @@ If you need information about:
 
 ---
 
-## 🔍 Before Creating ANY Files
+##  Before Creating ANY Files
 
 ```
 1. Search: Glob/Grep for existing components
@@ -70,7 +87,7 @@ If you need information about:
 
 ---
 
-## 🔒 Use Centralized Constants (MANDATORY)
+##  Use Centralized Constants (MANDATORY)
 
 | Type | Import From | Example |
 |------|-------------|---------|
@@ -83,7 +100,7 @@ If you need information about:
 
 ---
 
-## 🎨 After EVERY UI Change
+##  After EVERY UI Change
 
 1. Navigate to the page
 2. Test Arabic (RTL) - take screenshot
@@ -95,7 +112,7 @@ For major changes: Run `/design-review`
 
 ---
 
-## 🔀 After Every Push
+##  After Every Push
 
 Provide PR link:
 ```
@@ -104,7 +121,7 @@ https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
 
 ---
 
-## ✅ Completion Checklist
+##  Completion Checklist
 
 Before saying "done", verify:
 
@@ -116,7 +133,7 @@ Before saying "done", verify:
 
 ---
 
-## 📁 Key Files Reference
+##  Key Files Reference
 
 | Purpose | Location |
 |---------|----------|
@@ -128,15 +145,16 @@ Before saying "done", verify:
 
 ---
 
-## 📋 Available Commands Reference
+##  Available Commands Reference
 
 ### Planning & Implementation Workflow
 
-| Command | Purpose | Approval? | Output |
-|---------|---------|-----------|--------|
-| `/plan {topic}` | Create EARS requirements | ⛔ HARD STOP | `.claude/specs/{topic}/requirements.md` |
-| `/implementation {topic}` | Create design + tasks | ⛔ HARD STOP x2 | `design.md` + `tasks.md` |
-| `/complete-phase` | Execute one task at a time | ⛔ Per task | Code changes |
+| # | Command | Purpose | Approval? | Output |
+|---|---------|---------|-----------|--------|
+| 1 | `/plan {topic}` | Create EARS requirements | HARD STOP | `.claude/specs/{topic}/requirements.md` |
+| 2 | `/design {topic}` | Create technical design | HARD STOP | `.claude/specs/{topic}/design.md` |
+| 3 | `/tasks {topic}` | Create implementation tasks | HARD STOP | `.claude/specs/{topic}/tasks.md` |
+| 4 | `/complete-phase` | Execute one task at a time | Per task | Code changes |
 
 ### Quality Assurance
 
@@ -181,54 +199,61 @@ Before saying "done", verify:
 
 ---
 
-## 📊 Workflow Diagram
+##  Workflow Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 1: PLANNING                                               │
-│ /plan {topic} → requirements.md → ⛔ WAIT FOR APPROVAL          │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ "approved"
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 2: DESIGN                                                 │
-│ /implementation {topic} → design.md → ⛔ WAIT FOR APPROVAL      │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ "approved"
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 3: TASKS                                                  │
-│ /implementation {topic} → tasks.md → ⛔ WAIT FOR APPROVAL       │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ "approved"
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 4: IMPLEMENTATION                                         │
-│ /complete-phase → ONE task → ⛔ WAIT → repeat until done        │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ all tasks complete
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 5: STRUCTURAL REVIEW                                      │
-│ /arewedone → Score (0-100) → ⛔ WAIT FOR APPROVAL               │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ score ≥ 80
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 6: ARCHITECTURE REVIEW                                    │
-│ /arch-review → Grade (A-F) → ⛔ WAIT FOR APPROVAL               │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ grade ≥ C
-┌─────────────────────────────────────────────────────────────────┐
-│ PHASE 7: FINAL VERIFICATION                                     │
-│ /verify {topic} → Pass/Fail → ⛔ WAIT FOR APPROVAL              │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ "approved"
++-------------------------------------------------------------------+
+| PHASE 1: PLANNING                                                  |
+| /plan {topic} -> requirements.md -> WAIT FOR APPROVAL              |
++-------------------------------------------------------------------+
+                              | "approved"
+                              v
++-------------------------------------------------------------------+
+| PHASE 2: DESIGN                                                    |
+| /design {topic} -> design.md -> WAIT FOR APPROVAL                  |
++-------------------------------------------------------------------+
+                              | "approved"
+                              v
++-------------------------------------------------------------------+
+| PHASE 3: TASKS                                                     |
+| /tasks {topic} -> tasks.md -> WAIT FOR APPROVAL                    |
++-------------------------------------------------------------------+
+                              | "approved"
+                              v
++-------------------------------------------------------------------+
+| PHASE 4: IMPLEMENTATION                                            |
+| /complete-phase -> ONE task -> WAIT -> repeat until done           |
++-------------------------------------------------------------------+
+                              | all tasks complete
+                              v
++-------------------------------------------------------------------+
+| PHASE 5: STRUCTURAL REVIEW                                         |
+| /arewedone -> Score (0-100) -> WAIT FOR APPROVAL                   |
++-------------------------------------------------------------------+
+                              | score >= 80
+                              v
++-------------------------------------------------------------------+
+| PHASE 6: ARCHITECTURE REVIEW                                       |
+| /arch-review -> Grade (A-F) -> WAIT FOR APPROVAL                   |
++-------------------------------------------------------------------+
+                              | grade >= C
+                              v
++-------------------------------------------------------------------+
+| PHASE 7: FINAL VERIFICATION                                        |
+| /verify {topic} -> Pass/Fail -> WAIT FOR APPROVAL                  |
++-------------------------------------------------------------------+
+                              | "approved"
+                              v
                          CREATE PR
 ```
 
 ---
 
-## 🔄 Version History
+##  Version History
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-01-13 | 4.0 | Split `/implementation` into `/design` (Phase 2) and `/tasks` (Phase 3) for separate approval gates |
 | 2026-01-12 | 3.0 | Added new commands (/bugs, /test, /perf-check, /ui-review, /docs, /commit, /rebase, /worktree, /issue), agents (bug-finder, test-runner, performance-profiler, ui-ux-consultant, doc-reviewer, doc-implementer, github-issue-creator, git-cherry-pick-orchestrator), and hooks (clean_commit_guard, emoji_remover, protect_claude_md, github_issue_guard, centralized_constants_guard, rtl_check) |
 | 2026-01-12 | 2.0 | Added TL;DR, workflow diagram, commands reference, /arewedone, /arch-review |
 | - | 1.0 | Initial version |
-
