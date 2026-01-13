@@ -15,7 +15,7 @@
  * - Automatic token refresh on 401
  *
  * ============================================================================
- * 🚨 BACKEND_TODO: CRITICAL AUTH ISSUES DOCUMENTED
+ *  BACKEND_TODO: CRITICAL AUTH ISSUES DOCUMENTED
  * ============================================================================
  * Several backend issues are documented in this file with BACKEND_TODO comments.
  * See src/config/BACKEND_AUTH_ISSUES.ts for full documentation.
@@ -67,13 +67,18 @@ import { generateDeviceFingerprint, getStoredFingerprint, storeDeviceFingerprint
 import { ROUTES } from '@/constants/routes'
 import { STORAGE_KEYS, AUTH_TIMING } from '@/constants/storage-keys'
 import { authEvents } from './auth-events'
-import { showErrorToast } from './toast-utils'
+import { showErrorToast, showErrorToastWithAction } from './toast-utils'
 import {
   handleSessionExpired,
   handleSessionTimeout,
   handleCrossTabLogout,
   handleCsrfFailure,
 } from './auth-redirect'
+import {
+  type RequiredAction,
+  type FeatureAccessDeniedResponse,
+  RequiredActionType,
+} from '@/types/featureAccess'
 import { authBroadcast } from './auth-broadcast'
 import { sessionActivity } from './session-activity'
 
@@ -123,7 +128,7 @@ const tokenLog = (message: string, data?: any) => {
   console.log(`[TOKEN] ${message}`, data !== undefined ? data : '')
 }
 const tokenWarn = (message: string, data?: any) => {
-  console.warn(`[TOKEN] ⚠️ ${message}`, data !== undefined ? data : '')
+  console.warn(`[TOKEN]  ${message}`, data !== undefined ? data : '')
 }
 
 /**
@@ -623,7 +628,7 @@ const processQueue = (error: any = null): void => {
  * Returns true if refresh was successful, false otherwise
  *
  * ============================================================================
- * 🚨 BACKEND_TODO: TOKEN REFRESH ENDPOINT
+ *  BACKEND_TODO: TOKEN REFRESH ENDPOINT
  * ============================================================================
  * The POST /api/auth/refresh endpoint MUST:
  *
@@ -679,7 +684,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
   const legacyRefreshToken = refreshTokenFromStorage || refreshTokenFromCookie
 
   // Enhanced debug: Show all auth sources
-  console.log('[TOKEN] 🔍 Token refresh check:', {
+  console.log('[TOKEN]  Token refresh check:', {
     hasActiveSession: hasActiveSession,
     hasSessionIndicators: hasSession,
     memoryExpiresAt: memoryExpiresAt ? new Date(memoryExpiresAt).toISOString() : 'not set',
@@ -691,8 +696,8 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
   if (!hasSession && !legacyRefreshToken) {
     tokenWarn('No session indicators found - cannot refresh')
-    console.error('[TOKEN] ❌ REFRESH BLOCKED - No active session!')
-    console.error('[TOKEN] 💡 This usually means:')
+    console.error('[TOKEN]  REFRESH BLOCKED - No active session!')
+    console.error('[TOKEN]  This usually means:')
     console.error('[TOKEN]    1. User has been fully logged out')
     console.error('[TOKEN]    2. Session expired on backend')
     console.error('[TOKEN]    3. User never completed login')
@@ -741,7 +746,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
     if (isBffResponse) {
       // BFF Pattern: Tokens in httpOnly cookies, only expiresIn in response
-      console.log('[TOKEN] ✅ Token refresh SUCCESS (BFF pattern)', {
+      console.log('[TOKEN]  Token refresh SUCCESS (BFF pattern)', {
         duration: `${duration}ms`,
         expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
         refreshedAt: refreshedAt,
@@ -755,7 +760,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
     if (isLegacyResponse) {
       // Legacy Pattern: Tokens in response body
-      console.log('[TOKEN] ✅ Token refresh SUCCESS (Legacy pattern)', {
+      console.log('[TOKEN]  Token refresh SUCCESS (Legacy pattern)', {
         duration: `${duration}ms`,
         hasExpiresIn: !!expiresIn,
         expiresIn: expiresIn ? `${expiresIn}s (${Math.round(expiresIn / 60)}min)` : 'N/A',
@@ -770,7 +775,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
     // Neither pattern matched - check if expiresIn is at least present (minimal BFF response)
     if (expiresIn !== undefined) {
-      console.log('[TOKEN] ✅ Token refresh SUCCESS (minimal response)', {
+      console.log('[TOKEN]  Token refresh SUCCESS (minimal response)', {
         duration: `${duration}ms`,
         expiresIn: `${expiresIn}s (${Math.round(expiresIn / 60)}min)`,
       })
@@ -790,7 +795,7 @@ const performTokenRefresh = async (): Promise<boolean> => {
     const duration = Date.now() - startTime
 
     // Enhanced error logging for diagnosis
-    console.error('[TOKEN] ❌ Token refresh FAILED', {
+    console.error('[TOKEN]  Token refresh FAILED', {
       duration: `${duration}ms`,
       status: error?.response?.status,
       statusText: error?.response?.statusText,
@@ -801,16 +806,16 @@ const performTokenRefresh = async (): Promise<boolean> => {
 
     // Specific guidance based on error type
     if (error?.response?.status === 401) {
-      console.error('[TOKEN] 💡 401 Error - Refresh token is invalid or expired')
+      console.error('[TOKEN]  401 Error - Refresh token is invalid or expired')
       console.error('[TOKEN]    → User needs to log in again')
     } else if (error?.response?.status === 400) {
-      console.error('[TOKEN] 💡 400 Error - Missing or malformed refresh token')
+      console.error('[TOKEN]  400 Error - Missing or malformed refresh token')
       console.error('[TOKEN]    → Check if SameSite cookie is blocking the refresh token')
     } else if (error?.response?.status === 403) {
-      console.error('[TOKEN] 💡 403 Error - CSRF or security issue')
+      console.error('[TOKEN]  403 Error - CSRF or security issue')
       console.error('[TOKEN]    → Check CSRF token configuration')
     } else if (!error?.response) {
-      console.error('[TOKEN] 💡 Network Error - Could not reach the server')
+      console.error('[TOKEN]  Network Error - Could not reach the server')
       console.error('[TOKEN]    → Check CORS, network connectivity, or server status')
     }
 
@@ -884,7 +889,7 @@ let cachedCsrfToken: string | null = null
  * Falls back to cached token from response headers for cross-origin requests
  *
  * ============================================================================
- * 🚨 BACKEND_TODO: CSRF COOKIE CONFIGURATION
+ *  BACKEND_TODO: CSRF COOKIE CONFIGURATION
  * ============================================================================
  * The CSRF cookie is often NOT accessible from JavaScript because:
  * 1. httpOnly: true - JS can't read httpOnly cookies
@@ -1041,6 +1046,152 @@ export const apiClientNoVersion = axios.create({
 const shouldBypassCircuitBreaker = (url: string): boolean => {
   // All /auth/* routes bypass circuit breaker
   return url.includes('/auth/')
+}
+
+/**
+ * Handle FEATURE_ACCESS_DENIED error (403)
+ * Shows toast with action button based on requiredAction.type
+ * Replaces the old EMAIL_VERIFICATION_REQUIRED redirect behavior
+ *
+ * @param requiredAction - Action the user needs to take (from backend response)
+ * @param message - Bilingual message to show (already selected based on language)
+ * @param _feature - Feature that was blocked (for logging/debugging)
+ */
+const handleFeatureAccessDenied = (
+  requiredAction: RequiredAction,
+  message: string,
+  _feature?: string
+): void => {
+  const lang = localStorage.getItem('i18nextLng') || 'en'
+  const isArabic = lang === 'ar'
+  const toastDuration = 8000 // 8 seconds for action toasts
+
+  switch (requiredAction.type) {
+    case RequiredActionType.LOGIN:
+      // Redirect immediately for login (no toast needed)
+      if (typeof window !== 'undefined') {
+        window.location.href = ROUTES.auth.signIn
+      }
+      break
+
+    case RequiredActionType.VERIFY_EMAIL:
+      showErrorToastWithAction(
+        message,
+        isArabic ? 'تفعيل البريد' : 'Verify Email',
+        () => {
+          if (typeof window !== 'undefined') {
+            window.location.href = requiredAction.redirectTo
+          }
+        },
+        toastDuration
+      )
+      break
+
+    case RequiredActionType.SUBSCRIBE:
+      showErrorToastWithAction(
+        message,
+        isArabic ? 'الاشتراك الآن' : 'Subscribe',
+        () => {
+          if (typeof window !== 'undefined') {
+            window.location.href = requiredAction.redirectTo
+          }
+        },
+        toastDuration
+      )
+      break
+
+    case RequiredActionType.UPGRADE_TIER:
+      showErrorToastWithAction(
+        message,
+        isArabic ? 'ترقية الباقة' : 'Upgrade',
+        () => {
+          if (typeof window !== 'undefined') {
+            window.location.href = requiredAction.redirectTo
+          }
+        },
+        toastDuration
+      )
+      break
+
+    case RequiredActionType.RETRY_PAYMENT:
+      showErrorToastWithAction(
+        message,
+        isArabic ? 'تحديث الدفع' : 'Update Payment',
+        () => {
+          if (typeof window !== 'undefined') {
+            window.location.href = requiredAction.redirectTo
+          }
+        },
+        toastDuration
+      )
+      break
+
+    default:
+      // Fallback for unknown action types
+      showErrorToastWithAction(
+        message,
+        isArabic ? 'العودة للرئيسية' : 'Go Home',
+        () => {
+          if (typeof window !== 'undefined') {
+            window.location.href = ROUTES.dashboard.home
+          }
+        },
+        toastDuration
+      )
+  }
+}
+
+/**
+ * Parse and handle FEATURE_ACCESS_DENIED or EMAIL_VERIFICATION_REQUIRED errors
+ * Shared between apiClient and apiClientNoVersion interceptors (DRY principle)
+ *
+ * @param error - Axios error object
+ * @returns Rejected promise if handled, undefined if not a feature access error
+ */
+const parseAndHandleFeatureAccessError = (error: AxiosError): Promise<never> | undefined => {
+  if (error.response?.status !== 403) return undefined
+
+  const errorCode = (error.response?.data as Record<string, unknown>)?.code
+
+  // Handle FEATURE_ACCESS_DENIED (new) or EMAIL_VERIFICATION_REQUIRED (backwards compat)
+  if (errorCode === 'FEATURE_ACCESS_DENIED' || errorCode === 'EMAIL_VERIFICATION_REQUIRED') {
+    const data = error.response?.data as FeatureAccessDeniedResponse | undefined
+
+    // Get bilingual message based on current language
+    const lang = localStorage.getItem('i18nextLng') || 'en'
+    const message = lang === 'ar'
+      ? (data?.messageAr || data?.message || 'يرجى تفعيل بريدك الإلكتروني للوصول إلى هذه الميزة')
+      : (data?.message || 'Please verify your email to access this feature')
+
+    // Get required action from response, or construct default for backwards compat
+    const requiredAction: RequiredAction = data?.requiredAction || {
+      type: RequiredActionType.VERIFY_EMAIL,
+      redirectTo: ROUTES.auth.verifyEmailRequired,
+    }
+
+    // STATE SYNC: Update auth store with backend's email verification state
+    // This ensures frontend state stays in sync with backend truth
+    if (data?.emailVerification) {
+      authEvents.onFeatureAccessDenied.emit({
+        isVerified: data.emailVerification.isVerified,
+        requiresVerification: data.emailVerification.requiresVerification,
+      })
+    }
+
+    // Handle the action (shows toast with action button)
+    handleFeatureAccessDenied(requiredAction, message, data?.feature)
+
+    return Promise.reject({
+      status: 403,
+      message,
+      code: 'FEATURE_ACCESS_DENIED',
+      error: true,
+      requiredAction,
+      feature: data?.feature,
+    })
+  }
+
+  return undefined
 }
 
 // Apply same interceptors to non-versioned client (with gold standard protections)
@@ -1275,36 +1426,13 @@ apiClientNoVersion.interceptors.response.use(
       }
     }
 
-    // Handle 403 Forbidden - Check for email verification or CSRF token errors
+    // Handle 403 Forbidden - Check for feature access denied or CSRF token errors
     if (error.response?.status === 403) {
-      const errorCode = error.response?.data?.code
+      // Use shared handler for FEATURE_ACCESS_DENIED (DRY principle)
+      const featureAccessResult = parseAndHandleFeatureAccessError(error)
+      if (featureAccessResult) return featureAccessResult
 
-      // Handle EMAIL_VERIFICATION_REQUIRED - Redirect to email verification page
-      if (errorCode === 'EMAIL_VERIFICATION_REQUIRED') {
-        const blockedFeature = error.response?.data?.emailVerification?.blockedFeature
-        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
-
-        // Build redirect URL with context
-        const params = new URLSearchParams({
-          returnTo: currentPath,
-          ...(blockedFeature && { blockedFeature }),
-        })
-
-        // Redirect to email verification page using centralized route constant
-        if (typeof window !== 'undefined') {
-          window.location.href = `${ROUTES.auth.verifyEmailRequired}?${params.toString()}`
-        }
-
-        return Promise.reject({
-          status: 403,
-          message: error.response?.data?.message || 'يرجى تفعيل بريدك الإلكتروني للوصول إلى هذه الميزة',
-          code: 'EMAIL_VERIFICATION_REQUIRED',
-          error: true,
-          blockedFeature,
-        })
-      }
-
-      const csrfErrorCode = errorCode
+      const csrfErrorCode = (error.response?.data as Record<string, unknown>)?.code
       const csrfErrorMessage = error.response?.data?.message?.toLowerCase() || ''
 
       // Check for CSRF token errors - retry once with fresh token
@@ -1768,34 +1896,9 @@ apiClient.interceptors.response.use(
       return Promise.reject(rateLimitError)
     }
 
-    // Handle 403 EMAIL_VERIFICATION_REQUIRED - Redirect to email verification page
-    if (error.response?.status === 403) {
-      const errorCode = error.response?.data?.code
-
-      if (errorCode === 'EMAIL_VERIFICATION_REQUIRED') {
-        const blockedFeature = error.response?.data?.emailVerification?.blockedFeature
-        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
-
-        // Build redirect URL with context
-        const params = new URLSearchParams({
-          returnTo: currentPath,
-          ...(blockedFeature && { blockedFeature }),
-        })
-
-        // Redirect to email verification page using centralized route constant
-        if (typeof window !== 'undefined') {
-          window.location.href = `${ROUTES.auth.verifyEmailRequired}?${params.toString()}`
-        }
-
-        return Promise.reject({
-          status: 403,
-          message: error.response?.data?.message || 'يرجى تفعيل بريدك الإلكتروني للوصول إلى هذه الميزة',
-          code: 'EMAIL_VERIFICATION_REQUIRED',
-          error: true,
-          blockedFeature,
-        })
-      }
-    }
+    // Handle 403 FEATURE_ACCESS_DENIED - Use shared handler (DRY principle)
+    const featureAccessResult = parseAndHandleFeatureAccessError(error)
+    if (featureAccessResult) return featureAccessResult
 
     // Handle 401 Unauthorized - Token refresh logic
     if (error.response?.status === 401) {
@@ -2209,8 +2312,8 @@ export const clearCache = (_urlPattern?: string) => {
     '  - queryClient.invalidateQueries({ queryKey: [...] }) to invalidate specific queries | لإبطال استعلامات محددة\n' +
     '  - queryClient.removeQueries({ queryKey: [...] }) to remove queries | لإزالة الاستعلامات\n\n' +
     'Migration example | مثال الترحيل:\n' +
-    '  ❌ clearCache("/cases/123")\n' +
-    '  ✅ queryClient.invalidateQueries({ queryKey: ["case", "123"] })'
+    '   clearCache("/cases/123")\n' +
+    '   queryClient.invalidateQueries({ queryKey: ["case", "123"] })'
   )
   // No-op: TanStack Query handles caching now
 }
@@ -2231,9 +2334,9 @@ export const getCacheSize = () => {
     '  - queryClient.getQueryCache() to access the query cache | للوصول إلى ذاكرة الاستعلامات\n' +
     '  - queryClient.getQueryData(queryKey) to get specific query data | للحصول على بيانات استعلام محددة\n\n' +
     'Migration example | مثال الترحيل:\n' +
-    '  ❌ const size = getCacheSize()\n' +
-    '  ✅ const cache = queryClient.getQueryCache()\n' +
-    '  ✅ const data = queryClient.getQueryData(["cases"])'
+    '   const size = getCacheSize()\n' +
+    '   const cache = queryClient.getQueryCache()\n' +
+    '   const data = queryClient.getQueryData(["cases"])'
   )
   return 0 // No axios-level cache
 }
@@ -2295,7 +2398,7 @@ export const debugAuth = () => {
   }
 
   const state = {
-    '🔐 Auth State': {
+    ' Auth State': {
       pattern: pattern,
       hasActiveSession: hasActiveSession,
       hasSessionIndicators: hasSession,
@@ -2304,16 +2407,16 @@ export const debugAuth = () => {
       isExpiringSoon: isTokenExpiringSoon(60),
       scheduledRefreshActive: !!tokenRefreshTimeoutId,
     },
-    '📡 Cross-Tab Sync (Enterprise)': broadcastInfo,
-    '⏱️ Session Activity (Enterprise)': activityInfo,
-    '📦 Legacy Storage (for backward compatibility)': {
+    ' Cross-Tab Sync (Enterprise)': broadcastInfo,
+    '⏱ Session Activity (Enterprise)': activityInfo,
+    ' Legacy Storage (for backward compatibility)': {
       hasAccessToken: !!accessToken,
       hasRefreshTokenInLocalStorage: !!refreshTokenStorage,
       hasRefreshTokenInCookie: !!refreshTokenCookie,
     },
-    '👤 Token Info': tokenInfo || (isBffPattern ? 'Token in httpOnly cookie (not readable by JS)' : 'No valid access token'),
-    '🍪 Visible Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
-    '💡 Tips': {
+    ' Token Info': tokenInfo || (isBffPattern ? 'Token in httpOnly cookie (not readable by JS)' : 'No valid access token'),
+    ' Visible Cookies': document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+    ' Tips': {
       'Force refresh': 'debugAuth.refresh()',
       'Clear auth state': 'debugAuth.clear()',
       'Watch logs': 'Filter console by [TOKEN]',
@@ -2321,41 +2424,41 @@ export const debugAuth = () => {
     },
   }
 
-  console.log('%c🔍 Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
-  console.log('%c📋 Pattern: ' + pattern, 'font-size: 14px; font-weight: bold; color: #2196F3')
-  console.table(state['🔐 Auth State'])
-  console.log('%c📡 Cross-Tab Sync (Enterprise)', 'font-size: 14px; font-weight: bold; color: #00BCD4')
-  console.table(state['📡 Cross-Tab Sync (Enterprise)'])
-  console.log('%c⏱️ Session Activity (Enterprise)', 'font-size: 14px; font-weight: bold; color: #8BC34A')
-  console.table(state['⏱️ Session Activity (Enterprise)'])
-  console.log('%c📦 Legacy Storage', 'font-size: 14px; font-weight: bold; color: #607D8B')
-  console.table(state['📦 Legacy Storage (for backward compatibility)'])
-  console.log('%c👤 Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
-  console.log(state['👤 Token Info'])
-  console.log('%c🍪 Visible Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
-  console.log(state['🍪 Visible Cookies'])
-  console.log('%c💡 Tips', 'font-size: 14px; font-weight: bold; color: #9C27B0')
-  console.log(state['💡 Tips'])
+  console.log('%c Auth Debug Info', 'font-size: 16px; font-weight: bold; color: #4CAF50')
+  console.log('%c Pattern: ' + pattern, 'font-size: 14px; font-weight: bold; color: #2196F3')
+  console.table(state[' Auth State'])
+  console.log('%c Cross-Tab Sync (Enterprise)', 'font-size: 14px; font-weight: bold; color: #00BCD4')
+  console.table(state[' Cross-Tab Sync (Enterprise)'])
+  console.log('%c⏱ Session Activity (Enterprise)', 'font-size: 14px; font-weight: bold; color: #8BC34A')
+  console.table(state['⏱ Session Activity (Enterprise)'])
+  console.log('%c Legacy Storage', 'font-size: 14px; font-weight: bold; color: #607D8B')
+  console.table(state[' Legacy Storage (for backward compatibility)'])
+  console.log('%c Token Info', 'font-size: 14px; font-weight: bold; color: #2196F3')
+  console.log(state[' Token Info'])
+  console.log('%c Visible Cookies', 'font-size: 14px; font-weight: bold; color: #FF9800')
+  console.log(state[' Visible Cookies'])
+  console.log('%c Tips', 'font-size: 14px; font-weight: bold; color: #9C27B0')
+  console.log(state[' Tips'])
 
   return state
 }
 
 // Attach helper methods
 debugAuth.refresh = async () => {
-  console.log('%c🔄 Forcing token refresh...', 'font-size: 14px; font-weight: bold; color: #FF5722')
+  console.log('%c Forcing token refresh...', 'font-size: 14px; font-weight: bold; color: #FF5722')
   const result = await refreshAccessToken()
   if (result) {
-    console.log('%c✅ Token refresh successful!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
+    console.log('%c Token refresh successful!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
   } else {
-    console.log('%c❌ Token refresh failed!', 'font-size: 14px; font-weight: bold; color: #F44336')
+    console.log('%c Token refresh failed!', 'font-size: 14px; font-weight: bold; color: #F44336')
   }
   return result
 }
 
 debugAuth.clear = () => {
-  console.log('%c🗑️ Clearing all tokens...', 'font-size: 14px; font-weight: bold; color: #FF5722')
+  console.log('%c Clearing all tokens...', 'font-size: 14px; font-weight: bold; color: #FF5722')
   clearTokens()
-  console.log('%c✅ Tokens cleared!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
+  console.log('%c Tokens cleared!', 'font-size: 14px; font-weight: bold; color: #4CAF50')
 }
 
 // Expose to window for console access
@@ -2368,25 +2471,25 @@ if (typeof window !== 'undefined') {
 
   // Show debug commands on app load
   console.log(
-    '%c🔐 Auth Debug Commands Available',
+    '%c Auth Debug Commands Available',
     'font-size: 14px; font-weight: bold; color: #4CAF50; background: #E8F5E9; padding: 4px 8px; border-radius: 4px;'
   )
   console.log(
-    '%c┌────────────────────────────────────────────────────────────────────┐\n' +
-    '│  debugAuth()                  → Show current auth state            │\n' +
-    '│  debugAuth.refresh()          → Force token refresh                │\n' +
-    '│  debugAuth.clear()            → Clear all tokens (logout)          │\n' +
-    '├────────────────────────────────────────────────────────────────────┤\n' +
-    '│  🏢 Enterprise Features:                                           │\n' +
-    '│  authBroadcast.getTabId()     → Get this tab\'s ID                  │\n' +
-    '│  authBroadcast.broadcastLogout(\'test\') → Test cross-tab logout     │\n' +
-    '│  sessionActivity.getDebugInfo() → Session activity state           │\n' +
-    '│  sessionActivity.isUserIdle() → Check if user is idle              │\n' +
-    '└────────────────────────────────────────────────────────────────────┘',
+    '%c\n' +
+    '  debugAuth()                  → Show current auth state            \n' +
+    '  debugAuth.refresh()          → Force token refresh                \n' +
+    '  debugAuth.clear()            → Clear all tokens (logout)          \n' +
+    '\n' +
+    '   Enterprise Features:                                           \n' +
+    '  authBroadcast.getTabId()     → Get this tab\'s ID                  \n' +
+    '  authBroadcast.broadcastLogout(\'test\') → Test cross-tab logout     \n' +
+    '  sessionActivity.getDebugInfo() → Session activity state           \n' +
+    '  sessionActivity.isUserIdle() → Check if user is idle              \n' +
+    '',
     'font-family: monospace; color: #1976D2;'
   )
   console.log(
-    '%c💡 Filter console by [TOKEN] to see all auth activity',
+    '%c Filter console by [TOKEN] to see all auth activity',
     'color: #9C27B0; font-style: italic;'
   )
 

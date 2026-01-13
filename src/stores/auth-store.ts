@@ -10,17 +10,20 @@ import { Analytics, identifyUser, clearUser as clearAnalyticsUser } from '@/lib/
 import authService, { User, LoginCredentials, isPlanAtLeast, getPlanLevel, hasFeature, PasswordBreachWarning, isOTPRequired, LoginOTPRequiredResponse } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { authEvents } from '@/lib/auth-events'
 
 /**
  * Email verification state from backend
  * Returned in login response, /auth/me, and after email verification
+ *
+ * Note: allowedFeatures and blockedFeatures have been removed in favor of
+ * the unified feature access system. See src/types/featureAccess.ts and
+ * src/hooks/useFeatureAccess.ts for the new approach.
  */
 export interface EmailVerificationState {
   isVerified: boolean
   requiresVerification: boolean
   verificationSentAt?: string
-  allowedFeatures: string[]
-  blockedFeatures: string[]
 }
 
 /**
@@ -490,3 +493,38 @@ export const selectIsPasswordBreached = (state: AuthState) =>
  */
 export const selectOtpRequired = (state: AuthState) => state.otpRequired
 export const selectOtpData = (state: AuthState) => state.otpData
+
+/**
+ * State Sync: Listen for FEATURE_ACCESS_DENIED events from API interceptor
+ *
+ * PATTERN: Backend is source of truth. When backend returns FEATURE_ACCESS_DENIED,
+ * it includes the current email verification state. We sync this to keep frontend
+ * state consistent with backend, which prevents stale state issues.
+ *
+ * Example: User verifies email in another tab, then tries to access a feature
+ * that was blocked. The API will now succeed, but if it fails for another reason,
+ * the FEATURE_ACCESS_DENIED response will tell us the updated verification state.
+ *
+ * NOTE: This subscription runs once when the module loads (singleton pattern).
+ * No cleanup needed since the auth store lives for the entire app lifetime.
+ */
+authEvents.onFeatureAccessDenied.subscribe(({ isVerified, requiresVerification }) => {
+  try {
+    const currentState = useAuthStore.getState().emailVerification
+
+    // Only update if the state is different to avoid unnecessary re-renders
+    if (
+      currentState?.isVerified !== isVerified ||
+      currentState?.requiresVerification !== requiresVerification
+    ) {
+      useAuthStore.getState().setEmailVerification({
+        isVerified,
+        requiresVerification,
+        verificationSentAt: currentState?.verificationSentAt,
+      })
+    }
+  } catch (error) {
+    // Log error but don't crash - state sync is non-critical
+    console.error('[AUTH_STORE] Failed to sync email verification state from FEATURE_ACCESS_DENIED:', error)
+  }
+})

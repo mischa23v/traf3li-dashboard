@@ -122,6 +122,21 @@ const _authEvents = {
    * Use this for UI updates that depend on auth state
    */
   onAuthStateChange: createEvent<{ isAuthenticated: boolean }>(),
+
+  /**
+   * Emitted when FEATURE_ACCESS_DENIED error is received from backend
+   * Use this to sync email verification state from backend response
+   *
+   * PATTERN: Backend is source of truth - when it says the user's email
+   * verification state has changed, we sync it to the frontend store.
+   *
+   * Subscribers:
+   * - auth-store: updates emailVerification state
+   */
+  onFeatureAccessDenied: createEvent<{
+    isVerified: boolean
+    requiresVerification: boolean
+  }>(),
 } as const
 
 // Freeze to prevent accidental modification like `authEvents.onTokensCleared = null`
@@ -154,6 +169,7 @@ export const clearAllAuthEventListeners = (confirm: boolean = false): void => {
   authEvents.onTokensRefreshed.clear()
   authEvents.onCrossTabLogout.clear()
   authEvents.onAuthStateChange.clear()
+  authEvents.onFeatureAccessDenied.clear()
 }
 
 /**
@@ -166,6 +182,7 @@ export const getAuthEventsDebugInfo = (): Record<string, number> => {
     onTokensRefreshed: authEvents.onTokensRefreshed.subscriberCount,
     onCrossTabLogout: authEvents.onCrossTabLogout.subscriberCount,
     onAuthStateChange: authEvents.onAuthStateChange.subscriberCount,
+    onFeatureAccessDenied: authEvents.onFeatureAccessDenied.subscriberCount,
   }
 }
 

@@ -216,30 +216,45 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
       const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', requestBody)
       const responseData = response.data
 
-      // For login purpose: Store tokens and set user in auth store
-      // Backend returns both snake_case (OAuth 2.0) and camelCase (backwards compat)
+      // For login purpose: Set user in auth store
+      // BFF Pattern: Tokens are in httpOnly cookies (NOT in response body)
+      // Legacy Pattern: Tokens in response body (backwards compat)
       const accessToken = responseData.accessToken || (responseData as any).access_token
       const refreshToken = responseData.refreshToken || (responseData as any).refresh_token
+      const expiresIn = (responseData as any).expires_in || (responseData as any).expiresIn
 
       if (purpose === 'login') {
-        // SECURITY: For login OTP, tokens and user MUST be present
-        if (!accessToken || !responseData.user) {
-          console.error('[OTP] Login OTP verified but missing tokens/user:', {
-            hasAccessToken: !!accessToken,
+        // BFF Pattern: User is required, tokens are in httpOnly cookies
+        if (!responseData.user) {
+          console.error('[OTP] Login OTP verified but missing user:', {
             hasUser: !!responseData.user,
+            responseKeys: Object.keys(responseData),
           })
           throw new Error(isRTL
             ? 'خطأ في نظام التحقق. يرجى المحاولة مرة أخرى.'
             : 'Authentication system error. Please try again.')
         }
 
-        // Store tokens for API authentication
-        storeTokens(accessToken, refreshToken)
+        // Store tokens - supports both BFF and Legacy patterns
+        // BFF: accessToken is null (in httpOnly cookie), only track expiresIn
+        // Legacy: accessToken is in response body
+        if (accessToken) {
+          // Legacy pattern: tokens in response body
+          storeTokens(accessToken, refreshToken, expiresIn)
+          console.log('[OTP] Login OTP verified (Legacy pattern), tokens stored')
+        } else if (expiresIn !== undefined) {
+          // BFF pattern: tokens in httpOnly cookies, only track expiry
+          storeTokens(null, null, expiresIn)
+          console.log('[OTP] Login OTP verified (BFF pattern), session tracked')
+        } else {
+          // BFF pattern without expiresIn - tokens still in cookies
+          console.log('[OTP] Login OTP verified (BFF pattern), tokens in httpOnly cookies')
+        }
 
         // Set user in auth store - this makes the user authenticated
         useAuthStore.getState().setUser(responseData.user as any)
 
-        console.log('[OTP] Login OTP verified, tokens stored, user set:', {
+        console.log('[OTP] Login OTP verified, user set:', {
           userId: responseData.user._id,
           role: responseData.user.role,
         })

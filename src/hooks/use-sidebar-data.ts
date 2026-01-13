@@ -27,7 +27,7 @@ import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
 import { getLocalizedFullName } from '@/lib/arabic-names'
-import { useEmailVerification } from '@/hooks/useEmailVerification'
+import { useFeatureAccess } from '@/hooks/useFeatureAccess'
 
 type NavItem = {
   title: string
@@ -66,7 +66,7 @@ export function useSidebarData(): SidebarData {
   const isLoading = useAuthStore((state) => state.isLoading)
   const permissions = usePermissionsStore((state) => state.permissions)
   const isNavGroupVisible = useModuleVisibilityStore((state) => state.isNavGroupVisible)
-  const { isNavGroupBlocked } = useEmailVerification()
+  const { isNavGroupBlocked } = useFeatureAccess()
 
   // Build full name with locale-aware name detection
   const getFullName = () => {

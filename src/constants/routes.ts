@@ -69,6 +69,10 @@ export const ROUTES = {
     terms: '/terms',
     privacy: '/privacy',
     conflictPolicy: '/conflict-policy',
+    // Logout routes (multiple paths for compatibility)
+    logout: '/logout',
+    authLogout: '/auth/logout',
+    signOut: '/sign-out',
   },
 
   /**

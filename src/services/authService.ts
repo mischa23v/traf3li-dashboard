@@ -10,7 +10,7 @@
  * - Token refresh
  *
  * ============================================================================
- * 🚨 BACKEND_TODO: AUTH ENDPOINT REQUIREMENTS
+ *  BACKEND_TODO: AUTH ENDPOINT REQUIREMENTS
  * ============================================================================
  * See src/config/BACKEND_AUTH_ISSUES.ts for full documentation.
  *
@@ -63,10 +63,10 @@ const authLog = (message: string, data?: any) => {
   console.log(`[AUTH-SVC] ${message}`, data !== undefined ? data : '')
 }
 const authWarn = (message: string, data?: any) => {
-  console.warn(`[AUTH-SVC] ⚠️ ${message}`, data !== undefined ? data : '')
+  console.warn(`[AUTH-SVC]  ${message}`, data !== undefined ? data : '')
 }
 const authError = (message: string, error?: any) => {
-  console.error(`[AUTH-SVC] ❌ ${message}`, error || '')
+  console.error(`[AUTH-SVC]  ${message}`, error || '')
 }
 
 /**
@@ -253,13 +253,15 @@ export interface LoginOTPRequiredResponse {
 /**
  * Email Verification State from backend
  * Returned in login/OTP responses to indicate feature access restrictions
+ *
+ * Note: allowedFeatures and blockedFeatures have been removed in favor of
+ * the unified feature access system. See src/types/featureAccess.ts and
+ * src/hooks/useFeatureAccess.ts for the new approach.
  */
 export interface EmailVerificationResponse {
   isVerified: boolean
   requiresVerification: boolean
   verificationSentAt?: string
-  allowedFeatures: string[]
-  blockedFeatures: string[]
 }
 
 /**
@@ -617,7 +619,7 @@ const authService = {
    * Also sets HttpOnly cookie for backward compatibility
    *
    * =========================================================================
-   * 🚨 BACKEND_TODO: LOGIN ENDPOINT REQUIREMENTS
+   *  BACKEND_TODO: LOGIN ENDPOINT REQUIREMENTS
    * =========================================================================
    * POST /api/auth/login MUST return:
    *
@@ -1300,7 +1302,7 @@ const authService = {
    * Verify OTP code and login
    *
    * =========================================================================
-   * 🚨 BACKEND_TODO: OTP VERIFY ENDPOINT MUST RETURN TOKENS
+   *  BACKEND_TODO: OTP VERIFY ENDPOINT MUST RETURN TOKENS
    * =========================================================================
    * POST /api/auth/verify-otp MUST return:
    *
@@ -1450,7 +1452,7 @@ const authService = {
 
   /**
    * Send magic link to email for passwordless authentication
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   *  ENDPOINT IMPLEMENTED IN BACKEND
    * POST /api/auth/magic-link/send
    */
   sendMagicLink: async (data: MagicLinkData): Promise<MagicLinkResponse> => {
@@ -1473,7 +1475,7 @@ const authService = {
 
   /**
    * Verify magic link token and login
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   *  ENDPOINT IMPLEMENTED IN BACKEND
    * POST /api/auth/magic-link/verify
    */
   verifyMagicLink: async (data: MagicLinkVerifyData): Promise<User> => {
