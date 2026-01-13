@@ -56,11 +56,45 @@ export interface FeatureAccessDeniedResponse {
     requiresVerification: boolean
   }
   subscription: {
-    status: 'none' | 'trial' | 'trialing' | 'active' | 'past_due' | 'canceled'
+    status: 'none' | 'trial' | 'trialing' | 'active' | 'past_due' | 'canceled' | 'paused' | 'incomplete'
     tier: 'free' | 'starter' | 'professional' | 'enterprise'
     requiresSubscription: boolean
   }
 }
+
+/**
+ * Access level helper constants - reduces duplication in FEATURE_ACCESS matrix
+ * Each constant defines which user states can access features at that level
+ */
+
+/** Any authenticated user, including PAST_DUE - for critical account features */
+const ALWAYS_ALLOWED: UserState[] = [
+  UserState.UNVERIFIED_FREE,
+  UserState.UNVERIFIED_TRIAL,
+  UserState.VERIFIED_FREE,
+  UserState.VERIFIED_TRIAL,
+  UserState.VERIFIED_PAID,
+  UserState.PAST_DUE,
+]
+
+/** All active users except PAST_DUE - no email verification required */
+const NO_VERIFICATION: UserState[] = [
+  UserState.UNVERIFIED_FREE,
+  UserState.UNVERIFIED_TRIAL,
+  UserState.VERIFIED_FREE,
+  UserState.VERIFIED_TRIAL,
+  UserState.VERIFIED_PAID,
+]
+
+/** Only verified users - email verification required */
+const REQUIRES_VERIFICATION: UserState[] = [
+  UserState.VERIFIED_FREE,
+  UserState.VERIFIED_TRIAL,
+  UserState.VERIFIED_PAID,
+]
+
+/** Only paid users - requires active paid subscription */
+const REQUIRES_PAID: UserState[] = [UserState.VERIFIED_PAID]
 
 /**
  * Feature access matrix - which user states can access which features
@@ -68,104 +102,81 @@ export interface FeatureAccessDeniedResponse {
  *
  * Note: Frontend uses this for optimistic UI (hiding nav groups, etc.)
  * Backend is the source of truth and enforces access via middleware
+ *
+ * Feature counts: 6 always + 6 no-verification + 35 verification + 4 paid = 51 total
  */
 export const FEATURE_ACCESS: Record<string, UserState[]> = {
-  // Always allowed (any authenticated user, even past_due)
-  auth: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-    UserState.PAST_DUE,
-  ],
-  profile_view: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-    UserState.PAST_DUE,
-  ],
-  billing_view: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-    UserState.PAST_DUE,
-  ],
-  notifications: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-    UserState.PAST_DUE,
-  ],
+  // 
+  // ALWAYS ALLOWED (6 features) - Any authenticated user, including PAST_DUE
+  // 
+  auth: ALWAYS_ALLOWED,
+  profile_view: ALWAYS_ALLOWED,
+  billing_view: ALWAYS_ALLOWED,
+  notifications: ALWAYS_ALLOWED,
+  upgrade: ALWAYS_ALLOWED,
+  health: ALWAYS_ALLOWED,
 
-  // Allowed without email verification (but not for past_due)
-  tasks: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
-  reminders: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
-  events: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
-  calendar: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
-  appointments: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
-  gantt: [
-    UserState.UNVERIFIED_FREE,
-    UserState.UNVERIFIED_TRIAL,
-    UserState.VERIFIED_FREE,
-    UserState.VERIFIED_TRIAL,
-    UserState.VERIFIED_PAID,
-  ],
+  // 
+  // NO VERIFICATION REQUIRED (6 features) - Allowed without email verification
+  // 
+  tasks: NO_VERIFICATION,
+  reminders: NO_VERIFICATION,
+  events: NO_VERIFICATION,
+  calendar: NO_VERIFICATION,
+  appointments: NO_VERIFICATION,
+  gantt: NO_VERIFICATION,
 
-  // Requires email verification (not subscription)
-  cases: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  clients: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  contacts: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  invoices: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  documents: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  templates: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  team: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  integrations: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  reports: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  analytics: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  settings: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  crm: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
-  hr: [UserState.VERIFIED_FREE, UserState.VERIFIED_TRIAL, UserState.VERIFIED_PAID],
+  // 
+  // REQUIRES EMAIL VERIFICATION (35 features) - Must have verified email
+  // 
+  // Core business features
+  cases: REQUIRES_VERIFICATION,
+  clients: REQUIRES_VERIFICATION,
+  contacts: REQUIRES_VERIFICATION,
+  invoices: REQUIRES_VERIFICATION,
+  documents: REQUIRES_VERIFICATION,
+  templates: REQUIRES_VERIFICATION,
+  team: REQUIRES_VERIFICATION,
+  integrations: REQUIRES_VERIFICATION,
+  reports: REQUIRES_VERIFICATION,
+  analytics: REQUIRES_VERIFICATION,
+  settings: REQUIRES_VERIFICATION,
+  crm: REQUIRES_VERIFICATION,
+  hr: REQUIRES_VERIFICATION,
+  dashboard: REQUIRES_VERIFICATION,
+  // Finance features
+  billing_manage: REQUIRES_VERIFICATION,
+  payments: REQUIRES_VERIFICATION,
+  expenses: REQUIRES_VERIFICATION,
+  retainers: REQUIRES_VERIFICATION,
+  statements: REQUIRES_VERIFICATION,
+  // Legal features
+  legal_documents: REQUIRES_VERIFICATION,
+  matters: REQUIRES_VERIFICATION,
+  contracts: REQUIRES_VERIFICATION,
+  // CRM/Sales features
+  leads: REQUIRES_VERIFICATION,
+  territories: REQUIRES_VERIFICATION,
+  sales: REQUIRES_VERIFICATION,
+  // HR features
+  payroll: REQUIRES_VERIFICATION,
+  leave: REQUIRES_VERIFICATION,
+  attendance: REQUIRES_VERIFICATION,
+  // System features
+  automation: REQUIRES_VERIFICATION,
+  webhooks: REQUIRES_VERIFICATION,
+  api_access: REQUIRES_VERIFICATION,
+  workflow: REQUIRES_VERIFICATION,
+  files: REQUIRES_VERIFICATION,
+  storage: REQUIRES_VERIFICATION,
 
-  // Requires subscription (knowledge center features)
-  knowledge_center: [UserState.VERIFIED_PAID],
-  knowledge_articles: [UserState.VERIFIED_PAID],
+  // 
+  // REQUIRES PAID SUBSCRIPTION (4 features) - Knowledge Center
+  // 
+  knowledge_center: REQUIRES_PAID,
+  knowledge_articles: REQUIRES_PAID,
+  knowledge_categories: REQUIRES_PAID,
+  knowledge_search: REQUIRES_PAID,
 }
 
 /**
@@ -235,3 +246,42 @@ export const BLOCKED_ROUTE_PATTERNS = [
  * Type for blocked route patterns
  */
 export type BlockedRoutePattern = (typeof BLOCKED_ROUTE_PATTERNS)[number]
+
+/**
+ * 
+ * TIER-SPECIFIC FEATURES (Future Implementation Reference)
+ * 
+ *
+ * These features require specific subscription tiers beyond just VERIFIED_PAID.
+ * They are documented here for future implementation reference when these
+ * enterprise/professional features are built.
+ *
+ * ENTERPRISE TIER ONLY:
+ * - sso: Single Sign-On integration (SAML, OIDC)
+ * - saml: SAML authentication configuration
+ * - custom_branding: Custom branding/white-label UI
+ * - ip_whitelist: IP whitelist access restrictions
+ *
+ * PROFESSIONAL OR ENTERPRISE TIER:
+ * - audit_logs: Audit log viewing and export
+ *
+ * Implementation pattern for tier-specific features:
+ * ```typescript
+ * const TIER_SPECIFIC_FEATURES: Record<string, SubscriptionTier[]> = {
+ *   sso: ['enterprise'],
+ *   saml: ['enterprise'],
+ *   audit_logs: ['professional', 'enterprise'],
+ *   custom_branding: ['enterprise'],
+ *   ip_whitelist: ['enterprise'],
+ * }
+ * ```
+ *
+ * To check tier access:
+ * ```typescript
+ * function canAccessTierFeature(feature: string, userTier: SubscriptionTier): boolean {
+ *   const requiredTiers = TIER_SPECIFIC_FEATURES[feature]
+ *   if (!requiredTiers) return false
+ *   return requiredTiers.includes(userTier)
+ * }
+ * ```
+ */

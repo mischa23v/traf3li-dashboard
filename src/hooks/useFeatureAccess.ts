@@ -124,6 +124,12 @@ export function useFeatureAccess(): UseFeatureAccessReturn {
       return isEmailVerified ? UserState.VERIFIED_TRIAL : UserState.UNVERIFIED_TRIAL
     }
 
+    // Handle paused/incomplete as no active subscription
+    // These statuses mean subscription is not currently active
+    if (subStatus === 'paused' || subStatus === 'incomplete') {
+      return isEmailVerified ? UserState.VERIFIED_FREE : UserState.UNVERIFIED_FREE
+    }
+
     // Free tier (no subscription or canceled)
     return isEmailVerified ? UserState.VERIFIED_FREE : UserState.UNVERIFIED_FREE
   }, [user, emailVerification])
