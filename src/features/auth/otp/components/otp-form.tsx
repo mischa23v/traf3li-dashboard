@@ -18,7 +18,6 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-  InputOTPSeparator,
 } from '@/components/ui/input-otp'
 import { Loader2, RefreshCw, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
@@ -51,12 +50,14 @@ interface OtpFormProps extends React.HTMLAttributes<HTMLFormElement> {
   onResendOtp?: () => Promise<void>
   /** Callback when OTP is verified successfully */
   onSuccess?: () => void
+  /** Callback when user cancels - navigates back to sign-in */
+  onCancel?: () => void
 }
 
 // Cooldown duration in seconds (OTP endpoints are rate-limited to 3/hour)
 const RESEND_COOLDOWN = 60
 
-export function OtpForm({ className, email, purpose = 'login', loginSessionToken, sessionExpiresIn = 600, onResendOtp, onSuccess, ...props }: OtpFormProps) {
+export function OtpForm({ className, email, purpose = 'login', loginSessionToken, sessionExpiresIn = 600, onResendOtp, onSuccess, onCancel, ...props }: OtpFormProps) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
@@ -332,28 +333,24 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
             <FormItem>
               <FormLabel className='sr-only'>رمز التحقق</FormLabel>
               <FormControl>
-                {/* IMPORTANT: dir="ltr" ensures numbers display left-to-right even in RTL mode */}
-                <InputOTP
-                  maxLength={6}
-                  {...field}
-                  dir="ltr"
-                  containerClassName='justify-between sm:[&>[data-slot="input-otp-group"]>div]:w-12'
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
+                {/* LTR wrapper for OTP input */}
+                <div dir="ltr" className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    {...field}
+                    dir="ltr"
+                    containerClassName='justify-center'
+                  >
+                    <InputOTPGroup className="gap-2">
+                      <InputOTPSlot index={0} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                      <InputOTPSlot index={1} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                      <InputOTPSlot index={2} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                      <InputOTPSlot index={3} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                      <InputOTPSlot index={4} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                      <InputOTPSlot index={5} className="w-11 h-12 text-xl font-semibold rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500/20" />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -390,12 +387,12 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
             <p>{errorMessage}</p>
             {attemptsLeft !== null && attemptsLeft > 0 && (
               <p className="text-xs text-orange-600 dark:text-orange-400">
-                {isRTL ? '⚠️ تحذير: سيتم قفل حسابك بعد استنفاد المحاولات' : '⚠️ Warning: Your account will be locked after all attempts are used'}
+                {isRTL ? ' تحذير: سيتم قفل حسابك بعد استنفاد المحاولات' : ' Warning: Your account will be locked after all attempts are used'}
               </p>
             )}
             {attemptsLeft === 0 && (
               <p className="text-xs text-red-700 dark:text-red-400 font-medium">
-                {isRTL ? '🔒 تم استنفاد المحاولات. يرجى طلب رمز جديد.' : '🔒 All attempts used. Please request a new code.'}
+                {isRTL ? ' تم استنفاد المحاولات. يرجى طلب رمز جديد.' : ' All attempts used. Please request a new code.'}
               </p>
             )}
             {requestId && (
@@ -406,19 +403,33 @@ export function OtpForm({ className, email, purpose = 'login', loginSessionToken
           </div>
         )}
 
-        <Button className='mt-2' disabled={otp.length < 6 || isLoading || sessionExpired}>
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin me-2" />
-              {isRTL ? 'جاري التحقق...' : 'Verifying...'}
-            </>
-          ) : (
-            isRTL ? 'تحقق' : 'Verify'
-          )}
-        </Button>
+        {/* Action buttons - Cancel and Continue */}
+        <div className="flex gap-3 mt-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 h-12 rounded-xl border border-slate-200 bg-white text-slate-600 font-medium hover:bg-slate-50 transition-all flex items-center justify-center"
+          >
+            {isRTL ? 'إلغاء' : 'Cancel'}
+          </button>
+          <button
+            type="submit"
+            disabled={otp.length < 6 || isLoading || sessionExpired}
+            className="flex-1 h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {isRTL ? 'جاري التحقق...' : 'Verifying...'}
+              </>
+            ) : (
+              isRTL ? 'متابعة' : 'Continue'
+            )}
+          </button>
+        </div>
 
         {/* Resend OTP button with cooldown */}
-        <div className="text-center">
+        <div className="text-center mt-2">
           <Button
             type="button"
             variant="ghost"
