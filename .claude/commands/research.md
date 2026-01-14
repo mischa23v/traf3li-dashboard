@@ -1,3 +1,12 @@
+---
+name: research
+description: Research enterprise patterns and best practices
+version: 1.1.0
+risk: A
+reviewer: null
+last_updated: 2026-01-14
+---
+
 # Enterprise Research Workflow
 
 You are conducting enterprise-level research for the TRAF3LI Dashboard project. This command creates comprehensive research documentation following industry best practices.
@@ -120,8 +129,8 @@ Synthesize findings into actionable recommendations:
 - [ ] [Future consideration]
 
 ## Anti-Patterns to Avoid
-- ❌ [Pattern to avoid with reason]
-- ❌ [Pattern to avoid with reason]
+-  [Pattern to avoid with reason]
+-  [Pattern to avoid with reason]
 
 ## Integration with Existing Patterns
 Reference gold standard implementations:

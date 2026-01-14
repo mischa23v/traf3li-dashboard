@@ -2,6 +2,10 @@
 name: rebase
 description: Rebase current branch onto remote upstream with smart stash handling
 argument-hint: [optional: target-branch-name]
+version: 1.1.0
+risk: C
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /rebase - Smart Git Rebase

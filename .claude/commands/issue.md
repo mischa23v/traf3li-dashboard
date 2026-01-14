@@ -2,6 +2,10 @@
 name: issue
 description: Create a GitHub issue for bugs, tasks, or future work items
 argument-hint: [optional: brief description of the issue]
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /issue - GitHub Issue Creator

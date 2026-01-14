@@ -1,6 +1,10 @@
 ---
 name: tasks
 description: Create tasks.md (implementation plan) from approved design - Phase 3
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /tasks - Implementation Tasks (Phase 3)

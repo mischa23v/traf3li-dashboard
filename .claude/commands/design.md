@@ -1,6 +1,10 @@
 ---
 name: design
 description: Create design.md (technical architecture) from approved requirements - Phase 2
+version: 1.1.0
+risk: B
+reviewer: react_architect
+last_updated: 2026-01-14
 ---
 
 # /design - Technical Design (Phase 2)

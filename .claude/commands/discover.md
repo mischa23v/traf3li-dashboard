@@ -1,3 +1,12 @@
+---
+name: discover
+description: Analyze existing codebase before planning new features
+version: 1.1.0
+risk: A
+reviewer: null
+last_updated: 2026-01-14
+---
+
 # Pre-Planning Discovery Command
 
 You are conducting a comprehensive codebase analysis before planning any new feature. This is a MANDATORY step before running `/plan`.
@@ -32,12 +41,12 @@ Check if a feature module exists:
 
 ```
 src/features/{topic}/
-├── components/     # UI components
-├── hooks/         # Feature-specific hooks
-├── services/      # API services
-├── types/         # TypeScript types
-├── utils/         # Utilities
-└── index.ts       # Public exports
+ components/     # UI components
+ hooks/         # Feature-specific hooks
+ services/      # API services
+ types/         # TypeScript types
+ utils/         # Utilities
+ index.ts       # Public exports
 ```
 
 **Status:**

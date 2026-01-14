@@ -1,6 +1,10 @@
 ---
 name: plan
 description: Create requirements.md with EARS format user stories and acceptance criteria
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /plan - Requirements Gathering (Phase 1)
