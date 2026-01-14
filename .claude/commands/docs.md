@@ -2,6 +2,10 @@
 name: docs
 description: Three-phase documentation workflow - review, implement, commit
 argument-hint: [path/to/file or directory] (optional)
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /docs - Documentation Workflow

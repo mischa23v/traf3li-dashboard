@@ -2,6 +2,10 @@
 name: worktree
 description: Create a new git worktree with sequential numbering for parallel work
 argument-hint: (no arguments needed)
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /worktree - Git Worktree Creator

@@ -1,6 +1,10 @@
 ---
 name: complete-phase
 description: Execute ONE task at a time from tasks.md with verification
+version: 1.1.0
+risk: B
+reviewer: react_architect
+last_updated: 2026-01-14
 ---
 
 # /complete-phase - Execute Tasks One at a Time

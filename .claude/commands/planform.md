@@ -1,6 +1,10 @@
 ---
 name: planform
 description: Create list page design specs based on Tasks List gold standard (dimensions, spacing, colors, components)
+version: 1.1.0
+risk: A
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # List Page Design System - Gold Standard Pattern
@@ -13,31 +17,31 @@ This document contains the complete design specifications from the Tasks List pa
 
 ### Main Container
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│ HEADER (navy bg)                                                    │
-├─────────────────────────────────────────────────────────────────────┤
-│ MAIN (bg-[#f8f9fa], rounded-tr-3xl, p-6 lg:p-8)                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │ HERO CARD (ProductivityHero)                                  │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                     │
-│  ┌─────────────────────────────┬───────────────────────────────┐  │
-│  │ LEFT: Content (lg:col-span-2)│ RIGHT: Sidebar (lg:col-span-1)│  │
-│  │  ┌─────────────────────────┐ │  ┌─────────────────────────┐  │  │
-│  │  │ FILTER CARD             │ │  │ QUICK ACTIONS WIDGET    │  │  │
-│  │  └─────────────────────────┘ │  └─────────────────────────┘  │  │
-│  │  ┌─────────────────────────┐ │  ┌─────────────────────────┐  │  │
-│  │  │ AI SUGGESTION (optional)│ │  │ CALENDAR WIDGET         │  │  │
-│  │  └─────────────────────────┘ │  └─────────────────────────┘  │  │
-│  │  ┌─────────────────────────┐ │                               │  │
-│  │  │ LIST ITEMS              │ │                               │  │
-│  │  │ (Card 1)                │ │                               │  │
-│  │  │ (Card 2)                │ │                               │  │
-│  │  │ ...                     │ │                               │  │
-│  │  │ [Load More Button]      │ │                               │  │
-│  │  └─────────────────────────┘ │                               │  │
-│  └─────────────────────────────┴───────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+
+ HEADER (navy bg)                                                    
+
+ MAIN (bg-[#f8f9fa], rounded-tr-3xl, p-6 lg:p-8)                    
+    
+   HERO CARD (ProductivityHero)                                    
+    
+                                                                     
+    
+   LEFT: Content (lg:col-span-2) RIGHT: Sidebar (lg:col-span-1)  
+           
+     FILTER CARD                 QUICK ACTIONS WIDGET        
+           
+           
+     AI SUGGESTION (optional)    CALENDAR WIDGET             
+           
+                                      
+     LIST ITEMS                                                
+     (Card 1)                                                  
+     (Card 2)                                                  
+     ...                                                       
+     [Load More Button]                                        
+                                      
+    
+
 ```
 
 ### Grid Layout
@@ -439,7 +443,7 @@ This document contains the complete design specifications from the Tasks List pa
 
 ## 4. QUICK ACTIONS SIDEBAR
 
-**⚠️ CRITICAL: Quick Actions widget shows DIFFERENT buttons for each view mode. NO tabs in detail/create views.**
+** CRITICAL: Quick Actions widget shows DIFFERENT buttons for each view mode. NO tabs in detail/create views.**
 
 ### Quick Actions by View Mode
 
@@ -1065,7 +1069,7 @@ Standard form page layout for creating or editing entities.
 
 ## 13. UNIVERSAL KEYBOARD SHORTCUTS
 
-**⚠️ CRITICAL: Use these EXACT shortcuts across ALL pages and ALL modules for consistency.**
+** CRITICAL: Use these EXACT shortcuts across ALL pages and ALL modules for consistency.**
 
 ### Centralized Hook (MANDATORY)
 **Location:** `src/hooks/useKeyboardShortcuts.ts`
@@ -1634,20 +1638,20 @@ When creating a new module (HR, Finance, etc.), follow this structure:
 ### Folder Structure
 ```
 src/features/{module}/
-├── components/
-│   ├── {module}-list-view.tsx      # Main list page (copy tasks-list-view.tsx)
-│   ├── create-{entity}-view.tsx    # Create form (copy create-task-view.tsx)
-│   ├── {entity}-details-view.tsx   # Detail view (copy task-details-view.tsx)
-│   ├── {module}-sidebar.tsx        # Sidebar widget (copy tasks-sidebar.tsx)
-│   ├── {module}-columns.tsx        # Table columns (copy tasks-columns.tsx)
-│   └── {module}-dialogs.tsx        # Modals/dialogs
-├── constants/
-│   └── {module}-options.ts         # Dropdown options, status/priority maps
-├── data/
-│   └── schema.ts                   # Zod schemas
-├── hooks/
-│   └── use{Module}.ts              # Custom hooks (if not in src/hooks/)
-└── index.tsx                       # Route exports
+ components/
+    {module}-list-view.tsx      # Main list page (copy tasks-list-view.tsx)
+    create-{entity}-view.tsx    # Create form (copy create-task-view.tsx)
+    {entity}-details-view.tsx   # Detail view (copy task-details-view.tsx)
+    {module}-sidebar.tsx        # Sidebar widget (copy tasks-sidebar.tsx)
+    {module}-columns.tsx        # Table columns (copy tasks-columns.tsx)
+    {module}-dialogs.tsx        # Modals/dialogs
+ constants/
+    {module}-options.ts         # Dropdown options, status/priority maps
+ data/
+    schema.ts                   # Zod schemas
+ hooks/
+    use{Module}.ts              # Custom hooks (if not in src/hooks/)
+ index.tsx                       # Route exports
 ```
 
 ### Step-by-Step Module Creation
@@ -1711,23 +1715,23 @@ src/features/{module}/
 
 ### Do NOT Change
 These patterns MUST stay consistent across ALL modules:
-- ❌ Keyboard shortcuts (N, S, D, A, C, L, /, Escape)
-- ❌ Filter card dimensions (h-14 inputs, rounded-2xl)
-- ❌ List item card structure
-- ❌ Quick Actions sidebar layout
-- ❌ Hero card structure
-- ❌ Color palette (priority, status colors)
-- ❌ Animation timings
+-  Keyboard shortcuts (N, S, D, A, C, L, /, Escape)
+-  Filter card dimensions (h-14 inputs, rounded-2xl)
+-  List item card structure
+-  Quick Actions sidebar layout
+-  Hero card structure
+-  Color palette (priority, status colors)
+-  Animation timings
 
 ### DO Customize
 These CAN vary per module:
-- ✅ Status options (todo/done vs pending/approved)
-- ✅ Priority labels
-- ✅ Filter dropdown options
-- ✅ Stat cards in hero
-- ✅ Quick action buttons (Complete vs Approve)
-- ✅ Form fields in create/edit
-- ✅ Column definitions in list
+-  Status options (todo/done vs pending/approved)
+-  Priority labels
+-  Filter dropdown options
+-  Stat cards in hero
+-  Quick action buttons (Complete vs Approve)
+-  Form fields in create/edit
+-  Column definitions in list
 
 ---
 

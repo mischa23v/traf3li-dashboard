@@ -1,6 +1,10 @@
 ---
 name: arewedone
 description: Run structural completeness review after implementation
+version: 1.1.0
+risk: A
+reviewer: react_architect
+last_updated: 2026-01-14
 ---
 
 # /arewedone - Structural Completeness Check

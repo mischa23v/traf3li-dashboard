@@ -2,6 +2,10 @@
 name: commit
 description: Intelligent commit based on conversation context - stages and commits related files
 argument-hint: [optional: description of what to commit]
+version: 1.1.0
+risk: B
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /commit - Smart Git Commit

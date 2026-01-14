@@ -2,6 +2,10 @@
 name: test
 description: Run tests with the test-runner agent - unit tests, coverage, or E2E
 argument-hint: [unit|coverage|e2e|all] [path/to/file] (optional)
+version: 1.1.0
+risk: A
+reviewer: null
+last_updated: 2026-01-14
 ---
 
 # /test - Test Runner Command

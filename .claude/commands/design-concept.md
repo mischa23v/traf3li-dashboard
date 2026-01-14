@@ -1,3 +1,13 @@
+---
+name: design-concept
+description: Create distinctive, production-grade design concepts for UI features
+argument-hint: [topic] - Feature or component to design
+version: 1.1.0
+risk: A
+reviewer: design_systems
+last_updated: 2026-01-14
+---
+
 # Design Concept Command
 
 You are creating a distinctive, production-grade design concept for the TRAF3LI Dashboard. This command integrates enterprise research with the Frontend Design Skill to create UI specifications that avoid generic "AI slop" aesthetics.
@@ -8,7 +18,7 @@ Create design concept for: $ARGUMENTS
 ## Design Philosophy
 
 ### Avoid "AI Slop" Aesthetics
-❌ **DO NOT USE:**
+ **DO NOT USE:**
 - Generic fonts (Inter, Roboto, Open Sans defaults)
 - Predictable card layouts with rounded corners
 - Purple/blue gradients
@@ -17,7 +27,7 @@ Create design concept for: $ARGUMENTS
 - Excessive whitespace without purpose
 - Generic icon sets without customization
 
-✅ **DO USE:**
+ **DO USE:**
 - Bold, committed typography choices
 - Distinctive color palettes with personality
 - Unexpected but functional layouts
@@ -96,11 +106,11 @@ Reference planform.md specifications:
 
 ### Page Layout
 Following planform.md gold standard:
-┌─────────────────────────────────────────────────────────┐
-│ [Sidebar] │ [Filter Card]          │ [Quick Actions]   │
-│           │ [List Items]           │ [Calendar Widget] │
-│           │ [Load More]            │                   │
-└─────────────────────────────────────────────────────────┘
+
+ [Sidebar]  [Filter Card]           [Quick Actions]   
+            [List Items]            [Calendar Widget] 
+            [Load More]                               
+
 
 ### Filter Card (if applicable)
 - Background: bg-slate-800/50

@@ -1,10 +1,11 @@
 ---
 name: match-design
 description: Update any module to match gold standard design from Tasks (planform.md)
-arguments:
-  - name: module
-    description: Module to update (e.g., clients, hr, finance, crm)
-    required: true
+argument-hint: Module to update (e.g., clients, hr, finance, crm)
+version: 1.1.0
+risk: B
+reviewer: design_systems
+last_updated: 2026-01-14
 ---
 
 # Match Module to Gold Standard Design
@@ -33,8 +34,8 @@ Search for these files in `src/features/$ARGUMENTS.module/`:
 
 ### Report Missing Files
 ```
-✅ FOUND: [filename]
-❌ MISSING: [expected file] - MUST CREATE
+ FOUND: [filename]
+ MISSING: [expected file] - MUST CREATE
 ```
 
 ---
@@ -59,10 +60,10 @@ QueryKeys.$ARGUMENTS.module.detail(id)
 
 ### Report Status
 ```
-✅ Routes defined: [list which exist]
-❌ Routes missing: [list which need adding]
-✅ Query keys defined: [list which exist]
-❌ Query keys missing: [list which need adding]
+ Routes defined: [list which exist]
+ Routes missing: [list which need adding]
+ Query keys defined: [list which exist]
+ Query keys missing: [list which need adding]
 ```
 
 ---
@@ -72,8 +73,8 @@ QueryKeys.$ARGUMENTS.module.detail(id)
 ### Required Hooks in Module
 | Hook | Purpose | Check |
 |------|---------|-------|
-| `use{Module}` or `use{Module}s` | Data fetching (list, detail, mutations) | ✅/❌ |
-| `useKeyboardShortcuts` | Centralized keyboard shortcuts | ✅/❌ |
+| `use{Module}` or `use{Module}s` | Data fetching (list, detail, mutations) | / |
+| `useKeyboardShortcuts` | Centralized keyboard shortcuts | / |
 
 ### Check Hook Implementation
 Read the main hook file and verify:
@@ -105,16 +106,16 @@ useKeyboardShortcuts({
 
 | Component | Gold Standard | Check |
 |-----------|---------------|-------|
-| Page layout | `grid-cols-1 lg:grid-cols-3 gap-8` | ✅/❌ |
-| Hero card | `<ProductivityHero>` with 4 stats | ✅/❌ |
-| Filter card | `rounded-[2rem]`, inputs `h-14` | ✅/❌ |
-| Search input | `h-14`, icon `end-4`, loading spinner | ✅/❌ |
-| Filter dropdowns | `GosiSelect`, `h-14`, `min-w-[220px]` | ✅/❌ |
-| List items | `rounded-[2rem]`, `p-5`, hover states | ✅/❌ |
-| Status badges | Correct colors per status | ✅/❌ |
-| Empty state | Icon + message + CTA button | ✅/❌ |
-| Load more | `GosiButton` full width | ✅/❌ |
-| Sidebar present | `<{Module}Sidebar mode="list">` | ✅/❌ |
+| Page layout | `grid-cols-1 lg:grid-cols-3 gap-8` | / |
+| Hero card | `<ProductivityHero>` with 4 stats | / |
+| Filter card | `rounded-[2rem]`, inputs `h-14` | / |
+| Search input | `h-14`, icon `end-4`, loading spinner | / |
+| Filter dropdowns | `GosiSelect`, `h-14`, `min-w-[220px]` | / |
+| List items | `rounded-[2rem]`, `p-5`, hover states | / |
+| Status badges | Correct colors per status | / |
+| Empty state | Icon + message + CTA button | / |
+| Load more | `GosiButton` full width | / |
+| Sidebar present | `<{Module}Sidebar mode="list">` | / |
 
 ---
 
@@ -124,20 +125,20 @@ useKeyboardShortcuts({
 
 | Component | Gold Standard | Check |
 |-----------|---------------|-------|
-| Page layout | Same 3-column grid | ✅/❌ |
-| Back button | `← Back to list` link | ✅/❌ |
-| Title + status badge | Header with entity name | ✅/❌ |
-| Tabs | `Overview, Comments, Files, History` | ✅/❌ |
-| Description card | `rounded-[2rem] p-6` | ✅/❌ |
-| Compact info row | 4-column grid with icons | ✅/❌ |
-| Section cards | Consistent `rounded-[2rem]` | ✅/❌ |
-| Subtasks/related | Checkbox list if applicable | ✅/❌ |
-| Comments section | Add comment form + list | ✅/❌ |
-| Files section | Upload + file list | ✅/❌ |
-| Delete dialog | `AlertDialog` with confirmation | ✅/❌ |
-| Loading skeleton | Matches layout structure | ✅/❌ |
-| Error state | Alert with retry button | ✅/❌ |
-| Sidebar present | `<{Module}Sidebar mode="details" entityId={id}>` | ✅/❌ |
+| Page layout | Same 3-column grid | / |
+| Back button | `← Back to list` link | / |
+| Title + status badge | Header with entity name | / |
+| Tabs | `Overview, Comments, Files, History` | / |
+| Description card | `rounded-[2rem] p-6` | / |
+| Compact info row | 4-column grid with icons | / |
+| Section cards | Consistent `rounded-[2rem]` | / |
+| Subtasks/related | Checkbox list if applicable | / |
+| Comments section | Add comment form + list | / |
+| Files section | Upload + file list | / |
+| Delete dialog | `AlertDialog` with confirmation | / |
+| Loading skeleton | Matches layout structure | / |
+| Error state | Alert with retry button | / |
+| Sidebar present | `<{Module}Sidebar mode="details" entityId={id}>` | / |
 
 ---
 
@@ -147,19 +148,19 @@ useKeyboardShortcuts({
 
 | Component | Gold Standard | Check |
 |-----------|---------------|-------|
-| Page layout | Same 3-column grid | ✅/❌ |
-| Form container | `rounded-[2rem]` card | ✅/❌ |
-| Mode toggle | Basic/Advanced tabs | ✅/❌ |
-| Two-column fields | `grid-cols-1 md:grid-cols-2 gap-6` | ✅/❌ |
-| Input heights | All inputs `h-14` | ✅/❌ |
-| Labels | `text-sm font-medium text-slate-700` | ✅/❌ |
-| Required indicator | Red asterisk | ✅/❌ |
-| Textarea | `min-h-[120px]` | ✅/❌ |
-| Date pickers | `GosiDatePicker` | ✅/❌ |
-| Submit button | Full width, `h-14`, emerald | ✅/❌ |
-| Form validation | Error messages below fields | ✅/❌ |
-| Edit mode | Pre-fills data, changes button text | ✅/❌ |
-| Sidebar present | `<{Module}Sidebar mode="create" onClearForm onSaveForm>` | ✅/❌ |
+| Page layout | Same 3-column grid | / |
+| Form container | `rounded-[2rem]` card | / |
+| Mode toggle | Basic/Advanced tabs | / |
+| Two-column fields | `grid-cols-1 md:grid-cols-2 gap-6` | / |
+| Input heights | All inputs `h-14` | / |
+| Labels | `text-sm font-medium text-slate-700` | / |
+| Required indicator | Red asterisk | / |
+| Textarea | `min-h-[120px]` | / |
+| Date pickers | `GosiDatePicker` | / |
+| Submit button | Full width, `h-14`, emerald | / |
+| Form validation | Error messages below fields | / |
+| Edit mode | Pre-fills data, changes button text | / |
+| Sidebar present | `<{Module}Sidebar mode="create" onClearForm onSaveForm>` | / |
 
 ---
 
@@ -170,43 +171,43 @@ useKeyboardShortcuts({
 #### Quick Actions Widget Structure
 | Check | Gold Standard | Status |
 |-------|---------------|--------|
-| **Uses `useKeyboardShortcuts` hook** | MANDATORY - not custom implementation | ✅/❌ |
-| Receives `mode` prop | `'list' \| 'create' \| 'details'` | ✅/❌ |
-| Receives `entityId` prop | For detail view | ✅/❌ |
-| **List view has tabs** | Main (أساسي) + Bulk (جماعي) | ✅/❌ |
-| List Main buttons | View (V), Select (S), Delete (D), Archive (A) | ✅/❌ |
-| List Bulk buttons | Select All (L), Complete (C), Delete (D), Archive (A) | ✅/❌ |
-| **Detail view NO tabs** | 4 buttons directly | ✅/❌ |
-| Detail buttons | Complete, Edit, Delete, View All | ✅/❌ |
-| **Create view NO tabs** | 4 buttons directly | ✅/❌ |
-| Create buttons | Create, Clear, Cancel, Save | ✅/❌ |
+| **Uses `useKeyboardShortcuts` hook** | MANDATORY - not custom implementation | / |
+| Receives `mode` prop | `'list' \| 'create' \| 'details'` | / |
+| Receives `entityId` prop | For detail view | / |
+| **List view has tabs** | Main (أساسي) + Bulk (جماعي) | / |
+| List Main buttons | View (V), Select (S), Delete (D), Archive (A) | / |
+| List Bulk buttons | Select All (L), Complete (C), Delete (D), Archive (A) | / |
+| **Detail view NO tabs** | 4 buttons directly | / |
+| Detail buttons | Complete, Edit, Delete, View All | / |
+| **Create view NO tabs** | 4 buttons directly | / |
+| Create buttons | Create, Clear, Cancel, Save | / |
 
 #### Quick Actions Styling (CRITICAL)
 | Check | Gold Standard | Status |
 |-------|---------------|--------|
-| Container | `bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950` | ✅/❌ |
-| Container border | `ring-1 ring-white/10` | ✅/❌ |
-| Container radius | `rounded-[2rem]` | ✅/❌ |
-| Container padding | `p-5` | ✅/❌ |
-| Tab buttons container | `bg-white/5 rounded-2xl p-1.5` | ✅/❌ |
-| Active tab | `bg-emerald-500 text-white` | ✅/❌ |
-| Inactive tab | `text-slate-400 hover:text-white` | ✅/❌ |
-| Action buttons layout | `grid grid-cols-2 gap-3 mt-5` | ✅/❌ |
-| Action button | `rounded-3xl py-6 border-0` | ✅/❌ |
-| Keyboard badge | `kbd` style with `bg-white/20 text-white/90 px-2 py-0.5 rounded-md text-xs font-mono` | ✅/❌ |
+| Container | `bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950` | / |
+| Container border | `ring-1 ring-white/10` | / |
+| Container radius | `rounded-[2rem]` | / |
+| Container padding | `p-5` | / |
+| Tab buttons container | `bg-white/5 rounded-2xl p-1.5` | / |
+| Active tab | `bg-emerald-500 text-white` | / |
+| Inactive tab | `text-slate-400 hover:text-white` | / |
+| Action buttons layout | `grid grid-cols-2 gap-3 mt-5` | / |
+| Action button | `rounded-3xl py-6 border-0` | / |
+| Keyboard badge | `kbd` style with `bg-white/20 text-white/90 px-2 py-0.5 rounded-md text-xs font-mono` | / |
 
 #### Calendar & Notifications Widget (Below Quick Actions)
 | Check | Gold Standard | Status |
 |-------|---------------|--------|
-| Widget container | `bg-white rounded-[2rem] ring-1 ring-black/5 shadow-sm p-5 mt-6` | ✅/❌ |
-| Tab buttons | التقويم (Calendar) + التنبيهات (Notifications) | ✅/❌ |
-| Tab container | `bg-slate-100 rounded-xl p-1` | ✅/❌ |
-| Active calendar tab | `bg-white shadow-sm text-emerald-700` | ✅/❌ |
-| Day strip | Horizontal scroll with 5 days visible | ✅/❌ |
-| Current day highlight | `bg-emerald-500 text-white` | ✅/❌ |
-| Uses `useCalendar` hook | For date selection state | ✅/❌ |
-| Uses `useUpcomingReminders` hook | For notifications data | ✅/❌ |
-| Empty state icon | Calendar or Bell icon with message | ✅/❌ |
+| Widget container | `bg-white rounded-[2rem] ring-1 ring-black/5 shadow-sm p-5 mt-6` | / |
+| Tab buttons | التقويم (Calendar) + التنبيهات (Notifications) | / |
+| Tab container | `bg-slate-100 rounded-xl p-1` | / |
+| Active calendar tab | `bg-white shadow-sm text-emerald-700` | / |
+| Day strip | Horizontal scroll with 5 days visible | / |
+| Current day highlight | `bg-emerald-500 text-white` | / |
+| Uses `useCalendar` hook | For date selection state | / |
+| Uses `useUpcomingReminders` hook | For notifications data | / |
+| Empty state icon | Calendar or Bell icon with message | / |
 
 #### Keyboard Shortcuts Reference
 | Shortcut | Action | View |
