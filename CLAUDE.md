@@ -1,4 +1,4 @@
-Never Log in to playwright let me log in because of rate limit.
+Never Log in to playwright let me log in because of rate limit. never close dev server or plaseright or chrome browser I will
 #  REQUIREMENT: ENTERPRISE-LEVEL CODE QUALITY
 
 **Make sure all code is enterprise-level, production-level, and meets gold standard. Be honest - review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases. also Do a git diff and review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases.**
@@ -258,4 +258,5 @@ Before saying "done", verify:
 | 2026-01-12 | 3.0 | Added new commands (/bugs, /test, /perf-check, /ui-review, /docs, /commit, /rebase, /worktree, /issue), agents (bug-finder, test-runner, performance-profiler, ui-ux-consultant, doc-reviewer, doc-implementer, github-issue-creator, git-cherry-pick-orchestrator), and hooks (clean_commit_guard, emoji_remover, protect_claude_md, github_issue_guard, centralized_constants_guard, rtl_check) |
 | 2026-01-12 | 2.0 | Added TL;DR, workflow diagram, commands reference, /arewedone, /arch-review |
 | - | 1.0 | Initial version |
+
 
