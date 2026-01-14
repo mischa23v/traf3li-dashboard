@@ -549,7 +549,7 @@ const normalizeUser = (user: User): User => {
 let lastSuccessfulAuth: number = 0
 let consecutive401Count: number = 0
 let memoryCachedUser: User | null = null // Keep user in memory as backup to localStorage
-const AUTH_GRACE_PERIOD = 2 * 60 * 1000 // 2 minutes - SECURITY: reduced from 30 minutes
+const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - DEV: increased for development stability
 const MAX_CONSECUTIVE_401 = 3 // SECURITY: reduced from 10 - prompt re-auth after 3 failures
 
 /**
