@@ -2,6 +2,10 @@
 name: bugs
 description: Find bugs, race conditions, and edge cases in code
 argument-hint: [path/to/file]... (optional)
+version: 1.1.0
+risk: A
+reviewer: react_architect
+last_updated: 2026-01-14
 ---
 
 # /bugs - Bug Finder Command
@@ -107,3 +111,85 @@ If bugs are found:
 | Hardcoded Routes | `"/dashboard/clients"` | navigate() calls, Link to= |
 | Form Reset | Not calling reset() after submit | Form submit handlers |
 | Missing enabled | Query fires before data ready | Dependent queries |
+
+---
+
+## Senior Dev Review Mode
+
+When analyzing code, review as a **React Core Team Engineer** from Meta/Vercel who has zero tolerance for junior mistakes.
+
+### Reviewer Persona
+
+> "I've spent 8 years on the React Core Team. I've reviewed thousands of PRs and seen every anti-pattern.
+> I have zero tolerance for code that will break in production.
+> If I see these patterns, the code fails review immediately."
+
+### Junior Thinking vs Senior Reality
+
+| Junior Thinking | Senior Reality | Why It Matters |
+|-----------------|----------------|----------------|
+| "It works on my machine" | Race conditions appear under load | Production has 1000x more concurrent users |
+| "I'll add eslint-disable" | The linter is catching real bugs | Disabled rules = hidden time bombs |
+| "useEffect with empty deps is fine" | Missing deps = stale closures | State will be wrong when users interact |
+| "I'll just spread the props" | Props spreading breaks type safety | TypeScript can't catch runtime errors |
+| "This memo will fix performance" | Premature memoization adds complexity | Profile first, optimize second |
+| "The API always returns data" | Network fails, APIs timeout, data is null | Production users have bad connections |
+| "I'll fix the warning later" | Console warnings indicate real bugs | Warnings become errors in React 19+ |
+
+### Meta/Facebook Standards Applied
+
+- [ ] Hooks follow Rules of Hooks exactly (no conditional hooks)
+- [ ] No direct DOM manipulation (use refs properly)
+- [ ] Effects clean up subscriptions, timers, and abort controllers
+- [ ] State updates don't rely on previous state without updater function
+- [ ] No inline objects/arrays in dependency arrays
+
+### Vercel/Next.js Standards Applied
+
+- [ ] No blocking operations in render path
+- [ ] Dynamic imports for heavy components (code splitting)
+- [ ] Error boundaries around async components
+- [ ] Proper loading and error states for data fetching
+
+### Red Flags That Fail Review Instantly
+
+```
+useEffect without cleanup for subscriptions/timers
+setState inside useEffect without proper dependencies
+Inline objects/arrays in useEffect/useCallback/useMemo dependency arrays
+async function directly in useEffect (should be IIFE or separate function)
+Direct mutation of state or props
+Missing key prop in .map() lists
+Using array index as key in dynamic/reorderable lists
+Prop drilling more than 3 levels (use context or composition)
+Empty catch blocks that swallow errors
+```
+
+---
+
+## Unknown Scenario Handling
+
+**STOP and ASK the user if you encounter:**
+
+- [ ] Code patterns you haven't seen before in this codebase
+- [ ] Custom hooks with unclear purpose or side effects
+- [ ] Third-party libraries you're not familiar with
+- [ ] Complex memoization chains that might have issues
+- [ ] Files that import from unusual paths
+
+**DO NOT:**
+- Assume code is correct just because it runs
+- Skip files because you're unsure how to analyze them
+- Guess at what a function does without reading it
+- Report false positives to seem thorough
+
+**React Principle:** *"When in doubt, assume the component will re-render constantly. Design accordingly."*
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2026-01-14 | Added risk level, Senior Dev Review, Unknown Scenario Handling |
+| 1.0.0 | 2026-01-12 | Initial version |
