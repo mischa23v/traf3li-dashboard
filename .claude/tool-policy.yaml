@@ -1,0 +1,377 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# TRAF3LI Frontend - Tool Policy
+# Centralized risk levels, reviewer profiles, and command mappings
+# ═══════════════════════════════════════════════════════════════════════════════
+version: 1.0.0
+updated: 2026-01-14
+
+# ───────────────────────────────────────────────────────────────────────────────
+# RISK LEVELS
+# ───────────────────────────────────────────────────────────────────────────────
+risk_levels:
+  A:
+    name: Safe
+    description: Read-only analysis, no file changes
+    approval: auto
+    color: green
+    examples:
+      - /bugs
+      - /perf-check
+      - /ui-review
+      - /design-review
+      - /arch-review
+      - /arewedone
+      - /discover
+      - /research
+      - /test
+
+  B:
+    name: Mutating
+    description: Creates or modifies files, but reversible with git
+    approval: explicit
+    color: yellow
+    examples:
+      - /plan
+      - /design
+      - /tasks
+      - /complete-phase
+      - /verify
+      - /commit
+      - /docs
+      - /worktree
+      - /match-design
+      - /design-concept
+      - /planform
+      - /issue
+
+  C:
+    name: Destructive
+    description: Hard to reverse, affects git history or deletes data
+    approval: explicit_with_reason
+    color: red
+    examples:
+      - /rebase
+
+# ───────────────────────────────────────────────────────────────────────────────
+# SENIOR REVIEWER PROFILES (Frontend-Specific)
+# ───────────────────────────────────────────────────────────────────────────────
+reviewer_profiles:
+  react_architect:
+    name: "React Core Team Engineer"
+    background: "8+ years on React Core Team, reviewed thousands of PRs, seen every anti-pattern"
+    companies:
+      - Meta/Facebook
+      - Vercel
+      - Remix
+    focus:
+      - Component architecture patterns
+      - Hook composition and dependencies
+      - State management anti-patterns
+      - Re-render optimization
+      - Concurrent rendering considerations
+      - Effect cleanup and race conditions
+    standards:
+      - "If useState has >3 related pieces, use useReducer"
+      - "Custom hooks must have single responsibility"
+      - "Never mutate state directly, even in event handlers"
+      - "Memoization is last resort, not first"
+      - "Effects must clean up subscriptions"
+      - "Avoid useEffect for derived state"
+    red_flags:
+      - "useEffect without cleanup for subscriptions"
+      - "setState inside useEffect without dependencies"
+      - "Inline objects/arrays in dependency arrays"
+      - "async function directly in useEffect"
+      - "Direct mutation of state/props"
+      - "Missing key prop in lists"
+      - "Index as key in dynamic lists"
+      - "Prop drilling more than 3 levels"
+
+  design_systems_lead:
+    name: "Design Systems Architect"
+    background: "Principal Design Systems Engineer, built systems used by 500+ engineers"
+    companies:
+      - Airbnb
+      - Stripe
+      - Uber
+      - Shopify
+    focus:
+      - Component API design
+      - Design token usage
+      - Variant and composition patterns
+      - Accessibility by default
+      - Theme architecture
+      - Consistent spacing and typography
+    standards:
+      - "Components should be composable, not configurable"
+      - "Props should be declarative, not imperative"
+      - "Every interactive element needs visible focus state"
+      - "Color should never be only differentiator"
+      - "Use design tokens, not hardcoded values"
+      - "Variants over boolean props explosion"
+    red_flags:
+      - "More than 10 boolean props on a component"
+      - "Hardcoded colors instead of tokens"
+      - "Missing focus-visible styles"
+      - "Inconsistent spacing (not using scale)"
+      - "Component doing too many things"
+
+  accessibility_engineer:
+    name: "Accessibility Staff Engineer"
+    background: "Led accessibility programs for products with 1B+ users, WCAG expert"
+    companies:
+      - Microsoft
+      - Apple
+      - Google
+    focus:
+      - WCAG 2.1 AA compliance
+      - Screen reader compatibility
+      - Keyboard navigation
+      - Focus management
+      - ARIA patterns
+      - Color contrast
+      - Motion sensitivity
+    standards:
+      - "Every image needs alt text, even if empty string"
+      - "Custom controls must match native keyboard behavior"
+      - "Focus must never be trapped without escape"
+      - "Status messages need aria-live regions"
+      - "4.5:1 contrast for normal text, 3:1 for large"
+      - "No content conveyed by color alone"
+    red_flags:
+      - "onClick without keyboard equivalent"
+      - "Missing aria-label on icon buttons"
+      - "Div with onClick (should be button)"
+      - "Missing skip navigation link"
+      - "Auto-playing media without controls"
+      - "Timeout without warning"
+
+  performance_engineer:
+    name: "Web Performance Engineer"
+    background: "Chrome Team, optimized Core Web Vitals for top 1000 sites"
+    companies:
+      - Google Chrome
+      - Cloudflare
+      - Vercel
+    focus:
+      - Core Web Vitals (LCP, CLS, INP)
+      - Bundle size optimization
+      - React render optimization
+      - Memory leak detection
+      - Network waterfall analysis
+      - Image optimization
+    standards:
+      - "Initial bundle under 200KB compressed"
+      - "No layout shifts above 0.1 CLS"
+      - "Interactive within 3.8s on 4G"
+      - "No memory growth over time"
+      - "Images must be lazy loaded below fold"
+      - "Code split routes and heavy components"
+    red_flags:
+      - "Importing entire library for one function"
+      - "useEffect fetching without cleanup/abort"
+      - "Creating new objects/functions in render"
+      - "Missing React.memo on list items"
+      - "Synchronous localStorage in render"
+      - "Unbounded list without virtualization"
+
+  i18n_expert:
+    name: "Internationalization Architect"
+    background: "Built i18n systems supporting 100+ locales, RTL/LTR expert"
+    companies:
+      - Google
+      - Notion
+      - Figma
+    focus:
+      - RTL/LTR layout mirroring
+      - Text expansion handling
+      - Number/date/currency formatting
+      - Bidirectional text
+      - Translation key architecture
+      - Locale-aware sorting
+    standards:
+      - "Use logical properties (start/end), never physical (left/right)"
+      - "Text containers must handle 200% expansion"
+      - "Numbers follow locale conventions"
+      - "No hardcoded strings in components"
+      - "Date/time must use locale formatting"
+      - "Currency must show correct symbol position"
+    red_flags:
+      - "ml-4 instead of ms-4 (not RTL-safe)"
+      - "text-left instead of text-start"
+      - "Hardcoded 'January' instead of t('month.january')"
+      - "Fixed-width containers that break with long text"
+      - "Icons that should mirror in RTL but don't"
+
+# ───────────────────────────────────────────────────────────────────────────────
+# COMMAND MAPPINGS
+# ───────────────────────────────────────────────────────────────────────────────
+commands:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Level A - Safe (Auto-approve)
+  # ─────────────────────────────────────────────────────────────────────────────
+  bugs:
+    risk: A
+    reviewer: react_architect
+    auto_approve: true
+    description: "Find bugs, race conditions, and edge cases"
+
+  perf-check:
+    risk: A
+    reviewer: performance_engineer
+    auto_approve: true
+    description: "Analyze performance issues"
+
+  ui-review:
+    risk: A
+    reviewer:
+      - accessibility_engineer
+      - design_systems_lead
+    auto_approve: true
+    description: "Review UI/UX and RTL support"
+
+  design-review:
+    risk: A
+    reviewer:
+      - accessibility_engineer
+      - i18n_expert
+    auto_approve: true
+    description: "RTL/LTR accessibility check"
+
+  arch-review:
+    risk: A
+    reviewer: react_architect
+    auto_approve: true
+    description: "Architecture quality review"
+
+  arewedone:
+    risk: A
+    reviewer: react_architect
+    auto_approve: true
+    description: "Structural completeness check"
+
+  discover:
+    risk: A
+    reviewer: null
+    auto_approve: true
+    description: "Analyze existing codebase"
+
+  research:
+    risk: A
+    reviewer: null
+    auto_approve: true
+    description: "Research enterprise patterns"
+
+  test:
+    risk: A
+    reviewer: null
+    auto_approve: true
+    description: "Run tests"
+
+  audit:
+    risk: A
+    reviewer: null
+    auto_approve: true
+    description: "View command audit trail"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Level B - Mutating (Requires approval)
+  # ─────────────────────────────────────────────────────────────────────────────
+  plan:
+    risk: B
+    reviewer: null
+    requires_approval: true
+    creates_file: ".claude/specs/{topic}/requirements.md"
+    description: "Create EARS requirements"
+
+  design:
+    risk: B
+    reviewer: react_architect
+    requires_approval: true
+    creates_file: ".claude/specs/{topic}/design.md"
+    description: "Create technical design"
+
+  tasks:
+    risk: B
+    reviewer: null
+    requires_approval: true
+    creates_file: ".claude/specs/{topic}/tasks.md"
+    description: "Create implementation tasks"
+
+  complete-phase:
+    risk: B
+    reviewer: react_architect
+    requires_approval: per_task
+    audit_required: true
+    description: "Execute one task at a time"
+
+  verify:
+    risk: B
+    reviewer:
+      - react_architect
+      - accessibility_engineer
+      - performance_engineer
+    requires_approval: true
+    description: "Final verification"
+
+  commit:
+    risk: B
+    reviewer: null
+    requires_approval: false
+    audit_required: true
+    description: "Smart git commit"
+
+  docs:
+    risk: B
+    reviewer: null
+    requires_approval: true
+    description: "3-phase documentation workflow"
+
+  worktree:
+    risk: B
+    reviewer: null
+    requires_approval: false
+    description: "Create numbered git worktree"
+
+  match-design:
+    risk: B
+    reviewer: design_systems_lead
+    requires_approval: true
+    description: "Match module to gold standard design"
+
+  design-concept:
+    risk: B
+    reviewer: design_systems_lead
+    requires_approval: true
+    description: "UI/UX specifications"
+
+  planform:
+    risk: B
+    reviewer: design_systems_lead
+    requires_approval: false
+    description: "Gold standard design specs"
+
+  issue:
+    risk: B
+    reviewer: null
+    requires_approval: true
+    description: "Create GitHub issue"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Level C - Destructive (Requires confirmation + reason)
+  # ─────────────────────────────────────────────────────────────────────────────
+  rebase:
+    risk: C
+    reviewer: null
+    requires_confirmation: true
+    audit_required: true
+    warning: "This rewrites git history and may affect shared branches"
+    description: "Rebase with smart stash handling"
+
+# ───────────────────────────────────────────────────────────────────────────────
+# DEFAULT BEHAVIORS
+# ───────────────────────────────────────────────────────────────────────────────
+defaults:
+  unknown_command_risk: B  # If command has no risk level, assume B
+  audit_retention_days: 30
+  audit_location: ".claude/audit/"
