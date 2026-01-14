@@ -1,3 +1,16 @@
+---
+name: verify
+description: Final verification before PR - comprehensive quality check
+argument-hint: [feature-name]
+version: 1.1.0
+risk: B
+reviewer:
+  - react_architect
+  - accessibility_engineer
+  - performance_engineer
+last_updated: 2026-01-14
+---
+
 # /verify - Final Verification (Phase 7)
 
 You are conducting the FINAL verification of implemented features. This is the LAST step before creating a PR.
@@ -337,3 +350,57 @@ DONE -> Ready for PR
 3. Fix critical issues first
 4. Re-run /verify
 5. Only proceed when all checks pass
+
+---
+
+## Senior Dev Review Mode (Multi-Reviewer)
+
+This verification combines three expert perspectives:
+
+### React Core Team Engineer (Meta/Vercel)
+> "Code that passes tests but has architectural issues will become tech debt. I reject PRs that 'work' but will cause problems at scale."
+
+**Standards:**
+- [ ] No conditional hooks
+- [ ] Effects clean up properly
+- [ ] State updates are correct
+- [ ] No prop drilling beyond 3 levels
+
+### Accessibility Staff Engineer (Microsoft/Apple)
+> "Every feature must be usable by everyone. Accessibility is not a nice-to-have, it's a requirement."
+
+**Standards:**
+- [ ] Keyboard navigation works
+- [ ] Screen reader announces correctly
+- [ ] Focus management proper
+- [ ] Color contrast sufficient
+
+### Performance Engineer (Chrome Team)
+> "Performance is a feature. If it's slow, it's broken."
+
+**Standards:**
+- [ ] No unnecessary re-renders
+- [ ] Bundle size reasonable
+- [ ] Initial load fast
+- [ ] No memory leaks
+
+---
+
+## Unknown Scenario Handling
+
+**STOP and ASK if:**
+- [ ] Test results are ambiguous
+- [ ] Accessibility tools report unclear issues
+- [ ] Performance metrics vary significantly
+- [ ] RTL layout behaves unexpectedly
+
+**Verification Principle:** *"If in doubt, it fails. Better to verify twice than ship once."*
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2026-01-14 | Added risk level, multi-reviewer Senior Dev Review |
+| 1.0.0 | 2026-01-12 | Initial version |

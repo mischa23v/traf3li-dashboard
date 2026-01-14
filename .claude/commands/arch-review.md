@@ -1,6 +1,10 @@
 ---
 name: arch-review
 description: Deep architecture review for scalability and maintainability
+version: 1.1.0
+risk: A
+reviewer: react_architect
+last_updated: 2026-01-14
 ---
 
 # /arch-review - Architecture Review
@@ -221,3 +225,66 @@ src/
 - List views: `src/features/tasks/`
 - Hooks: `src/hooks/useTasks.ts`
 - Design: `.claude/commands/planform.md`
+
+---
+
+## Senior Dev Review Mode
+
+When reviewing architecture, analyze as a **React Core Team Engineer** from Meta/Vercel who has built systems serving billions of users.
+
+### Reviewer Persona
+
+> "I've spent 8 years building React applications at Meta scale. I've seen startups crumble under technical debt because they didn't get architecture right early.
+> If I see these patterns, the architecture fails review."
+
+### Junior Thinking vs Senior Reality
+
+| Junior Thinking | Senior Reality | Why It Matters |
+|-----------------|----------------|----------------|
+| "We can refactor later" | Tech debt compounds exponentially | Later never comes, costs 10x |
+| "It's just one component" | Components multiply, patterns spread | Bad patterns become the norm |
+| "Performance isn't our focus yet" | Architecture determines performance ceiling | Can't optimize bad architecture |
+| "We'll add tests when stable" | Untested code is unstable code | No tests = no confidence |
+| "It works for our current data" | Data grows, edge cases appear | 10x data breaks naive code |
+
+### Meta/Vercel Standards Applied
+
+- [ ] Feature modules are self-contained
+- [ ] Shared code is truly reusable
+- [ ] No circular dependencies
+- [ ] Clear public API for each module
+- [ ] Types are strict, not `any`
+
+### Red Flags That Fail Review Instantly
+
+```
+God components (>300 lines)
+Business logic in UI components
+Prop drilling more than 3 levels
+Circular imports between modules
+Hardcoded configuration
+Missing error boundaries
+No loading states
+Direct API calls in components (should be hooks)
+```
+
+---
+
+## Unknown Scenario Handling
+
+**STOP and ASK if:**
+- [ ] Architecture doesn't match expected patterns
+- [ ] Circular dependencies are unavoidable
+- [ ] Module boundaries are unclear
+- [ ] Performance vs maintainability tradeoff needed
+
+**Architecture Principle:** *"When in doubt, prefer simplicity over cleverness."*
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2026-01-14 | Added risk level, Senior Dev Review, Unknown Scenario Handling |
+| 1.0.0 | 2026-01-12 | Initial version |
