@@ -1090,29 +1090,32 @@ export function CreateTaskView() {
                                 )}
 
                                 {/* Submit */}
-                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to={ROUTES.dashboard.tasks.list}>
-                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                            إلغاء
+                                <div className="flex items-center justify-between gap-4 pt-6 border-t border-slate-100">
+                                    <span className="text-sm text-slate-500">للحفظ السريع اضغط كنترول + إنتر</span>
+                                    <div className="flex items-center gap-4">
+                                        <Link to={ROUTES.dashboard.tasks.list}>
+                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                                إلغاء
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            type="submit"
+                                            className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                            disabled={createTaskMutation.isPending}
+                                        >
+                                            {createTaskMutation.isPending ? (
+                                                <span className="flex items-center gap-2">
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    جاري الحفظ...
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-2">
+                                                    <Save className="w-4 h-4" aria-hidden="true" />
+                                                    حفظ المهمة
+                                                </span>
+                                            )}
                                         </Button>
-                                    </Link>
-                                    <Button
-                                        type="submit"
-                                        className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={createTaskMutation.isPending}
-                                    >
-                                        {createTaskMutation.isPending ? (
-                                            <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                جاري الحفظ...
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" aria-hidden="true" />
-                                                حفظ المهمة
-                                            </span>
-                                        )}
-                                    </Button>
+                                    </div>
                                 </div>
                             </form>
                         </div>

@@ -28,6 +28,8 @@ interface StatItem {
 interface ProductivityHeroProps {
     badge: string;
     title?: string;
+    /** Optional subtitle text shown below the title */
+    subtitle?: string;
     type?: string;
     hideButtons?: boolean;
     children?: React.ReactNode;
@@ -37,7 +39,7 @@ interface ProductivityHeroProps {
     listMode?: boolean;
 }
 
-export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
+export function ProductivityHero({ badge, title, subtitle, type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
     const { t } = useTranslation()
 
     // Only fetch stats if not provided via props (reduces API calls)

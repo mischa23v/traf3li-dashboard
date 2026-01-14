@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ROUTES } from '@/constants/routes'
 import {
-    ArrowRight, Save, Calendar, Clock,
+    Save, Calendar, Clock,
     Bell, FileText, AlertCircle, Loader2,
     Plus, X, ChevronDown, ChevronUp, Repeat, Users,
-    Scale, User, Briefcase, Mail, MessageSquare, Smartphone, CheckSquare
+    Scale, User, Briefcase, Mail, MessageSquare, Smartphone,
+    LayoutGrid, Settings2, Tag
 } from 'lucide-react'
+import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -24,6 +26,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { FieldTooltip } from '@/components/ui/field-tooltip'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -40,8 +43,24 @@ import type {
     RecurrenceFrequency,
     NotificationChannel,
     RecurringConfig,
-    NotificationConfig
 } from '@/services/remindersService'
+
+// Field tooltips for reminders (matching task-options pattern)
+const REMINDER_FIELD_TOOLTIPS = {
+    title: 'اكتب عنواناً واضحاً ومختصراً يصف التذكير',
+    type: 'اختر نوع التذكير المناسب (موعد نهائي، جلسة، اجتماع، إلخ)',
+    priority: 'اختر مستوى أهمية التذكير',
+    reminderDate: 'حدد تاريخ التذكير',
+    reminderTime: 'حدد وقت التذكير',
+    assignedTo: 'اختر المحامي أو المسؤول الذي سيتلقى التذكير',
+    relatedCase: 'اختر القضية المرتبطة بهذا التذكير إن وجدت',
+    relatedClient: 'اختر العميل المرتبط بهذا التذكير',
+    tags: 'أضف كلمات مفتاحية لتسهيل البحث والتصنيف',
+    description: 'اكتب تفاصيل التذكير والملاحظات الإضافية',
+    notifications: 'اختر قنوات الإشعارات وأوقات التنبيه المسبق',
+    recurring: 'فعّل هذا الخيار إذا كان التذكير يتكرر بشكل دوري',
+    maxSnoozeCount: 'حدد عدد مرات التأجيل المسموح بها',
+}
 
 const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string; tooltip: string }[] = [
     { value: 'critical', label: 'عاجل جداً', color: 'bg-red-500', tooltip: 'تذكير عاجل جداً يتطلب إجراءً فورياً ولا يحتمل أي تأخير' },
@@ -107,10 +126,15 @@ export function CreateReminderView() {
     const navigate = useNavigate()
     const createReminderMutation = useCreateReminder()
 
+    // Check if user is part of a firm (solo lawyers don't have firmId)
+    const firmId = useAuthStore(selectFirmId)
+    const isFirmMember = !!firmId
+
     // Fetch real data from APIs
     const { data: clients, isLoading: clientsLoading } = useClients()
     const { data: cases, isLoading: casesLoading } = useCases()
-    const { data: teamMembers, isLoading: teamLoading } = useTeamMembers()
+    // Only fetch team members if user is part of a firm
+    const { data: teamMembers, isLoading: teamLoading } = useTeamMembers(isFirmMember)
 
     // Form state
     const [formData, setFormData] = useState({
@@ -153,9 +177,54 @@ export function CreateReminderView() {
     const [showNotifications, setShowNotifications] = useState(false)
     const [showAdvanced, setShowAdvanced] = useState(false)
 
+    // Form mode: basic (required fields only) or advanced (all fields)
+    const [formMode, setFormMode] = useState<'basic' | 'advanced'>('basic')
+
+    // Form ref for programmatic submission
+    const formRef = useRef<HTMLFormElement>(null)
+
     // Form validation state
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+    // Clear form handler
+    const handleClearForm = () => {
+        setFormData({
+            title: '',
+            description: '',
+            reminderDate: '',
+            reminderTime: '',
+            priority: 'medium' as ReminderPriority,
+            type: 'general' as ReminderTypeLegacy,
+            assignedTo: '',
+            relatedCase: '',
+            relatedClient: '',
+            maxSnoozeCount: 3,
+            tags: [],
+        })
+        setTagInput('')
+        setIsRecurring(false)
+        setRecurringConfig({
+            enabled: false,
+            frequency: 'weekly',
+            endType: 'never',
+            daysOfWeek: [],
+            interval: 1,
+            skipWeekends: false,
+            skipHolidays: false,
+        })
+        setNotificationChannels(['in_app'])
+        setAdvanceNotifications([30])
+        setEscalationEnabled(false)
+        setEscalationDelay(60)
+        setErrors({})
+        setTouched({})
+    }
+
+    // Save form handler (triggers form submit)
+    const handleSaveForm = () => {
+        formRef.current?.requestSubmit()
+    }
 
     // Validate a single field (validation disabled for testing)
     const validateField = (_field: string, _value: any): string => {
@@ -270,7 +339,7 @@ export function CreateReminderView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: ROUTES.dashboard.overview, isActive: false },
+        { title: 'نظرة عامة', href: ROUTES.dashboard.home, isActive: false },
         { title: 'المهام', href: ROUTES.dashboard.tasks.list, isActive: false },
         { title: 'التذكيرات', href: ROUTES.dashboard.tasks.reminders.list, isActive: true },
         { title: 'الأحداث', href: ROUTES.dashboard.tasks.events.list, isActive: false },
@@ -286,46 +355,84 @@ export function CreateReminderView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                {/* HERO CARD - Hidden on mobile */}
-                <div className="hidden md:block">
-                    <ProductivityHero badge="التذكيرات" title="إنشاء تذكير" type="reminders" listMode={true} />
-                </div>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* HERO CARD - Full width (matching tasks) */}
+                <ProductivityHero badge="إدارة التذكيرات" title="إنشاء تذكير" type="reminders" listMode={true} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Form Content */}
-                    <div className="lg:col-span-2 space-y-4">
-                        {/* Back Arrow Link - Styled like sidebar cards */}
-                        <Link to={ROUTES.dashboard.tasks.reminders.list} className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
-                            <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
-                                <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-600 transition-colors" />
-                            </div>
-                            <span className="text-base font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">العودة لقائمة التذكيرات</span>
-                        </Link>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-8">
 
                         {/* Form Card */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                            <form onSubmit={handleSubmit}>
-                                {/* Header */}
-                                <div className="px-8 pt-8 pb-6 border-b border-slate-100">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                            <CheckSquare className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
-                                        </div>
-                                        <div>
-                                            <h1 className="text-2xl font-bold text-slate-900">تذكير جديد</h1>
-                                            <p className="text-base text-slate-500">للحفظ السريع اضغط كنترول + إنتر</p>
-                                        </div>
-                                    </div>
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                            {/* Mode Toggle + Reminder Name Preview */}
+                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                                {/* Reminder Name Preview - shows on left in RTL */}
+                                <div className="flex-1 min-w-0 me-4">
+                                    {formData.title && (
+                                        <h2 className="text-lg font-semibold text-slate-800 truncate">
+                                            {formData.title}
+                                        </h2>
+                                    )}
+                                </div>
+                                {/* Mode Toggle - Segmented Control */}
+                                <div className="relative inline-flex p-1 bg-slate-100/80 rounded-full flex-shrink-0">
+                                    {/* Sliding Background Indicator - RTL aware */}
+                                    <div
+                                        className={cn(
+                                            "absolute top-1 bottom-1 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-300 ease-out",
+                                            formMode === 'basic'
+                                                ? "end-[calc(50%+2px)]"
+                                                : "end-1"
+                                        )}
+                                        style={{ width: 'calc(50% - 4px)' }}
+                                    />
+                                    {/* Basic Button (first) */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormMode('basic')}
+                                        className={cn(
+                                            "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200",
+                                            formMode === 'basic'
+                                                ? "text-emerald-600"
+                                                : "text-slate-500 hover:text-slate-600"
+                                        )}
+                                    >
+                                        <LayoutGrid className="w-4 h-4" />
+                                        أساسي
+                                    </button>
+                                    {/* Advanced Button (second) */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormMode('advanced')}
+                                        className={cn(
+                                            "relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200",
+                                            formMode === 'advanced'
+                                                ? "text-emerald-600"
+                                                : "text-slate-500 hover:text-slate-600"
+                                        )}
+                                    >
+                                        <Settings2 className="w-4 h-4" />
+                                        متقدم
+                                    </button>
+                                </div>
+                            </div>
 
-                                    {/* Title input with label */}
+                            <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+                                {/* Basic Info */}
+                                <div className="space-y-6">
+                                    {/* Title - Full width */}
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-600">عنوان التذكير</label>
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                            عنوان التذكير
+                                            <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.title} />
+                                        </label>
                                         <Input
-                                            placeholder="اكتب عنوان التذكير هنا..."
+                                            placeholder=""
                                             className={cn(
-                                                "text-lg font-semibold border border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-12 placeholder:text-slate-400 placeholder:font-normal bg-slate-50/50",
-                                                touched.title && errors.title && "border-red-500 focus:border-red-500"
+                                                "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                                             )}
                                             value={formData.title}
                                             onChange={(e) => handleChange('title', e.target.value)}
@@ -335,15 +442,15 @@ export function CreateReminderView() {
                                             <p className="text-sm text-red-500 mt-1">{errors.title}</p>
                                         )}
                                     </div>
-                                </div>
 
-                                {/* Basic Info */}
-                                <div className="px-8 py-6 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Type, Priority, Date - flexible grid (matching tasks layout) */}
+                                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
+                                        {/* Type */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                <AlertCircle className="w-4 h-4 text-emerald-500" />
                                                 نوع التذكير
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.type} />
                                             </label>
                                             <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -358,54 +465,13 @@ export function CreateReminderView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Priority */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التاريخ
-                                            </label>
-                                            <Input
-                                                type="date"
-                                                className={cn(
-                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
-                                                    touched.reminderDate && errors.reminderDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                                                )}
-                                                value={formData.reminderDate}
-                                                onChange={(e) => handleChange('reminderDate', e.target.value)}
-                                                onBlur={() => handleBlur('reminderDate')}
-                                            />
-                                            {touched.reminderDate && errors.reminderDate && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.reminderDate}</p>
-                                            )}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                الوقت
-                                            </label>
-                                            <Input
-                                                type="time"
-                                                className={cn(
-                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
-                                                    touched.reminderTime && errors.reminderTime && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                                                )}
-                                                value={formData.reminderTime}
-                                                onChange={(e) => handleChange('reminderTime', e.target.value)}
-                                                onBlur={() => handleBlur('reminderTime')}
-                                            />
-                                            {touched.reminderTime && errors.reminderTime && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.reminderTime}</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                <AlertCircle className="w-4 h-4 text-emerald-500" />
                                                 الأهمية
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.priority} />
                                             </label>
                                             <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -423,157 +489,229 @@ export function CreateReminderView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تعيين إلى
-                                            </label>
-                                            <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر المسؤول (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {teamLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : teamMembers && teamMembers.length > 0 ? (
-                                                        teamMembers.map((member) => (
-                                                            <SelectItem key={member._id} value={member._id}>
-                                                                {member.firstName} {member.lastName}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            لا يوجد أعضاء فريق
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Date */}
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Scale className="w-4 h-4 text-emerald-500" />
-                                                القضية المرتبطة
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                التاريخ
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.reminderDate} />
                                             </label>
-                                            <Select value={formData.relatedCase} onValueChange={(value) => handleChange('relatedCase', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر القضية (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {casesLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : cases?.cases && cases.cases.length > 0 ? (
-                                                        cases.cases.map((caseItem) => (
-                                                            <SelectItem key={caseItem._id} value={caseItem._id}>
-                                                                {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
-                                                                {caseItem.title}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            لا توجد قضايا
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                العميل المرتبط
-                                            </label>
-                                            <Select value={formData.relatedClient} onValueChange={(value) => handleChange('relatedClient', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر العميل (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {clientsLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : clients?.data && clients.data.length > 0 ? (
-                                                        clients.data.map((client) => (
-                                                            <SelectItem key={client._id} value={client._id}>
-                                                                {client.fullName}
-                                                                {client.companyName && ` - ${client.companyName}`}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            لا يوجد عملاء
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Tags */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            الوسوم
-                                        </label>
-                                        <div className="flex flex-wrap gap-2 mb-2">
-                                            {formData.tags.map(tag => (
-                                                <Badge key={tag} variant="secondary" className="gap-1">
-                                                    {tag}
-                                                    <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" aria-hidden="true" />
-                                                    </button>
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                        <div className="flex gap-2">
                                             <Input
-                                                placeholder="أضف وسم..."
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
-                                                value={tagInput}
-                                                onChange={(e) => setTagInput(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault()
-                                                        addTag()
-                                                    }
-                                                }}
+                                                type="date"
+                                                data-field="reminderDate"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100",
+                                                    touched.reminderDate && errors.reminderDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
+                                                value={formData.reminderDate}
+                                                onChange={(e) => handleChange('reminderDate', e.target.value)}
+                                                onBlur={() => handleBlur('reminderDate')}
                                             />
-                                            <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" aria-hidden="true" />
-                                            </Button>
+                                            {touched.reminderDate && errors.reminderDate && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.reminderDate}</p>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                            ملاحظات إضافية
-                                        </label>
-                                        <Textarea
-                                            placeholder="أدخل أي ملاحظات إضافية..."
-                                            className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                            value={formData.description}
-                                            onChange={(e) => handleChange('description', e.target.value)}
-                                        />
-                                    </div>
+                                    {/* Advanced Mode Fields */}
+                                    {formMode === 'advanced' && (
+                                        <>
+                                            {/* Row 1: Client (1fr), Case (1fr), Time (0.5fr) - matching tasks pattern */}
+                                            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
+                                                {/* Client */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        العميل المرتبط
+                                                        <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.relatedClient} />
+                                                    </label>
+                                                    <Select value={formData.relatedClient} onValueChange={(value) => handleChange('relatedClient', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                            <SelectValue placeholder="اختر العميل (اختياري)" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {clientsLoading ? (
+                                                                <div className="flex items-center justify-center py-4">
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                </div>
+                                                            ) : clients?.data && clients.data.length > 0 ? (
+                                                                clients.data.map((client) => (
+                                                                    <SelectItem key={client._id} value={client._id}>
+                                                                        {client.fullName}
+                                                                        {client.companyName && ` - ${client.companyName}`}
+                                                                    </SelectItem>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-center py-4 text-slate-500 text-sm">
+                                                                    لا يوجد عملاء
+                                                                </div>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+
+                                                {/* Case */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Scale className="w-4 h-4 text-emerald-500" />
+                                                        القضية المرتبطة
+                                                        <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.relatedCase} />
+                                                    </label>
+                                                    <Select value={formData.relatedCase} onValueChange={(value) => handleChange('relatedCase', value)}>
+                                                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                            <SelectValue placeholder="اختر القضية" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {casesLoading ? (
+                                                                <div className="flex items-center justify-center py-4">
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                </div>
+                                                            ) : cases?.cases && cases.cases.length > 0 ? (
+                                                                cases.cases.map((caseItem) => (
+                                                                    <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                                        {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
+                                                                        {caseItem.title}
+                                                                    </SelectItem>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-center py-4 text-slate-500 text-sm">
+                                                                    لا توجد قضايا
+                                                                </div>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+
+                                                {/* Time - 0.5fr to match Due Date size */}
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                        الوقت
+                                                        <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.reminderTime} />
+                                                    </label>
+                                                    <Input
+                                                        type="time"
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 [&::-webkit-calendar-picker-indicator]:opacity-100"
+                                                        value={formData.reminderTime}
+                                                        onChange={(e) => handleChange('reminderTime', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Row 2: Assigned To (only for firm members) - same pattern as tasks */}
+                                            {isFirmMember && (
+                                                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_0.5fr] gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                            <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                            تعيين إلى
+                                                            <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.assignedTo} />
+                                                        </label>
+                                                        <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
+                                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                                <SelectValue placeholder="اختر المسؤول (اختياري)" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {teamLoading ? (
+                                                                    <div className="flex items-center justify-center py-4">
+                                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                                    </div>
+                                                                ) : teamMembers && teamMembers.length > 0 ? (
+                                                                    teamMembers.map((member) => (
+                                                                        <SelectItem key={member._id} value={member._id}>
+                                                                            {member.firstName} {member.lastName}
+                                                                            {member.role && ` (${member.role})`}
+                                                                        </SelectItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <div className="text-center py-4 text-slate-500 text-sm">
+                                                                        لا يوجد أعضاء فريق
+                                                                    </div>
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    {/* Empty slots to maintain grid alignment */}
+                                                    <div />
+                                                    <div />
+                                                </div>
+                                            )}
+
+                                            {/* Tags - Full width */}
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Tag className="w-4 h-4 text-emerald-500" />
+                                                    الوسوم
+                                                    <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.tags} />
+                                                </label>
+                                                <div className="flex flex-wrap gap-2 mb-2">
+                                                    {formData.tags.map(tag => (
+                                                        <Badge key={tag} variant="secondary" className="gap-1">
+                                                            {tag}
+                                                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
+                                                                <X className="w-3 h-3" aria-hidden="true" />
+                                                            </button>
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 flex-1"
+                                                        value={tagInput}
+                                                        onChange={(e) => setTagInput(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault()
+                                                                addTag()
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
+                                                        <Plus className="w-4 h-4" aria-hidden="true" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            {/* Description - Full width */}
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                                                    ملاحظات إضافية
+                                                    <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.description} />
+                                                </label>
+                                                <Textarea
+                                                    className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                    value={formData.description}
+                                                    onChange={(e) => handleChange('description', e.target.value)}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
 
-                                {/* Notification Channels Section */}
+                                {/* Notification Channels Section - Advanced only */}
+                                {formMode === 'advanced' && (
                                 <Collapsible open={showNotifications} onOpenChange={setShowNotifications}>
                                     <div className="border-t border-slate-100 pt-6">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Bell className="w-5 h-5 text-emerald-500" />
-                                                    قنوات الإشعارات
-                                                </h3>
-                                                {showNotifications ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Bell className="w-5 h-5 text-emerald-500" />
+                                                        قنوات الإشعارات
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.notifications} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showNotifications ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                                 <p className="text-sm text-slate-500 mb-3">اختر قنوات الإشعارات:</p>
@@ -638,19 +776,30 @@ export function CreateReminderView() {
                                         </CollapsibleContent>
                                     </div>
                                 </Collapsible>
+                                )}
 
-                                {/* Recurring Section */}
+                                {/* Recurring Section - Advanced only */}
+                                {formMode === 'advanced' && (
                                 <Collapsible open={showRecurring} onOpenChange={setShowRecurring}>
                                     <div className="border-t border-slate-100 pt-6">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Repeat className="w-5 h-5 text-emerald-500" />
-                                                    تذكير متكرر
-                                                </h3>
-                                                {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Repeat className="w-5 h-5 text-emerald-500" />
+                                                        تذكير متكرر
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.recurring} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                                 <div className="flex items-center gap-3">
@@ -802,19 +951,30 @@ export function CreateReminderView() {
                                         </CollapsibleContent>
                                     </div>
                                 </Collapsible>
+                                )}
 
-                                {/* Advanced Settings */}
+                                {/* Advanced Settings - Advanced only */}
+                                {formMode === 'advanced' && (
                                 <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
                                     <div className="border-t border-slate-100 pt-6">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Briefcase className="w-5 h-5 text-emerald-500" />
-                                                    إعدادات متقدمة
-                                                </h3>
-                                                {showAdvanced ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Briefcase className="w-5 h-5 text-emerald-500" />
+                                                        إعدادات متقدمة
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={REMINDER_FIELD_TOOLTIPS.maxSnoozeCount} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showAdvanced ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                                 <div className="space-y-2">
@@ -833,42 +993,48 @@ export function CreateReminderView() {
                                         </CollapsibleContent>
                                     </div>
                                 </Collapsible>
+                                )}
 
-                                {/* Footer / Actions */}
-                                <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
-                                    <div className="flex items-center gap-3 ms-auto">
+                                {/* Submit */}
+                                <div className="flex items-center justify-between gap-4 pt-6 border-t border-slate-100">
+                                    <span className="text-sm text-slate-500">للحفظ السريع اضغط كنترول + إنتر</span>
+                                    <div className="flex items-center gap-4">
                                         <Link to={ROUTES.dashboard.tasks.reminders.list}>
-                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
+                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
                                                 إلغاء
                                             </Button>
                                         </Link>
-                                        <Button
-                                            type="submit"
-                                            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 h-11 px-8 font-medium"
-                                            disabled={createReminderMutation.isPending}
-                                        >
-                                            {createReminderMutation.isPending ? (
-                                                <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    جاري الحفظ...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Save className="w-4 h-4" aria-hidden="true" />
-                                                    حفظ التذكير
-                                                </span>
-                                            )}
-                                        </Button>
+                                    <Button
+                                        type="submit"
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                        disabled={createReminderMutation.isPending}
+                                    >
+                                        {createReminderMutation.isPending ? (
+                                            <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                جاري الحفظ...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Save className="w-4 h-4" aria-hidden="true" />
+                                                حفظ التذكير
+                                            </span>
+                                        )}
+                                    </Button>
                                     </div>
                                 </div>
                             </form>
                         </div>
                     </div>
 
-                    {/* Sidebar Widgets - Hidden on mobile */}
-                    <div className="hidden lg:block">
-                        <TasksSidebar context="reminders" />
-                    </div>
+                    {/* Sidebar Widgets */}
+                    <TasksSidebar
+                        context="reminders"
+                        mode="create"
+                        onClearForm={handleClearForm}
+                        onSaveForm={handleSaveForm}
+                        isSaving={createReminderMutation.isPending}
+                    />
                 </div>
             </Main>
         </>
