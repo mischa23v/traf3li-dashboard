@@ -181,6 +181,42 @@ grep -rn "\\.map(" src/ --include="*.tsx" | grep -v "key="
 - Missing `key` prop or using array index as key
 - Expensive calculations not memoized
 
+### 9. React Best Practices (Vercel's 40+ Rules)
+
+**Search for CRITICAL issues:**
+```bash
+# Waterfall requests - sequential awaits that could be parallelized
+grep -rn "await.*\n.*await" src/ --include="*.ts" --include="*.tsx"
+
+# Barrel file imports (loads entire module)
+grep -rn "from '@/components'" src/ --include="*.tsx"
+grep -rn "from '@/hooks'" src/ --include="*.tsx"
+grep -rn "from 'lucide-react'" src/ --include="*.tsx"
+```
+
+**Search for MEDIUM issues:**
+```bash
+# Non-functional setState (stale closure risk)
+grep -rn "set[A-Z].*\[\.\.\..*\]" src/ --include="*.tsx"
+
+# useState without lazy initialization for expensive ops
+grep -rn "useState([^(]" src/ --include="*.tsx"
+
+# Array mutation with .sort() instead of .toSorted()
+grep -rn "\.sort(" src/ --include="*.tsx"
+
+# .find() in loops (should use Map for O(1) lookup)
+grep -rn "\.forEach\|\.map\|\.filter" src/ --include="*.tsx" | xargs grep "\.find("
+```
+
+**Common issues:**
+- Sequential `await` instead of `Promise.all()` for independent fetches
+- Barrel imports loading entire module (e.g., 1500+ icons from lucide-react)
+- `setItems([...items, new])` instead of `setItems(curr => [...curr, new])`
+- `useState(expensiveFunction())` instead of `useState(() => expensiveFunction())`
+- `.sort()` mutates array (use `.toSorted()` for immutability)
+- `.find()` in loops is O(n) each time (use Map for O(1))
+
 ---
 
 ## Investigation Process

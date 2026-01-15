@@ -2,13 +2,14 @@
 name: verify
 description: Final verification before PR - comprehensive quality check
 argument-hint: [feature-name]
-version: 1.1.0
+version: 1.2.0
 risk: B
 reviewer:
   - react_architect
   - accessibility_engineer
   - performance_engineer
-last_updated: 2026-01-14
+  - vercel_react_principal
+last_updated: 2026-01-15
 ---
 
 # /verify - Final Verification (Phase 7)
@@ -185,6 +186,51 @@ Grep: "queryClient.invalidateQueries" with manual keys
 - [ ] No unnecessary imports
 - [ ] Lazy loading where appropriate
 - [ ] Tree shaking working
+
+### 8.5. React Best Practices (Vercel's 40+ Rules)
+
+#### CRITICAL: Waterfalls & Bundle Size
+```bash
+# Check for sequential awaits (should use Promise.all)
+Grep: "await.*await" in async functions
+
+# Check for barrel file imports
+Grep: "from '@/components'" or "from '@/hooks'"
+
+# Check for lucide-react barrel import
+Grep: "from 'lucide-react'"
+```
+- [ ] No sequential `await` that could be parallelized
+- [ ] No barrel file imports (use direct paths)
+- [ ] Heavy components use dynamic imports
+
+#### HIGH: Caching & Deduplication
+- [ ] React Query/SWR for all data fetching
+- [ ] Proper `staleTime` and `gcTime` configured
+- [ ] Cache invalidation uses `Promise.all()` for parallel invalidation
+
+#### MEDIUM: Re-render Optimization
+```bash
+# Check for inline objects in props
+Grep: "={{" in JSX files
+
+# Check for non-functional setState
+Grep: "set[A-Z].*[...items" patterns
+```
+- [ ] No inline objects/arrays in JSX props
+- [ ] `useState` uses functional updates: `setItems(curr => [...curr, new])`
+- [ ] `useState` with expensive init uses lazy form: `useState(() => expensive())`
+
+#### LOW: JavaScript Performance
+- [ ] Uses `toSorted()` instead of `sort()` (no array mutation)
+- [ ] Uses `Map` for repeated lookups instead of `.find()` in loops
+- [ ] Expensive computations are memoized
+
+**Quick Check Command:**
+```bash
+# Run full React best practices review
+/react-review {modified-files}
+```
 
 ### 9. Security Check
 
@@ -384,6 +430,19 @@ This verification combines three expert perspectives:
 - [ ] Initial load fast
 - [ ] No memory leaks
 
+### Vercel Principal Engineer (React Best Practices)
+> "I've optimized the Vercel Dashboard from Lighthouse 51 to 94. I know every React anti-pattern that kills performance."
+
+**Standards (40+ Vercel Rules):**
+- [ ] No waterfall requests (use `Promise.all`)
+- [ ] No barrel file imports
+- [ ] Dynamic imports for heavy components
+- [ ] Functional setState updates
+- [ ] Lazy useState initialization for expensive ops
+- [ ] No inline objects in JSX props
+- [ ] Uses `toSorted()` not `sort()` (immutable)
+- [ ] Maps for repeated lookups
+
 ---
 
 ## Unknown Scenario Handling
@@ -402,5 +461,6 @@ This verification combines three expert perspectives:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-15 | Added Vercel's 40+ React best practices, new reviewer: vercel_react_principal |
 | 1.1.0 | 2026-01-14 | Added risk level, multi-reviewer Senior Dev Review |
 | 1.0.0 | 2026-01-12 | Initial version |
