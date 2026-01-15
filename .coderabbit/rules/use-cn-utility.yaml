@@ -1,0 +1,19 @@
+# AST-Grep rule: Enforce cn() utility for conditional classes
+id: use-cn-utility
+language: typescript
+rule:
+  pattern: className={`${$COND ? $A : $B}`}
+message: |
+  ⚠️ Use cn() utility for conditional classNames instead of template literals.
+
+  Import and use cn() from @/lib/utils:
+
+  import { cn } from '@/lib/utils'
+
+  className={cn("base-classes", condition && "conditional-class")}
+
+  This provides:
+  - Proper class merging with tailwind-merge
+  - Cleaner conditional logic
+  - Better TypeScript support
+severity: hint

@@ -1,0 +1,24 @@
+# AST-Grep rule: Verify API error handling
+id: api-error-handling
+language: typescript
+rule:
+  pattern: apiClient.$METHOD($$$)
+  constraints:
+    METHOD:
+      regex: "(get|post|put|patch|delete)"
+message: |
+  ℹ️ API call detected. Ensure proper error handling.
+
+  Required pattern:
+  1. Wrap in try/catch
+  2. Use handleApiError for error processing
+  3. Return meaningful error messages
+
+  Example:
+  try {
+    const response = await apiClient.get('/endpoint')
+    return response.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+severity: hint

@@ -1,0 +1,22 @@
+# AST-Grep rule: Verify mutation has invalidation
+id: mutation-invalidation
+language: typescript
+rule:
+  pattern: useMutation({ mutationFn: $FN })
+message: |
+  ⚠️ useMutation detected without visible invalidation setup.
+
+  Mutations should use cache invalidation helpers:
+
+  import { invalidateCache } from '@/lib/cache-invalidation'
+
+  useMutation({
+    mutationFn: createTask,
+    onSuccess: () => {
+      invalidateCache.tasks.all()
+      // or specific: invalidateCache.tasks.detail(id)
+    }
+  })
+
+  This ensures proper cache synchronization after mutations.
+severity: hint

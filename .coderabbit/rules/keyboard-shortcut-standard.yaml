@@ -1,0 +1,23 @@
+# AST-Grep rule: Detect non-standard keyboard shortcuts
+id: keyboard-shortcut-standard
+language: typescript
+rule:
+  any:
+    - pattern: key === "Escape"
+    - pattern: key === "Enter"
+    - pattern: e.key === "Escape"
+    - pattern: e.key === "Enter"
+    - pattern: event.key === "Escape"
+    - pattern: event.key === "Enter"
+message: |
+  ℹ️ Keyboard shortcut detected. Verify standardization across modules.
+
+  Standard keyboard shortcuts (from planform.md):
+  - Escape: Close modal/sidebar/dropdown
+  - Enter: Submit form (when in text input)
+  - Ctrl/Cmd + Enter: Submit form (when in textarea)
+  - Ctrl/Cmd + S: Save draft
+  - Arrow keys: Navigate lists
+
+  Ensure consistent behavior with the Tasks module gold standard.
+severity: hint

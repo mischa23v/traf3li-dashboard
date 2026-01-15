@@ -1,0 +1,20 @@
+# AST-Grep rule: Enforce QueryKeys factory usage
+id: use-query-keys-factory
+language: typescript
+rule:
+  pattern: useQuery({ queryKey: [$$$] })
+  constraints:
+    "$$$":
+      regex: "^['\"`]"
+message: |
+  ❌ Hardcoded query key detected. Use QueryKeys factory from @/lib/query-keys instead.
+
+  Example:
+  import { QueryKeys } from '@/lib/query-keys'
+  useQuery({ queryKey: QueryKeys.tasks.detail(id) })
+
+  This ensures:
+  - Type-safe query keys
+  - Consistent invalidation patterns
+  - Better maintainability
+severity: warning

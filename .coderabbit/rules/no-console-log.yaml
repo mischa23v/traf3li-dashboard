@@ -1,0 +1,16 @@
+# AST-Grep rule: Detect console.log statements (development artifacts)
+id: no-console-log
+language: typescript
+rule:
+  any:
+    - pattern: console.log($$$)
+    - pattern: console.warn($$$)
+    - pattern: console.info($$$)
+message: |
+  ❌ Development console statement detected. Remove before PR.
+
+  console.log, console.warn, and console.info should be removed.
+  For error logging, use console.error with proper error handling.
+
+  The /arewedone command checks for these as "development artifacts".
+severity: warning

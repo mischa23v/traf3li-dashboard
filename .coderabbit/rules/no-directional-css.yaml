@@ -1,0 +1,23 @@
+# AST-Grep rule: Detect directional CSS classes (breaks RTL)
+id: no-directional-css
+language: typescript
+rule:
+  any:
+    - pattern: className="$CLASSES"
+    - pattern: className={`$CLASSES`}
+  constraints:
+    CLASSES:
+      regex: "(ml-|mr-|pl-|pr-|left-|right-|text-left|text-right)"
+message: |
+  ❌ Directional CSS classes break RTL layout. Use logical properties instead:
+
+  Replace:
+  - ml-* → ms-* (margin-inline-start)
+  - mr-* → me-* (margin-inline-end)
+  - pl-* → ps-* (padding-inline-start)
+  - pr-* → pe-* (padding-inline-end)
+  - left-* → start-*
+  - right-* → end-*
+  - text-left → text-start
+  - text-right → text-end
+severity: warning

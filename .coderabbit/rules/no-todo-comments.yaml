@@ -1,0 +1,19 @@
+# AST-Grep rule: Detect TODO comments (development artifacts)
+id: no-todo-comments
+language: typescript
+rule:
+  any:
+    - pattern: // TODO$$$
+    - pattern: // FIXME$$$
+    - pattern: // HACK$$$
+    - pattern: // XXX$$$
+message: |
+  ⚠️ Development TODO/FIXME comment detected.
+
+  Before PR, either:
+  1. Complete the TODO item
+  2. Create a GitHub issue with /issue command
+  3. Remove if no longer relevant
+
+  The /arewedone command flags these as incomplete work.
+severity: hint

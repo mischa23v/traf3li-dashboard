@@ -1,0 +1,22 @@
+# AST-Grep rule: Enforce rounded-2xl for buttons (Gold Standard from planform.md)
+id: button-rounded-standard
+language: typescript
+rule:
+  any:
+    - pattern: <Button className="$CLASSES" />
+    - pattern: <button className="$CLASSES" />
+  constraints:
+    CLASSES:
+      not:
+        regex: "rounded-2xl"
+message: |
+  ⚠️ Buttons should use rounded-2xl for consistent border radius.
+
+  Gold Standard button styling:
+  - rounded-2xl (16px radius)
+  - h-14 for primary actions
+  - h-10 for secondary/compact actions
+
+  Example:
+  <Button className="h-14 rounded-2xl ..." />
+severity: hint

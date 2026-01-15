@@ -1,0 +1,21 @@
+# AST-Grep rule: Enforce h-14 for all form inputs (Gold Standard from planform.md)
+id: input-height-standard
+language: typescript
+rule:
+  any:
+    - pattern: <Input className="$CLASSES" />
+    - pattern: <input className="$CLASSES" />
+  constraints:
+    CLASSES:
+      not:
+        regex: "h-14"
+message: |
+  ⚠️ Input elements should use h-14 height (Gold Standard from Tasks module).
+
+  Standard input heights:
+  - h-14 (56px) - Default for all form inputs
+  - This ensures consistent touch targets and visual harmony
+
+  Example:
+  <Input className="h-14 rounded-2xl ..." />
+severity: hint

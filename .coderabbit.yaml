@@ -1,0 +1,301 @@
+# CodeRabbit Configuration for TRAF3LI Dashboard
+# Enterprise-level React/TypeScript legal practice management dashboard
+# https://docs.coderabbit.ai/configuration/
+
+version: 2
+
+# Language configuration
+language: en-US
+
+# Early access features
+early_access: true
+
+# Reviews configuration
+reviews:
+  # Enable high confidence suggestions
+  high_level_summary: true
+
+  # Poem generation (disabled - professional codebase)
+  poem: false
+
+  # Request changes workflow
+  request_changes_workflow: true
+
+  # Collapse walkthrough - keep detailed for enterprise review
+  collapse_walkthrough: false
+
+  # Review profile - assertive for enterprise-level code quality
+  profile: assertive
+
+  # Path-based instructions
+  path_instructions:
+    # Core source code
+    - path: "src/**/*.{ts,tsx}"
+      instructions: |
+        ## Enterprise Code Quality Standards
+
+        **MANDATORY CHECKS:**
+        1. **Centralized Constants** - Verify usage of:
+           - Routes: `@/constants/routes` (never hardcode route strings)
+           - Query Keys: `@/lib/query-keys` (use QueryKeys factory)
+           - Cache Times: `@/config/cache` (use CACHE_TIMES constants)
+           - Cache Invalidation: `@/lib/cache-invalidation`
+
+        2. **TypeScript Strictness:**
+           - No `any` types without explicit justification
+           - Proper interface/type definitions for all props
+           - Correct generic usage with TanStack Query
+
+        3. **React Query Patterns:**
+           - Use QueryKeys factory for all query keys
+           - Use CACHE_CONFIG for staleTime/gcTime
+           - Proper error handling with handleApiError
+           - Use cache invalidation helpers
+
+        4. **Component Patterns:**
+           - Use Radix UI primitives for accessibility
+           - Tailwind CSS for styling (no inline styles)
+           - Proper loading/error states
+           - Skeleton loaders for async content
+
+    # RTL/i18n specific
+    - path: "src/**/*.{ts,tsx}"
+      instructions: |
+        ## RTL/LTR Bilingual Support (Arabic/English)
+
+        **CRITICAL CHECKS:**
+        1. Never use `left`/`right` in Tailwind - use `start`/`end` (e.g., `ps-4`, `me-2`)
+        2. Never use `text-left`/`text-right` - use `text-start`/`text-end`
+        3. Never use `ml-`/`mr-` - use `ms-`/`me-` for margins
+        4. Never use `pl-`/`pr-` - use `ps-`/`pe-` for padding
+        5. All user-facing strings must use i18next `t()` function
+        6. Icons that indicate direction must flip in RTL (use `rtl:rotate-180` or `rtl:scale-x-[-1]`)
+        7. Check for proper `dir="rtl"` handling in layouts
+
+    # Service layer
+    - path: "src/services/**/*.ts"
+      instructions: |
+        ## API Service Layer Standards
+
+        **REQUIRED PATTERNS:**
+        1. Use `apiClient` from `@/lib/api` for all requests
+        2. Use `handleApiError` for error handling
+        3. Define explicit TypeScript interfaces for:
+           - Request payloads
+           - Backend response types (suffix with `FromBackend` if mapping needed)
+           - Frontend interfaces (what components consume)
+        4. Map backend field names to frontend conventions (e.g., `image` → `avatar`)
+        5. Include request deduplication for frequently called endpoints
+        6. Document API endpoints with comments (e.g., `// GET /api/tasks/:id`)
+
+    # Hooks
+    - path: "src/hooks/**/*.ts"
+      instructions: |
+        ## React Hooks Standards
+
+        **REQUIRED:**
+        1. Use QueryKeys factory for all useQuery/useMutation keys
+        2. Use CACHE_CONFIG for query options
+        3. Proper TypeScript generics for TanStack Query
+        4. Use cache invalidation helpers in mutations
+        5. Handle loading, error, and success states
+        6. Document hook purpose and parameters
+
+    # Components
+    - path: "src/components/**/*.tsx"
+      instructions: |
+        ## Shared Component Standards
+
+        **REQUIRED:**
+        1. Use Radix UI primitives for accessibility
+        2. Use `cn()` utility for conditional classes
+        3. Use CVA (class-variance-authority) for component variants
+        4. Props must be typed with interfaces
+        5. Use forwardRef for components that need ref forwarding
+        6. Support RTL/LTR layouts with logical properties
+
+    # Feature modules
+    - path: "src/features/**/*.tsx"
+      instructions: |
+        ## Feature Module Standards
+
+        **ARCHITECTURE:**
+        - `/components` - Feature-specific UI components
+        - `/hooks` - Feature-specific React hooks
+        - `/utils` - Feature-specific utilities
+
+        **REQUIRED:**
+        1. Use centralized route constants for navigation
+        2. Use QueryKeys for cache management
+        3. Follow container/presentation pattern where appropriate
+        4. Handle error boundaries at feature level
+        5. Lazy load heavy components
+
+    # Test files
+    - path: "**/*.{test,spec}.{ts,tsx}"
+      instructions: |
+        ## Testing Standards
+
+        **REQUIRED:**
+        1. Use Vitest for unit tests
+        2. Use React Testing Library patterns
+        3. Test RTL/LTR layouts where applicable
+        4. Mock API calls properly
+        5. Test error states and loading states
+        6. Test Arabic and English content
+
+  # Review scope
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+      - develop
+
+    # Ignore patterns
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+      - "[skip ci]"
+      - "[skip review]"
+
+# Chat configuration
+chat:
+  auto_reply: true
+
+# Knowledge base
+knowledge_base:
+  # Learnings from this repository
+  learnings:
+    scope: auto
+
+  # Issue tracking
+  issues:
+    scope: auto
+
+  # PR discussions
+  pull_requests:
+    scope: auto
+
+# Custom tools
+tools:
+  # GitHub Actions - for workflow files
+  github_actions:
+    enabled: true
+
+  # Markdownlint for documentation
+  markdownlint:
+    enabled: true
+
+  # Biome for linting (if available)
+  biome:
+    enabled: true
+
+  # ESLint integration
+  eslint:
+    enabled: true
+    config_file: "eslint.config.js"
+
+  # TypeScript compiler checks
+  ast_grep:
+    enabled: true
+    rule_dirs:
+      - ".coderabbit/rules"
+
+    packages:
+      - "@anthropic-ai/claude-code"
+
+# Custom review instructions
+review_instructions: |
+  ## TRAF3LI Dashboard Code Review Guidelines
+
+  This is an enterprise-level legal practice management dashboard built with:
+  - React 19 + TypeScript 5.9
+  - TanStack Router & React Query
+  - Tailwind CSS 4 with RTL support
+  - Radix UI components
+  - TipTap rich text editor
+  - i18next for bilingual Arabic/English
+
+  ### Development Workflow
+
+  This project uses a mandatory phase-based workflow (see .claude/commands/):
+  `/plan → /design → /tasks → /complete-phase → /arewedone → /arch-review → /verify`
+
+  PRs should represent completed, verified work through this pipeline.
+
+  ### Gold Standard Reference
+
+  The Tasks module (src/features/tasks/) is the gold standard. All other modules should match:
+  - Input heights: h-14 (56px)
+  - Button radius: rounded-2xl
+  - Card radius: rounded-2xl
+  - Consistent keyboard shortcuts
+  - Mobile-first responsive design
+
+  ### Priority Review Areas
+
+  1. **Centralized Constants** (CRITICAL)
+     - ALL routes must use `ROUTES` from `@/constants/routes`
+     - ALL query keys must use `QueryKeys` from `@/lib/query-keys`
+     - ALL cache times must use `CACHE_TIMES` from `@/config/cache`
+     - ALL invalidation must use `invalidateCache` from `@/lib/cache-invalidation`
+     - Flag ANY hardcoded routes, query keys, or magic numbers
+
+  2. **RTL/LTR Support** (CRITICAL)
+     - Never use directional CSS (left/right)
+     - Always use logical properties (start/end, inline-start/inline-end)
+     - Check icon direction flipping for RTL (use rtl:rotate-180 or rtl:scale-x-[-1])
+     - Verify i18n key usage for all user text
+     - Test BOTH Arabic and English layouts
+
+  3. **API Contracts**
+     - Verify service functions match backend contracts
+     - Check for proper field mapping (backend → frontend)
+     - Ensure proper TypeScript types for responses
+     - Use handleApiError for error handling
+
+  4. **React Query Patterns**
+     - Proper use of QueryKeys factory
+     - Correct cache configuration from CACHE_CONFIG
+     - Proper mutation invalidation with invalidateCache helpers
+     - Error handling with handleApiError
+
+  5. **Component Quality**
+     - Radix UI for accessibility
+     - Proper loading/error states
+     - Skeleton loaders for async content
+     - Mobile responsive design
+     - Use cn() utility for conditional classes
+
+  6. **Development Artifacts** (from /arewedone checks)
+     - No console.log statements
+     - No TODO/FIXME comments without GitHub issues
+     - No commented-out code
+     - No unused imports or variables
+     - No hardcoded test data
+
+  ### What to Flag
+
+  - ❌ Hardcoded route strings (use ROUTES constant)
+  - ❌ Hardcoded query keys (use QueryKeys factory)
+  - ❌ Magic numbers for cache times (use CACHE_TIMES)
+  - ❌ `ml-`, `mr-`, `pl-`, `pr-` classes (use ms-/me-/ps-/pe-)
+  - ❌ `text-left`, `text-right` classes (use text-start/text-end)
+  - ❌ `left-`, `right-` positioning (use start-/end-)
+  - ❌ Hardcoded Arabic/English strings (use t() function)
+  - ❌ Missing TypeScript types (no untyped props or any)
+  - ❌ Missing error handling in API calls
+  - ❌ Missing loading states in async components
+  - ❌ console.log statements (remove before PR)
+  - ❌ TODO comments without linked issues
+  - ❌ Non-standard input heights (should be h-14)
+  - ❌ Non-standard button radius (should be rounded-2xl)
+
+# Jira integration (disabled - not using Jira)
+jira:
+  enabled: false
+
+# Linear integration (disabled - not using Linear)
+linear:
+  enabled: false

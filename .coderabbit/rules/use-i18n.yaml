@@ -1,0 +1,28 @@
+# AST-Grep rule: Detect hardcoded Arabic/English strings
+id: use-i18n
+language: typescript
+rule:
+  any:
+    - pattern: <$TAG>$TEXT</$TAG>
+    - pattern: title="$TEXT"
+    - pattern: placeholder="$TEXT"
+    - pattern: label="$TEXT"
+  constraints:
+    TEXT:
+      regex: "[\u0600-\u06FF]|^[A-Z][a-z]+ [a-z]+"
+message: |
+  ⚠️ Possible hardcoded user-facing string detected.
+
+  Use i18next t() function for all user-facing text:
+
+  import { useTranslation } from 'react-i18next'
+  const { t } = useTranslation()
+
+  <span>{t('common.save')}</span>
+  <input placeholder={t('search.placeholder')} />
+
+  This ensures:
+  - Proper Arabic/English translation
+  - RTL text rendering
+  - Maintainable translations
+severity: hint

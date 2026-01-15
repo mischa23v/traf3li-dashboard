@@ -1,0 +1,17 @@
+# AST-Grep rule: Detect hardcoded route strings
+id: no-hardcoded-routes
+language: typescript
+rule:
+  pattern: navigate($PATH)
+  constraints:
+    PATH:
+      regex: "^['\"`]/dashboard"
+message: |
+  ❌ Hardcoded route detected. Use ROUTES constant from @/constants/routes instead.
+
+  Example: navigate(ROUTES.dashboard.clients.list) instead of navigate('/dashboard/clients')
+severity: warning
+fix: |
+  Import and use ROUTES constant:
+  import { ROUTES } from '@/constants/routes'
+  navigate(ROUTES.dashboard...)

@@ -1,0 +1,30 @@
+# AST-Grep rule: Enforce CACHE_TIMES constant usage
+id: use-cache-times
+language: typescript
+rule:
+  any:
+    - pattern: staleTime: $NUM
+    - pattern: gcTime: $NUM
+    - pattern: cacheTime: $NUM
+  constraints:
+    NUM:
+      regex: "^[0-9]"
+message: |
+  ❌ Hardcoded cache time detected. Use CACHE_TIMES from @/config/cache instead.
+
+  Example:
+  import { CACHE_TIMES, CACHE_CONFIG } from '@/config/cache'
+
+  useQuery({
+    ...CACHE_CONFIG.queries.lists,
+    // or
+    staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: CACHE_TIMES.GC_MEDIUM,
+  })
+
+  Available constants:
+  - CACHE_TIMES.SHORT (2 min)
+  - CACHE_TIMES.MEDIUM (5 min)
+  - CACHE_TIMES.LONG (30 min)
+  - CACHE_TIMES.HOUR (1 hour)
+severity: warning
