@@ -1,11 +1,13 @@
 ---
 name: bugs
-description: Find bugs, race conditions, and edge cases in code
+description: Find bugs, race conditions, and edge cases in code (includes Vercel's 40+ React rules)
 argument-hint: [path/to/file]... (optional)
-version: 1.1.0
+version: 1.2.0
 risk: A
-reviewer: react_architect
-last_updated: 2026-01-14
+reviewer:
+  - react_architect
+  - vercel_react_principal
+last_updated: 2026-01-15
 ---
 
 # /bugs - Bug Finder Command
@@ -57,6 +59,13 @@ Focus on:
 6. Routing bugs (hardcoded routes instead of ROUTES constant)
 7. Error handling gaps (empty catch, missing error states)
 8. Performance bugs (inline objects, missing keys)
+9. React Best Practices (Vercel's 40+ rules):
+   - Waterfall requests (sequential awaits instead of Promise.all)
+   - Barrel file imports (from '@/components' instead of direct paths)
+   - Non-functional setState (setItems([...items, new]) vs setItems(curr => [...curr, new]))
+   - Missing lazy useState initialization for expensive operations
+   - Array mutation with .sort() instead of .toSorted()
+   - .find() in loops instead of Map for repeated lookups
 
 Return a prioritized list of bugs with file locations, code snippets, and recommended fixes.
 ```
@@ -191,5 +200,6 @@ Empty catch blocks that swallow errors
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-15 | Added Vercel's 40+ React best practices rules |
 | 1.1.0 | 2026-01-14 | Added risk level, Senior Dev Review, Unknown Scenario Handling |
 | 1.0.0 | 2026-01-12 | Initial version |
