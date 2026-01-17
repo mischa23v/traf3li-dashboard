@@ -1,21 +1,14 @@
-import api from './api'
-
 /**
- * ⚠️ WARNING: Backend Endpoint Mismatch
+ * Expense Claims Service (HR Module)
+ * Handles employee expense reimbursement claims
  *
- * This service uses /hr/expense-claims/* endpoints which DO NOT exist in the backend.
- * The actual backend has only /api/expenses/* endpoints (see expenseService.ts).
+ * API Endpoints: /hr/expense-claims/*
  *
- * These endpoints will fail with 404 errors until backend implements them:
- * - POST /hr/expense-claims
- * - GET /hr/expense-claims
- * - GET /hr/expense-claims/:id
- * - PATCH /hr/expense-claims/:id
- * - DELETE /hr/expense-claims/:id
- * - And all other expense claim endpoints
- *
- * For working expense functionality, use expenseService.ts instead.
+ * Note: This service is for HR expense reimbursements.
+ * For finance/accounting expenses, see expenseService.ts
  */
+
+import api from './api'
 
 // ==================== TYPES & ENUMS ====================
 
@@ -564,10 +557,6 @@ export interface ExpenseClaimStats {
 // ==================== ERROR MESSAGES (BILINGUAL) ====================
 
 const ERROR_MESSAGES = {
-  ENDPOINT_NOT_IMPLEMENTED: {
-    en: 'Expense claims feature is not yet implemented in the backend',
-    ar: 'ميزة مطالبات المصروفات غير مطبقة بعد في الخادم'
-  },
   FETCH_FAILED: {
     en: 'Failed to fetch expense claims',
     ar: 'فشل في جلب مطالبات المصروفات'
@@ -631,9 +620,9 @@ const formatBilingualError = (errorKey: keyof typeof ERROR_MESSAGES, details?: s
  * Handle API error with bilingual messages
  */
 const handleExpenseClaimError = (error: any, errorKey: keyof typeof ERROR_MESSAGES): never => {
-  // If it's a 404, it's likely the endpoint doesn't exist
-  if (error?.status === 404) {
-    throw new Error(formatBilingualError('ENDPOINT_NOT_IMPLEMENTED'))
+  // If it's a 404, resource not found
+  if (error?.status === 404 || error?.response?.status === 404) {
+    throw new Error(formatBilingualError('NOT_FOUND'))
   }
 
   // If error already has a message, use it
@@ -647,7 +636,7 @@ const handleExpenseClaimError = (error: any, errorKey: keyof typeof ERROR_MESSAG
   }
 
   // If it's a 400 (validation error)
-  if (error?.status === 400) {
+  if (error?.status === 400 || error?.response?.status === 400) {
     const details = error?.errors?.map((e: any) => `${e.field}: ${e.message}`).join(', ')
     throw new Error(formatBilingualError('INVALID_DATA', details))
   }

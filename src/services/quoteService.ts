@@ -11,19 +11,19 @@
 import apiClient from '@/lib/api'
 import { throwBilingualError } from '@/lib/bilingualErrorHandler'
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // QUOTE TYPES
-// ═══════════════════════════════════════════════════════════════
+// 
 
 export type QuoteStatus =
   | 'draft'
-  | 'pending'
   | 'sent'
+  | 'viewed'
   | 'accepted'
-  | 'declined'
-  | 'cancelled'
-  | 'on_hold'
+  | 'rejected'
+  | 'revised'
   | 'expired'
+  | 'cancelled'
 
 export type QuoteValidStatus = 'valid' | 'expiring_soon' | 'expired'
 export type QuoteCustomerType = 'lead' | 'client'
@@ -124,9 +124,9 @@ export interface QuoteFilters {
   sortOrder?: 'asc' | 'desc'
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // QUOTE SERVICE
-// ═══════════════════════════════════════════════════════════════
+// 
 
 export const quoteService = {
   /**
@@ -260,6 +260,22 @@ export const quoteService = {
         reason,
       })
       // Backend returns: { success, message, data: quote }
+      return response.data.data || response.data.quote || response.data
+    } catch (error: any) {
+      throwBilingualError(error, 'QUOTE_UPDATE_FAILED')
+    }
+  },
+
+  /**
+   * Create quote revision
+   * POST /quotes/:quoteId/revise
+   */
+  reviseQuote: async (
+    quoteId: string,
+    revisionData?: Partial<CreateQuoteData>
+  ): Promise<Quote> => {
+    try {
+      const response = await apiClient.post(`/quotes/${quoteId}/revise`, revisionData || {})
       return response.data.data || response.data.quote || response.data
     } catch (error: any) {
       throwBilingualError(error, 'QUOTE_UPDATE_FAILED')

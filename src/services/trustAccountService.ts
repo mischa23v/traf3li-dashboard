@@ -306,9 +306,13 @@ export const trustAccountService = {
     return response.data
   },
 
-  // Note: Backend doesn't have this endpoint - transactions are cleared during reconciliation
-  markTransactionCleared: async (id: string, clearedDate: string): Promise<TrustTransaction> => {
-    throw new Error('Endpoint not available - use reconciliation process to clear transactions')
+  /**
+   * Mark transaction as cleared
+   * POST /trust-accounts/transactions/:id/clear
+   */
+  markTransactionCleared: async (accountId: string, transactionId: string, clearedDate: string): Promise<TrustTransaction> => {
+    const response = await api.post(`/trust-accounts/${accountId}/transactions/${transactionId}/clear`, { clearedDate })
+    return response.data
   },
 
   // Reconciliation
@@ -323,16 +327,13 @@ export const trustAccountService = {
     return response.data
   },
 
+  /**
+   * Get single reconciliation
+   * GET /trust-accounts/:accountId/reconciliations/:reconciliationId
+   */
   getReconciliation: async (accountId: string, reconciliationId: string): Promise<TrustReconciliation> => {
-    // Note: Backend doesn't have a specific endpoint for getting a single reconciliation
-    // Use getReconciliations and filter by ID instead
-    const response = await api.get(`/trust-accounts/${accountId}/reconciliations`)
-    const reconciliations = response.data.data || []
-    const reconciliation = reconciliations.find((r: any) => r._id === reconciliationId)
-    if (!reconciliation) {
-      throw new Error(`Reconciliation ${reconciliationId} not found`)
-    }
-    return reconciliation
+    const response = await api.get(`/trust-accounts/${accountId}/reconciliations/${reconciliationId}`)
+    return response.data
   },
 
   startReconciliation: async (data: {
@@ -346,31 +347,43 @@ export const trustAccountService = {
     return response.data
   },
 
+  /**
+   * Update reconciliation
+   * PATCH /trust-accounts/:accountId/reconciliations/:reconciliationId
+   */
   updateReconciliation: async (
     accountId: string,
     reconciliationId: string,
     data: Partial<TrustReconciliation>
   ): Promise<TrustReconciliation> => {
-    // Note: Backend doesn't have an update reconciliation endpoint
-    throw new Error('Endpoint not available')
+    const response = await api.patch(`/trust-accounts/${accountId}/reconciliations/${reconciliationId}`, data)
+    return response.data
   },
 
+  /**
+   * Complete reconciliation
+   * POST /trust-accounts/:accountId/reconciliations/:reconciliationId/complete
+   */
   completeReconciliation: async (
     accountId: string,
     reconciliationId: string,
     notes?: string
   ): Promise<TrustReconciliation> => {
-    // Note: Backend doesn't have a complete reconciliation endpoint
-    throw new Error('Endpoint not available')
+    const response = await api.post(`/trust-accounts/${accountId}/reconciliations/${reconciliationId}/complete`, { notes })
+    return response.data
   },
 
+  /**
+   * Add reconciliation adjustment
+   * POST /trust-accounts/:accountId/reconciliations/:reconciliationId/adjustments
+   */
   addReconciliationAdjustment: async (
     accountId: string,
     reconciliationId: string,
     adjustment: ReconciliationAdjustment
   ): Promise<TrustReconciliation> => {
-    // Note: Backend doesn't have an adjustment endpoint
-    throw new Error('Endpoint not available')
+    const response = await api.post(`/trust-accounts/${accountId}/reconciliations/${reconciliationId}/adjustments`, adjustment)
+    return response.data
   },
 
   // Three-Way Reconciliation
@@ -386,8 +399,10 @@ export const trustAccountService = {
     return response.data
   },
 
-  // Reports
-  // Note: Backend doesn't have client ledger report endpoint
+  /**
+   * Get client ledger report
+   * GET /trust-accounts/:accountId/reports/client-ledger/:clientId
+   */
   getClientLedgerReport: async (
     accountId: string,
     clientId: string,
@@ -401,10 +416,14 @@ export const trustAccountService = {
     closingBalance: number
     transactions: TrustTransaction[]
   }> => {
-    throw new Error('Endpoint not available - use getTransactions with clientId filter instead')
+    const response = await api.get(`/trust-accounts/${accountId}/reports/client-ledger/${clientId}`, { params })
+    return response.data
   },
 
-  // Note: Backend doesn't have export endpoint
+  /**
+   * Export trust report
+   * GET /trust-accounts/:accountId/reports/export
+   */
   exportTrustReport: async (
     accountId: string,
     params: {
@@ -415,7 +434,11 @@ export const trustAccountService = {
       format: 'pdf' | 'xlsx'
     }
   ): Promise<Blob> => {
-    throw new Error('Endpoint not available')
+    const response = await api.get(`/trust-accounts/${accountId}/reports/export`, {
+      params,
+      responseType: 'blob'
+    })
+    return response.data
   },
 
   // Get account summary
