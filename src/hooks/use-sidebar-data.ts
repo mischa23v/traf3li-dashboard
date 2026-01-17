@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   LayoutDashboard,
   Calendar,
@@ -27,6 +28,17 @@ import type { ModuleKey } from '@/types/rbac'
 import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
 import { getLocalizedFullName } from '@/lib/arabic-names'
+import { useSidebarConfig } from './use-sidebar-config'
+import { useRecents } from './use-recents'
+import { createSidebarConfig, SIDEBAR_DEFAULTS } from '@/constants/sidebar-defaults'
+import type {
+  FirmType,
+  SidebarConfig,
+  SidebarBasicSection,
+  SidebarRecentsSection,
+  SidebarModulesSection,
+  SidebarFooterSection,
+} from '@/types/sidebar'
 
 type NavItem = {
   title: string
@@ -57,6 +69,17 @@ type SidebarData = {
     plan: string
   }[]
   navGroups: NavGroup[]
+  /** New dynamic sidebar sections */
+  sections: {
+    basic: SidebarBasicSection
+    recents: SidebarRecentsSection
+    modules: SidebarModulesSection
+    footer: SidebarFooterSection
+  }
+  /** Current firm type for sidebar filtering */
+  firmType: FirmType
+  /** Whether the sidebar config is loading */
+  isConfigLoading: boolean
 }
 
 export function useSidebarData(): SidebarData {
@@ -65,6 +88,54 @@ export function useSidebarData(): SidebarData {
   const isLoading = useAuthStore((state) => state.isLoading)
   const permissions = usePermissionsStore((state) => state.permissions)
   const isNavGroupVisible = useModuleVisibilityStore((state) => state.isNavGroupVisible)
+
+  // New dynamic sidebar hooks
+  const { data: apiConfig, isLoading: isConfigLoading } = useSidebarConfig()
+  const { recents } = useRecents()
+
+  // Derive firm type from user data
+  // Solo: isSoloLawyer flag OR (no firmId AND role is 'lawyer')
+  // Small: Default for firms with 2-50 employees
+  // Large: Firms with 50+ employees (enterprise)
+  const derivedFirmType: FirmType = useMemo(() => {
+    // If API provided config, use its firmType
+    if (apiConfig?.firmType) {
+      return apiConfig.firmType
+    }
+
+    // Otherwise derive from user data
+    const user = authUser as {
+      isSoloLawyer?: boolean
+      firmId?: string
+      role?: string
+      firm?: {
+        employeeCount?: number
+        firmType?: FirmType
+      }
+    } | null
+
+    // Check for explicit firm type from firm settings
+    if (user?.firm?.firmType) {
+      return user.firm.firmType
+    }
+
+    // Solo lawyer detection
+    if (user?.isSoloLawyer || (!user?.firmId && user?.role === 'lawyer')) {
+      return 'solo'
+    }
+
+    // Derive from employee count
+    const employeeCount = user?.firm?.employeeCount ?? 1
+    if (employeeCount >= 50) {
+      return 'large'
+    }
+    if (employeeCount >= 2) {
+      return 'small'
+    }
+
+    // Default to solo for safety
+    return 'solo'
+  }, [authUser, apiConfig?.firmType])
 
   // Build full name with locale-aware name detection
   const getFullName = () => {
@@ -852,6 +923,37 @@ export function useSidebarData(): SidebarData {
     },
   ]
 
+  // Build dynamic sidebar sections
+  // Use API config if available, otherwise create from derived firm type
+  const sidebarConfig: SidebarConfig = useMemo(() => {
+    if (apiConfig) {
+      // API provided config - use it but update recents
+      return {
+        ...apiConfig,
+        sections: {
+          ...apiConfig.sections,
+          recents: {
+            ...apiConfig.sections.recents,
+            items: recents,
+          },
+        },
+      }
+    }
+
+    // Create config from derived firm type with recents
+    const config = createSidebarConfig(derivedFirmType)
+    return {
+      ...config,
+      sections: {
+        ...config.sections,
+        recents: {
+          ...config.sections.recents,
+          items: recents,
+        },
+      },
+    }
+  }, [apiConfig, derivedFirmType, recents])
+
   return {
     user: {
       name: getFullName(),
@@ -866,5 +968,9 @@ export function useSidebarData(): SidebarData {
       },
     ],
     navGroups: filterNavGroups(allNavGroups),
+    // New dynamic sidebar properties
+    sections: sidebarConfig.sections,
+    firmType: derivedFirmType,
+    isConfigLoading,
   }
 }

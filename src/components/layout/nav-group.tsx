@@ -1,9 +1,10 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useCallback } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDirection } from '@/context/direction-provider'
 import { useRoutePrefetch } from '@/hooks/use-route-prefetch'
+import { useRecents } from '@/hooks/use-recents'
 import {
   Collapsible,
   CollapsibleContent,
@@ -78,7 +79,20 @@ function NavBadge({ children }: { children: ReactNode }) {
 function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
   const prefetch = useRoutePrefetch()
+  const { trackVisit } = useRecents()
   const translatedTitle = useNavTitle(item.title)
+
+  const handleClick = useCallback(() => {
+    setOpenMobile(false)
+    // Track visit for recents
+    trackVisit({
+      id: `nav-${item.url}`,
+      title: translatedTitle,
+      path: item.url as string,
+      icon: item.icon?.displayName ?? item.icon?.name ?? 'Link',
+    })
+  }, [setOpenMobile, trackVisit, item.url, translatedTitle, item.icon])
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -88,7 +102,7 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
       >
         <Link
           to={item.url}
-          onClick={() => setOpenMobile(false)}
+          onClick={handleClick}
           onMouseEnter={() => prefetch(item.url)}
         >
           {item.icon && <item.icon />}
@@ -109,9 +123,25 @@ function SidebarMenuCollapsible({
 }) {
   const { setOpenMobile } = useSidebar()
   const prefetch = useRoutePrefetch()
+  const { trackVisit } = useRecents()
   const { t } = useTranslation()
   const translateTitle = (title: string) => title.includes('.') ? t(title) : title
   const translatedTitle = translateTitle(item.title)
+
+  const handleSubItemClick = useCallback(
+    (subItem: { title: string; url: string; icon?: React.ElementType }) => {
+      setOpenMobile(false)
+      // Track visit for recents
+      trackVisit({
+        id: `nav-${subItem.url}`,
+        title: translateTitle(subItem.title),
+        path: subItem.url,
+        icon: subItem.icon?.displayName ?? subItem.icon?.name ?? 'Link',
+      })
+    },
+    [setOpenMobile, trackVisit, translateTitle]
+  )
+
   return (
     <Collapsible
       asChild
@@ -137,7 +167,7 @@ function SidebarMenuCollapsible({
                 >
                   <Link
                     to={subItem.url}
-                    onClick={() => setOpenMobile(false)}
+                    onClick={() => handleSubItemClick(subItem)}
                     onMouseEnter={() => prefetch(subItem.url)}
                   >
                     {subItem.icon && <subItem.icon />}
@@ -164,8 +194,23 @@ function SidebarMenuCollapsedDropdown({
   const { t } = useTranslation()
   const { dir } = useDirection()
   const prefetch = useRoutePrefetch()
+  const { trackVisit } = useRecents()
   const translateTitle = (title: string) => title.includes('.') ? t(title) : title
   const translatedTitle = translateTitle(item.title)
+
+  const handleSubItemClick = useCallback(
+    (sub: { title: string; url: string; icon?: React.ElementType }) => {
+      // Track visit for recents
+      trackVisit({
+        id: `nav-${sub.url}`,
+        title: translateTitle(sub.title),
+        path: sub.url,
+        icon: sub.icon?.displayName ?? sub.icon?.name ?? 'Link',
+      })
+    },
+    [trackVisit, translateTitle]
+  )
+
   return (
     <SidebarMenuItem>
       <DropdownMenu>
@@ -190,6 +235,7 @@ function SidebarMenuCollapsedDropdown({
               <Link
                 to={sub.url}
                 className={`${checkIsActive(href, sub) ? 'bg-secondary' : ''}`}
+                onClick={() => handleSubItemClick(sub)}
                 onMouseEnter={() => prefetch(sub.url)}
               >
                 {sub.icon && <sub.icon />}

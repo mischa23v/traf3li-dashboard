@@ -1,0 +1,8 @@
+# Requirements Approved
+**Approved at**: 2026-01-17
+**User said**: "sidebar is in hooks find one that has everything then continue"
+
+## Key Files Identified
+- `src/hooks/use-sidebar-data.ts` - Main hook with all navigation (870 lines)
+- `src/stores/module-visibility-store.ts` - Module visibility control
+- `src/components/layout/app-sidebar.tsx` - Main sidebar component

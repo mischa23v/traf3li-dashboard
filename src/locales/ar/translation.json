@@ -194,6 +194,11 @@
       "slas": "اتفاقيات مستوى الخدمة",
       "crmTransactions": "معاملات CRM"
     },
+    "sections": {
+      "basic": "الأساسية",
+      "recents": "الأخيرة",
+      "modules": "الوحدات"
+    },
     "general": "عام",
     "dashboard": "لوحة التحكم",
     "tasks": "المهام",
