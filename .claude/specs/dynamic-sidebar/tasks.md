@@ -32,7 +32,7 @@
 **Details**:
 - Add `sidebar` section to QueryKeys factory
 - Add `sidebar.all()` and `sidebar.config()` keys
-**Status**: [ ] Not Started
+**Status**: [x] Complete
 
 ### Task 1.3: Create Sidebar Service
 **File**: `src/services/sidebarService.ts` (NEW)

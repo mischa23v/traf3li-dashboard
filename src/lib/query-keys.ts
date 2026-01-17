@@ -1801,6 +1801,14 @@ export const QueryKeys = {
     step: (stepId: string) => [...QueryKeys.setupOrchestration.all(), 'step', stepId] as const,
   },
 
+  // ==================== SIDEBAR ====================
+  sidebar: {
+    all: () => ['sidebar'] as const,
+    config: () => [...QueryKeys.sidebar.all(), 'config'] as const,
+    recommend: () => [...QueryKeys.sidebar.all(), 'recommend'] as const,
+    moduleAvailable: (moduleId: string) => [...QueryKeys.sidebar.all(), 'module', moduleId, 'available'] as const,
+  },
+
   // ==================== DATA EXPORT ====================
   dataExport: {
     all: () => ['data-export'] as const,
