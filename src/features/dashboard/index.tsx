@@ -99,12 +99,13 @@ export function Dashboard() {
   const { data: todayEventsFallback, isLoading: eventsLoadingFallback } = useTodayEvents(shouldLoadOverviewFallback)
   const { data: financialSummaryFallback, isLoading: financialLoadingFallback } = useFinancialSummary(shouldLoadOverviewFallback)
 
-  // Resolve data - prefer summary, fallback only when needed
-  const caseStats = dashboardSummary?.caseStats || caseStatsFallback
-  const taskStats = dashboardSummary?.taskStats || taskStatsFallback
-  const reminderStats = dashboardSummary?.reminderStats || reminderStatsFallback
-  const todayEvents = dashboardSummary?.todayEvents || todayEventsFallback
-  const financialSummary = dashboardSummary?.financialSummary || financialSummaryFallback
+  // Resolve data - prefer summary ONLY if not error, otherwise use fallback
+  // IMPORTANT: When summaryError is true, the placeholderData has zeros - use fallback for real data
+  const caseStats = (!summaryError && dashboardSummary?.caseStats) || caseStatsFallback
+  const taskStats = (!summaryError && dashboardSummary?.taskStats) || taskStatsFallback
+  const reminderStats = (!summaryError && dashboardSummary?.reminderStats) || reminderStatsFallback
+  const todayEvents = (!summaryError && dashboardSummary?.todayEvents) || todayEventsFallback
+  const financialSummary = (!summaryError && dashboardSummary?.financialSummary) || financialSummaryFallback
 
   const eventsLoading = summaryLoading || (useFallbackHooks && eventsLoadingFallback)
   const financialLoading = summaryLoading || (useFallbackHooks && financialLoadingFallback)
