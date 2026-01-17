@@ -74,15 +74,15 @@ Grep: "skipAuth|bypassAuth|noAuth" in src/
 Grep: "<input" without validation in src/
 Grep: "onChange.*setState" without validation
 
-# Check API input validation
-Grep: "req.body" without validation in services
+# Check for unvalidated form submissions
+Grep: "onSubmit" without validation schema
 ```
 
 **Rules:**
-- [ ] All forms have validation (Zod/Yup)
-- [ ] Server-side validation for all inputs
+- [ ] All forms have validation (Zod/react-hook-form)
 - [ ] Type checking on API responses
 - [ ] File upload validation (type, size)
+- [ ] Sanitize user inputs before display
 
 ### 5. CSRF Protection
 ```bash
@@ -126,21 +126,22 @@ npm audit --audit-level=high
 - [ ] Dependencies regularly updated
 - [ ] Lockfile integrity maintained
 
-### 8. Multi-Tenancy Isolation
+### 8. BFF Pattern Compliance
 ```bash
-# Check for firmId/lawyerId in API calls
-Grep: "firmId|lawyerId" in services/
-Grep: "tenantId|organizationId" in src/
+# Ensure no direct external API calls (bypass BFF)
+Grep: "fetch.*api\.|axios.*api\." for external calls
+Grep: "process.env.*API_URL" for direct backend access
 
-# Check for data leakage risks
-Grep: "getAll|findAll" without tenant filter
+# Check tenant context is NOT stored client-side
+Grep: "localStorage.*firmId|tenantId" in src/
+Grep: "sessionStorage.*firmId|tenantId" in src/
 ```
 
 **Rules:**
-- [ ] All queries include tenant context (firmId)
-- [ ] No cross-tenant data access possible
-- [ ] User context properly validated
-- [ ] API responses filtered by tenant
+- [ ] All API calls go through BFF (no direct backend access)
+- [ ] Tenant context handled by session (httpOnly cookies)
+- [ ] No firmId/tenantId stored in localStorage/sessionStorage
+- [ ] User context comes from auth session, not URL params
 
 ### 9. Error Handling Security
 ```bash
@@ -191,7 +192,7 @@ Grep: "axios.create|fetch" for security headers
 | CSRF Protection | PASS/FAIL | High | X |
 | Authorization | PASS/FAIL | High | X |
 | Dependencies | PASS/FAIL | Variable | X |
-| Multi-Tenancy | PASS/FAIL | Critical | X |
+| BFF Pattern | PASS/FAIL | High | X |
 | Error Handling | PASS/FAIL | Medium | X |
 | API Security | PASS/FAIL | High | X |
 
@@ -230,7 +231,7 @@ After audit, output:
 | Auth | PASS/FAIL |
 | Data | PASS/FAIL |
 | Dependencies | PASS/FAIL |
-| Tenancy | PASS/FAIL |
+| BFF Pattern | PASS/FAIL |
 
 ### Critical Issues (if any)
 - {Issue 1}
@@ -286,4 +287,5 @@ Reply with `yes` or `continue` to proceed.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.1 | 2026-01-17 | Tailored for frontend: replaced Multi-Tenancy with BFF Pattern, removed backend-specific checks |
 | 1.0.0 | 2026-01-17 | Initial version (ported from backend) |

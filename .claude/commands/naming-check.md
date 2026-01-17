@@ -204,4 +204,4 @@ Reply with `yes` or `continue` to proceed to arch-review.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | 2026-01-17 | Initial version (ported from backend) |
+| 1.0.0 | 2026-01-17 | Initial version - React/TypeScript conventions (ported from backend) |
