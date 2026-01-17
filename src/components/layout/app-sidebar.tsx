@@ -132,31 +132,29 @@ function RecentsSection({
 }
 
 /**
- * Modules Section - Collapsible module groups
+ * Modules Section - Collapsible module groups under single "Modules" label
  */
 function ModulesSection({
   modules,
+  label,
+  labelAr,
 }: {
   modules: SidebarModule[]
+  label?: string
+  labelAr?: string
 }) {
   const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
+  const displayLabel = isArabic && labelAr ? labelAr : label
 
-  const navGroups = useMemo(
-    () =>
-      modules.map((module) => ({
-        title: isArabic ? module.labelAr : module.label,
-        items: [toNavCollapsible(module)] as NavItem[],
-      })),
-    [modules, isArabic]
+  // Transform all modules to collapsible items under single group
+  const navItems = useMemo(
+    () => modules.map(toNavCollapsible) as NavItem[],
+    [modules]
   )
 
   return (
-    <>
-      {navGroups.map((group) => (
-        <NavGroup key={group.title} title={group.title} items={group.items} />
-      ))}
-    </>
+    <NavGroup title={displayLabel ?? 'Modules'} items={navItems} />
   )
 }
 
@@ -233,7 +231,11 @@ export function AppSidebar() {
         />
 
         {/* Modules Section - Collapsible groups filtered by firm type */}
-        <ModulesSection modules={sections.modules.items} />
+        <ModulesSection
+          modules={sections.modules.items}
+          label={sections.modules.label}
+          labelAr={sections.modules.labelAr}
+        />
       </SidebarContent>
       <SidebarFooter>
         {/* Footer Items - Settings, Help */}
