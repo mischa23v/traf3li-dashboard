@@ -327,7 +327,7 @@ const billingRatesService = {
 
   /**
    * Get all billing rates
-   * GET /api/billing/rates
+   * GET /api/billing-rates
    */
   getRates: async (filters?: RateFilters): Promise<{ rates: BillingRate[]; total: number }> => {
     try {
@@ -341,7 +341,7 @@ const billingRatesService = {
       if (filters?.limit) params.append('limit', filters.limit.toString())
 
       const queryString = params.toString()
-      const url = queryString ? `/billing/rates?${queryString}` : '/billing/rates'
+      const url = queryString ? `/billing-rates?${queryString}` : '/billing-rates'
 
       const response = await apiClient.get<BackendResponse<BillingRate[]>>(url)
       return {
@@ -355,11 +355,11 @@ const billingRatesService = {
 
   /**
    * Get single rate by ID
-   * GET /api/billing/rates/:id
+   * GET /api/billing-rates/:id
    */
   getRate: async (id: string): Promise<BillingRate> => {
     try {
-      const response = await apiClient.get<BackendResponse<BillingRate>>(`/billing/rates/${id}`)
+      const response = await apiClient.get<BackendResponse<BillingRate>>(`/billing-rates/${id}`)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -368,11 +368,11 @@ const billingRatesService = {
 
   /**
    * Create new billing rate
-   * POST /api/billing/rates
+   * POST /api/billing-rates
    */
   createRate: async (data: CreateRateData): Promise<BillingRate> => {
     try {
-      const response = await apiClient.post<LegacyRateResponse>('/billing/rates', data)
+      const response = await apiClient.post<LegacyRateResponse>('/billing-rates', data)
       return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -381,11 +381,11 @@ const billingRatesService = {
 
   /**
    * Update billing rate
-   * PUT /api/billing/rates/:id
+   * PUT /api/billing-rates/:id
    */
   updateRate: async (id: string, data: UpdateRateData): Promise<BillingRate> => {
     try {
-      const response = await apiClient.put<LegacyRateResponse>(`/billing/rates/${id}`, data)
+      const response = await apiClient.put<LegacyRateResponse>(`/billing-rates/${id}`, data)
       return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -394,11 +394,11 @@ const billingRatesService = {
 
   /**
    * Delete billing rate
-   * DELETE /api/billing/rates/:id
+   * DELETE /api/billing-rates/:id
    */
   deleteRate: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/billing/rates/${id}`)
+      await apiClient.delete(`/billing-rates/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -406,11 +406,11 @@ const billingRatesService = {
 
   /**
    * Get rate statistics
-   * GET /api/billing/rates/stats
+   * GET /api/billing-rates/stats
    */
   getRateStats: async (): Promise<any> => {
     try {
-      const response = await apiClient.get<BackendResponse<any>>('/billing/rates/stats')
+      const response = await apiClient.get<BackendResponse<any>>('/billing-rates/stats')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -419,7 +419,7 @@ const billingRatesService = {
 
   /**
    * Get applicable rate for a user/case/client
-   * GET /api/billing/rates/applicable
+   * GET /api/billing-rates/applicable
    */
   getApplicableRate: async (params: { userId?: string; caseId?: string; clientId?: string; category?: RateCategory }): Promise<BillingRate | null> => {
     try {
@@ -430,7 +430,7 @@ const billingRatesService = {
       if (params.category) queryParams.append('category', params.category)
 
       const queryString = queryParams.toString()
-      const url = queryString ? `/billing/rates/applicable?${queryString}` : '/billing/rates/applicable'
+      const url = queryString ? `/billing-rates/applicable?${queryString}` : '/billing-rates/applicable'
 
       const response = await apiClient.get<BackendResponse<BillingRate>>(url)
       return response.data.data || null
@@ -442,11 +442,11 @@ const billingRatesService = {
 
   /**
    * Set standard rate (quick setup)
-   * POST /api/billing/rates/standard
+   * POST /api/billing-rates/standard
    */
   setStandardRate: async (data: { amount: number; currency: Currency }): Promise<BillingRate> => {
     try {
-      const response = await apiClient.post<LegacyRateResponse>('/billing/rates/standard', data)
+      const response = await apiClient.post<LegacyRateResponse>('/billing-rates/standard', data)
       return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -457,11 +457,11 @@ const billingRatesService = {
 
   /**
    * Get default rate group
-   * GET /api/billing/groups/default
+   * GET /api/billing-groups/default
    */
   getDefaultRateGroup: async (): Promise<RateGroup | null> => {
     try {
-      const response = await apiClient.get<BackendResponse<RateGroup>>('/billing/groups/default')
+      const response = await apiClient.get<BackendResponse<RateGroup>>('/billing-groups/default')
       return response.data.data || null
     } catch (error: any) {
       if (error.response?.status === 404) return null
@@ -471,7 +471,7 @@ const billingRatesService = {
 
   /**
    * Get all rate groups
-   * GET /api/billing/groups
+   * GET /api/billing-groups
    */
   getRateGroups: async (filters?: RateGroupFilters): Promise<{ groups: RateGroup[]; total: number }> => {
     try {
@@ -483,7 +483,7 @@ const billingRatesService = {
       if (filters?.limit) params.append('limit', filters.limit.toString())
 
       const queryString = params.toString()
-      const url = queryString ? `/billing/groups?${queryString}` : '/billing/groups'
+      const url = queryString ? `/billing-groups?${queryString}` : '/billing-groups'
 
       const response = await apiClient.get<BackendResponse<RateGroup[]>>(url)
       return {
@@ -497,11 +497,11 @@ const billingRatesService = {
 
   /**
    * Get single rate group by ID
-   * GET /api/billing/groups/:id
+   * GET /api/billing-groups/:id
    */
   getRateGroup: async (id: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.get<BackendResponse<RateGroup>>(`/billing/groups/${id}`)
+      const response = await apiClient.get<BackendResponse<RateGroup>>(`/billing-groups/${id}`)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -510,11 +510,11 @@ const billingRatesService = {
 
   /**
    * Create new rate group
-   * POST /api/billing/groups
+   * POST /api/billing-groups
    */
   createRateGroup: async (data: CreateRateGroupData): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<BackendResponse<RateGroup>>('/billing/groups', data)
+      const response = await apiClient.post<BackendResponse<RateGroup>>('/billing-groups', data)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -523,11 +523,11 @@ const billingRatesService = {
 
   /**
    * Update rate group
-   * PATCH /api/billing/groups/:id
+   * PATCH /api/billing-groups/:id
    */
   updateRateGroup: async (id: string, data: UpdateRateGroupData): Promise<RateGroup> => {
     try {
-      const response = await apiClient.patch<BackendResponse<RateGroup>>(`/billing/groups/${id}`, data)
+      const response = await apiClient.patch<BackendResponse<RateGroup>>(`/billing-groups/${id}`, data)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -536,11 +536,11 @@ const billingRatesService = {
 
   /**
    * Delete rate group
-   * DELETE /api/billing/groups/:id
+   * DELETE /api/billing-groups/:id
    */
   deleteRateGroup: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/billing/groups/${id}`)
+      await apiClient.delete(`/billing-groups/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -548,11 +548,11 @@ const billingRatesService = {
 
   /**
    * Add rate to group
-   * POST /api/billing/groups/:groupId/rates
+   * POST /api/billing-groups/:groupId/rates
    */
   addRateToGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing/groups/${groupId}/rates`, { rateId })
+      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing-groups/${groupId}/rates`, { rateId })
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -561,11 +561,11 @@ const billingRatesService = {
 
   /**
    * Remove rate from group
-   * DELETE /api/billing/groups/:groupId/rates/:rateId
+   * DELETE /api/billing-groups/:groupId/rates/:rateId
    */
   removeRateFromGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.delete<BackendResponse<RateGroup>>(`/billing/groups/${groupId}/rates/${rateId}`)
+      const response = await apiClient.delete<BackendResponse<RateGroup>>(`/billing-groups/${groupId}/rates/${rateId}`)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -574,11 +574,11 @@ const billingRatesService = {
 
   /**
    * Duplicate rate group
-   * POST /api/billing/groups/:id/duplicate
+   * POST /api/billing-groups/:id/duplicate
    */
   duplicateRateGroup: async (id: string, name: string, nameAr: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing/groups/${id}/duplicate`, { name, nameAr })
+      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing-groups/${id}/duplicate`, { name, nameAr })
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -746,7 +746,7 @@ const billingRatesService = {
 
   /**
    * Get time entries
-   * GET /api/billing/time-entries
+   * GET /api/time-entries
    */
   getTimeEntries: async (filters?: TimeEntryFilters): Promise<{ entries: TimeEntry[]; total: number }> => {
     try {
@@ -763,7 +763,7 @@ const billingRatesService = {
       if (filters?.limit) params.append('limit', filters.limit.toString())
 
       const queryString = params.toString()
-      const url = queryString ? `/billing/time-entries?${queryString}` : '/billing/time-entries'
+      const url = queryString ? `/time-entries?${queryString}` : '/time-entries'
 
       const response = await apiClient.get<BackendResponse<TimeEntry[]>>(url)
       return {
@@ -777,11 +777,11 @@ const billingRatesService = {
 
   /**
    * Create time entry
-   * POST /api/billing/time-entries
+   * POST /api/time-entries
    */
   createTimeEntry: async (data: CreateTimeEntryData): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.post<BackendResponse<TimeEntry>>('/billing/time-entries', data)
+      const response = await apiClient.post<BackendResponse<TimeEntry>>('/time-entries', data)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -790,11 +790,11 @@ const billingRatesService = {
 
   /**
    * Update time entry
-   * PATCH /api/billing/time-entries/:id
+   * PATCH /api/time-entries/:id
    */
   updateTimeEntry: async (id: string, data: UpdateTimeEntryData): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.patch<BackendResponse<TimeEntry>>(`/billing/time-entries/${id}`, data)
+      const response = await apiClient.patch<BackendResponse<TimeEntry>>(`/time-entries/${id}`, data)
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -803,11 +803,11 @@ const billingRatesService = {
 
   /**
    * Delete time entry
-   * DELETE /api/billing/time-entries/:id
+   * DELETE /api/time-entries/:id
    */
   deleteTimeEntry: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/billing/time-entries/${id}`)
+      await apiClient.delete(`/time-entries/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -815,11 +815,11 @@ const billingRatesService = {
 
   /**
    * Approve time entries
-   * POST /api/billing/time-entries/approve
+   * POST /api/time-entries/approve
    */
   approveTimeEntries: async (ids: string[]): Promise<TimeEntry[]> => {
     try {
-      const response = await apiClient.post<BackendResponse<TimeEntry[]>>('/billing/time-entries/approve', { ids })
+      const response = await apiClient.post<BackendResponse<TimeEntry[]>>('/time-entries/approve', { ids })
       return response.data.data || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -830,11 +830,11 @@ const billingRatesService = {
 
   /**
    * Get billing statistics
-   * GET /api/billing/statistics
+   * GET /api/billing-rates/statistics
    */
   getStatistics: async (): Promise<BillingStatistics> => {
     try {
-      const response = await apiClient.get<BackendResponse<BillingStatistics>>('/billing/statistics')
+      const response = await apiClient.get<BackendResponse<BillingStatistics>>('/billing-rates/statistics')
       return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))

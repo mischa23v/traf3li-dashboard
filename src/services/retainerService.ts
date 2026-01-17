@@ -12,7 +12,7 @@ import apiClient, { handleApiError } from '@/lib/api'
  */
 export type RetainerStatus = 'active' | 'depleted' | 'refunded' | 'expired' | 'cancelled'
 
-export type RetainerType = 'general' | 'evergreen' | 'fixed_fee' | 'advance'
+export type RetainerType = 'advance' | 'evergreen' | 'flat_fee' | 'security'
 
 /**
  * Transaction Type
