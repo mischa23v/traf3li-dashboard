@@ -61,7 +61,7 @@ export const BASIC_ITEMS: SidebarItem[] = [
     label: 'sidebar.nav.items.overview',
     labelAr: 'sidebar.nav.items.overview',
     icon: 'LayoutDashboard',
-    path: ROUTES.dashboard.overview,
+    path: ROUTES.dashboard.home,
     order: 1,
   },
   {
