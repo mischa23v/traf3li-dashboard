@@ -194,6 +194,11 @@
       "slas": "Service Level Agreements",
       "crmTransactions": "CRM Transactions"
     },
+    "sections": {
+      "basic": "Basic",
+      "recents": "Recents",
+      "modules": "Modules"
+    },
     "general": "General",
     "dashboard": "Dashboard",
     "apps": "Apps",
