@@ -1497,9 +1497,35 @@ export const invalidateCache = {
     all: () => queryClient.invalidateQueries({ queryKey: ['cache-stats'] }),
   },
 
-  // Sidebar data
+  // Sidebar Configuration
   sidebar: {
+    /** Invalidate all sidebar-related queries */
+    all: () => queryClient.invalidateQueries({ queryKey: ['sidebar'] }),
+    /** Invalidate sidebar data by date */
     data: (date?: string) => queryClient.invalidateQueries({ queryKey: ['sidebar', 'data', date] }),
+    /** Invalidate sidebar config (firmType, modules, etc.) */
+    config: () => queryClient.invalidateQueries({ queryKey: ['sidebar', 'config'] }),
+    /** Invalidate recommended firm type */
+    recommend: () => queryClient.invalidateQueries({ queryKey: ['sidebar', 'recommend'] }),
+    /** Invalidate module availability check */
+    moduleAvailable: (moduleId?: string) =>
+      moduleId
+        ? queryClient.invalidateQueries({ queryKey: ['sidebar', 'module', moduleId, 'available'] })
+        : queryClient.invalidateQueries({ queryKey: ['sidebar', 'module'] }),
+    /** Called after firm type is updated - invalidates all sidebar-related queries */
+    onFirmTypeChange: async () => {
+      await Promise.all([
+        invalidateCache.sidebar.all(),
+        invalidateCache.sidebar.config(),
+        invalidateCache.sidebar.recommend(),
+      ])
+    },
+    /** Related invalidations for sidebar mutations */
+    related: async () => {
+      await Promise.all([
+        invalidateCache.sidebar.all(),
+      ])
+    },
   },
 
   // CRM Advanced

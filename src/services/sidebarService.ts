@@ -11,6 +11,7 @@
  */
 
 import apiClient from '@/lib/api'
+import { ROUTES } from '@/constants/routes'
 import type { SidebarConfig, SidebarConfigResponse, FirmType } from '@/types/sidebar'
 
 // 
@@ -67,7 +68,7 @@ const formatBilingualError = (
  */
 export async function getSidebarConfig(): Promise<SidebarConfig | null> {
   try {
-    const response = await apiClient.get<SidebarConfigResponse>('/sidebar/config')
+    const response = await apiClient.get<SidebarConfigResponse>(ROUTES.api.sidebar.config)
 
     if (response.data?.success && response.data?.data) {
       return response.data.data
@@ -100,7 +101,7 @@ export async function getSidebarConfigPreview(
 ): Promise<SidebarConfig | null> {
   try {
     const response = await apiClient.get<SidebarConfigResponse>(
-      `/sidebar/config/${firmType}`
+      ROUTES.api.sidebar.configPreview(firmType)
     )
 
     if (response.data?.success && response.data?.data) {
@@ -127,7 +128,7 @@ export async function getRecommendedFirmType(): Promise<FirmType | null> {
     const response = await apiClient.get<{
       success: boolean
       data: { recommendedType: FirmType; employeeCount: number }
-    }>('/sidebar/recommend')
+    }>(ROUTES.api.sidebar.recommend)
 
     if (response.data?.success && response.data?.data?.recommendedType) {
       return response.data.data.recommendedType
@@ -155,7 +156,7 @@ export async function checkModuleAvailability(
     const response = await apiClient.get<{
       success: boolean
       data: { available: boolean; reason?: string }
-    }>(`/sidebar/module/${moduleId}/available`)
+    }>(ROUTES.api.sidebar.moduleAvailable(moduleId))
 
     if (response.data?.success) {
       return response.data.data?.available ?? false
@@ -180,7 +181,7 @@ export async function checkModuleAvailability(
 export async function updateFirmType(firmType: FirmType): Promise<void> {
   try {
     const response = await apiClient.patch<{ success: boolean; message?: string }>(
-      '/sidebar/firm-type',
+      ROUTES.api.sidebar.updateFirmType,
       { firmType }
     )
 

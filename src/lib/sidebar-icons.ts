@@ -129,31 +129,70 @@ const ICON_MAP: Record<string, LucideIcon> = {
 }
 
 /**
+ * Default fallback icon for missing icons
+ * HelpCircle is neutral and indicates "unknown"
+ */
+const DEFAULT_FALLBACK_ICON = HelpCircle
+
+/**
  * Get Lucide icon component by name
  * Returns undefined if icon not found
+ * Logs warning in DEV mode for missing icons to help catch API/config mismatches
  *
  * @param name - Icon name (case-sensitive)
  * @returns Lucide icon component or undefined
  */
 export function getIcon(name: string | undefined): LucideIcon | undefined {
   if (!name) return undefined
-  return ICON_MAP[name]
+
+  const icon = ICON_MAP[name]
+
+  // Log warning in DEV mode if icon not found - helps catch API/config mismatches
+  if (!icon && import.meta.env.DEV) {
+    console.warn(
+      `[SidebarIcons] Icon "${name}" not found in ICON_MAP. Add it to sidebar-icons.ts`
+    )
+  }
+
+  return icon
 }
 
 /**
  * Get Lucide icon component by name with fallback
  * Returns fallback icon if name not found
+ * Logs warning in DEV mode for missing icons
  *
  * @param name - Icon name (case-sensitive)
- * @param fallback - Fallback icon component
+ * @param fallback - Fallback icon component (defaults to HelpCircle)
  * @returns Lucide icon component
  */
 export function getIconOrFallback(
   name: string | undefined,
-  fallback: LucideIcon
+  fallback: LucideIcon = DEFAULT_FALLBACK_ICON
 ): LucideIcon {
   if (!name) return fallback
-  return ICON_MAP[name] ?? fallback
+
+  const icon = ICON_MAP[name]
+
+  // Log warning in DEV mode if using fallback
+  if (!icon && import.meta.env.DEV) {
+    console.warn(
+      `[SidebarIcons] Icon "${name}" not found, using fallback. Add it to sidebar-icons.ts`
+    )
+  }
+
+  return icon ?? fallback
+}
+
+/**
+ * Get Lucide icon component by name, always returns an icon
+ * Uses HelpCircle as default fallback - useful for production safety
+ *
+ * @param name - Icon name (case-sensitive)
+ * @returns Lucide icon component (never undefined)
+ */
+export function getIconSafe(name: string | undefined): LucideIcon {
+  return getIconOrFallback(name, DEFAULT_FALLBACK_ICON)
 }
 
 export default ICON_MAP
