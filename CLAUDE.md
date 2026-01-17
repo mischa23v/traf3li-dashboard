@@ -246,17 +246,3 @@ Before saying "done", verify:
                               | "approved"
                               v
                          CREATE PR
-```
-
----
-
-##  Version History
-
-| Date | Version | Changes |
-|------|---------|---------|
-| 2026-01-13 | 4.0 | Split `/implementation` into `/design` (Phase 2) and `/tasks` (Phase 3) for separate approval gates |
-| 2026-01-12 | 3.0 | Added new commands (/bugs, /test, /perf-check, /ui-review, /docs, /commit, /rebase, /worktree, /issue), agents (bug-finder, test-runner, performance-profiler, ui-ux-consultant, doc-reviewer, doc-implementer, github-issue-creator, git-cherry-pick-orchestrator), and hooks (clean_commit_guard, emoji_remover, protect_claude_md, github_issue_guard, centralized_constants_guard, rtl_check) |
-| 2026-01-12 | 2.0 | Added TL;DR, workflow diagram, commands reference, /arewedone, /arch-review |
-| - | 1.0 | Initial version |
-
-
