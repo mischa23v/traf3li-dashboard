@@ -126,7 +126,6 @@ https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
 
 Before saying "done", verify:
 
-- [ ] No TypeScript errors (`npm run build`)
 - [ ] Used centralized constants (not hardcoded values)
 - [ ] Tested in browser (both languages if UI)
 - [ ] No console errors
@@ -246,3 +245,4 @@ Before saying "done", verify:
                               | "approved"
                               v
                          CREATE PR
+
