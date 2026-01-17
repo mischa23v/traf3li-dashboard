@@ -29,13 +29,11 @@ import { canView } from '@/lib/permissions'
 import { ROUTES } from '@/constants/routes'
 import { getLocalizedFullName } from '@/lib/arabic-names'
 import { useSidebarConfig } from './use-sidebar-config'
-import { useRecents } from './use-recents'
-import { createSidebarConfig, SIDEBAR_DEFAULTS } from '@/constants/sidebar-defaults'
+import { createSidebarConfig } from '@/constants/sidebar-defaults'
 import type {
   FirmType,
   SidebarConfig,
   SidebarBasicSection,
-  SidebarRecentsSection,
   SidebarModulesSection,
   SidebarOtherSection,
 } from '@/types/sidebar'
@@ -72,7 +70,6 @@ type SidebarData = {
   /** New dynamic sidebar sections */
   sections: {
     basic: SidebarBasicSection
-    recents: SidebarRecentsSection
     modules: SidebarModulesSection
     other: SidebarOtherSection
   }
@@ -91,7 +88,6 @@ export function useSidebarData(): SidebarData {
 
   // New dynamic sidebar hooks
   const { data: apiConfig, isLoading: isConfigLoading } = useSidebarConfig()
-  const { recents } = useRecents()
 
   // Derive firm type from user data
   // Solo: isSoloLawyer flag OR (no firmId AND role is 'lawyer')
@@ -927,32 +923,10 @@ export function useSidebarData(): SidebarData {
   // Use API config if available, otherwise create from derived firm type
   const sidebarConfig: SidebarConfig = useMemo(() => {
     if (apiConfig) {
-      // API provided config - use it but update recents
-      return {
-        ...apiConfig,
-        sections: {
-          ...apiConfig.sections,
-          recents: {
-            ...apiConfig.sections.recents,
-            items: recents,
-          },
-        },
-      }
+      return apiConfig
     }
-
-    // Create config from derived firm type with recents
-    const config = createSidebarConfig(derivedFirmType)
-    return {
-      ...config,
-      sections: {
-        ...config.sections,
-        recents: {
-          ...config.sections.recents,
-          items: recents,
-        },
-      },
-    }
-  }, [apiConfig, derivedFirmType, recents])
+    return createSidebarConfig(derivedFirmType)
+  }, [apiConfig, derivedFirmType])
 
   return {
     user: {

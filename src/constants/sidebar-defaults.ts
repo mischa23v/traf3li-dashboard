@@ -721,14 +721,6 @@ export const SIDEBAR_DEFAULTS: SidebarConfig = {
       labelAr: 'sidebar.nav.sections.basic',
       items: BASIC_ITEMS,
     },
-    recents: {
-      id: 'recents',
-      label: 'sidebar.nav.sections.recents',
-      labelAr: 'sidebar.nav.sections.recents',
-      icon: 'Clock',
-      maxItems: 5,
-      items: [],
-    },
     modules: {
       label: 'sidebar.nav.sections.modules',
       labelAr: 'sidebar.nav.sections.modules',
@@ -768,14 +760,6 @@ export function createSidebarConfig(firmType: FirmType): SidebarConfig {
         label: 'sidebar.nav.sections.basic',
         labelAr: 'sidebar.nav.sections.basic',
         items: BASIC_ITEMS,
-      },
-      recents: {
-        id: 'recents',
-        label: 'sidebar.nav.sections.recents',
-        labelAr: 'sidebar.nav.sections.recents',
-        icon: 'Clock',
-        maxItems: 5,
-        items: [],
       },
       modules: {
         label: 'sidebar.nav.sections.modules',

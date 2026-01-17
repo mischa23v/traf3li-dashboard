@@ -19,7 +19,7 @@ import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import { TeamSwitcher } from './team-switcher'
 import { Link, useLocation } from '@tanstack/react-router'
-import type { SidebarItem, SidebarModule, RecentItem } from '@/types/sidebar'
+import type { SidebarItem, SidebarModule } from '@/types/sidebar'
 import type { NavItem, NavCollapsible } from './types'
 
 /**
@@ -105,48 +105,6 @@ function BasicSection({
 }
 
 /**
- * Recents Section - Shows recently visited pages
- * Only renders if there are recent items
- */
-function RecentsSection({
-  items,
-  label,
-}: {
-  items: RecentItem[]
-  label: string
-}) {
-  const location = useLocation()
-  const translateText = useTranslateText()
-  const translatedLabel = translateText(label)
-
-  if (items.length === 0) {
-    return null
-  }
-
-  return (
-    <SidebarGroup>
-      <SidebarGroupLabel>{translatedLabel}</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => {
-          const isActive = location.pathname === item.path
-          const Icon = getIcon(item.icon)
-          return (
-            <SidebarMenuItem key={item.id}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                <Link to={item.path}>
-                  {Icon && <Icon />}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )
-        })}
-      </SidebarMenu>
-    </SidebarGroup>
-  )
-}
-
-/**
  * Modules Section - Collapsible module groups under single "Modules" label
  * NavGroup handles translation internally
  */
@@ -210,11 +168,10 @@ function OtherSection({
 /**
  * AppSidebar - Main sidebar component
  *
- * Renders four sections:
+ * Renders three sections:
  * 1. Basic - Always visible items (Overview, Calendar, Tasks, etc.)
- * 2. Recents - Recently visited pages (conditional)
- * 3. Modules - Collapsible module groups (filtered by firm type)
- * 4. Other - Settings and Help in main content area
+ * 2. Modules - Collapsible module groups (filtered by firm type)
+ * 3. Other - Settings and Help in main content area
  *
  * All labels use translation keys that are resolved by the section components.
  */
@@ -233,12 +190,6 @@ export function AppSidebar() {
         <BasicSection
           items={sections.basic.items}
           label={sections.basic.label}
-        />
-
-        {/* Recents Section - Only if there are recents */}
-        <RecentsSection
-          items={sections.recents.items}
-          label={sections.recents.label}
         />
 
         {/* Modules Section - Collapsible groups filtered by firm type */}
