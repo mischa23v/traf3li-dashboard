@@ -53,11 +53,8 @@ You build production systems serving millions of users.
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ BEFORE PR                                                                    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ • Run: npm run build (verify no TypeScript errors)                          │
-│ • Run: git diff (self-review like you HATE this code)                       │
-│ • Check: RTL/LTR support for UI changes                                     │
-│ • Check: No console errors in browser                                       │
+├─────────────────────────────────────────────────────────────────────────────┤                      │
+│ • Run: git diff (self-review like you HATE this code)                       │                                     │                                      │
 │ • Ask: "Would this pass review at Google?"                                  │
 └─────────────────────────────────────────────────────────────────────────────┘
 
