@@ -1,4 +1,4 @@
-Never Log in to playwright let me log in because of rate limit. never close dev server or plaseright or chrome browser I will
+Never Log in to playwright let me log in because of rate limit. never close dev server or playwright or chrome browser I will
 #  REQUIREMENT: ENTERPRISE-LEVEL CODE QUALITY
 
 **Make sure all code is enterprise-level, production-level, and meets gold standard. Be honest - review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases. also Do a git diff and review your own code like you're a senior dev doing a code review and you HATE this implementation. What would you criticize? What edge cases am I missing? Make sure you take care of ALL edge cases and corner cases.**
@@ -99,20 +99,6 @@ If you need information about:
 
 **NEVER hardcode routes, query keys, or magic numbers.**
 
----
-
-##  After EVERY UI Change
-
-1. Navigate to the page
-2. Test Arabic (RTL) - take screenshot
-3. Test English (LTR) - take screenshot
-4. Check console for errors
-5. Test mobile viewport if applicable
-
-For major changes: Run `/design-review`
-
----
-
 ##  After Every Push
 
 Provide PR link:
@@ -127,8 +113,6 @@ https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
 Before saying "done", verify:
 
 - [ ] Used centralized constants (not hardcoded values)
-- [ ] Tested in browser (both languages if UI)
-- [ ] No console errors
 - [ ] Created PR link if pushed
 
 ---
@@ -245,4 +229,5 @@ Before saying "done", verify:
                               | "approved"
                               v
                          CREATE PR
+
 
