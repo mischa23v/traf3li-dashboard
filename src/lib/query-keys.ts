@@ -1316,6 +1316,9 @@ export const QueryKeys = {
   sidebar: {
     all: () => ['sidebar'] as const,
     data: (date: string) => [...QueryKeys.sidebar.all(), 'data', date] as const,
+    config: () => [...QueryKeys.sidebar.all(), 'config'] as const,
+    recommend: () => [...QueryKeys.sidebar.all(), 'recommend'] as const,
+    moduleAvailable: (moduleId: string) => [...QueryKeys.sidebar.all(), 'module', moduleId, 'available'] as const,
   },
 
   // ==================== EVENTS ====================
@@ -1799,14 +1802,6 @@ export const QueryKeys = {
     all: () => ['setup-orchestration'] as const,
     progress: () => [...QueryKeys.setupOrchestration.all(), 'progress'] as const,
     step: (stepId: string) => [...QueryKeys.setupOrchestration.all(), 'step', stepId] as const,
-  },
-
-  // ==================== SIDEBAR ====================
-  sidebar: {
-    all: () => ['sidebar'] as const,
-    config: () => [...QueryKeys.sidebar.all(), 'config'] as const,
-    recommend: () => [...QueryKeys.sidebar.all(), 'recommend'] as const,
-    moduleAvailable: (moduleId: string) => [...QueryKeys.sidebar.all(), 'module', moduleId, 'available'] as const,
   },
 
   // ==================== DATA EXPORT ====================
