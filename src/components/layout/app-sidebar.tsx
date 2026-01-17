@@ -23,12 +23,26 @@ import type { SidebarItem, SidebarModule, RecentItem } from '@/types/sidebar'
 import type { NavItem, NavCollapsible } from './types'
 
 /**
+ * Helper to translate text - if it's a translation key (contains '.'), translate it
+ */
+function useTranslateText() {
+  const { t } = useTranslation()
+  return (text: string | undefined): string => {
+    if (!text) return ''
+    if (text.includes('.')) {
+      return t(text)
+    }
+    return text
+  }
+}
+
+/**
  * Transform SidebarItem to NavItem format
- * Maps string icon names to Lucide components
+ * Note: Labels contain translation keys that will be translated by NavGroup
  */
 function toNavItem(item: SidebarItem): NavItem {
   return {
-    title: item.label,
+    title: item.label, // Translation key - will be translated by consuming component
     url: item.path,
     icon: getIcon(item.icon),
     badge: item.badge?.toString(),
@@ -37,13 +51,14 @@ function toNavItem(item: SidebarItem): NavItem {
 
 /**
  * Transform SidebarModule to NavCollapsible format
+ * Note: Labels contain translation keys that will be translated by NavGroup
  */
 function toNavCollapsible(module: SidebarModule): NavCollapsible {
   return {
-    title: module.label,
+    title: module.label, // Translation key - will be translated by NavGroup
     icon: getIcon(module.icon),
     items: module.items.map((item) => ({
-      title: item.label,
+      title: item.label, // Translation key - will be translated by NavGroup
       url: item.path,
       icon: getIcon(item.icon),
       badge: item.badge?.toString(),
@@ -62,20 +77,23 @@ function BasicSection({
   label?: string
 }) {
   const location = useLocation()
+  const translateText = useTranslateText()
   const navItems = useMemo(() => items.map(toNavItem), [items])
+  const translatedLabel = translateText(label)
 
   return (
     <SidebarGroup>
-      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
+      {translatedLabel && <SidebarGroupLabel>{translatedLabel}</SidebarGroupLabel>}
       <SidebarMenu>
         {navItems.map((item) => {
           const isActive = location.pathname === item.url
+          const translatedTitle = translateText(item.title)
           return (
             <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+              <SidebarMenuButton asChild isActive={isActive} tooltip={translatedTitle}>
                 <Link to={item.url as string}>
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span>{translatedTitle}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -93,16 +111,13 @@ function BasicSection({
 function RecentsSection({
   items,
   label,
-  labelAr,
 }: {
   items: RecentItem[]
   label: string
-  labelAr?: string
 }) {
-  const { i18n } = useTranslation()
   const location = useLocation()
-  const isArabic = i18n.language === 'ar'
-  const displayLabel = isArabic && labelAr ? labelAr : label
+  const translateText = useTranslateText()
+  const translatedLabel = translateText(label)
 
   if (items.length === 0) {
     return null
@@ -110,7 +125,7 @@ function RecentsSection({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{displayLabel}</SidebarGroupLabel>
+      <SidebarGroupLabel>{translatedLabel}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isActive = location.pathname === item.path
@@ -133,28 +148,24 @@ function RecentsSection({
 
 /**
  * Modules Section - Collapsible module groups under single "Modules" label
+ * NavGroup handles translation internally
  */
 function ModulesSection({
   modules,
   label,
-  labelAr,
 }: {
   modules: SidebarModule[]
   label?: string
-  labelAr?: string
 }) {
-  const { i18n } = useTranslation()
-  const isArabic = i18n.language === 'ar'
-  const displayLabel = isArabic && labelAr ? labelAr : label
-
   // Transform all modules to collapsible items under single group
+  // NavGroup component handles translation of titles internally
   const navItems = useMemo(
     () => modules.map(toNavCollapsible) as NavItem[],
     [modules]
   )
 
   return (
-    <NavGroup title={displayLabel ?? 'Modules'} items={navItems} />
+    <NavGroup title={label ?? 'sidebar.nav.sections.modules'} items={navItems} />
   )
 }
 
@@ -164,32 +175,28 @@ function ModulesSection({
 function OtherSection({
   items,
   label,
-  labelAr,
 }: {
   items: SidebarItem[]
   label?: string
-  labelAr?: string
 }) {
-  const { i18n } = useTranslation()
   const location = useLocation()
-  const isArabic = i18n.language === 'ar'
-  const displayLabel = isArabic && labelAr ? labelAr : label
-
-  // Transform to NavItem for consistency with translation handling
+  const translateText = useTranslateText()
   const navItems = useMemo(() => items.map(toNavItem), [items])
+  const translatedLabel = translateText(label)
 
   return (
     <SidebarGroup>
-      {displayLabel && <SidebarGroupLabel>{displayLabel}</SidebarGroupLabel>}
+      {translatedLabel && <SidebarGroupLabel>{translatedLabel}</SidebarGroupLabel>}
       <SidebarMenu>
         {navItems.map((item) => {
           const isActive = location.pathname === item.url
+          const translatedTitle = translateText(item.title)
           return (
             <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+              <SidebarMenuButton asChild isActive={isActive} tooltip={translatedTitle}>
                 <Link to={item.url as string}>
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span>{translatedTitle}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -208,21 +215,13 @@ function OtherSection({
  * 2. Recents - Recently visited pages (conditional)
  * 3. Modules - Collapsible module groups (filtered by firm type)
  * 4. Other - Settings and Help in main content area
+ *
+ * All labels use translation keys that are resolved by the section components.
  */
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
-  const { i18n } = useTranslation()
   const sidebarData = useSidebarData()
   const { sections } = sidebarData
-  const isArabic = i18n.language === 'ar'
-
-  // Get localized labels
-  const basicLabel = isArabic
-    ? sections.basic.labelAr
-    : sections.basic.label
-  const recentsLabel = isArabic
-    ? sections.recents.labelAr
-    : sections.recents.label
 
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
@@ -233,28 +232,25 @@ export function AppSidebar() {
         {/* Basic Section - Always visible */}
         <BasicSection
           items={sections.basic.items}
-          label={basicLabel}
+          label={sections.basic.label}
         />
 
         {/* Recents Section - Only if there are recents */}
         <RecentsSection
           items={sections.recents.items}
-          label={recentsLabel ?? 'Recents'}
-          labelAr={sections.recents.labelAr}
+          label={sections.recents.label}
         />
 
         {/* Modules Section - Collapsible groups filtered by firm type */}
         <ModulesSection
           modules={sections.modules.items}
           label={sections.modules.label}
-          labelAr={sections.modules.labelAr}
         />
 
         {/* Other Section - Settings, Help */}
         <OtherSection
           items={sections.other.items}
           label={sections.other.label}
-          labelAr={sections.other.labelAr}
         />
       </SidebarContent>
       <SidebarFooter>

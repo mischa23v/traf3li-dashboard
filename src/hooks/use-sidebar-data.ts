@@ -37,7 +37,7 @@ import type {
   SidebarBasicSection,
   SidebarRecentsSection,
   SidebarModulesSection,
-  SidebarFooterSection,
+  SidebarOtherSection,
 } from '@/types/sidebar'
 
 type NavItem = {
@@ -74,7 +74,7 @@ type SidebarData = {
     basic: SidebarBasicSection
     recents: SidebarRecentsSection
     modules: SidebarModulesSection
-    footer: SidebarFooterSection
+    other: SidebarOtherSection
   }
   /** Current firm type for sidebar filtering */
   firmType: FirmType
