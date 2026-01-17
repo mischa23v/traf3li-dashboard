@@ -41,7 +41,7 @@
 - Call `GET /api/sidebar/config`
 - Return typed `SidebarConfig` response
 - Handle error gracefully (return null, let hook handle fallback)
-**Status**: [ ] Not Started
+**Status**: [x] Complete
 
 ### Task 1.4: Create Sidebar Defaults
 **File**: `src/constants/sidebar-defaults.ts` (NEW)
