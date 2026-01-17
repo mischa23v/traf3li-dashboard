@@ -159,31 +159,44 @@ function ModulesSection({
 }
 
 /**
- * Footer Section - Settings, Help icons
+ * Other Section - Settings, Help items in main content area
  */
-function FooterSection({ items }: { items: SidebarItem[] }) {
+function OtherSection({
+  items,
+  label,
+  labelAr,
+}: {
+  items: SidebarItem[]
+  label?: string
+  labelAr?: string
+}) {
   const { i18n } = useTranslation()
   const location = useLocation()
   const isArabic = i18n.language === 'ar'
+  const displayLabel = isArabic && labelAr ? labelAr : label
+
+  // Transform to NavItem for consistency with translation handling
+  const navItems = useMemo(() => items.map(toNavItem), [items])
 
   return (
-    <SidebarMenu>
-      {items.map((item) => {
-        const isActive = location.pathname === item.path
-        const Icon = getIcon(item.icon)
-        const label = isArabic ? item.labelAr : item.label
-        return (
-          <SidebarMenuItem key={item.id}>
-            <SidebarMenuButton asChild isActive={isActive} tooltip={label}>
-              <Link to={item.path}>
-                {Icon && <Icon />}
-                <span>{label}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        )
-      })}
-    </SidebarMenu>
+    <SidebarGroup>
+      {displayLabel && <SidebarGroupLabel>{displayLabel}</SidebarGroupLabel>}
+      <SidebarMenu>
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.url
+          return (
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                <Link to={item.url as string}>
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )
+        })}
+      </SidebarMenu>
+    </SidebarGroup>
   )
 }
 
@@ -194,7 +207,7 @@ function FooterSection({ items }: { items: SidebarItem[] }) {
  * 1. Basic - Always visible items (Overview, Calendar, Tasks, etc.)
  * 2. Recents - Recently visited pages (conditional)
  * 3. Modules - Collapsible module groups (filtered by firm type)
- * 4. Footer - Settings and Help in footer area
+ * 4. Other - Settings and Help in main content area
  */
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
@@ -236,11 +249,16 @@ export function AppSidebar() {
           label={sections.modules.label}
           labelAr={sections.modules.labelAr}
         />
+
+        {/* Other Section - Settings, Help */}
+        <OtherSection
+          items={sections.other.items}
+          label={sections.other.label}
+          labelAr={sections.other.labelAr}
+        />
       </SidebarContent>
       <SidebarFooter>
-        {/* Footer Items - Settings, Help */}
-        <FooterSection items={sections.footer.items} />
-        {/* User section */}
+        {/* User section only */}
         <NavUser user={sidebarData.user} />
       </SidebarFooter>
       <SidebarRail />
