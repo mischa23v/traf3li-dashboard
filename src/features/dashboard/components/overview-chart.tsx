@@ -32,6 +32,17 @@ const generateDefaultData = (t: TFunction) => {
   }))
 }
 
+// Format currency - backend returns halalas, convert to SAR
+const formatCurrency = (halalas: number, t: TFunction): string => {
+  const sar = halalas / 100
+  // Use locale-appropriate formatting
+  const formatted = new Intl.NumberFormat('en-SA', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(sar)
+  return formatted
+}
+
 export const OverviewChart = memo(function OverviewChart({
   t,
   data,
@@ -44,8 +55,11 @@ export const OverviewChart = memo(function OverviewChart({
 
   const maxValue = useMemo(() => {
     const max = Math.max(...chartData.map((d) => d.revenue))
-    return max > 0 ? max : 6000 // Default max for empty data
+    return max > 0 ? max : 600000 // Default max in halalas (6000 SAR)
   }, [chartData])
+
+  // Currency symbol based on language
+  const currencySymbol = t('common.currencySymbol', 'SAR')
 
   // Loading state
   if (isLoading) {
@@ -76,12 +90,12 @@ export const OverviewChart = memo(function OverviewChart({
       <CardContent className="pb-4">
         <div className="h-[350px] flex items-end gap-2">
           {/* Y-axis labels */}
-          <div className="flex flex-col justify-between h-full text-xs text-slate-400 pe-2 pb-6">
-            <span>${(maxValue).toLocaleString()}</span>
-            <span>${(maxValue * 0.75).toLocaleString()}</span>
-            <span>${(maxValue * 0.5).toLocaleString()}</span>
-            <span>${(maxValue * 0.25).toLocaleString()}</span>
-            <span>$0</span>
+          <div className="flex flex-col justify-between h-full text-xs text-slate-400 pe-2 pb-6 min-w-[60px]">
+            <span>{formatCurrency(maxValue, t)}</span>
+            <span>{formatCurrency(maxValue * 0.75, t)}</span>
+            <span>{formatCurrency(maxValue * 0.5, t)}</span>
+            <span>{formatCurrency(maxValue * 0.25, t)}</span>
+            <span>0</span>
           </div>
 
           {/* Bars */}
@@ -97,12 +111,12 @@ export const OverviewChart = memo(function OverviewChart({
                     <div
                       className="w-full bg-slate-900 rounded-t-sm transition-all duration-500 hover:bg-slate-700 cursor-pointer group relative"
                       style={{ height: `${heightPercent}%`, minHeight: item.revenue > 0 ? '4px' : '2px' }}
-                      title={`${item.month}: $${item.revenue.toLocaleString()}`}
+                      title={`${item.month}: ${formatCurrency(item.revenue, t)} ${currencySymbol}`}
                     >
                       {/* Tooltip on hover */}
                       {item.revenue > 0 && (
                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                          ${item.revenue.toLocaleString()}
+                          {formatCurrency(item.revenue, t)} {currencySymbol}
                         </div>
                       )}
                     </div>

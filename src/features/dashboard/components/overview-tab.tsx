@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { OverviewStats } from './overview-stats'
 import { OverviewChart } from './overview-chart'
+import { useRevenueChart } from '@/hooks/useDashboard'
 import type { OverviewTabProps, DashboardEvent } from '../types'
 
 export const OverviewTab = memo(function OverviewTab({
@@ -27,6 +28,20 @@ export const OverviewTab = memo(function OverviewTab({
   caseStats,
   upcomingEventsCount = 0,
 }: OverviewTabProps) {
+  // Fetch revenue chart data for Overview bar chart
+  const { data: revenueChartResponse, isLoading: revenueChartLoading } = useRevenueChart(12, true)
+
+  // Transform backend data to component format: { month: string; revenue: number }[]
+  const chartData = useMemo(() => {
+    if (!revenueChartResponse?.data || revenueChartResponse.data.length === 0) {
+      return undefined
+    }
+    return revenueChartResponse.data.map((item) => ({
+      month: item.month,
+      revenue: item.revenue ?? 0,
+    }))
+  }, [revenueChartResponse])
+
   return (
     <div className="space-y-6">
       {/* Top Stats Row - Shadcn Style */}
@@ -42,7 +57,7 @@ export const OverviewTab = memo(function OverviewTab({
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Overview Chart - Takes 4 columns */}
         <div className="col-span-full lg:col-span-4">
-          <OverviewChart t={t} isLoading={financialLoading} />
+          <OverviewChart t={t} data={chartData} isLoading={revenueChartLoading} />
         </div>
 
         {/* Today's Schedule - Takes 3 columns */}
