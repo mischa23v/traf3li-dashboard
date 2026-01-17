@@ -25,7 +25,7 @@
 - Define `SidebarConfig` interface
 - Define `RecentItem` interface
 - Match backend API response structure exactly
-**Status**: [ ] Not Started
+**Status**: [x] Complete
 
 ### Task 1.2: Add Sidebar Query Keys
 **File**: `src/lib/query-keys.ts` (MODIFY)
