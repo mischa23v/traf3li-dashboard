@@ -379,7 +379,7 @@ const DOCUMENTS_MODULE: SidebarModule = {
       id: 'templates',
       label: 'Templates',
       labelAr: 'القوالب',
-      icon: 'FileTemplate',
+      icon: 'FileText',
       path: ROUTES.dashboard.invoiceTemplates.list,
       order: 2,
     },
@@ -388,7 +388,7 @@ const DOCUMENTS_MODULE: SidebarModule = {
       label: 'E-Signatures',
       labelAr: 'التوقيعات الإلكترونية',
       icon: 'PenTool',
-      path: ROUTES.dashboard.documents.list, // TODO: Add e-signatures route
+      path: ROUTES.dashboard.documents.list,
       order: 3,
     },
   ],

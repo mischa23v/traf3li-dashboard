@@ -74,7 +74,9 @@ export async function getSidebarConfig(): Promise<SidebarConfig | null> {
     }
 
     // Handle unexpected response format
-    console.warn('[SidebarService] Unexpected response format:', response.data)
+    if (import.meta.env.DEV) {
+      console.warn('[SidebarService] Unexpected response format:', response.data)
+    }
     return null
   } catch (error: unknown) {
     // Don't throw - return null to trigger fallback

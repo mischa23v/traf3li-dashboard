@@ -57,7 +57,9 @@ function readFromStorage(): RecentItem[] {
 
     // Validate array structure
     if (!Array.isArray(parsed)) {
-      console.warn('[RecentsTracker] Invalid storage format, resetting')
+      if (import.meta.env.DEV) {
+        console.warn('[RecentsTracker] Invalid storage format, resetting')
+      }
       window.localStorage.removeItem(STORAGE_KEY)
       return []
     }
