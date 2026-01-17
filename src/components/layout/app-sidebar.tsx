@@ -61,10 +61,7 @@ function BasicSection({
   items: SidebarItem[]
   label?: string
 }) {
-  const { i18n } = useTranslation()
   const location = useLocation()
-  const isArabic = i18n.language === 'ar'
-
   const navItems = useMemo(() => items.map(toNavItem), [items])
 
   return (
@@ -139,16 +136,11 @@ function RecentsSection({
  */
 function ModulesSection({
   modules,
-  label,
-  labelAr,
 }: {
   modules: SidebarModule[]
-  label?: string
-  labelAr?: string
 }) {
   const { i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
-  const displayLabel = isArabic && labelAr ? labelAr : label
 
   const navGroups = useMemo(
     () =>
@@ -210,7 +202,7 @@ export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { i18n } = useTranslation()
   const sidebarData = useSidebarData()
-  const { sections, firmType } = sidebarData
+  const { sections } = sidebarData
   const isArabic = i18n.language === 'ar'
 
   // Get localized labels
@@ -220,9 +212,6 @@ export function AppSidebar() {
   const recentsLabel = isArabic
     ? sections.recents.labelAr
     : sections.recents.label
-  const modulesLabel = isArabic
-    ? sections.modules.labelAr
-    : sections.modules.label
 
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
@@ -244,11 +233,7 @@ export function AppSidebar() {
         />
 
         {/* Modules Section - Collapsible groups filtered by firm type */}
-        <ModulesSection
-          modules={sections.modules.items}
-          label={modulesLabel}
-          labelAr={sections.modules.labelAr}
-        />
+        <ModulesSection modules={sections.modules.items} />
       </SidebarContent>
       <SidebarFooter>
         {/* Footer Items - Settings, Help */}
