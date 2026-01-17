@@ -1,27 +1,18 @@
 /**
  * Lock Date Service
  *
- * ⚠️ BACKEND STATUS: NOT IMPLEMENTED
+ * Backend Status:
+ * - GET /lock-dates - WORKING (200)
+ * - GET /lock-dates/history - BACKEND BUG (500)
+ * - GET /lock-dates/periods - BACKEND BUG (500)
+ * - Other endpoints - NOT IMPLEMENTED
  *
  * This service defines the frontend API client for lock date management.
- * The backend endpoints are NOT YET IMPLEMENTED. This is frontend-ready code
- * awaiting backend development.
- *
- * Expected endpoints:
- * - GET /lock-dates
- * - PATCH /lock-dates/:lockType
- * - DELETE /lock-dates/:lockType
- * - POST /lock-dates/check
- * - POST /lock-dates/check-range
- * - POST /lock-dates/periods/lock
- * - POST /lock-dates/periods/reopen
- * - GET /lock-dates/periods
- * - GET /lock-dates/history
- * - PATCH /lock-dates/fiscal-year-end
  *
  * API service for fiscal period management and date locking
  */
 
+import { apiClient, handleApiError } from '@/lib/api'
 import type {
   LockDateConfig,
   LockType,
@@ -37,20 +28,24 @@ import type {
 
 /**
  * Get current lock date configuration
- *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ * WORKING: Backend returns 200
+ * GET /api/lock-dates
  */
 export const getLockDates = async (): Promise<LockDateConfig> => {
-  throw new Error(
-    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
-    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
-  )
+  try {
+    const response = await apiClient.get('/lock-dates')
+    return response.data.data || response.data
+  } catch (error: unknown) {
+    throw new Error(
+      `Failed to fetch lock dates | فشل جلب تواريخ القفل: ${handleApiError(error)}`
+    )
+  }
 }
 
 /**
  * Update a specific lock date
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const updateLockDate = async (
   lockType: LockType,
@@ -65,7 +60,7 @@ export const updateLockDate = async (
 /**
  * Clear a lock date (set to null)
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const clearLockDate = async (lockType: LockType): Promise<LockDateConfig> => {
   throw new Error(
@@ -79,7 +74,7 @@ export const clearLockDate = async (lockType: LockType): Promise<LockDateConfig>
 /**
  * Lock a fiscal period
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const lockPeriod = async (data: LockPeriodData): Promise<LockDateConfig> => {
   throw new Error(
@@ -91,7 +86,7 @@ export const lockPeriod = async (data: LockPeriodData): Promise<LockDateConfig> 
 /**
  * Reopen a locked period
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const reopenPeriod = async (data: ReopenPeriodData): Promise<LockDateConfig> => {
   throw new Error(
@@ -102,14 +97,19 @@ export const reopenPeriod = async (data: ReopenPeriodData): Promise<LockDateConf
 
 /**
  * Get list of fiscal periods with lock status
- *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ * BACKEND BUG: Returns 500 Internal Error
+ * GET /api/lock-dates/periods
  */
 export const getFiscalPeriods = async (year?: number): Promise<FiscalPeriod[]> => {
-  throw new Error(
-    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
-    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
-  )
+  try {
+    const params = year ? `?year=${year}` : ''
+    const response = await apiClient.get(`/lock-dates/periods${params}`)
+    return response.data.data || response.data
+  } catch (error: unknown) {
+    throw new Error(
+      `Failed to fetch fiscal periods (backend bug) | فشل جلب الفترات المالية (خطأ في الخادم): ${handleApiError(error)}`
+    )
+  }
 }
 
 // ==================== LOCK CHECKING ====================
@@ -117,7 +117,7 @@ export const getFiscalPeriods = async (year?: number): Promise<FiscalPeriod[]> =
 /**
  * Check if a date is locked
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const checkDateLocked = async (
   date: string,
@@ -132,7 +132,7 @@ export const checkDateLocked = async (
 /**
  * Check if a date range has any locked dates
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const checkDateRangeLocked = async (
   startDate: string,
@@ -149,18 +149,28 @@ export const checkDateRangeLocked = async (
 
 /**
  * Get lock date change history
- *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ * BACKEND BUG: Returns 500 Internal Error
+ * GET /api/lock-dates/history
  */
 export const getLockDateHistory = async (
   lockType?: LockType,
   page?: number,
   limit?: number
 ): Promise<LockDateHistory> => {
-  throw new Error(
-    'Lock dates feature is not yet available. Backend endpoint not implemented. | ' +
-    'ميزة تواريخ القفل غير متاحة حالياً. نقطة النهاية الخلفية غير مطبقة.'
-  )
+  try {
+    const params = new URLSearchParams()
+    if (lockType) params.append('lockType', lockType)
+    if (page) params.append('page', page.toString())
+    if (limit) params.append('limit', limit.toString())
+    const queryString = params.toString()
+    const url = queryString ? `/lock-dates/history?${queryString}` : '/lock-dates/history'
+    const response = await apiClient.get(url)
+    return response.data.data || response.data
+  } catch (error: unknown) {
+    throw new Error(
+      `Failed to fetch lock date history (backend bug) | فشل جلب سجل تواريخ القفل (خطأ في الخادم): ${handleApiError(error)}`
+    )
+  }
 }
 
 // ==================== FISCAL YEAR ====================
@@ -168,7 +178,7 @@ export const getLockDateHistory = async (
 /**
  * Update fiscal year end date
  *
- * ⚠️ NOT IMPLEMENTED: Backend endpoint does not exist
+ *  NOT IMPLEMENTED: Backend endpoint does not exist
  */
 export const updateFiscalYearEnd = async (
   month: number,

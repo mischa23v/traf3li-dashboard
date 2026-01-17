@@ -5,16 +5,21 @@
  *
  * Use Case: Progressive tax calculations for payroll
  *
- * Backend Routes (IMPLEMENTED):
- * ✅ GET    /income-tax-slabs                       - List tax slabs
- * ✅ GET    /income-tax-slabs/:id                   - Get single
- * ✅ POST   /income-tax-slabs                       - Create
- * ✅ PUT    /income-tax-slabs/:id                   - Update
- * ✅ DELETE /income-tax-slabs/:id                   - Delete
- * ✅ POST   /income-tax-slabs/:id/calculate         - Calculate tax for income
- * ✅ POST   /income-tax-slabs/:id/clone             - Clone for new year
- * ✅ GET    /income-tax-slabs/countries             - Supported countries
- * ✅ POST   /income-tax-slabs/initialize-defaults   - Initialize defaults
+ *  BACKEND STATUS: NOT IMPLEMENTED (404 - Route not registered)
+ *
+ * All endpoints return 404. The backend route is not mounted.
+ * This service is frontend-ready, awaiting backend implementation.
+ *
+ * Expected Routes (NOT YET AVAILABLE):
+ *  GET    /income-tax-slabs                       - List tax slabs
+ *  GET    /income-tax-slabs/:id                   - Get single
+ *  POST   /income-tax-slabs                       - Create
+ *  PUT    /income-tax-slabs/:id                   - Update
+ *  DELETE /income-tax-slabs/:id                   - Delete
+ *  POST   /income-tax-slabs/:id/calculate         - Calculate tax for income
+ *  POST   /income-tax-slabs/:id/clone             - Clone for new year
+ *  GET    /income-tax-slabs/countries             - Supported countries
+ *  POST   /income-tax-slabs/initialize-defaults   - Initialize defaults
  */
 
 import { apiClient, handleApiError } from '@/lib/api'
@@ -122,7 +127,7 @@ export interface SupportedCountry {
 const incomeTaxSlabsService = {
   /**
    * Get all tax slabs
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/income-tax-slabs
    */
   getTaxSlabs: async (filters?: TaxSlabFilters): Promise<{
@@ -151,7 +156,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Get single tax slab
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/income-tax-slabs/:id
    */
   getTaxSlab: async (id: string): Promise<IncomeTaxSlab> => {
@@ -167,7 +172,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Create a new tax slab
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/income-tax-slabs
    */
   createTaxSlab: async (data: CreateTaxSlabData): Promise<IncomeTaxSlab> => {
@@ -183,7 +188,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Update a tax slab
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * PUT /api/income-tax-slabs/:id
    */
   updateTaxSlab: async (id: string, data: Partial<CreateTaxSlabData>): Promise<IncomeTaxSlab> => {
@@ -199,7 +204,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Delete a tax slab
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * DELETE /api/income-tax-slabs/:id
    */
   deleteTaxSlab: async (id: string): Promise<void> => {
@@ -214,7 +219,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Calculate tax for a given income
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/income-tax-slabs/:id/calculate
    */
   calculateTax: async (
@@ -237,7 +242,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Clone a tax slab for a new year
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/income-tax-slabs/:id/clone
    */
   cloneTaxSlab: async (
@@ -263,7 +268,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Get supported countries
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/income-tax-slabs/countries
    */
   getSupportedCountries: async (): Promise<SupportedCountry[]> => {
@@ -279,7 +284,7 @@ const incomeTaxSlabsService = {
 
   /**
    * Initialize default tax slabs for a country
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/income-tax-slabs/initialize-defaults
    */
   initializeDefaults: async (

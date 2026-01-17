@@ -1,19 +1,24 @@
 /**
  * Exchange Rate Revaluation Service
  * Handles period-end adjustment for multi-currency accounts
- * Base route: /api/exchange-rate-revaluation
+ * Base route: /api/exchange-rate-revaluations
  *
  * Use Case: Period-end adjustment for multi-currency accounts
  *
- * Backend Routes (IMPLEMENTED):
- * ✅ GET    /exchange-rate-revaluation              - List revaluations
- * ✅ GET    /exchange-rate-revaluation/:id          - Get single revaluation
- * ✅ POST   /exchange-rate-revaluation/preview      - Preview before running
- * ✅ POST   /exchange-rate-revaluation/run          - Execute revaluation
- * ✅ POST   /exchange-rate-revaluation/:id/post     - Post to General Ledger
- * ✅ POST   /exchange-rate-revaluation/:id/reverse  - Reverse revaluation
- * ✅ GET    /exchange-rate-revaluation/report       - Period report
- * ✅ GET    /exchange-rate-revaluation/accounts     - Get eligible accounts
+ * BACKEND STATUS: NOT IMPLEMENTED (404 - Route not registered)
+ *
+ * All endpoints return 404. The backend route is not mounted.
+ * This service is frontend-ready, awaiting backend implementation.
+ *
+ * Expected Routes (NOT YET AVAILABLE):
+ * GET    /exchange-rate-revaluations              - List revaluations
+ * GET    /exchange-rate-revaluations/:id          - Get single revaluation
+ * POST   /exchange-rate-revaluations/preview      - Preview before running
+ * POST   /exchange-rate-revaluations/run          - Execute revaluation
+ * POST   /exchange-rate-revaluations/:id/post     - Post to General Ledger
+ * POST   /exchange-rate-revaluations/:id/reverse  - Reverse revaluation
+ * GET    /exchange-rate-revaluations/report       - Period report
+ * GET    /exchange-rate-revaluations/accounts     - Get eligible accounts
  */
 
 import { apiClient, handleApiError } from '@/lib/api'
@@ -104,7 +109,7 @@ export interface RevaluationReportFilters {
 const exchangeRateRevaluationService = {
   /**
    * Get all revaluations
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/exchange-rate-revaluation
    */
   getRevaluations: async (filters?: RevaluationFilters): Promise<{
@@ -133,7 +138,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Get single revaluation
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/exchange-rate-revaluation/:id
    */
   getRevaluation: async (id: string): Promise<ExchangeRateRevaluation> => {
@@ -149,7 +154,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Get eligible accounts for revaluation
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/exchange-rate-revaluation/accounts
    */
   getEligibleAccounts: async (): Promise<EligibleAccount[]> => {
@@ -165,7 +170,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Preview revaluation before running
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/exchange-rate-revaluation/preview
    *
    * Returns preview of gains/losses without executing
@@ -186,7 +191,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Run revaluation
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/exchange-rate-revaluation/run
    *
    * Executes the revaluation. Set autoPost=true to immediately post to GL.
@@ -204,7 +209,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Post revaluation to General Ledger
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/exchange-rate-revaluation/:id/post
    */
   postRevaluation: async (id: string): Promise<ExchangeRateRevaluation> => {
@@ -220,7 +225,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Reverse revaluation
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * POST /api/exchange-rate-revaluation/:id/reverse
    */
   reverseRevaluation: async (id: string): Promise<ExchangeRateRevaluation> => {
@@ -236,7 +241,7 @@ const exchangeRateRevaluationService = {
 
   /**
    * Get revaluation report for a period
-   * ✅ ENDPOINT IMPLEMENTED IN BACKEND
+   * NOT IMPLEMENTED: Backend returns 404
    * GET /api/exchange-rate-revaluation/report
    */
   getReport: async (filters: RevaluationReportFilters): Promise<{
