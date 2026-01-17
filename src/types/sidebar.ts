@@ -70,30 +70,9 @@ export interface SidebarModule {
   items: SidebarItem[]
 }
 
-// 
-// RECENTS
-// 
-
-/**
- * Recently visited page item
- * Stored in localStorage for quick navigation
- */
-export interface RecentItem {
-  /** Unique identifier (usually path-based) */
-  id: string
-  /** Display title (translated) */
-  title: string
-  /** Navigation path */
-  path: string
-  /** Lucide icon name */
-  icon: string
-  /** Timestamp when visited */
-  visitedAt: number
-}
-
-// 
+//
 // SIDEBAR SECTIONS
-// 
+//
 
 /**
  * Basic section configuration
@@ -106,24 +85,6 @@ export interface SidebarBasicSection {
   labelAr?: string
   /** Basic navigation items */
   items: SidebarItem[]
-}
-
-/**
- * Recents section configuration
- */
-export interface SidebarRecentsSection {
-  /** Section identifier */
-  id: 'recents'
-  /** Section label (English) */
-  label: string
-  /** Section label (Arabic) */
-  labelAr?: string
-  /** Lucide icon name */
-  icon: string
-  /** Maximum items to display */
-  maxItems: number
-  /** Recent items (populated from localStorage, not API) */
-  items: RecentItem[]
 }
 
 /**
@@ -168,7 +129,6 @@ export interface SidebarConfig {
   /** Sidebar sections */
   sections: {
     basic: SidebarBasicSection
-    recents: SidebarRecentsSection
     modules: SidebarModulesSection
     other: SidebarOtherSection
   }
