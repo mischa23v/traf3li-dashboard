@@ -1,0 +1,33 @@
+# Design Approved
+**Approved at**: 2026-01-17
+**User said**: "yes approved"
+
+## Backend API Status - COMPLETE
+
+### Endpoints Ready
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/sidebar/config` | GET | Returns sidebar config for current user's firm |
+| `/api/sidebar/config/:firmType` | GET | Preview config for specific firm type |
+| `/api/sidebar/configurations` | GET | All configs (admin only) |
+| `/api/sidebar/recommend` | GET | Recommended firm type based on employee count |
+| `/api/sidebar/module/:moduleId/available` | GET | Check if module is available |
+| `/api/sidebar/firm-type` | PATCH | Update firm type (owner/admin) |
+
+### Market Module Control
+```javascript
+// Firm model has:
+moduleSettings: {
+  marketEnabled: Boolean  // default: false
+}
+
+// To enable Market for a firm:
+PATCH /api/firms/:id
+{ "moduleSettings.marketEnabled": true }
+```
+
+## Answers to Open Questions
+| Question | Answer |
+|----------|--------|
+| Market module separate setting? | Yes - controlled by `firm.moduleSettings.marketEnabled` |
+| Support pinning in Recents? | No - keep Recents auto-populated only (consider Favorites feature later) |
