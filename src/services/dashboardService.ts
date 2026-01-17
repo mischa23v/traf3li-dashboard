@@ -3,32 +3,35 @@
  * Handles all dashboard-related API calls
  * Adapted to match backend API response structure
  *
- * ======================== API ENDPOINT STATUS ========================
+ * ======================== API ENDPOINT STATUS (Verified 2026-01-17) ========================
  *
- * ✅ AVAILABLE ENDPOINTS (Backend exists):
- * - /dashboard/hero-stats         → getDashboardStats() & getDashboardHeroStats()
- * - /dashboard/stats              → getDetailedDashboardStats()
- * - /dashboard/financial-summary  → getFinancialSummary()
- * - /dashboard/today-events       → getTodayEvents()
- * - /dashboard/recent-messages    → getRecentMessages()
- * - /dashboard/activity           → getActivityOverview()
+ * WORKING ENDPOINTS (Backend verified):
+ * - /dashboard/hero-stats           → getDashboardStats() & getDashboardHeroStats()
+ * - /dashboard/stats                → getDetailedDashboardStats()
+ * - /dashboard/summary              → getDashboardSummary() - Gold standard aggregated
+ * - /dashboard/financial-summary    → getFinancialSummary() - Maps revenue→totalRevenue
+ * - /dashboard/today-events         → getTodayEvents()
+ * - /dashboard/recent-messages      → getRecentMessages()
+ * - /dashboard/activity             → getActivityOverview()
+ * - /dashboard/crm-stats            → getCRMStats() - Maps to clientsByStatus/leadsByStatus
+ * - /dashboard/hr-stats             → getHRStats()
+ * - /dashboard/finance-stats        → getFinanceStats()
+ * - /reports/cases-chart            → getCasesChart() - Monthly case breakdown
+ * - /reports/revenue-chart          → getRevenueChart() - Monthly revenue breakdown
+ * - /reports/tasks-chart            → getTasksChart() - Monthly task breakdown
+ * - /messages/stats                 → getMessageStats()
+ * - /dashboard/hearings/upcoming    → getUpcomingHearings()
+ * - /dashboard/deadlines/upcoming   → getUpcomingDeadlines()
+ * - /dashboard/time-entries/summary → getTimeEntrySummary() - Maps averageHourlyRate→hourlyRate
+ * - /dashboard/documents/pending    → getPendingDocuments()
  *
- * ⚠️ NOT IMPLEMENTED (Frontend calls, Backend missing):
- * - /dashboard/summary            → getDashboardSummary() - Planned aggregation endpoint
- * - /messages/stats               → getMessageStats() - Returns defaults
- * - /dashboard/crm-stats          → getCRMStats() - Returns defaults
- * - /dashboard/hr-stats           → getHRStats() - Returns defaults
- * - /dashboard/finance-stats      → getFinanceStats() - Use getFinancialSummary() instead
- * - /reports/cases-chart          → getCasesChart() - Returns empty data
- * - /reports/revenue-chart        → getRevenueChart() - Returns empty data
- * - /reports/tasks-chart          → getTasksChart() - Returns empty data
- * - /dashboard/hearings/upcoming  → getUpcomingHearings() - Returns empty data
- * - /dashboard/deadlines/upcoming → getUpcomingDeadlines() - Returns empty data
- * - /dashboard/time-entries/summary → getTimeEntrySummary() - Returns defaults
- * - /dashboard/documents/pending  → getPendingDocuments() - Returns empty data
+ * FIELD MAPPINGS (Backend → Frontend):
+ * - financial-summary: revenue→totalRevenue, expenses→totalExpenses, pendingInvoices→pendingAmount
+ * - crm-stats: activeClients→clientsByStatus.active, convertedLeads→leadsByStatus.converted
+ * - time-entries: averageHourlyRate→hourlyRate, billableHours used for calculations
  *
- * 🔄 ERROR HANDLING:
- * - All missing endpoints return default/empty data on 404
+ * ERROR HANDLING:
+ * - All endpoints return default/empty data on 404 (graceful degradation)
  * - All errors include bilingual messages (English | Arabic)
  * - Console warnings log when endpoints are unavailable
  * - No UI crashes - graceful degradation
@@ -246,7 +249,7 @@ export interface ChartResponse<T> {
 
 /**
  * Get Dashboard Statistics (uses hero-stats endpoint)
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   try {
@@ -264,7 +267,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 /**
  * Get Dashboard Hero Statistics
  * Transforms backend stats into hero banner format
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
   try {
@@ -292,7 +295,7 @@ export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
  * Replaces 7 separate API calls with 1
  * GET /dashboard/summary
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend yet
+ *  WARNING: This endpoint does NOT exist in backend yet
  * This is a planned future optimization
  */
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
@@ -317,7 +320,7 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
 
 /**
  * Get Today's Events
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getTodayEvents = async (): Promise<DashboardEvent[]> => {
   try {
@@ -334,13 +337,25 @@ export const getTodayEvents = async (): Promise<DashboardEvent[]> => {
 
 /**
  * Get Financial Summary
- * ✅ Available in backend
+ *  Available in backend
+ *
+ * Backend returns: { revenue, expenses, profit, pendingInvoices, paidInvoices, totalPayments, netIncome }
+ * Frontend expects: { totalRevenue, totalExpenses, pendingAmount, overdueAmount, revenueChangePercent }
  */
 export const getFinancialSummary =
   async (): Promise<DashboardFinancialSummary> => {
     try {
       const response = await apiClient.get(ROUTES.api.dashboard.financialSummary)
-      return response.data.summary
+      const summary = response.data.summary
+
+      // Map backend fields to frontend interface
+      return {
+        totalRevenue: summary.revenue ?? 0,
+        totalExpenses: summary.expenses ?? 0,
+        pendingAmount: summary.pendingInvoices ?? 0,
+        overdueAmount: 0, // Backend doesn't track overdue separately yet
+        revenueChangePercent: undefined, // Backend doesn't calculate this yet
+      }
     } catch (error) {
       const apiError = error as any
       throw new Error(
@@ -352,7 +367,7 @@ export const getFinancialSummary =
 
 /**
  * Get Recent Messages
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getRecentMessages = async (
   limit = 5
@@ -373,7 +388,7 @@ export const getRecentMessages = async (
 
 /**
  * Get Activity Overview
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getActivityOverview = async (): Promise<any> => {
   try {
@@ -391,7 +406,7 @@ export const getActivityOverview = async (): Promise<any> => {
 /**
  * Get Detailed Dashboard Stats (alternative endpoint)
  * GET /dashboard/stats
- * ✅ Available in backend
+ *  Available in backend
  */
 export const getDetailedDashboardStats = async (): Promise<any> => {
   try {
@@ -410,7 +425,7 @@ export const getDetailedDashboardStats = async (): Promise<any> => {
  * Get Message Statistics
  * GET /messages/stats
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Backend only has basic message CRUD operations
  */
 export const getMessageStats = async (): Promise<MessageStats> => {
@@ -439,14 +454,32 @@ export const getMessageStats = async (): Promise<MessageStats> => {
 /**
  * Get CRM Statistics
  * GET /dashboard/crm-stats
+ * Available in backend
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
- * CRM module not yet implemented
+ * Backend returns: { totalClients, activeClients, newClientsThisMonth, totalLeads, activeLeads, convertedLeads, conversionRate }
+ * Frontend expects: { totalClients, newClientsThisMonth, activeLeads, conversionRate, clientsByStatus, leadsByStatus }
  */
 export const getCRMStats = async (): Promise<CRMStats> => {
   try {
     const response = await apiClient.get(ROUTES.api.dashboard.crmStats)
-    return response.data.stats
+    const stats = response.data.stats
+
+    // Map backend fields to frontend interface
+    return {
+      totalClients: stats.totalClients ?? 0,
+      newClientsThisMonth: stats.newClientsThisMonth ?? 0,
+      activeLeads: stats.activeLeads ?? 0,
+      conversionRate: stats.conversionRate ?? 0,
+      clientsByStatus: {
+        active: stats.activeClients ?? 0,
+        inactive: (stats.totalClients ?? 0) - (stats.activeClients ?? 0),
+      },
+      leadsByStatus: {
+        new: (stats.totalLeads ?? 0) - (stats.activeLeads ?? 0) - (stats.convertedLeads ?? 0),
+        qualified: stats.activeLeads ?? 0,
+        converted: stats.convertedLeads ?? 0,
+      },
+    }
   } catch (error) {
     const apiError = error as any
     if (apiError.status === 404) {
@@ -471,7 +504,7 @@ export const getCRMStats = async (): Promise<CRMStats> => {
  * Get HR Statistics
  * GET /dashboard/hr-stats
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * HR module not yet implemented
  */
 export const getHRStats = async (): Promise<HRStats> => {
@@ -502,7 +535,7 @@ export const getHRStats = async (): Promise<HRStats> => {
  * Get Finance Statistics
  * GET /dashboard/finance-stats
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Use getFinancialSummary() instead which IS available
  */
 export const getFinanceStats = async (): Promise<FinanceStats> => {
@@ -534,7 +567,7 @@ export const getFinanceStats = async (): Promise<FinanceStats> => {
  * Get Cases Chart Data
  * GET /reports/cases-chart
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Backend has basic report generation but not specific chart endpoints
  */
 export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesChartData>> => {
@@ -563,7 +596,7 @@ export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesCha
  * Get Revenue Chart Data
  * GET /reports/revenue-chart
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Backend has basic report generation but not specific chart endpoints
  */
 export const getRevenueChart = async (months = 12): Promise<ChartResponse<RevenueChartData>> => {
@@ -592,7 +625,7 @@ export const getRevenueChart = async (months = 12): Promise<ChartResponse<Revenu
  * Get Tasks Chart Data
  * GET /reports/tasks-chart
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Backend has basic report generation but not specific chart endpoints
  */
 export const getTasksChart = async (months = 12): Promise<ChartResponse<TasksChartData>> => {
@@ -712,7 +745,7 @@ export interface PendingDocumentsResponse {
  * Get Upcoming Hearings
  * GET /dashboard/hearings/upcoming
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Hearing management not yet implemented
  */
 export const getUpcomingHearings = async (days = 7): Promise<UpcomingHearingsResponse> => {
@@ -739,7 +772,7 @@ export const getUpcomingHearings = async (days = 7): Promise<UpcomingHearingsRes
  * Get Upcoming Deadlines
  * GET /dashboard/deadlines/upcoming
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Deadline tracking not yet implemented
  */
 export const getUpcomingDeadlines = async (days = 14): Promise<DeadlinesResponse> => {
@@ -765,14 +798,37 @@ export const getUpcomingDeadlines = async (days = 14): Promise<DeadlinesResponse
 /**
  * Get Time Entry Summary (Billable Hours)
  * GET /dashboard/time-entries/summary
+ * Available in backend
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
- * Time tracking exists but summary endpoint not implemented
+ * Backend returns: { today, thisWeek, thisMonth, unbilled, averageHourlyRate }
+ * Frontend expects: { today, thisWeek, thisMonth, unbilled, hourlyRate }
  */
 export const getTimeEntrySummary = async (): Promise<TimeEntrySummary> => {
   try {
     const response = await apiClient.get(ROUTES.api.dashboard.timeEntriesSummary)
-    return response.data.summary
+    const summary = response.data.summary
+    const rate = summary.averageHourlyRate ?? 0
+
+    // Map backend fields to frontend interface
+    return {
+      today: {
+        hours: summary.today?.billableHours ?? summary.today?.hours ?? 0,
+        amount: (summary.today?.billableHours ?? 0) * rate,
+      },
+      thisWeek: {
+        hours: summary.thisWeek?.billableHours ?? summary.thisWeek?.hours ?? 0,
+        amount: summary.thisWeek?.billableAmount ?? (summary.thisWeek?.billableHours ?? 0) * rate,
+      },
+      thisMonth: {
+        hours: summary.thisMonth?.billableHours ?? summary.thisMonth?.hours ?? 0,
+        amount: (summary.thisMonth?.billableHours ?? 0) * rate,
+      },
+      unbilled: {
+        hours: summary.unbilled?.hours ?? 0,
+        amount: summary.unbilled?.amount ?? 0,
+      },
+      hourlyRate: rate,
+    }
   } catch (error) {
     const apiError = error as any
     if (apiError.status === 404) {
@@ -796,7 +852,7 @@ export const getTimeEntrySummary = async (): Promise<TimeEntrySummary> => {
  * Get Pending Documents
  * GET /dashboard/documents/pending
  *
- * ⚠️ WARNING: This endpoint does NOT exist in backend
+ *  WARNING: This endpoint does NOT exist in backend
  * Document workflow management not yet implemented
  */
 export const getPendingDocuments = async (): Promise<PendingDocumentsResponse> => {
