@@ -48,6 +48,23 @@ export const ROUTES = {
     messages: {
       stats: '/messages/stats',
     },
+
+    /**
+     * Sidebar API endpoints
+     * Used for dynamic sidebar configuration by firm type
+     */
+    sidebar: {
+      /** Get sidebar config for current user */
+      config: '/sidebar/config',
+      /** Preview config for specific firm type */
+      configPreview: (firmType: 'solo' | 'small' | 'large') => `/sidebar/config/${firmType}`,
+      /** Get recommended firm type based on employee count */
+      recommend: '/sidebar/recommend',
+      /** Check if specific module is available */
+      moduleAvailable: (moduleId: string) => `/sidebar/module/${moduleId}/available`,
+      /** Update firm type (owner/admin only) */
+      updateFirmType: '/sidebar/firm-type',
+    },
   },
 
   /**
