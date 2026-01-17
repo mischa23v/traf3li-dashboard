@@ -566,14 +566,28 @@ export const getFinanceStats = async (): Promise<FinanceStats> => {
 /**
  * Get Cases Chart Data
  * GET /reports/cases-chart
+ * Available in backend
  *
- *  WARNING: This endpoint does NOT exist in backend
- * Backend has basic report generation but not specific chart endpoints
+ * Backend returns data array, frontend component calculates summary from data
  */
 export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesChartData>> => {
   try {
     const response = await apiClient.get(ROUTES.api.reports.casesChart, { params: { months } })
-    return response.data
+    const data = response.data
+
+    // Calculate summary from data array for consistency
+    const dataArray = data.data || []
+    const summary = {
+      totalOpened: dataArray.reduce((sum: number, item: CasesChartData) => sum + (item.opened || 0), 0),
+      totalClosed: dataArray.reduce((sum: number, item: CasesChartData) => sum + (item.closed || 0), 0),
+      totalPending: dataArray.reduce((sum: number, item: CasesChartData) => sum + (item.pending || 0), 0),
+      totalCases: dataArray.reduce((sum: number, item: CasesChartData) => sum + (item.total || 0), 0),
+    }
+
+    return {
+      ...data,
+      summary,
+    }
   } catch (error) {
     const apiError = error as any
     if (apiError.status === 404) {
@@ -595,14 +609,28 @@ export const getCasesChart = async (months = 12): Promise<ChartResponse<CasesCha
 /**
  * Get Revenue Chart Data
  * GET /reports/revenue-chart
+ * Available in backend
  *
- *  WARNING: This endpoint does NOT exist in backend
- * Backend has basic report generation but not specific chart endpoints
+ * Backend returns data array, frontend needs calculated summary
  */
 export const getRevenueChart = async (months = 12): Promise<ChartResponse<RevenueChartData>> => {
   try {
     const response = await apiClient.get(ROUTES.api.reports.revenueChart, { params: { months } })
-    return response.data
+    const data = response.data
+
+    // Calculate summary from data array (backend doesn't provide it)
+    const dataArray = data.data || []
+    const summary = {
+      totalRevenue: dataArray.reduce((sum: number, item: RevenueChartData) => sum + (item.revenue || 0), 0),
+      totalExpenses: dataArray.reduce((sum: number, item: RevenueChartData) => sum + (item.expenses || 0), 0),
+      totalProfit: dataArray.reduce((sum: number, item: RevenueChartData) => sum + (item.profit || 0), 0),
+      totalCollected: dataArray.reduce((sum: number, item: RevenueChartData) => sum + (item.collected || 0), 0),
+    }
+
+    return {
+      ...data,
+      summary,
+    }
   } catch (error) {
     const apiError = error as any
     if (apiError.status === 404) {
@@ -624,14 +652,35 @@ export const getRevenueChart = async (months = 12): Promise<ChartResponse<Revenu
 /**
  * Get Tasks Chart Data
  * GET /reports/tasks-chart
+ * Available in backend
  *
- *  WARNING: This endpoint does NOT exist in backend
- * Backend has basic report generation but not specific chart endpoints
+ * Backend returns data array, frontend needs calculated summary
  */
 export const getTasksChart = async (months = 12): Promise<ChartResponse<TasksChartData>> => {
   try {
     const response = await apiClient.get(ROUTES.api.reports.tasksChart, { params: { months } })
-    return response.data
+    const data = response.data
+
+    // Calculate summary from data array (backend doesn't provide it)
+    const dataArray = data.data || []
+    const totalCompleted = dataArray.reduce((sum: number, item: TasksChartData) => sum + (item.completed || 0), 0)
+    const totalInProgress = dataArray.reduce((sum: number, item: TasksChartData) => sum + (item.inProgress || 0), 0)
+    const totalPending = dataArray.reduce((sum: number, item: TasksChartData) => sum + (item.pending || 0), 0)
+    const totalOverdue = dataArray.reduce((sum: number, item: TasksChartData) => sum + (item.overdue || 0), 0)
+    const totalTasks = totalCompleted + totalInProgress + totalPending + totalOverdue
+
+    const summary = {
+      completed: totalCompleted,
+      inProgress: totalInProgress,
+      pending: totalPending,
+      overdue: totalOverdue,
+      overallCompletionRate: totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0,
+    }
+
+    return {
+      ...data,
+      summary,
+    }
   } catch (error) {
     const apiError = error as any
     if (apiError.status === 404) {
