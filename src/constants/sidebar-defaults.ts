@@ -114,11 +114,11 @@ export const BASIC_ITEMS: SidebarItem[] = [
   },
 ]
 
-// 
-// FOOTER ITEMS
-// 
+//
+// OTHER SECTION ITEMS (Settings, Help)
+//
 
-export const FOOTER_ITEMS: SidebarItem[] = [
+export const OTHER_ITEMS: SidebarItem[] = [
   {
     id: 'settings',
     label: 'sidebar.nav.items.settings',
@@ -734,8 +734,10 @@ export const SIDEBAR_DEFAULTS: SidebarConfig = {
       labelAr: 'sidebar.nav.sections.modules',
       items: getModulesForFirmType('solo'),
     },
-    footer: {
-      items: FOOTER_ITEMS,
+    other: {
+      label: 'sidebar.nav.sections.other',
+      labelAr: 'sidebar.nav.sections.other',
+      items: OTHER_ITEMS,
     },
   },
   meta: {
@@ -747,7 +749,7 @@ export const SIDEBAR_DEFAULTS: SidebarConfig = {
     ),
     totalItems:
       BASIC_ITEMS.length +
-      FOOTER_ITEMS.length +
+      OTHER_ITEMS.length +
       getModulesForFirmType('solo').reduce((acc, m) => acc + m.items.length, 0),
   },
 }
@@ -780,8 +782,10 @@ export function createSidebarConfig(firmType: FirmType): SidebarConfig {
         labelAr: 'sidebar.nav.sections.modules',
         items: modules,
       },
-      footer: {
-        items: FOOTER_ITEMS,
+      other: {
+        label: 'sidebar.nav.sections.other',
+        labelAr: 'sidebar.nav.sections.other',
+        items: OTHER_ITEMS,
       },
     },
     meta: {
@@ -790,7 +794,7 @@ export function createSidebarConfig(firmType: FirmType): SidebarConfig {
       totalModuleItems: modules.reduce((acc, m) => acc + m.items.length, 0),
       totalItems:
         BASIC_ITEMS.length +
-        FOOTER_ITEMS.length +
+        OTHER_ITEMS.length +
         modules.reduce((acc, m) => acc + m.items.length, 0),
     },
   }

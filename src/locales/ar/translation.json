@@ -268,13 +268,15 @@
       "sections": {
         "basic": "الأساسية",
         "recents": "الأخيرة",
-        "modules": "الوحدات"
+        "modules": "الوحدات",
+        "other": "أخرى"
       }
     },
     "sections": {
       "basic": "الأساسية",
       "recents": "الأخيرة",
-      "modules": "الوحدات"
+      "modules": "الوحدات",
+      "other": "أخرى"
     },
     "general": "عام",
     "dashboard": "لوحة التحكم",

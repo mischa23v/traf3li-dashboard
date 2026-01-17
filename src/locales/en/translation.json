@@ -268,13 +268,15 @@
       "sections": {
         "basic": "Basic",
         "recents": "Recents",
-        "modules": "Modules"
+        "modules": "Modules",
+        "other": "Other"
       }
     },
     "sections": {
       "basic": "Basic",
       "recents": "Recents",
-      "modules": "Modules"
+      "modules": "Modules",
+      "other": "Other"
     }
   },
   "general": "General",

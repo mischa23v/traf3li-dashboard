@@ -140,11 +140,15 @@ export interface SidebarModulesSection {
 }
 
 /**
- * Footer section configuration
- * Settings, Help, etc.
+ * Other section configuration
+ * Settings, Help, etc. - shown in main content area
  */
-export interface SidebarFooterSection {
-  /** Footer navigation items */
+export interface SidebarOtherSection {
+  /** Section label (English) */
+  label: string
+  /** Section label (Arabic) */
+  labelAr?: string
+  /** Other navigation items */
   items: SidebarItem[]
 }
 
@@ -166,7 +170,7 @@ export interface SidebarConfig {
     basic: SidebarBasicSection
     recents: SidebarRecentsSection
     modules: SidebarModulesSection
-    footer: SidebarFooterSection
+    other: SidebarOtherSection
   }
   /** Metadata for debugging/analytics */
   meta: {
