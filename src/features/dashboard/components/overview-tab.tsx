@@ -42,7 +42,7 @@ export const OverviewTab = memo(function OverviewTab({
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Overview Chart - Takes 4 columns */}
         <div className="col-span-full lg:col-span-4">
-          <OverviewChart t={t} financialSummary={financialSummary} isLoading={financialLoading} />
+          <OverviewChart t={t} isLoading={financialLoading} />
         </div>
 
         {/* Today's Schedule - Takes 3 columns */}
