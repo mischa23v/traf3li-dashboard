@@ -51,7 +51,7 @@
 - Export `isModuleVisibleForTier()` utility function
 - Define Basic items (7): Overview, Calendar, Appointments, Tasks, Cases, Contacts, Reports
 - Define Footer items: Settings, Help
-**Status**: [ ] Not Started
+**Status**: [x] Complete
 
 ### Task 1.5: Create Recents Tracker Utility
 **File**: `src/lib/recents-tracker.ts` (NEW)
