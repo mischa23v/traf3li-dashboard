@@ -295,4 +295,4 @@ Reply with `yes` to acknowledge review findings.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | 2026-01-17 | Initial version (ported from backend) |
+| 1.0.0 | 2026-01-17 | Initial version - React/TypeScript focused (ported from backend) |
